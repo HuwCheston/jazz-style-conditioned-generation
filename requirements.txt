@@ -2,3 +2,5 @@ numpy<2.0.0
 torch
 loguru
 requests
+black
+thefuzz
