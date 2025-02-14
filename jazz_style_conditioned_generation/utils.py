@@ -6,7 +6,7 @@
 import random
 from contextlib import contextmanager
 from pathlib import Path
-from time import time
+from time import time, sleep
 from typing import ContextManager
 
 import numpy as np
@@ -53,3 +53,17 @@ def timer(name: str) -> ContextManager[None]:
 def get_project_root() -> Path:
     """Returns the root directory of the project"""
     return Path(__file__).absolute().parent.parent
+
+
+def wait(secs: int):
+    """Little decorator that adds a wait in to prevent too many API calls being made too quickly"""
+
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            ret = func(*args, **kwargs)
+            sleep(secs)
+            return ret
+
+        return wrapper
+
+    return decorator
