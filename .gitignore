@@ -1,0 +1,7 @@
+# Data files
+/data/raw/jtd/
+/data/raw/pijama/
+
+# Project sources
+/.idea/
+/.venv/
