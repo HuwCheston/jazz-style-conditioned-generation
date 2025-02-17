@@ -29,7 +29,9 @@ API_ALBUM_LOOKUP = f'{API_ROOT}/lookup/album'
 API_ARTIST_SEARCH = f'{API_ROOT}/search/artist'
 API_WAIT_TIME = 0.1  # seconds, API terms of use specify no more than five calls per second
 
-ALBUM_METADATA_FIELDS = ["album_moods", "album_genres", "album_themes", "album_flags", "album_review"]
+ALBUM_METADATA_FIELDS = [
+    "album_moods", "album_genres", "album_themes", "album_flags", "album_review", "tivo_album_artists"
+]
 ALBUM_METADATA_FIELDS_WITH_WEIGHTS = ["moods", "genres", "subGenres", "themes"]
 
 ARTIST_METADATA_FIELDS = ["artist_moods", "artist_genres", "artist_bio"]
@@ -154,6 +156,9 @@ def parse_tivo_album_metadata(tivo_album_lookup: dict):
                 {k: v for k, v in value.items() if k in ['name', 'weight']}
                 for value in hit[field]
             ])
+    # Sanity check: store matched artist and title
+    new_album_metadata['tivo_album_name'] = hit['title']
+    new_album_metadata['tivo_album_artists'] = [i['name'] for i in hit['primaryArtists']]
     # Extracting reviews for the album
     if "primaryReview" in hit.keys():
         new_album_metadata['album_review'] = [clean_prose_text(review['text']) for review in hit['primaryReview']]
@@ -213,6 +218,8 @@ def parse_tivo_artist_metadata(tivo_artist_lookup: dict) -> dict:
         else:
             # Otherwise, just set this field to an empty list
             new_artist_metadata[f'artist_{field.replace("musicGenres", "genres")}'] = []
+    # Sanity check: store matched artist name
+    new_artist_metadata['tivo_artist_name'] = hit['name']
     # Now, add all the artist biographies
     new_artist_metadata['artist_bio'] = []
     if "musicBio" in hit.keys():
@@ -250,11 +257,12 @@ def parse_all_metadata(track_path: str) -> dict:
         logger.warning(f'Miss! {track_sep}')
         album_metadata_parsed = {}
     # Combine all the metadata dictionaries into a single dictionary
-    return (
+    all_metadata = (
             track_metadata |
             add_missing_keys(artist_metadata_parsed, ARTIST_METADATA_FIELDS) |
             add_missing_keys(album_metadata_parsed, ALBUM_METADATA_FIELDS)
     )
+    return add_missing_keys(all_metadata, ["tivo_artist_name", "tivo_album_name"], str)
 
 
 def main():
@@ -267,7 +275,7 @@ def main():
         # Iterate over every track in both datasets
         for track_path in all_tracks:
             # This is where we'll save our new metadata
-            tivo_metadata_path = os.path.join(track_path, 'metadata_tivo.csv')
+            tivo_metadata_path = os.path.join(track_path, 'metadata_tivo.json')
             # If we've already processed the track, we can skip over it
             if os.path.isfile(tivo_metadata_path) and not OVERWRITE_EXISTING:
                 logger.info(f'Track {track_path} already processed, skipping...')
