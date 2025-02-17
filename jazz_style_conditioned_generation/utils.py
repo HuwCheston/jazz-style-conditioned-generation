@@ -3,8 +3,11 @@
 
 """Utility classes, functions, and variables used across the entire pipeline"""
 
+import json
+import os
 import random
 from contextlib import contextmanager
+from functools import lru_cache
 from pathlib import Path
 from time import time, sleep
 from typing import ContextManager
@@ -53,6 +56,21 @@ def timer(name: str) -> ContextManager[None]:
 def get_project_root() -> Path:
     """Returns the root directory of the project"""
     return Path(__file__).absolute().parent.parent
+
+
+@lru_cache(maxsize=None)
+def get_data_files_with_ext(midi_dir_from_root: str = "data/raw", ext: str = "**/*.mid") -> list[str]:
+    """Gets the filepaths recursively for all files with a given extension inside midi_dir_from_root"""
+    return [str(p) for p in Path(os.path.join(get_project_root(), midi_dir_from_root)).glob(ext)]
+
+
+@lru_cache(maxsize=None)
+def read_json_cached(json_fpath: str) -> dict:
+    """Reads metadata for a given track with a cache to prevent redundant operations"""
+    assert os.path.isfile(json_fpath), f"Could not find JSON at {json_fpath}!"
+    with open(json_fpath, 'r') as f:
+        metadata = json.load(f)
+    return metadata
 
 
 def wait(secs: int):

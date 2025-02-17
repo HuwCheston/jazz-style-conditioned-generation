@@ -71,13 +71,6 @@ def get_tracks() -> list[str]:
             yield track_dir
 
 
-def read_track_metadata(track_dir: str) -> dict:
-    """Reads metadata for a given track"""
-    with open(os.path.join(track_dir, 'metadata.json'), 'r') as f:
-        metadata = json.load(f)
-    return metadata
-
-
 @utils.wait(secs=API_WAIT_TIME)
 @lru_cache(maxsize=None)
 def _cached_api_call(url: str) -> dict:
@@ -238,7 +231,7 @@ def parse_all_metadata(track_path: str) -> dict:
     global ALBUM_HITS, ALBUM_MISSES
 
     # Get the metadata for the track (already available for JTD + PiJAMA)
-    track_metadata = read_track_metadata(track_path)
+    track_metadata = utils.read_json_cached(os.path.join(track_path, 'metadata.json'))
     # Parse metadata for the ARTIST: this is always the pianist
     artist_metadata = artist_search(track_metadata['pianist'])
     artist_metadata_parsed = parse_tivo_artist_metadata(artist_metadata)
