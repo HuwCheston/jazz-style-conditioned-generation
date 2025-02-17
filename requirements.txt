@@ -6,3 +6,6 @@ black
 thefuzz
 tqdm
 deepdiff
+pandas
+matplotlib
+seaborn
