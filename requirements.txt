@@ -10,3 +10,5 @@ pandas
 matplotlib
 seaborn
 miditok
+transformers
+coverage
