@@ -88,6 +88,7 @@ class TivoScrape(unittest.TestCase):
             "hitCount": 1,
             "hits": [
                 {
+                    "title": "albumy-album",
                     "moods": [
                         {
                             "name": "moody-mood",
@@ -122,7 +123,8 @@ class TivoScrape(unittest.TestCase):
                         }
                     ],
                     "primaryReview": [{"text": "text text"}],
-                    "flags": ["flag1", "flag2"]
+                    "flags": ["flag1", "flag2"],
+                    "primaryArtists": []
                 }
             ]
         }
@@ -155,6 +157,8 @@ class TivoScrape(unittest.TestCase):
             ],
             "album_review": ["text text"],
             "album_flags": ["flag1", "flag2"],
+            "tivo_album_name": "albumy-album",
+            "tivo_album_artists": []
         }
         actual = stm.parse_tivo_album_metadata(good_album)
         self.assertTrue(compare_nested_dicts(expected, actual))
