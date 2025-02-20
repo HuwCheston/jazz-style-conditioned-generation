@@ -25,6 +25,8 @@ MAX_VELOCITY = 127
 MIDDLE_C = 60
 OCTAVE = 12
 
+MAX_SEQUENCE_LENGTH = 1024
+
 
 def seed_everything(seed: int = SEED) -> None:
     """Sets all random seeds for reproducible results."""

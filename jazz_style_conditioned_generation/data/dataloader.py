@@ -189,7 +189,7 @@ if __name__ == "__main__":
         combine_artist_and_album_tags=False,
         files_paths=midi_paths,
         tokenizer=token_factory,
-        max_seq_len=1024,
+        max_seq_len=utils.MAX_SEQUENCE_LENGTH,
         bos_token_id=token_factory["BOS_None"],
         eos_token_id=token_factory["EOS_None"],
     )

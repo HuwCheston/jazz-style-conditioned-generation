@@ -7,6 +7,7 @@ import unittest
 
 import torch
 
+from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.dataloader import CollatorMIDICondition, DatasetMIDICondition
 
 
@@ -27,7 +28,7 @@ class DataloaderTest(unittest.TestCase):
         combine_artist_and_album_tags=False,
         files_paths=["a/fake/filepath"],
         tokenizer=None,
-        max_seq_len=1024,
+        max_seq_len=utils.MAX_SEQUENCE_LENGTH,
         bos_token_id=1,
         eos_token_id=2,
     )
