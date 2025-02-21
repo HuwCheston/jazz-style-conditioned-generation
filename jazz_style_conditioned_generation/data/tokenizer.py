@@ -12,9 +12,8 @@ from loguru import logger
 from miditok import REMI, MIDILike, TSD, Structured, TokenizerConfig, constants
 
 from jazz_style_conditioned_generation import utils
-from jazz_style_conditioned_generation.data.conditions import get_special_tokens_for_condition
 
-DEFAULT_CONFIG = {
+DEFAULT_TOKENIZER_CONFIG = {
     "pitch_range": (21, 109),
     # "beat_res": {(0, 4): 8, (4, 12): 4},
     "num_velocities": 32,
@@ -23,12 +22,6 @@ DEFAULT_CONFIG = {
         "BOS",  # beginning of sequence
         "EOS",  # end of sequence
         "MASK",  # prevent attention to future tokens
-        # conditioning tokens
-        "ENSEMBLE_0", "ENSEMBLE_1",  # CONTEXT_0 == accompanied == jtd, C  CONTEXT_1 == unaccompanied == pijama
-        *get_special_tokens_for_condition("pianist"),
-        *get_special_tokens_for_condition("genres"),
-        *get_special_tokens_for_condition("moods"),
-        *get_special_tokens_for_condition("themes")
     ],
     "use_chords": True,
     "use_rests": True,
@@ -96,7 +89,7 @@ def load_saved_tokenizer(tokenizer_str: str, training_method: str, tokenizer_con
         # all non-iterable parameters should be the same
         )):
             # Load the tokenizer using these saved parameters
-            logger.info(f'loaded tokenizer at {tokenizer_js}!')
+            logger.info(f'Loaded tokenizer at {tokenizer_js}!')
             return get_tokenizer_class_from_string(tokenizer_str)(params=os.path.join(OUTPUT_DIR, tokenizer_js))
         # Otherwise, try the next tokenizer
         else:
@@ -128,7 +121,7 @@ def get_tokenizer(
 ):
     """Given a tokenizer name (as string), training method, and config, load a saved tokenizer or train from scratch"""
     if tokenizer_config is None:
-        tokenizer_config = DEFAULT_CONFIG
+        tokenizer_config = DEFAULT_TOKENIZER_CONFIG
 
     try:
         tokenizer = load_saved_tokenizer(tokenizer_str, training_method, tokenizer_config)
@@ -136,7 +129,7 @@ def get_tokenizer(
         with utils.timer('train tokenizer'):
             tokenizer = train_tokenizer(tokenizer_str, training_method, tokenizer_config)
     finally:
-        logger.info(f'tokenizer created with parameters: {tokenizer.__repr__()}')
+        logger.info(f'Tokenizer created with parameters: {tokenizer.__repr__()}')
         return tokenizer
 
 
@@ -159,7 +152,7 @@ def encode_decode_midi(tokenizer, midi_fpath: str = None):
 if __name__ == "__main__":
     utils.seed_everything()
     # Load the tokenizer with default arguments
-    token_factory = get_tokenizer(DEFAULT_TOKENIZER_CLASS, DEFAULT_TRAINING_METHOD, DEFAULT_CONFIG)
+    token_factory = get_tokenizer(DEFAULT_TOKENIZER_CLASS, DEFAULT_TRAINING_METHOD, DEFAULT_TOKENIZER_CONFIG)
     # Encode and decode a few example MIDIs
     for i in range(5):
         encode_decode_midi(token_factory)

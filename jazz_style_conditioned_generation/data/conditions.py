@@ -13,7 +13,8 @@ EXCLUDE = {
     "genres": ["Jazz Instrument", "Jazz", "Piano Jazz"],  # i.e., nearly every track tagged with these values
     "moods": [],
     "pianist": [],
-    "themes": []
+    "themes": [],
+    "ensemble": []
 }
 
 
@@ -74,6 +75,9 @@ def get_mapping_for_condition(
         metadata_dicts: list[dict] = None,
 ):
     """Gets key: idx mapping for all unique keys under a given condition"""
+    # We can't get this information from the metadata
+    if condition.lower() == "ensemble":
+        return {"Trio": 0, "Solo": 1}
     if metadata_dicts is None:
         metadata_dicts = load_metadata_jsons(None)
     # Get the "raw" values for this condition (i.e., a list of all genres for all tracks, with duplicates)
@@ -89,6 +93,9 @@ def get_special_tokens_for_condition(
         condition_mapping: dict = None,
 ) -> list[str]:
     """Given a condition, generate special tokens for all observed values that can be fed to MIDITok"""
+    if condition.lower() == "ensemble":
+        return ["ENSEMBLE_0", "ENSEMBLE_1"]
+
     # Get the mapping for this condition: idx: raw_name, i.e., {0: African Jazz, 1: African Folk, ...}
     if condition_mapping is None:
         condition_mapping = get_mapping_for_condition(condition, None)

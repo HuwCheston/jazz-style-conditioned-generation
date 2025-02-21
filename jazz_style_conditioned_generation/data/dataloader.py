@@ -4,16 +4,21 @@
 """Data loader and collator modules"""
 
 import os
-from collections.abc import Mapping
-from typing import Any
+import random
 
 import torch
-from loguru import logger
 from miditok.pytorch_data import DatasetMIDI, DataCollator
 from torch.utils.data import DataLoader
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data import conditions as cond
+
+DATA_DIR = os.path.join(utils.get_project_root(), "data")
+
+AUGMENT_PROB = 0.5
+PITCH_AUGMENT_RANGE = (-(utils.OCTAVE // 2), (utils.OCTAVE // 2))
+VELOCITY_AUGMENT_RANGE = (0.8, 1.2)
+DURATION_AUGMENT_RANGE = (12, 12)
 
 
 class DatasetMIDICondition(DatasetMIDI):
@@ -23,6 +28,8 @@ class DatasetMIDICondition(DatasetMIDI):
             self,
             condition_mapping: dict,
             combine_artist_and_album_tags: bool = False,
+            n_clips: int = None,
+            skip_conditioning: bool = False,
             *args,
             **kwargs,
     ) -> None:
@@ -33,12 +40,17 @@ class DatasetMIDICondition(DatasetMIDI):
         # If this is True, will use tags for BOTH artist and album for mood, genre, and them
         #  Otherwise, will use album tags by default, falling back to artist tags if these are not available
         self.combine_artist_and_album_tags = combine_artist_and_album_tags
+        self.skip_conditioning = skip_conditioning
         # Initialise the MIDITok dataset
         super().__init__(*args, **kwargs)
+        if n_clips is not None:
+            random.shuffle(self.files_paths)
+            self.files_paths = self.files_paths[:n_clips]
 
     @staticmethod
-    def load_metadata(track_filepath) -> dict:
+    def load_metadata(chunk_filepath) -> dict:
         # Load in the metadata JSON for this track
+        track_filepath = chunk_filepath.replace("/chunks/", "/raw/")
         metadata_path = os.path.join(os.path.dirname(track_filepath), "metadata_tivo.json")
         return utils.read_json_cached(metadata_path)
 
@@ -62,20 +74,18 @@ class DatasetMIDICondition(DatasetMIDI):
                     # Otherwise, we fall back to artist level tags
                     else:
                         matching_keys = [f"artist_{condition}"]
-                        logger.warning(f'No album tags for condition {condition}, track {metadata["fname"]}, '
-                                       f'falling back on artist tags with keys {matching_keys}!')
+                        # logger.warning(f'No album tags for condition {condition}, track {metadata["fname"]}, '
+                        #                f'falling back on artist tags with keys {matching_keys}!')
             # Raw tags for this track, e.g. [Sophisticated, Relaxed, Frantic] for mood
             condition_values = []
             try:
                 condition_values = [cond.get_inner_json_values(metadata, k) for k in matching_keys]
                 condition_values = [x for xs in condition_values for x in xs]
             except KeyError:
-                logger.warning(f"Couldn't get keys in {matching_keys}! Tokens will be empty!")
                 condition_values = []
-            else:
-                if len(condition_values) == 0:
-                    logger.warning(f"No values for keys {matching_keys}! Tokens will be empty")
             finally:
+                # if len(condition_values) == 0:
+                #     logger.warning(f"No values for keys {matching_keys}! Tokens will be empty")
                 # Remove any values which we've specified in the EXCLUDE dictionary
                 results[condition] = [cv for cv in condition_values if cv not in cond.EXCLUDE[condition]]
         # Drop duplicates and sort token list alphabetically
@@ -99,15 +109,6 @@ class DatasetMIDICondition(DatasetMIDI):
         return results
 
     @staticmethod
-    def add_special_tokens_to_input(
-            input_ids: torch.tensor,
-            special_tokens: torch.tensor,
-            insert_idx: int = 1
-    ) -> torch.tensor:
-        """Adds in special tokens to an input at the given `insert_idx`"""
-        return torch.cat([input_ids[:insert_idx], special_tokens, input_ids[insert_idx:]])
-
-    @staticmethod
     def get_ensemble_context_token(filename):
         dataset_name = filename.split(os.path.sep)[-3]
         if dataset_name == "jtd":
@@ -117,11 +118,70 @@ class DatasetMIDICondition(DatasetMIDI):
         else:
             raise ValueError(f"Expected dataset_name to be either 'jtd' or 'pijama', but got {dataset_name}!")
 
+    # def augment_score(self, score: Score) -> Score:
+    #     if random.uniform(0, 1) < AUGMENT_PROB:
+    #         pitch_augment = random.randrange(*PITCH_AUGMENT_RANGE)
+    #         velocity_augment = random.randrange(*VELOCITY_AUGMENT_RANGE)
+    #         duration_augment = random.uniform(*DURATION_AUGMENT_RANGE)
+    #
+    # def getitem_with_augmentation(self, idx: int):
+    #     """A copy of super().__getitem__ that allows for data augmentation of a `symusic.Score` object"""
+    #     labels = None
+    #
+    #     # Already pre-tokenized
+    #     if self.pre_tokenize:
+    #         token_ids = self.samples[idx]
+    #         if self.func_to_get_labels is not None:
+    #             labels = self.labels[idx]
+    #
+    #     # Tokenize on the fly
+    #     else:
+    #         # The tokenization steps are outside the try bloc as if there are errors,
+    #         # we might want to catch them to fix them instead of skipping the iteration.
+    #         try:
+    #             score = Score(self.files_paths[idx])
+    #         except SCORE_LOADING_EXCEPTION:
+    #             item = {self.sample_key_name: None}
+    #             if self.func_to_get_labels is not None:
+    #                 item[self.labels_key_name] = labels
+    #             return item
+    #
+    #         # DATA AUGMENTATION COMES HERE
+    #
+    #         tseq = self._tokenize_score(score)
+    #         # If not one_token_stream, we only take the first track/sequence
+    #         token_ids = tseq.ids if self.tokenizer.one_token_stream else tseq[0].ids
+    #         if self.func_to_get_labels is not None:
+    #             # tokseq can be given as a list of TokSequence to get the labels
+    #             labels = self.func_to_get_labels(score, tseq, self.files_paths[idx])
+    #             if not isinstance(labels, torch.LongTensor):
+    #                 labels = torch.LongTensor([labels] if isinstance(labels, int) else labels)
+    #
+    #     item = {self.sample_key_name: torch.LongTensor(token_ids)}
+    #     if self.func_to_get_labels is not None:
+    #         item[self.labels_key_name] = labels
+    #
+    #     return item
+
     def __getitem__(self, idx: int) -> dict[str, torch.LongTensor]:
         """Return the `idx` elements of the dataset with corresponding conditions"""
-        # TODO: in reality, input will probably not be a full file, but a chunk
-        # Load the metadata JSON file for this track
+        # Process the input MIDI to get token idxs
+        processed = super().__getitem__(idx)
+        if self.skip_conditioning:
+            return processed
+
+        # Grab the first token from the processed input
+        first_token = processed["input_ids"][0].item()
+        # If this is the beginning of the sequence, we don't need to add our conditioning tokens
+        if first_token != self.tokenizer["BOS_None"]:
+            # We can just return the sequence
+            return processed
+        initial_size = processed["input_ids"].size(0)
+        # Otherwise, we need to get the conditioning tokens
         filename = self.files_paths[idx]
+        # Should always be the first chunk from any track
+        assert utils.get_chunk_number_from_filepath(filename) == 0
+        # Load the metadata JSON file for this track
         metadata = self.load_metadata(filename)
         # This is a dictionary of {condition: [value1, value2]}, i.e. {"moods": ["Sophisticated", "Relaxed", "Frantic"]}
         conditions_for_track = self.get_conditions(metadata)
@@ -132,44 +192,10 @@ class DatasetMIDICondition(DatasetMIDI):
             condition_tokens_for_track.append(self.get_ensemble_context_token(filename))
         # These are the special tokens converted to integer indices, that we can use in training the model
         condition_token_idxs = torch.tensor([self.tokenizer[c] for c in condition_tokens_for_track])
-        assert [self.tokenizer[c.item()] for c in condition_token_idxs] == condition_tokens_for_track  # sanity check
-        # Process the input MIDI to get token idxs
-        to_collator = super().__getitem__(idx)
         # Add the special tokens in at the beginning of the sequence (after BOS)
-        to_collator["input_ids"] = self.add_special_tokens_to_input(to_collator["input_ids"], condition_token_idxs)
-        to_collator["labels"] = condition_token_idxs
-        # A separate dictionary of metadata, that won't be passed to the collator
-        not_to_collator = {
-            "condition": conditions_for_track,
-            "condition_tokens": condition_tokens_for_track,
-            # we can maybe add more values into this?
-        }
-        return to_collator, not_to_collator
-
-
-class CollatorMIDICondition(DataCollator):
-    """Superclass of MIDITok datacollator that allows for non-tensor values in batch and output dictionary"""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def __call__(self, batch: tuple[list[Mapping[str, Any]], list[Mapping[str, Any]]]) -> Mapping[str, Any]:
-        # Split the batch into the elements we do and do not want to pass to DataCollator.__call__
-        to_call, not_to_call = [i[0] for i in batch], [i[1] for i in batch]
-        # Pass the required elements in: this gives us a dictionary
-        proc_inputs = super().__call__(to_call)
-        # We can now go and add the other elements back into this dictionary
-        for k in not_to_call[0].keys():
-            proc_inputs[k] = [nc[k] for nc in not_to_call]
-        # This allows us to preserve e.g., the raw conditions (pianist/genre names, e.g.): should make our lives easier
-        return proc_inputs
-
-
-def ids_to_tokens(tokenizer, input_ids: list[int]) -> list[str]:
-    """Converts a list of MidiTok input IDs to tokens (as strings)"""
-    encoded_bytes = [tokenizer._model.id_to_token(i_id) for i_id in input_ids]
-    decoded_tokens = [tokenizer._vocab_learned_bytes_to_tokens[byte_] for byte_ in encoded_bytes]
-    return [item for sublist in decoded_tokens for item in sublist]
+        processed["input_ids"] = utils.add_to_tensor_at_idx(processed["input_ids"], condition_token_idxs)
+        assert processed["input_ids"].size(0) > initial_size
+        return processed
 
 
 if __name__ == "__main__":
@@ -185,6 +211,7 @@ if __name__ == "__main__":
 
     # Create a dataset
     dataset = DatasetMIDICondition(
+        n_clips=100,
         condition_mapping=condition_mappings,
         combine_artist_and_album_tags=False,
         files_paths=midi_paths,
@@ -193,10 +220,10 @@ if __name__ == "__main__":
         bos_token_id=token_factory["BOS_None"],
         eos_token_id=token_factory["EOS_None"],
     )
-    collator = CollatorMIDICondition(
+    collator = DataCollator(
         token_factory.pad_token_id,
-        labels_pad_idx=token_factory.pad_token_id,
-        copy_inputs_as_labels=False
+        copy_inputs_as_labels=True,
+        shift_labels=True
     )
     dataloader = DataLoader(dataset, batch_size=16, collate_fn=collator)
 
