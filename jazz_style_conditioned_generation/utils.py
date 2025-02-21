@@ -14,6 +14,8 @@ from typing import ContextManager
 
 import numpy as np
 import torch
+import transformers
+from loguru import logger
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 SEED = 42
@@ -26,13 +28,18 @@ MIDDLE_C = 60
 OCTAVE = 12
 
 MAX_SEQUENCE_LENGTH = 1024
+# This is important: it ensures that two chunks overlap slightly, to allow a causal chain between the
+#  end of one chunk and the beginning of the next. The MIDITok default is 1: increasing this seems to work better
+CHUNK_OVERLAP_BARS = 2
 
 
 def seed_everything(seed: int = SEED) -> None:
     """Sets all random seeds for reproducible results."""
     torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)  # safe to call even if cuda is not available
     random.seed(seed)
     np.random.seed(seed)
+    transformers.set_seed(seed)
 
 
 def total_parameters(layer) -> int:
@@ -55,9 +62,9 @@ def timer(name: str) -> ContextManager[None]:
         logger.debug(f"Took {end - start:.2f} seconds to {name}.")
 
 
-def get_project_root() -> Path:
+def get_project_root() -> str:
     """Returns the root directory of the project"""
-    return Path(__file__).absolute().parent.parent
+    return os.path.abspath(os.curdir)
 
 
 @lru_cache(maxsize=None)
@@ -87,3 +94,28 @@ def wait(secs: int):
         return wrapper
 
     return decorator
+
+
+def update_dictionary(d1: dict, d2: dict, overwrite: bool = False) -> dict:
+    """Update missing key-value pairs in `d1` with key-value pairs in `d2`"""
+    for k, v in d2.items():
+        if not overwrite:
+            if k not in d1.keys():
+                d1[k] = v
+        else:
+            d1[k] = v
+    return d1
+
+
+def get_chunk_number_from_filepath(chunk_filepath: str):
+    """Get the number of a MIDI chunk from a filepath: a value of 0 means this is the start of the whole track"""
+    try:
+        return int(chunk_filepath.split(os.path.sep)[-1].split("_")[-1].replace(".mid", ""))
+    except (ValueError, IndexError):
+        logger.warning(f"Couldn't get chunk number from filepath {chunk_filepath}, is is malformed?")
+        return None
+
+
+def add_to_tensor_at_idx(input_tensor: torch.tensor, insert_tensor: torch.tensor, insert_idx: int = 1) -> torch.tensor:
+    """Adds in a tensor to an input at the given `insert_idx`"""
+    return torch.cat([input_tensor[:insert_idx], insert_tensor, input_tensor[insert_idx:]])
