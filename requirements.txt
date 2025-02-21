@@ -14,3 +14,5 @@ transformers
 coverage
 pyyaml
 scikit-learn
+mlflow
+symusic
