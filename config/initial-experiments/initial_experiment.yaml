@@ -30,4 +30,5 @@ tokenizer_cfg:
   training_method: BPE
   tokenizer_kws: { }
 mlflow_cfg:
-  use: False
+  use: True
+  port: 8080

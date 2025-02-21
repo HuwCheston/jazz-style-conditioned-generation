@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 from time import time
 
+import mlflow
 import numpy as np
 import torch
 from loguru import logger
@@ -168,15 +169,7 @@ class TrainingModule:
         if self.checkpoint_cfg.get("load_checkpoints", True):
             self.load_checkpoint()
 
-        # TODO
-        # - validate conditions and get mapping
-        # - initialise model, optimizer, scheduler etc.
-        # - load checkpoint
-        # - load tokenizer
-        # - split data according to tokenizer using miditok
-        # - initialise dataloaders
-        # - train
-        # TODO: data augmentation?
+        # TODO: MLflow
 
     def create_dataloader(self, split: str, dataset_cfg: dict) -> torch.utils.data.DataLoader:
         """Creates a dataloader for a given split and configuration"""
@@ -288,7 +281,7 @@ class TrainingModule:
             files_paths=files_paths,
             tokenizer=self.tokenizer,
             save_dir=dataset_chunks_dir,
-            max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+            max_seq_len=utils.MAX_SEQUENCE_LENGTH,  # TODO: this should be MAX_SEQUENCE_LENGTH - MAX_CONDITION_TOKENS?
             # This is important: it ensures that two chunks overlap slightly, to allow a causal chain between the
             #  end of one chunk and the beginning of the next
             num_overlap_bars=utils.CHUNK_OVERLAP_BARS
@@ -340,7 +333,6 @@ class TrainingModule:
             self.scheduler.load_state_dict(loaded['scheduler_state_dict'])
         except KeyError:
             logger.warning("Could not find scheduler state dictionary in checkpoint, scheduler will be restarted!")
-            pass
         # Increment epoch by 1
         self.current_epoch = loaded["epoch"] + 1
         self.scheduler.last_epoch = self.current_epoch
@@ -415,6 +407,7 @@ class TrainingModule:
                 total=len(self.train_loader),
                 desc=f'Training, epoch {epoch_num} / {self.epochs}...'
         ):
+            # TODO: data augmentation?
             # Forwards pass
             loss = self.step(batch)
             # Backwards pass
@@ -457,8 +450,33 @@ class TrainingModule:
             epoch_loss.append(loss.item())
         return np.mean(epoch_loss)
 
+    def log_run_params_to_mlflow(self):
+        """If we're using MLFlow, log all run parameters to the dashboard"""
+
+        def logme(k, v):
+            try:
+                mlflow.log_param(k, v)
+            except mlflow.exceptions.MlflowException:
+                logger.warning(f'Unable to log param {k} with value {v} to dashboard: '
+                               f'has it already been logged (if this run is resumed from a checkpoint)?')
+
+        for key, val in self.__dict__.items():
+            if isinstance(val, (str, float, int, bool)):
+                logme(key, val)
+            elif isinstance(val, dict):
+                for inner_key, inner_val in val.items():
+                    if isinstance(inner_val, (str, float, int, bool)):
+                        logme(f'{key}_{inner_key}', inner_val)
+            else:
+                continue
+
+        logger.debug("Logged all run parameters to MLFlow dashboard!")
+
     def start(self):
         training_start = time()
+        # Log parameters for the run to MLflow if required
+        if self.mlflow_cfg.get("use", False):
+            self.log_run_params_to_mlflow()
         # Start training
         for epoch in range(self.current_epoch, self.epochs):
             self.current_epoch = epoch
@@ -485,6 +503,9 @@ class TrainingModule:
             # Checkpoint the run, if we need to
             if self.checkpoint_cfg["save_checkpoints"]:
                 self.save_checkpoint(metrics)
+            # Report results to MLFlow, if we're using this
+            if self.mlflow_cfg.get("use", False):
+                mlflow.log_metrics(metrics, step=epoch)
             # Step forward in the LR scheduler
             self.scheduler.step()
             logger.debug(f'LR for epoch {epoch + 1} will be {self.get_scheduler_lr()}')
@@ -509,11 +530,43 @@ def parse_config_yaml(fpath: str) -> dict:
         return cfg
 
 
+def get_tracking_uri(port: str = "8080") -> str:
+    """Attempts to get the MLflow tracking URI on given port based on system hostname"""
+    import socket
+
+    hostname = socket.gethostname().lower()
+    # Job is running locally: don't use mlflow
+    if "desktop" in hostname:
+        return None
+    # Job is running on the department server
+    elif "musix" in hostname:
+        return f"http://127.0.0.1:{port}"
+    # Job is running on HPC
+    else:
+        return f"http://musix.mus.cam.ac.uk:{port}"
+
+
+def add_run_id_to_config_yaml(config_fname: str, mlflow_run_id: str) -> None:
+    """Append an automatically-created mlflow run ID to a config `.yaml` file at the start of a new run"""
+    # This is the directory where our config file is
+    yamlpath = os.path.join(utils.get_project_root(), 'config', config_fname)
+    # Load the config file
+    with open(yamlpath, 'r') as yamlfile:
+        cur_yaml = yaml.safe_load(yamlfile)
+        # Create a new mlflow dictionary, if for whatever reason we don't have this
+        if 'mlflow_cfg' not in cur_yaml.keys():
+            cur_yaml['mlflow_cfg'] = {}
+        # Add the run ID into our config file
+        cur_yaml['mlflow_cfg']['run_id'] = mlflow_run_id
+    # Overwrite the config file, without sorting the keys
+    with open(yamlpath, 'w') as yamlfile:
+        yaml.safe_dump(cur_yaml, yamlfile, sort_keys=False)
+
+
 if __name__ == "__main__":
     import argparse
     import yaml
 
-    print(utils.get_project_root(), __file__)
     # Seed everything for reproducible results
     utils.seed_everything(utils.SEED)
 
@@ -526,5 +579,44 @@ if __name__ == "__main__":
         raise ValueError("No config file specified")
     training_kws = parse_config_yaml(args['config'])
 
-    tm = TrainingModule(**training_kws)
-    tm.start()
+    # Running training with logging on MLFlow
+    if training_kws["mlflow_cfg"]["use"]:
+        # Get the run ID from our config. Fall back to None if not provided
+        run_id = training_kws["mlflow_cfg"].get("run_id", None)
+        # Get the tracking URI based on the hostname of the device running the job
+        uri = get_tracking_uri(port=training_kws["mlflow_cfg"].get("port", "8080"))
+        if uri is None:
+            raise ValueError(f'Could not connect to MLFlow!')
+        else:
+            logger.debug(f'Attempting to connect to MLFlow server at {uri}...')
+            mlflow.set_tracking_uri(uri=uri)
+            try:
+                mlflow.set_experiment(training_kws["experiment"])
+            # If we're unable to reach the MLFlow server somehow
+            except mlflow.exceptions.MlflowException as err:
+                logger.warning(f'Could not connect to MLFlow, falling back to running locally! {err}')
+                # This will mean we break out of the current IF statement, and activate the next IF NOT statement
+                # in order to train locally, without using MLFlow
+                training_kws["mlflow_cfg"]["use"] = False
+            else:
+                # Otherwise, start training with the arguments we've passed in
+                tm = TrainingModule(**training_kws)
+                # Either run is being resumed with a run ID passed in with our config file
+                if run_id is not None:
+                    logger.debug(f'Resuming run with name {training_kws["run"]}, ID {run_id}!')
+                # Or this is a new run
+                else:
+                    logger.debug(f'Starting new run with name {training_kws["run"]}!')
+                # Start the run!
+                with mlflow.start_run(run_name=training_kws["run"], run_id=run_id):
+                    # If this is a new run, append the newly-created run ID to our yaml config file (if we passed this)
+                    if args['config'] is not None and 'run_id' not in training_kws['mlflow_cfg'].keys():
+                        new_run_id = mlflow.active_run().info.run_id
+                        add_run_id_to_config_yaml(args["config"], new_run_id)
+                        logger.debug(f'Added run id {new_run_id} to {args["config"]}!')
+                    tm.start()
+
+    # Running training locally
+    else:
+        tm = TrainingModule(**training_kws)
+        tm.start()
