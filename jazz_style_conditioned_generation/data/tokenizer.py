@@ -5,7 +5,6 @@
 
 import json
 import os
-from datetime import datetime
 from random import choice
 
 from loguru import logger
@@ -107,9 +106,8 @@ def train_tokenizer(tokenizer_str: str, training_method: str, tokenizer_config: 
     # Train the tokenizer on our MIDI paths
     tokenizer.train(vocab_size=VOCAB_SIZE, model=training_method, files_paths=midi_paths)
     # Dump the tokenizer instance
-    now = datetime.now().strftime('%y_%m_%d_%H:%M:%S')  # add the time the tokenizer was created to the filename
     tokenizer.save(
-        os.path.join(OUTPUT_DIR, f'{tokenizer_str.lower()}_{VOCAB_SIZE}_{training_method.lower()}_{now}.json')
+        os.path.join(OUTPUT_DIR, f'{tokenizer_str.lower()}_{VOCAB_SIZE}_{training_method.lower()}_{utils.now()}.json')
     )
     return tokenizer
 

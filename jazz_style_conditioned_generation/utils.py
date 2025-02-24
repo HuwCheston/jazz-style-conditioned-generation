@@ -7,6 +7,7 @@ import json
 import os
 import random
 from contextlib import contextmanager
+from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
 from time import time, sleep
@@ -119,3 +120,8 @@ def get_chunk_number_from_filepath(chunk_filepath: str):
 def add_to_tensor_at_idx(input_tensor: torch.tensor, insert_tensor: torch.tensor, insert_idx: int = 1) -> torch.tensor:
     """Adds in a tensor to an input at the given `insert_idx`"""
     return torch.cat([input_tensor[:insert_idx], insert_tensor, input_tensor[insert_idx:]])
+
+
+def now() -> str:
+    """Returns the current time, formatted nicely"""
+    return datetime.now().strftime('%y_%m_%d_%H:%M:%S')
