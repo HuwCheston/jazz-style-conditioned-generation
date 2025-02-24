@@ -72,6 +72,7 @@ class TrainingModule:
             checkpoint_cfg: dict,
             tokenizer_cfg: dict,
             mlflow_cfg: dict,
+            generate_cfg: dict
     ):
         # Set all keyword arguments to class parameters
         self.experiment = experiment
@@ -87,6 +88,7 @@ class TrainingModule:
         self.checkpoint_cfg = checkpoint_cfg
         self.tokenizer_cfg = tokenizer_cfg
         self.mlflow_cfg = mlflow_cfg
+        self.generate_cfg = generate_cfg
 
         # Initialise the current epoch at 0
         self.current_epoch = 0
@@ -144,9 +146,10 @@ class TrainingModule:
         # MODEL
         model_type = self.model_cfg.get("model_type", "gpt2-lm")
         model_kws = self.model_cfg.get("model_kws", dict())
-        logger.debug(f'Initialising model {model_type} with parameters {model_kws}...')
-        self.model = self.get_model(model_type, model_kws).to(utils.DEVICE)
+        logger.debug(f'Initialising model {model_type} with arguments {model_kws}...')
         logger.debug(f"Training on device {utils.DEVICE}")
+        self.model = self.get_model(model_type, model_kws).to(utils.DEVICE)
+        logger.debug(f"Initialised model with {utils.total_parameters(self.model)} parameters")
 
         # LOSS & METRICS
         self.current_validation_loss = 0.
@@ -167,9 +170,7 @@ class TrainingModule:
 
         # CHECKPOINTS
         if self.checkpoint_cfg.get("load_checkpoints", True):
-            self.load_checkpoint()
-
-        # TODO: MLflow
+            self.load_most_recent_checkpoint()
 
     def create_dataloader(self, split: str, dataset_cfg: dict) -> torch.utils.data.DataLoader:
         """Creates a dataloader for a given split and configuration"""
@@ -301,87 +302,102 @@ class TrainingModule:
         assert sum(len(list(v)) for v in chunk_splits.values()) == len(chunk_paths)
         return chunk_splits
 
-    def load_checkpoint(self) -> None:
+    def load_checkpoint(self, checkpoint_path: str) -> None:
+        """Load the checkpoint at the given fpath"""
+        # This will raise a warning about possible ACE exploits, but we don't care
+        try:
+            loaded = torch.load(checkpoint_path, map_location=utils.DEVICE, weights_only=False)
+        except FileNotFoundError:
+            logger.error(f'Could not load checkpoint at {checkpoint_path}, skipping load!')
+            return
+        else:
+            # Set state dictionary for all torch objects
+            self.model.load_state_dict(loaded["model_state_dict"], strict=True)
+            self.optimizer.load_state_dict(loaded["optimizer_state_dict"])
+            # For backwards compatibility with no LR scheduler runs: don't worry if we can't load the LR scheduler dict
+            try:
+                self.scheduler.load_state_dict(loaded['scheduler_state_dict'])
+            except KeyError:
+                logger.warning("Could not find scheduler state dictionary in checkpoint, scheduler will be restarted!")
+            # Increment epoch by 1
+            self.current_epoch = loaded["epoch"] + 1
+            self.scheduler.last_epoch = self.current_epoch
+            # For some reason, we need to do a step in the scheduler here so that we have the correct LR
+            self.scheduler.step()
+            logger.debug(f'Loaded the checkpoint at {checkpoint_path}!')
+
+    def load_most_recent_checkpoint(self) -> None:
         """Load the latest checkpoint for the current experiment and run"""
-        # Either use a custom checkpoint directory or the root directory of the project (default)
-        checkpoint_dir = self.checkpoint_cfg.get(
-            "checkpoint_dir",
-            os.path.join(utils.get_project_root(), 'checkpoints')
-        )
-        run_dir = os.path.join(checkpoint_dir, self.experiment, self.run)
         # If we haven't created a checkpoint for this run, skip loading and train from scratch
-        if not os.path.exists(run_dir):
+        if not os.path.exists(self.checkpoint_dir):
             logger.warning('Checkpoint folder does not exist for this experiment/run, skipping load!')
             return
 
-        # Get all the checkpoints for the current experiment/run combination
-        checkpoints = [i for i in os.listdir(run_dir) if i.endswith(".pth")]
+        # Get all the checkpoints for the current experiment/run combination, not including the "best" checkpoints
+        checkpoints = [i for i in os.listdir(self.checkpoint_dir) if i.endswith(".pth") and "best" not in i]
         if len(checkpoints) == 0:
             logger.warning('No checkpoints have been created yet for this experiment/run, skipping load!')
             return
-
         # Sort the checkpoints and load the latest one
         latest_checkpoint = sorted(checkpoints)[-1]
-        checkpoint_path = os.path.join(run_dir, latest_checkpoint)
-        # This will raise a warning about possible ACE exploits, but we don't care
-        loaded = torch.load(checkpoint_path, map_location=utils.DEVICE, weights_only=False)
-        # Set state dictionary for all torch objects
-        self.model.load_state_dict(loaded["model_state_dict"], strict=True)
-        self.optimizer.load_state_dict(loaded["optimizer_state_dict"])
-        # For backwards compatibility with no LR scheduler runs: don't worry if we can't load the LR scheduler dict
-        try:
-            self.scheduler.load_state_dict(loaded['scheduler_state_dict'])
-        except KeyError:
-            logger.warning("Could not find scheduler state dictionary in checkpoint, scheduler will be restarted!")
-        # Increment epoch by 1
-        self.current_epoch = loaded["epoch"] + 1
-        self.scheduler.last_epoch = self.current_epoch
-        # For some reason, we need to do a step in the scheduler here so that we have the correct LR
-        self.scheduler.step()
-        logger.debug(f'Loaded the checkpoint at {checkpoint_path}!')
+        checkpoint_path = os.path.join(self.checkpoint_dir, latest_checkpoint)
+        self.load_checkpoint(os.path.join(self.checkpoint_dir, checkpoint_path))
         # Set a NEW random seed according to the epoch, otherwise we'll just use the same randomisations as epoch 1
-        utils.seed_everything(utils.SEED ** self.current_epoch)
+        utils.seed_everything(utils.SEED * self.current_epoch)
 
-    def save_checkpoint(self, metrics) -> None:
-        """Save the model checkpoint at the current epoch"""
-        # How many epochs before we need to checkpoint (10 by default)
-        checkpoint_after = self.checkpoint_cfg.get("checkpoint_after_n_epochs", 10)
-        # The name of the checkpoint and where it'll be saved
-        new_check_name = f'checkpoint_{str(self.current_epoch).zfill(3)}.pth'
+    def save_checkpoint(self, metrics: dict, path: str) -> None:
+        """Saves a checkpoint with given metrics to required path"""
+        # Get the folder of checkpoints for the current experiment/run, and create if it doesn't exist
+        run_folder = os.path.dirname(path)
+        if not os.path.exists(run_folder):
+            os.makedirs(run_folder, exist_ok=True)
+        # Save everything, including the metrics, state dictionaries, and current epoch
+        torch.save(
+            dict(
+                **metrics,
+                model_state_dict=self.model.state_dict(),
+                optimizer_state_dict=self.optimizer.state_dict(),
+                scheduler_state_dict=self.scheduler.state_dict(),
+                epoch=self.current_epoch
+            ),
+            os.path.join(path),
+        )
+        logger.debug(f'Saved a checkpoint to {run_folder}')
+
+    @property
+    def checkpoint_dir(self) -> str:
+        """Directory for saving model checkpoints, unique to this experiment and run"""
         # Either use a custom checkpoint directory or the root directory of the project (default)
         checkpoint_dir = self.checkpoint_cfg.get(
             "checkpoint_dir",
             os.path.join(utils.get_project_root(), 'checkpoints')
         )
-        run_folder = os.path.join(checkpoint_dir, self.experiment, self.run)
-        # We always want to checkpoint on the final epoch!
-        if (self.current_epoch % checkpoint_after == 0) or (self.current_epoch + 1 == self.epochs):
-            # Get the folder of checkpoints for the current experiment/run, and create if it doesn't exist
-            if not os.path.exists(run_folder):
-                os.makedirs(run_folder, exist_ok=True)
-            # Save everything, including the metrics, state dictionaries, and current epoch
-            torch.save(
-                dict(
-                    **metrics,
-                    model_state_dict=self.model.state_dict(),
-                    optimizer_state_dict=self.optimizer.state_dict(),
-                    scheduler_state_dict=self.scheduler.state_dict(),
-                    epoch=self.current_epoch
-                ),
-                os.path.join(run_folder, new_check_name),
-            )
-            logger.debug(f'Saved a checkpoint to {run_folder}')
-        # If we want to remove old checkpoints after saving a new one
-        if self.checkpoint_cfg.get("delete_old_checkpoints", False):
-            logger.debug('Deleting old checkpoints...')
-            # Iterate through all the checkpoints in our folder
-            for old_checkpoint in os.listdir(run_folder):
-                # If the checkpoint is different to the most recent one and is a valid checkpoint
-                if old_checkpoint != new_check_name and old_checkpoint.endswith('.pth'):
-                    # Remove the old checkpoint
-                    old_path = os.path.join(run_folder, old_checkpoint)
-                    os.remove(old_path)
-                    logger.info(f'... deleted {old_path}')
+        return os.path.join(checkpoint_dir, self.experiment, self.run)
+
+    @property
+    def output_midi_dir(self) -> str:
+        """Directory for saving generated MIDI outputs, unique to this experiment and run"""
+        outputs_dir = os.path.join(utils.get_project_root(), "outputs/generation", self.experiment, self.run)
+        if not os.path.isdir(outputs_dir):
+            os.makedirs(outputs_dir, exist_ok=True)
+        return outputs_dir
+
+    def remove_old_checkpoints(self):
+        """Removes old checkpoints from the hard disk"""
+        logger.debug('Deleting old checkpoints...')
+        # Get the name of the current checkpoint
+        new_check_name = f'checkpoint_{str(self.current_epoch).zfill(3)}.pth'
+        # Iterate through all the checkpoints in our folder
+        for old_checkpoint in os.listdir(self.checkpoint_dir):
+            # Skip over deleting our best runs!
+            if old_checkpoint.endswith('_best.pth'):
+                continue
+            # If the checkpoint is different to the most recent one and is a valid checkpoint
+            if old_checkpoint != new_check_name and old_checkpoint.endswith('.pth'):
+                # Remove the old checkpoint
+                old_path = os.path.join(self.checkpoint_dir, old_checkpoint)
+                os.remove(old_path)
+                logger.info(f'... deleted {old_path}')
 
     def get_scheduler_lr(self) -> float:
         """Tries to return current LR from scheduler. Returns 0. on error, for safety with MLFlow logging"""
@@ -418,6 +434,47 @@ class TrainingModule:
             epoch_loss.append(loss.item())
         return np.mean(epoch_loss)
 
+    def remove_condition_tokens(self, tensor: torch.tensor) -> torch.tensor:
+        """Removes conditioning tokens from a tensor"""
+        # Copy the tensor so we don't overwrite it
+        new_tensor = tensor.detach().clone()
+        # Iterate through all the condition token IDs
+        for id_ in self.tokenizer.special_tokens_ids[4:]:
+            # Replace them with the pad token ID
+            new_tensor[new_tensor == id_] = self.tokenizer.pad_token_id
+        return new_tensor
+
+    def generate_from_batch(self, batch: dict, stage: str) -> None:
+        """Given a batch of items, generates a random example from one of the items"""
+        # Get the index of the element we're going to use to generate from
+        generate_idx = torch.randint(batch["input_ids"].size(0), (1,)).item()
+        # Get the input IDs and attention mask from the corresponding element
+        gen_iid = batch["input_ids"][generate_idx].unsqueeze(0)
+        gen_am = batch["attention_mask"][generate_idx].unsqueeze(0)
+        # Generate using the model
+        gen = self.model.generate(
+            gen_iid.to(utils.DEVICE),
+            attention_mask=gen_am.to(utils.DEVICE),
+            pad_token_id=self.tokenizer.pad_token_id,
+            bos_token_id=self.tokenizer["BOS_None"],
+            eos_token_id=self.tokenizer["EOS_None"],
+            bad_words_ids=[self.tokenizer.special_tokens_ids[4:]],  # prevent model from generating conditioning tokens
+            renormalize_logits=True,  # documentation says "highly recommended" to set this to True
+            **self.generate_cfg.get("generate_kws", dict())
+        )
+        try:
+            # Replace any generated condition tokens with pad tokens, then decode with the tokenizer
+            outs = self.tokenizer.decode(self.remove_condition_tokens(gen.to('cpu')))
+            inds = self.tokenizer.decode(self.remove_condition_tokens(gen_iid.to('cpu')))
+        except KeyError:
+            logger.warning(f"Couldn't generate from batch with tokens {gen_iid.tolist()}")
+        else:
+            # Dump everything to the output directory for this experiment/run
+            now = utils.now()
+            inds.dump_midi(f"{self.output_midi_dir}/input_{stage}_epoch{self.current_epoch}_{now}.mid")
+            outs.dump_midi(f"{self.output_midi_dir}/output_{stage}_epoch{self.current_epoch}_{now}.mid")
+            logger.info(f"Dumped {stage} MIDI from epoch {self.current_epoch} to {self.output_midi_dir}")
+
     def validation(self, epoch_num: int) -> float:
         self.model.eval()
         epoch_loss = []
@@ -432,9 +489,16 @@ class TrainingModule:
                 loss = self.step(batch)
             # No backwards pass
             epoch_loss.append(loss.item())
+            # Generate from this batch if required
+            if self.generate_cfg.get("do_generation", True):
+                if utils.random_probability() < self.generate_cfg.get("generation_probability", 0.01):
+                    self.generate_from_batch(batch, "validation")
         return np.mean(epoch_loss)
 
     def testing(self) -> float:
+        # Load the checkpoint with the best validation loss
+        if self.checkpoint_cfg.get("load_checkpoints", True):
+            self.load_checkpoint(os.path.join(self.checkpoint_dir, 'validation_best.pth'))
         self.model.eval()
         epoch_loss = []
         # Iterate over every batch in the dataloader
@@ -448,6 +512,10 @@ class TrainingModule:
                 loss = self.step(batch)
             # No backwards pass
             epoch_loss.append(loss.item())
+            # Generate from this batch if required
+            if self.generate_cfg.get("do_generation", True):
+                if utils.random_probability() < self.generate_cfg.get("generation_probability", 0.01):
+                    self.generate_from_batch(batch, "testing")
         return np.mean(epoch_loss)
 
     def log_run_params_to_mlflow(self):
@@ -473,6 +541,7 @@ class TrainingModule:
         logger.debug("Logged all run parameters to MLFlow dashboard!")
 
     def start(self):
+        """Runs training for this module"""
         training_start = time()
         # Log parameters for the run to MLflow if required
         if self.mlflow_cfg.get("use", False):
@@ -489,7 +558,6 @@ class TrainingModule:
             logger.debug(f'Epoch {epoch} / {self.epochs}, validation finished: loss {self.current_validation_loss:.3f}')
             # Log if this is our best epoch
             if self.current_validation_loss < self.best_validation_loss:
-                # TODO: we should probably enforce checkpointing here...
                 self.best_validation_loss = self.current_validation_loss
                 logger.info(f'New best validation loss: {self.current_validation_loss:.3f}')
             # Log parameters from this epoch in MLFlow
@@ -502,7 +570,19 @@ class TrainingModule:
             )
             # Checkpoint the run, if we need to
             if self.checkpoint_cfg["save_checkpoints"]:
-                self.save_checkpoint(metrics)
+                # How many epochs before we need to checkpoint (10 by default)
+                checkpoint_after = self.checkpoint_cfg.get("checkpoint_after_n_epochs", 10)
+                # The name of the checkpoint and where it'll be saved
+                new_check_name = f'checkpoint_{str(self.current_epoch).zfill(3)}.pth'
+                # We always want to checkpoint on the final epoch!
+                if (self.current_epoch % checkpoint_after == 0) or (self.current_epoch + 1 == self.epochs):
+                    self.save_checkpoint(metrics, os.path.join(self.checkpoint_dir, new_check_name))
+                # If we want to remove old checkpoints after saving a new one
+                if self.checkpoint_cfg.get("delete_old_checkpoints", False):
+                    self.remove_old_checkpoints()
+                # Save an additional checkpoint for the run if this is the best epoch
+                if self.current_validation_loss == self.best_validation_loss:
+                    self.save_checkpoint(metrics, os.path.join(self.checkpoint_dir, 'validation_best.pth'))
             # Report results to MLFlow, if we're using this
             if self.mlflow_cfg.get("use", False):
                 mlflow.log_metrics(metrics, step=epoch)
@@ -517,6 +597,7 @@ class TrainingModule:
 
 
 def parse_config_yaml(fpath: str) -> dict:
+    """Parses a configuration YAML file at `fpath`"""
     full_fpath = os.path.join(utils.get_project_root(), 'config', fpath)
     if not full_fpath.endswith(".yaml"):
         full_fpath += ".yaml"
