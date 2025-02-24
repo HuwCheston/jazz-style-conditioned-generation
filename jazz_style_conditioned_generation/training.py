@@ -139,8 +139,10 @@ class TrainingModule:
         logger.debug("Split chunks: " + ", ".join([f'{k}: {len(list(v))}' for k, v in self.chunk_splits.items()]))
 
         # DATALOADERS
+        logger.debug(f'Initialising training loader with args {self.train_dataset_cfg}')
         self.train_loader = self.create_dataloader("train", self.train_dataset_cfg)
         self.test_loader = self.create_dataloader("test", self.test_dataset_cfg)
+        logger.debug(f'Initialising testing + validation loaders with args {self.test_dataset_cfg}')
         self.validation_loader = self.create_dataloader("validation", self.test_dataset_cfg)  # reuse test config
 
         # MODEL

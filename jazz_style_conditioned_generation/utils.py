@@ -17,6 +17,9 @@ import numpy as np
 import torch
 import transformers
 from loguru import logger
+from symusic import Score
+
+import utils
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 SEED = 42
@@ -130,3 +133,13 @@ def now() -> str:
 def random_probability() -> float:
     """Returns a random float between 0 and 1, useful in e.g. deciding whether to apply augmentation or not"""
     return random.uniform(0, 1)
+
+
+def get_pitch_range(score: Score) -> tuple[int, int]:
+    """Returns the pitch range of a Symusic Score object"""
+    pitches = [i.pitch for i in score.tracks[0].notes]
+    min_pitch, max_pitch = min(pitches), max(pitches)
+    # Sanity check the pitch range: should be within the range of the piano
+    assert min_pitch >= MIDI_OFFSET
+    assert max_pitch <= (utils.MIDI_OFFSET + utils.PIANO_KEYS)
+    return min_pitch, max_pitch

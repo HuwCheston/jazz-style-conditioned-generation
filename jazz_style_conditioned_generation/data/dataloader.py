@@ -6,8 +6,12 @@
 import os
 import random
 
+import numpy as np
 import torch
+from miditok.constants import SCORE_LOADING_EXCEPTION
+from miditok.data_augmentation import augment_score
 from miditok.pytorch_data import DatasetMIDI, DataCollator
+from symusic import Score
 from torch.utils.data import DataLoader
 
 from jazz_style_conditioned_generation import utils
@@ -15,10 +19,36 @@ from jazz_style_conditioned_generation.data import conditions as cond
 
 DATA_DIR = os.path.join(utils.get_project_root(), "data")
 
-AUGMENT_PROB = 0.5
-PITCH_AUGMENT_RANGE = (-(utils.OCTAVE // 2), (utils.OCTAVE // 2))
-VELOCITY_AUGMENT_RANGE = (0.8, 1.2)
-DURATION_AUGMENT_RANGE = (12, 12)
+DEFAULT_AUGMENTATION_PROB = 0.5
+PITCH_AUGMENT_RANGE = (-6, 6)
+DURATION_AUGMENT_RANGE = np.linspace(0.8, 1.2, 17, dtype=float)  # [0.8, 0.825, 0.85] as in Music Transformer
+VELOCITY_AUGMENT_RANGE = (-12, 12)
+
+
+def get_pitch_augmentation_value(score: Score) -> int:
+    """Gets a pitch augmentation value that can be applied to a Score without exceeding the limits of the keyboard"""
+    # Get the minimum and maximum pitch from the score
+    min_pitch, max_pitch = utils.get_pitch_range(score)
+    # Default values
+    pitch_augment, min_pitch_augmented, max_pitch_augmented = 0, 0, 1000
+    # Keep iterating until we have an acceptable pitch augmentation value
+    while min_pitch_augmented < utils.MIDI_OFFSET or max_pitch_augmented > utils.MIDI_OFFSET + utils.PIANO_KEYS:
+        # Get a possible pitch augment value
+        pitch_augment = np.random.choice(range(*PITCH_AUGMENT_RANGE, 1))
+        # Add this to the min and max pitch
+        min_pitch_augmented = min_pitch + pitch_augment
+        max_pitch_augmented = max_pitch + pitch_augment
+    return pitch_augment
+
+
+def get_velocity_augmentation_value(tokenizer_velocities: np.array) -> int:
+    """Get a velocity augmentation value from the range of velocity bins accepted by the tokenizer"""
+    # The bins should presumably all be uniform
+    diff_velocities = np.diff(tokenizer_velocities)
+    assert np.all(diff_velocities == diff_velocities[0])
+    # Create the new range of velocity values and make a random choice from it
+    velocity_range = range(*VELOCITY_AUGMENT_RANGE, diff_velocities[0])
+    return np.random.choice(velocity_range)
 
 
 class DatasetMIDICondition(DatasetMIDI):
@@ -30,6 +60,8 @@ class DatasetMIDICondition(DatasetMIDI):
             combine_artist_and_album_tags: bool = False,
             n_clips: int = None,
             skip_conditioning: bool = False,
+            do_augmentation: bool = False,
+            augmentation_probability: float = DEFAULT_AUGMENTATION_PROB,
             *args,
             **kwargs,
     ) -> None:
@@ -41,6 +73,9 @@ class DatasetMIDICondition(DatasetMIDI):
         #  Otherwise, will use album tags by default, falling back to artist tags if these are not available
         self.combine_artist_and_album_tags = combine_artist_and_album_tags
         self.skip_conditioning = skip_conditioning
+        # Data augmentation arguments
+        self.do_augmentation = do_augmentation
+        self.augmentation_probability = augmentation_probability
         # Initialise the MIDITok dataset
         super().__init__(*args, **kwargs)
         if n_clips is not None:
@@ -118,55 +153,75 @@ class DatasetMIDICondition(DatasetMIDI):
         else:
             raise ValueError(f"Expected dataset_name to be either 'jtd' or 'pijama', but got {dataset_name}!")
 
-    # def augment_score(self, score: Score) -> Score:
-    #     if random.uniform(0, 1) < AUGMENT_PROB:
-    #         pitch_augment = random.randrange(*PITCH_AUGMENT_RANGE)
-    #         velocity_augment = random.randrange(*VELOCITY_AUGMENT_RANGE)
-    #         duration_augment = random.uniform(*DURATION_AUGMENT_RANGE)
-    #
-    # def getitem_with_augmentation(self, idx: int):
-    #     """A copy of super().__getitem__ that allows for data augmentation of a `symusic.Score` object"""
-    #     labels = None
-    #
-    #     # Already pre-tokenized
-    #     if self.pre_tokenize:
-    #         token_ids = self.samples[idx]
-    #         if self.func_to_get_labels is not None:
-    #             labels = self.labels[idx]
-    #
-    #     # Tokenize on the fly
-    #     else:
-    #         # The tokenization steps are outside the try bloc as if there are errors,
-    #         # we might want to catch them to fix them instead of skipping the iteration.
-    #         try:
-    #             score = Score(self.files_paths[idx])
-    #         except SCORE_LOADING_EXCEPTION:
-    #             item = {self.sample_key_name: None}
-    #             if self.func_to_get_labels is not None:
-    #                 item[self.labels_key_name] = labels
-    #             return item
-    #
-    #         # DATA AUGMENTATION COMES HERE
-    #
-    #         tseq = self._tokenize_score(score)
-    #         # If not one_token_stream, we only take the first track/sequence
-    #         token_ids = tseq.ids if self.tokenizer.one_token_stream else tseq[0].ids
-    #         if self.func_to_get_labels is not None:
-    #             # tokseq can be given as a list of TokSequence to get the labels
-    #             labels = self.func_to_get_labels(score, tseq, self.files_paths[idx])
-    #             if not isinstance(labels, torch.LongTensor):
-    #                 labels = torch.LongTensor([labels] if isinstance(labels, int) else labels)
-    #
-    #     item = {self.sample_key_name: torch.LongTensor(token_ids)}
-    #     if self.func_to_get_labels is not None:
-    #         item[self.labels_key_name] = labels
-    #
-    #     return item
+    def augment_score(self, score: Score) -> Score:
+        """Applies pitch, velocity, and duration augmentation to a Score object"""
+        # Get augmentation values
+        pitch_augment = get_pitch_augmentation_value(score)
+        # We don't need to worry too much about velocity as MIDItok will clip it automatically
+        velocity_augment = get_velocity_augmentation_value(self.tokenizer.velocities)
+        # We can augment pitch and velocity directly with the MIDItok function
+        augmented = augment_score(
+            score,
+            pitch_offset=pitch_augment,
+            velocity_offset=velocity_augment,
+            velocity_range=(min(self.tokenizer.velocities), max(self.tokenizer.velocities)),
+            augment_copy=True,
+            duration_offset=0,
+        )
+        # We need to use symusic to adjust the durations
+        duration_augment = np.random.choice(DURATION_AUGMENT_RANGE)
+        return augmented.adjust_time(
+            [augmented.start(), augmented.end()],
+            [augmented.start(), int(augmented.end() * duration_augment)],
+            inplace=False
+        )
+
+    def getitem_with_augmentation(self, idx: int):
+        """A copy of super().__getitem__ that allows for data augmentation of a `symusic.Score` object"""
+        labels = None
+
+        # Already pre-tokenized
+        if self.pre_tokenize:
+            token_ids = self.samples[idx]
+            if self.func_to_get_labels is not None:
+                labels = self.labels[idx]
+
+        # Tokenize on the fly
+        else:
+            # The tokenization steps are outside the try bloc as if there are errors,
+            # we might want to catch them to fix them instead of skipping the iteration.
+            try:
+                score = Score(self.files_paths[idx])
+            except SCORE_LOADING_EXCEPTION:
+                item = {self.sample_key_name: None}
+                if self.func_to_get_labels is not None:
+                    item[self.labels_key_name] = labels
+                return item
+
+            # DATA AUGMENTATION COMES HERE
+            if self.do_augmentation:
+                if utils.random_probability() < self.augmentation_probability:
+                    score = self.augment_score(score)
+
+            tseq = self._tokenize_score(score)
+            # If not one_token_stream, we only take the first track/sequence
+            token_ids = tseq.ids if self.tokenizer.one_token_stream else tseq[0].ids
+            if self.func_to_get_labels is not None:
+                # tokseq can be given as a list of TokSequence to get the labels
+                labels = self.func_to_get_labels(score, tseq, self.files_paths[idx])
+                if not isinstance(labels, torch.LongTensor):
+                    labels = torch.LongTensor([labels] if isinstance(labels, int) else labels)
+
+        item = {self.sample_key_name: torch.LongTensor(token_ids)}
+        if self.func_to_get_labels is not None:
+            item[self.labels_key_name] = labels
+
+        return item
 
     def __getitem__(self, idx: int) -> dict[str, torch.LongTensor]:
         """Return the `idx` elements of the dataset with corresponding conditions"""
         # Process the input MIDI to get token idxs
-        processed = super().__getitem__(idx)
+        processed = self.getitem_with_augmentation(idx)
         if self.skip_conditioning:
             return processed
 
