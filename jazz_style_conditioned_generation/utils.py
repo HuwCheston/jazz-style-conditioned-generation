@@ -44,14 +44,14 @@ def seed_everything(seed: int = SEED) -> None:
     transformers.set_seed(seed)
 
 
-def total_parameters(layer) -> int:
+def total_parameters(layer: torch.nn.Module) -> int:
+    """Gets total number of parameters for a pytorch module"""
     return sum(p.numel() for p in layer.parameters())
 
 
 @contextmanager
 def timer(name: str) -> ContextManager[None]:
     """Print out how long it takes to execute the provided block."""
-    from loguru import logger
     start = time()
     try:
         yield
@@ -66,8 +66,13 @@ def timer(name: str) -> ContextManager[None]:
 
 def get_project_root() -> str:
     """Returns the root directory of the project"""
-    # TODO: not working in pycharm
-    return os.path.abspath(os.curdir)
+    # Possibly the root directory, but doesn't work when running from the CLI for some reason
+    poss_path = str(Path(__file__).parent.parent)
+    # The root directory should always have these files (this is pretty hacky)
+    if all(fp in os.listdir(poss_path) for fp in ["config", "checkpoints", "data", "outputs", "setup.py"]):
+        return poss_path
+    else:
+        return os.path.abspath(os.curdir)
 
 
 @lru_cache(maxsize=None)
@@ -142,3 +147,7 @@ def get_pitch_range(score: Score) -> tuple[int, int]:
     assert min_pitch >= MIDI_OFFSET
     assert max_pitch <= (MIDI_OFFSET + PIANO_KEYS)
     return min_pitch, max_pitch
+
+
+if __name__ == "__main__":
+    logger.info(f"Root directory: {get_project_root()}")
