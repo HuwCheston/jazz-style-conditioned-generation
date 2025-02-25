@@ -8,7 +8,7 @@ import os
 from random import choice
 
 from loguru import logger
-from miditok import REMI, MIDILike, TSD, Structured, TokenizerConfig, constants
+from miditok import REMI, MIDILike, TSD, PerTok, Structured, TokenizerConfig, constants
 
 from jazz_style_conditioned_generation import utils
 
@@ -52,6 +52,8 @@ def get_tokenizer_class_from_string(tokenizer_str: str = DEFAULT_TOKENIZER_CLASS
         return TSD
     elif tokenizer_str == "Structured":
         return Structured
+    elif tokenizer_str == "PerTok":
+        return PerTok
     else:
         raise ValueError(f'`tokenizer_str` {tokenizer_str} is not recognized')
 
@@ -128,6 +130,7 @@ def get_tokenizer(
         with utils.timer('train tokenizer'):
             tokenizer = train_tokenizer(tokenizer_str, training_method, tokenizer_config)
     finally:
+        # TODO: errors can be a bit cryptic here
         logger.info(f'Tokenizer created with parameters: {tokenizer.__repr__()}')
         return tokenizer
 
