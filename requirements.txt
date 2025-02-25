@@ -19,3 +19,4 @@ symusic
 joblib
 openai
 dotenv
+pydantic
