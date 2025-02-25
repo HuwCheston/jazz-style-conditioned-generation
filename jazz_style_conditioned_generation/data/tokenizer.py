@@ -33,8 +33,9 @@ DEFAULT_TOKENIZER_CONFIG = {
     "remove_duplicated_notes": True,
 }
 # TODO: add a way to parameterize these
-VOCAB_SIZE = 40000
+VOCAB_SIZE = 20000
 DEFAULT_TRAINING_METHOD = "BPE"
+# TODO: we should almost definitely use the `PerTok` tokenizer here
 DEFAULT_TOKENIZER_CLASS = "TSD"
 
 OUTPUT_DIR = os.path.join(utils.get_project_root(), 'outputs/tokenizers')
