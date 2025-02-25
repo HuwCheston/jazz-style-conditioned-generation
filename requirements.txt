@@ -16,3 +16,6 @@ pyyaml
 scikit-learn
 mlflow
 symusic
+joblib
+openai
+dotenv
