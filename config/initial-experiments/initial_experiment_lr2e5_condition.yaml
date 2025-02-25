@@ -40,4 +40,4 @@ generate_cfg:
     top_k: 0.
 mlflow_cfg:
   use: True
-  port: 8080
+  port: 5000
