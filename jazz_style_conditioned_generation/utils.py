@@ -19,8 +19,6 @@ import transformers
 from loguru import logger
 from symusic import Score
 
-import utils
-
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 SEED = 42
 
@@ -34,7 +32,7 @@ OCTAVE = 12
 MAX_SEQUENCE_LENGTH = 1024
 # This is important: it ensures that two chunks overlap slightly, to allow a causal chain between the
 #  end of one chunk and the beginning of the next. The MIDITok default is 1: increasing this seems to work better
-CHUNK_OVERLAP_BARS = 2
+CHUNK_OVERLAP_BARS = 8
 
 
 def seed_everything(seed: int = SEED) -> None:
@@ -68,13 +66,14 @@ def timer(name: str) -> ContextManager[None]:
 
 def get_project_root() -> str:
     """Returns the root directory of the project"""
+    # TODO: not working in pycharm
     return os.path.abspath(os.curdir)
 
 
 @lru_cache(maxsize=None)
-def get_data_files_with_ext(midi_dir_from_root: str = "data/raw", ext: str = "**/*.mid") -> list[str]:
+def get_data_files_with_ext(dir_from_root: str = "data/raw", ext: str = "**/*.mid") -> list[str]:
     """Gets the filepaths recursively for all files with a given extension inside midi_dir_from_root"""
-    return [str(p) for p in Path(os.path.join(get_project_root(), midi_dir_from_root)).glob(ext)]
+    return [str(p) for p in Path(os.path.join(get_project_root(), dir_from_root)).glob(ext)]
 
 
 @lru_cache(maxsize=None)
@@ -141,5 +140,5 @@ def get_pitch_range(score: Score) -> tuple[int, int]:
     min_pitch, max_pitch = min(pitches), max(pitches)
     # Sanity check the pitch range: should be within the range of the piano
     assert min_pitch >= MIDI_OFFSET
-    assert max_pitch <= (utils.MIDI_OFFSET + utils.PIANO_KEYS)
+    assert max_pitch <= (MIDI_OFFSET + PIANO_KEYS)
     return min_pitch, max_pitch
