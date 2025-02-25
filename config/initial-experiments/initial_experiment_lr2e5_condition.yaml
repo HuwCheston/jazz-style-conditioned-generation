@@ -1,0 +1,43 @@
+experiment: initial-experiments
+run: initial_experiment_lr2e5_condition
+conditions: [ genres, moods, ensemble, themes, pianist ]
+batch_size: 8
+epochs: 100
+train_dataset_cfg:
+  skip_conditioning: false
+test_dataset_cfg:
+  skip_conditioning: false
+model_cfg:
+  model_type: gpt2-lm
+  model_kws:
+    n_embd: 512
+    n_layer: 6
+    n_head: 8
+optimizer_cfg:
+  optimizer_type: adam
+  optimizer_kws:
+    #    lr: 10.0e-4
+    lr: 2.0e-5
+scheduler_cfg:
+  scheduler_type: null
+  scheduler_kws: { }
+checkpoint_cfg:
+  save_checkpoints: True
+  load_checkpoints: True
+  checkpoint_after_n_epochs: 10
+tokenizer_cfg:
+  tokenizer_str: REMI
+  training_method: BPE
+  tokenizer_kws: { }
+generate_cfg:
+  do_generation: true
+  generation_probability: 0.01
+  generate_kws:
+    max_new_tokens: 200
+    do_sample: True
+    top_p: 0.92
+    min_p: 0.08
+    top_k: 0.
+mlflow_cfg:
+  use: True
+  port: 8080
