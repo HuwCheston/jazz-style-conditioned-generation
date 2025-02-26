@@ -37,7 +37,7 @@ def get_tracks_in_existing_split(split_name: str) -> list[str]:
 
 def get_pianist(fname: str) -> str:
     """Loads metadata for a given track and returns the name of the pianist"""
-    js_path = os.path.join(DATA_ROOT, fname, "metadata_tivo.json")
+    js_path = os.path.join(DATA_ROOT, fname, "metadata.json")
     return utils.read_json_cached(js_path)["pianist"]
 
 
