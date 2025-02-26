@@ -1,6 +1,9 @@
 # Data files
 /data/raw/jtd/
 /data/raw/pijama/
+/data/raw/jja/
+/data/raw/pianist8/
+/data/raw/bushgrafts/
 
 # Project sources
 /.idea/
