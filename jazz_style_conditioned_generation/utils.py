@@ -6,6 +6,7 @@
 import json
 import os
 import random
+import string
 from contextlib import contextmanager
 from datetime import datetime
 from functools import lru_cache
@@ -29,7 +30,7 @@ MAX_VELOCITY = 127
 MIDDLE_C = 60
 OCTAVE = 12
 
-MAX_SEQUENCE_LENGTH = 1024
+MAX_SEQUENCE_LENGTH = 512
 # This is important: it ensures that two chunks overlap slightly, to allow a causal chain between the
 #  end of one chunk and the beginning of the next. The MIDITok default is 1: increasing this seems to work better
 CHUNK_OVERLAP_BARS = 8
@@ -147,6 +148,14 @@ def get_pitch_range(score: Score) -> tuple[int, int]:
     assert min_pitch >= MIDI_OFFSET
     assert max_pitch <= (MIDI_OFFSET + PIANO_KEYS)
     return min_pitch, max_pitch
+
+
+def remove_punctuation(s: str) -> str:
+    """Removes punctuation from a given input string `s`"""
+    return ''.join(
+        c for c in str(s).translate(str.maketrans('', '', string.punctuation)).replace('’', '')
+        if c in string.printable
+    )
 
 
 if __name__ == "__main__":
