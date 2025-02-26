@@ -20,3 +20,5 @@ joblib
 openai
 dotenv
 pydantic
+lxml
+pretty-midi
