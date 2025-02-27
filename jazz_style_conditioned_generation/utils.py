@@ -49,6 +49,7 @@ def get_project_root() -> str:
 
 # These are the names of all the datasets we're using: one "folder" per dataset
 DATASETS = [i for i in os.listdir(os.path.join(get_project_root(), "data/raw")) if ".gitkeep" not in i]
+DATASETS_WITH_TIVO = ["jtd", "pijama", "pianist8"]
 
 
 def seed_everything(seed: int = SEED) -> None:

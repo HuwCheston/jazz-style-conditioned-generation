@@ -12,7 +12,6 @@ from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.preprocessing.tivo.tivo_utils import (
     API_ROOT,
     DATA_ROOT,
-    TIVO_DATASETS,
     format_named_person_or_entity,
     cached_api_call,
     clean_prose_text
@@ -32,7 +31,7 @@ def get_artists():
     """Gets the names of all artists contained within the datasets that have TiVo metadata (Pianist8, PiJAMA, JTD)"""
     # i.e., ./data/raw/jtd or ./data/raw/pijama
     pianists = []
-    for dataset in TIVO_DATASETS:
+    for dataset in utils.DATASETS_WITH_TIVO:
         dataset_dir = os.path.join(DATA_ROOT, dataset)
         # ./data/raw/jtd/<track>, ./data/raw/pijama/<track>
         for track in os.listdir(dataset_dir):

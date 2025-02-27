@@ -12,7 +12,6 @@ import requests
 from jazz_style_conditioned_generation import utils
 
 DATA_ROOT = os.path.join(utils.get_project_root(), 'data/raw')
-TIVO_DATASETS = ["jtd", 'pijama', 'pianist8', ]  # datasets with no metadata: jja, bushgrafts
 
 API_ROOT = "https://tivomusicapi-staging-elb.digitalsmiths.net/sd/tivomusicapi/taps/v3"
 API_HEADERS = {"Accept": "application/json"}

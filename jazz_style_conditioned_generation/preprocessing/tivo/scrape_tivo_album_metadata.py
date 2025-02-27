@@ -12,7 +12,6 @@ from tqdm import trange
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.preprocessing.tivo.tivo_utils import (
     API_ROOT,
-    TIVO_DATASETS,
     DATA_ROOT,
     format_named_person_or_entity,
     cached_api_call,
@@ -42,7 +41,7 @@ ALBUM_HITS, ALBUM_MISSES = 0, []
 def get_tracks() -> list[str]:
     """Gets the names of all tracks contained within the datasets that have TiVo metadata (Pianist8, PiJAMA, JTD)"""
     # i.e., ./data/raw/jtd or ./data/raw/pijama
-    for dataset in TIVO_DATASETS:
+    for dataset in utils.DATASETS_WITH_TIVO:
         dataset_dir = os.path.join(DATA_ROOT, dataset)
         # ./data/raw/jtd/<track>, ./data/raw/pijama/<track>
         for track in os.listdir(dataset_dir):
@@ -187,7 +186,7 @@ def dump_missing_albums(misses: list[dict]) -> None:
 def create_empty_metadata_jsons() -> None:
     """For tracks that cannot have TiVo metadata (e.g., from our latency/jitter experiment), create an empty JSON"""
     for dataset in utils.DATASETS:
-        if dataset not in TIVO_DATASETS:
+        if dataset not in utils.DATASETS_WITH_TIVO:
             dataset_path = os.path.join(DATA_ROOT, dataset)
             for track in os.listdir(dataset_path):
                 track_dir = os.path.join(dataset_path, track)
