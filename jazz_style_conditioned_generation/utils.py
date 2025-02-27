@@ -158,5 +158,11 @@ def remove_punctuation(s: str) -> str:
     )
 
 
+def write_json(metadata_dict: dict, filepath: str) -> None:
+    """Dumps a dictionary as a JSON in provided location"""
+    with open(filepath, 'w', encoding='utf-8') as f:
+        json.dump(metadata_dict, f, indent=4, ensure_ascii=False, sort_keys=False)
+
+
 if __name__ == "__main__":
     logger.info(f"Root directory: {get_project_root()}")
