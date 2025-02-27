@@ -7,6 +7,8 @@ import unittest
 
 from jazz_style_conditioned_generation.data.dataloader import *
 
+TEST_MIDI = os.path.join(utils.get_project_root(), "test/test_resources/test_midi1.mid")
+
 
 class DataloaderTest(unittest.TestCase):
     def test_add_eos_bos(self):
@@ -34,7 +36,7 @@ class DataloaderTest(unittest.TestCase):
         self.assertEqual(len(returned), desired_len)
 
     def test_get_pitch_range(self):
-        score = Score("test_resources/test_midi1.mid")
+        score = Score(TEST_MIDI)
         expected_min_pitch, expected_max_pitch = 34, 98
         actual_min_pitch, actual_max_pitch = utils.get_pitch_range(score)
         self.assertEqual(expected_min_pitch, actual_min_pitch)
@@ -42,14 +44,14 @@ class DataloaderTest(unittest.TestCase):
 
     def test_get_pitch_augment_value(self):
         # Test with a real midi clip
-        score = Score("test_resources/test_midi1.mid")
+        score = Score(TEST_MIDI)
         expected_max_augment = 3
         actual_augment = get_pitch_augmentation_value(score, PITCH_AUGMENT_RANGE)
         self.assertTrue(abs(actual_augment) <= expected_max_augment)
         # TODO: test with a midi clip that exceeds boundaries
 
     def test_data_augmentation(self):
-        score = Score("test_resources/test_midi1.mid")
+        score = Score(TEST_MIDI)
         prev_min_pitch, prev_max_pitch = 34, 98
         # Test with transposition up one semitone
         augmented = data_augmentation(
@@ -69,7 +71,7 @@ class DataloaderTest(unittest.TestCase):
     def test_dataset_random_chunk_getitem(self):
         ds = DatasetMIDIRandomChunk(
             tokenizer=REMI(),
-            files_paths=["test_resources/test_midi1.mid"],
+            files_paths=[TEST_MIDI],
             do_augmentation=False,
             max_seq_len=512
         )
@@ -85,7 +87,7 @@ class DataloaderTest(unittest.TestCase):
         max_seq_length = 10
         ds = DatasetMIDIRandomChunk(
             tokenizer=REMI(),
-            files_paths=["test_resources/test_midi1.mid"],
+            files_paths=[TEST_MIDI],
             do_augmentation=False,
             max_seq_len=10
         )
@@ -125,7 +127,7 @@ class DataloaderTest(unittest.TestCase):
         # Test with a low max_seq_len (== lots of chunks)
         ds_small = DatasetMIDIExhaustive(
             tokenizer=tokenizer,
-            files_paths=["test_resources/test_midi1.mid"],
+            files_paths=[TEST_MIDI],
             do_augmentation=False,
             max_seq_len=10
         )
@@ -133,7 +135,7 @@ class DataloaderTest(unittest.TestCase):
         # Test with a high max_seq_len (== few chunks)
         ds_big = DatasetMIDIExhaustive(
             tokenizer=REMI(),
-            files_paths=["test_resources/test_midi1.mid"],
+            files_paths=[TEST_MIDI],
             do_augmentation=False,
             max_seq_len=100000
         )
@@ -156,7 +158,7 @@ class DataloaderTest(unittest.TestCase):
         for ds in [DatasetMIDIExhaustive, DatasetMIDIRandomChunk]:
             ds_init = ds(
                 tokenizer=tokenizer,
-                files_paths=["test_resources/test_midi1.mid"],
+                files_paths=[TEST_MIDI],
                 do_augmentation=False,
                 max_seq_len=10
             )
