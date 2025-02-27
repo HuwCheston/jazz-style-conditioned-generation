@@ -20,7 +20,7 @@ from jazz_style_conditioned_generation.preprocessing.tivo.tivo_utils import (
     add_missing_keys
 )
 
-OVERWRITE_EXISTING = True  # if True, will re-process all tracks; if False, will skip
+OVERWRITE_EXISTING = False  # if True, will re-process all tracks; if False, will skip
 
 # Matched album name + matched artist name must be over this value to be valid
 MIN_ALBUM_VALIDATION_SCORE = 180  # maximum similarity is 200
@@ -28,10 +28,13 @@ MIN_ALBUM_VALIDATION_SCORE = 180  # maximum similarity is 200
 API_ALBUM_SEARCH = f'{API_ROOT}/search/album'
 API_ALBUM_LOOKUP = f'{API_ROOT}/lookup/album'
 
-ALBUM_METADATA_FIELDS = [
-    "album_moods", "album_genres", "album_themes", "album_flags", "album_review", "tivo_album_artists"
-]
+ALBUM_METADATA_FIELDS = ["moods", "genres", "themes", "flags", "review", "tivo_album_artists", ]
 ALBUM_METADATA_FIELDS_WITH_WEIGHTS = ["moods", "genres", "subGenres", "themes"]
+
+# This is a dictionary (created manually) that maps albums onto TiVo IDs
+MISMATCHED_ALBUMS = utils.read_json_cached(
+    os.path.join(utils.get_project_root(), "references/tivo_mismatched_albums.json")
+)
 
 ALBUM_HITS, ALBUM_MISSES = 0, []
 
@@ -110,26 +113,29 @@ def parse_tivo_album_metadata(tivo_album_lookup: dict):
     for field in ALBUM_METADATA_FIELDS_WITH_WEIGHTS:
         # We'll use this to combine sub-genres and genres into a single list
         field_replace = field.replace('subGenres', 'genres')
-        if f'album_{field_replace}' not in new_album_metadata.keys():
-            new_album_metadata[f'album_{field_replace}'] = []
+        if field_replace not in new_album_metadata.keys():
+            new_album_metadata[field_replace] = []
         if field in hit.keys():
-            new_album_metadata[f'album_{field_replace}'].extend([
+            new_album_metadata[field_replace].extend([
                 {k: v for k, v in value.items() if k in ['name', 'weight']}
                 for value in hit[field]
             ])
     # Sanity check: store matched artist and title
     new_album_metadata['tivo_album_name'] = hit['title']
-    new_album_metadata['tivo_album_artists'] = [i['name'] for i in hit['primaryArtists']]
+    if 'primaryArtists' in hit.keys():
+        new_album_metadata['tivo_album_artists'] = [i['name'] for i in hit['primaryArtists']]
+    else:
+        new_album_metadata['tivo_album_artists'] = []
     # Extracting reviews for the album
     if "primaryReview" in hit.keys():
-        new_album_metadata['album_review'] = [clean_prose_text(review['text']) for review in hit['primaryReview']]
+        new_album_metadata['review'] = [clean_prose_text(review['text']) for review in hit['primaryReview']]
     else:
-        new_album_metadata['album_review'] = []
+        new_album_metadata['review'] = []
     # Extracting flags for the album
     if "flags" in hit.keys():
-        new_album_metadata['album_flags'] = hit['flags']
+        new_album_metadata['flags'] = hit['flags']
     else:
-        new_album_metadata['album_flags'] = []
+        new_album_metadata['flags'] = []
     return new_album_metadata
 
 
@@ -139,28 +145,62 @@ def parse_all_metadata(track_path: str) -> dict:
 
     # Get the metadata for the track (already available for JTD + PiJAMA)
     track_metadata = utils.read_json_cached(os.path.join(track_path, 'metadata.json'))
-    # Parse metadata for the ALBUM: this may be lead by a different musician to the pianist!
-    album_searched = album_search(track_metadata)
-    album_is_valid = validate_album(track_metadata, album_searched)
+    # If we already have manually annotated the album ID
+    try:
+        album_id = [
+            i["tivo_id"] for i in MISMATCHED_ALBUMS
+            if (i["album_name"] == track_metadata["album_name"])
+               and (i["pianist"] == track_metadata["pianist"])
+        ][0]
+    # Otherwise we need to scrape TiVo to get the album ID
+    except IndexError:
+        # Parse metadata for the ALBUM: this may be lead by a different musician to the pianist!
+        album_searched = album_search(track_metadata)
+        album_id = validate_album(track_metadata, album_searched)
+
     # If we've been able to find a matching album
-    if album_is_valid:
+    if album_id:
         ALBUM_HITS += 1
         # Make another API call to get the full set of metadata and parse it
-        album_metadata = album_lookup(album_is_valid)
+        album_metadata = album_lookup(album_id)
         album_metadata_parsed = parse_tivo_album_metadata(album_metadata)
         album_metadata_parsed["tivo_found_match"] = True
     else:
-        track_sep = track_path.split(os.path.sep)[-1]
-        ALBUM_MISSES.append(track_sep)
-        logger.warning(f'Miss! {track_sep}')
+        ALBUM_MISSES.append(track_metadata)
+        logger.warning(f'Miss! Album: {track_metadata["album_name"]}, Pianist: {track_metadata["pianist"]}')
         album_metadata_parsed = {"tivo_found_match": False}
     # Combine all the metadata dictionaries into a single dictionary
-    all_metadata = (
-            track_metadata |
-            # add_missing_keys(artist_metadata_parsed, ARTIST_METADATA_FIELDS) |
-            add_missing_keys(album_metadata_parsed, ALBUM_METADATA_FIELDS)
-    )
+    all_metadata = track_metadata | add_missing_keys(album_metadata_parsed, ALBUM_METADATA_FIELDS)
     return add_missing_keys(all_metadata, ["tivo_album_name"], str)
+
+
+def dump_missing_albums(misses: list[dict]) -> None:
+    """Dump missing album names + pianist names to a JSON file for manual checking"""
+    done, result = set(), []
+    for d in misses:
+        if d['album_name'] + d["pianist"] not in done:
+            done.add(d['album_name'] + d["pianist"])
+            result.append(dict(album_name=d["album_name"], pianist=d["pianist"], tivo_id=None))
+    utils.write_json(result, os.path.join(utils.get_project_root(), "references", "tivo_album_misses.json"))
+
+
+def create_empty_metadata_jsons() -> None:
+    """For tracks that cannot have TiVo metadata (e.g., from our latency/jitter experiment), create an empty JSON"""
+    for dataset in utils.DATASETS:
+        if dataset not in TIVO_DATASETS:
+            dataset_path = os.path.join(DATA_ROOT, dataset)
+            for track in os.listdir(dataset_path):
+                track_dir = os.path.join(dataset_path, track)
+                if os.path.isdir(track_dir):
+                    # No need to create a metadata file if it already exists
+                    if "metadata_tivo.json" in os.listdir(track_dir):
+                        continue
+                    else:
+                        old_metadata = utils.read_json_cached(os.path.join(track_dir, 'metadata.json'))
+                        new_metadata = add_missing_keys(old_metadata, ALBUM_METADATA_FIELDS)
+                        new_metadata = add_missing_keys(new_metadata, ["tivo_album_name"], str)
+                        new_metadata["tivo_found_match"] = False
+                        utils.write_json(new_metadata, os.path.join(track_dir, 'metadata_tivo.json'))
 
 
 def main():
@@ -171,7 +211,7 @@ def main():
     logger.info(f'Found {len(all_tracks)} tracks to get TiVo metadata for!')
     with trange(len(all_tracks), desc='Processing...') as t:
         # Iterate over every track in both datasets
-        for track_path in all_tracks[50:]:
+        for track_path in all_tracks:
             # This is where we'll save our new metadata
             tivo_metadata_path = os.path.join(track_path, 'metadata_tivo.json')
             # If we've already processed the track, we can skip over it
@@ -185,11 +225,9 @@ def main():
             # Update the TQDM progress bar
             t.set_postfix(hits=ALBUM_HITS, misses=len(ALBUM_MISSES))
             t.update(1)
-    # TODO: we should create an empty metadata_tivo file for tracks from bushgrafts/jja?
-    # List the tracks that are misses in the console
-    misses_fmt = "\n".join(ALBUM_MISSES)
+    # For every track that can't have TiVo metadata, create a new JSON with the same keys but empty values
+    create_empty_metadata_jsons()
     logger.info('Done!')
-    logger.warning(rf'These tracks were misses: {misses_fmt}')
 
 
 if __name__ == "__main__":
