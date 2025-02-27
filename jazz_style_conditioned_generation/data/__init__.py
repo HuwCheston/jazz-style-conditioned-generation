@@ -4,7 +4,7 @@
 """Data classes to be used in training"""
 
 from .conditions import (
-    validate_conditions, get_mapping_for_condition, get_special_tokens_for_condition
+    validate_conditions, get_inner_json_values, get_condition_special_tokens
 )
 from .dataloader import (
     DATA_DIR, DatasetMIDIExhaustive, DatasetMIDIRandomChunk
@@ -16,8 +16,8 @@ from .tokenizer import (
 
 __all__ = [
     "validate_conditions",
-    "get_mapping_for_condition",
-    "get_special_tokens_for_condition",
+    "get_condition_special_tokens",
+    "get_inner_json_values",
     "DATA_DIR",
     "DatasetMIDIExhaustive",
     "DatasetMIDIRandomChunk",
