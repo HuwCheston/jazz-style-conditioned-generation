@@ -1,61 +1,45 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Adds metadata from TiVo into the existing metadata for JTD + PiJAMA"""
+"""Adds metadata from TiVo into the existing album metadata for JTD, PiJAMA, and Pianist8"""
 
-import json
 import os
-import re
-from functools import lru_cache
 
-import requests
 from loguru import logger
 from thefuzz import fuzz
 from tqdm import trange
 
 from jazz_style_conditioned_generation import utils
+from jazz_style_conditioned_generation.preprocessing.tivo.tivo_utils import (
+    API_ROOT,
+    TIVO_DATASETS,
+    DATA_ROOT,
+    format_named_person_or_entity,
+    cached_api_call,
+    clean_prose_text,
+    add_missing_keys
+)
 
-DATA_ROOT = os.path.join(utils.get_project_root(), 'data/raw')
-DATASETS = ["jtd", 'pijama']
 OVERWRITE_EXISTING = True  # if True, will re-process all tracks; if False, will skip
 
 # Matched album name + matched artist name must be over this value to be valid
 MIN_ALBUM_VALIDATION_SCORE = 180  # maximum similarity is 200
 
-API_ROOT = "https://tivomusicapi-staging-elb.digitalsmiths.net/sd/tivomusicapi/taps/v3"
-API_HEADERS = {"Accept": "application/json"}
 API_ALBUM_SEARCH = f'{API_ROOT}/search/album'
 API_ALBUM_LOOKUP = f'{API_ROOT}/lookup/album'
-API_ARTIST_SEARCH = f'{API_ROOT}/search/artist'
-API_WAIT_TIME = 0.1  # seconds, API terms of use specify no more than five calls per second
 
 ALBUM_METADATA_FIELDS = [
     "album_moods", "album_genres", "album_themes", "album_flags", "album_review", "tivo_album_artists"
 ]
 ALBUM_METADATA_FIELDS_WITH_WEIGHTS = ["moods", "genres", "subGenres", "themes"]
 
-ARTIST_METADATA_FIELDS = ["artist_moods", "artist_genres", "artist_bio"]
-ARTIST_METADATA_FIELDS_WITH_WEIGHTS = ["moods", "musicGenres"]
-
 ALBUM_HITS, ALBUM_MISSES = 0, []
 
 
-def format_named_person_or_entity(npe: str):
-    return " ".join(npe.lstrip().rstrip().title().split())
-
-
-def add_missing_keys(di: dict, keys: list, value_type: type = list) -> dict:
-    """Adds key-value pairs that do not exist into a dictionary"""
-    for key in keys:
-        if key not in di.keys():
-            di[key] = value_type()  # defaults to an empty list
-    return di
-
-
 def get_tracks() -> list[str]:
-    """Gets the names of all tracks contained within JTD and PiJAMA"""
+    """Gets the names of all tracks contained within the datasets that have TiVo metadata (Pianist8, PiJAMA, JTD)"""
     # i.e., ./data/raw/jtd or ./data/raw/pijama
-    for dataset in DATASETS:
+    for dataset in TIVO_DATASETS:
         dataset_dir = os.path.join(DATA_ROOT, dataset)
         # ./data/raw/jtd/<track>, ./data/raw/pijama/<track>
         for track in os.listdir(dataset_dir):
@@ -71,19 +55,12 @@ def get_tracks() -> list[str]:
             yield track_dir
 
 
-@utils.wait(secs=API_WAIT_TIME)
-@lru_cache(maxsize=None)
-def _cached_api_call(url: str) -> dict:
-    """Makes an API call to a given url: waiting and caching are implemented to prevent rate limiting"""
-    return requests.get(url, headers=API_HEADERS).json()
-
-
 def album_search(track_metadata: dict) -> str:
     """Makes an API request to search for an album given an artist and title"""
     artist = format_named_person_or_entity(track_metadata['bandleader']).replace(' ', '+')
     album = format_named_person_or_entity(track_metadata['album_name']).replace(' ', "+")
     request_fmt = f"{API_ALBUM_SEARCH}?artistName={artist}&title={album}"
-    return _cached_api_call(request_fmt)
+    return cached_api_call(request_fmt)
 
 
 def validate_album(track_metadata: dict, track_hit: dict) -> bool:
@@ -120,16 +97,7 @@ def validate_album(track_metadata: dict, track_hit: dict) -> bool:
 def album_lookup(tivo_album_id: str) -> dict:
     """Makes an API request using the unique ID for an album to get complete metadata"""
     request_fmt = f'{API_ALBUM_LOOKUP}?albumId={tivo_album_id}'
-    return _cached_api_call(request_fmt)
-
-
-def clean_prose_text(prose_text: str) -> str:
-    """Prose text from TiVo (e.g., bios, reviews) contains some HTML tags which we need to remove"""
-    # Iterate over each markup tag
-    for remove in ["roviLink", "muzeItalic"]:
-        # Use some regex to remove the tags but keep the content between the tags
-        prose_text = re.sub(rf'\[{remove}.*?\](.*?)\[/{remove}\]', r'\1', prose_text)
-    return prose_text
+    return cached_api_call(request_fmt)
 
 
 def parse_tivo_album_metadata(tivo_album_lookup: dict):
@@ -165,76 +133,12 @@ def parse_tivo_album_metadata(tivo_album_lookup: dict):
     return new_album_metadata
 
 
-def artist_search(artist_name: str) -> dict:
-    """Make an API call to get metadata for an artist"""
-    artist_name = format_named_person_or_entity(artist_name).replace(' ', '+')
-    request_fmt = f'{API_ARTIST_SEARCH}?name={artist_name}&includeAllFields=true&limit=1'
-    return _cached_api_call(request_fmt)
-
-
-def parse_artist_bios(tivo_musicbio: dict) -> list:
-    """TiVo artist bios have a weird structure, with numerous different keys. Here, we unpack them to a flat list"""
-    all_bios = []
-    # These are the keys that we find
-    for bio_key1 in ['headlineBio', 'biography', 'musicBioOverviewEnglish']:
-        if bio_key1 in tivo_musicbio.keys():
-            # Sometimes, we'll get a list of dictionaries
-            if isinstance(tivo_musicbio[bio_key1], list):
-                for txt in tivo_musicbio[bio_key1]:
-                    # The actual text can be stored under different keys, as well
-                    for bio_key2 in ['text', 'overview']:
-                        try:
-                            all_bios.append(clean_prose_text(txt[bio_key2]))
-                        except KeyError:
-                            continue
-            # other times, we'll just get a single dictionary
-            else:
-                all_bios.append(clean_prose_text(tivo_musicbio[bio_key1]))
-    return all_bios
-
-
-def parse_tivo_artist_metadata(tivo_artist_lookup: dict) -> dict:
-    """Parse metadata from the TiVo API for a given artist"""
-    assert tivo_artist_lookup['hitCount'] > 0, 'Got no hits for an artist that should have them!'
-    # We can fairly safely use the first hit for the artist, all the names are pretty unique
-    hit = tivo_artist_lookup['hits'][0]
-    new_artist_metadata = {}
-    # These are the fields that have separate "id", "name", and "weight" key-value pairs
-    for field in ARTIST_METADATA_FIELDS_WITH_WEIGHTS:
-        # We don't always get every field for every album
-        if field in hit.keys():
-            # Add just the required fields into our list
-            new_artist_metadata[f'artist_{field.replace("musicGenres", "genres")}'] = [
-                {k: v for k, v in value.items() if k in ['name', 'weight']}
-                for value in hit[field]
-            ]
-        else:
-            # Otherwise, just set this field to an empty list
-            new_artist_metadata[f'artist_{field.replace("musicGenres", "genres")}'] = []
-    # Sanity check: store matched artist name
-    new_artist_metadata['tivo_artist_name'] = hit['name']
-    # Now, add all the artist biographies
-    new_artist_metadata['artist_bio'] = []
-    if "musicBio" in hit.keys():
-        new_artist_metadata['artist_bio'].extend(parse_artist_bios(hit['musicBio']))
-    return new_artist_metadata
-
-
-def dump_metadata_json(metadata_dict: dict, filepath: str) -> None:
-    """Dumps a dictionary as a JSON in provided location"""
-    with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(metadata_dict, f, indent=4, ensure_ascii=False, sort_keys=False)
-
-
 def parse_all_metadata(track_path: str) -> dict:
     """For a given track, get track + album + artist metadata from TiVo and return a single dictionary"""
     global ALBUM_HITS, ALBUM_MISSES
 
     # Get the metadata for the track (already available for JTD + PiJAMA)
     track_metadata = utils.read_json_cached(os.path.join(track_path, 'metadata.json'))
-    # Parse metadata for the ARTIST: this is always the pianist
-    artist_metadata = artist_search(track_metadata['pianist'])
-    artist_metadata_parsed = parse_tivo_artist_metadata(artist_metadata)
     # Parse metadata for the ALBUM: this may be lead by a different musician to the pianist!
     album_searched = album_search(track_metadata)
     album_is_valid = validate_album(track_metadata, album_searched)
@@ -244,18 +148,19 @@ def parse_all_metadata(track_path: str) -> dict:
         # Make another API call to get the full set of metadata and parse it
         album_metadata = album_lookup(album_is_valid)
         album_metadata_parsed = parse_tivo_album_metadata(album_metadata)
+        album_metadata_parsed["tivo_found_match"] = True
     else:
         track_sep = track_path.split(os.path.sep)[-1]
         ALBUM_MISSES.append(track_sep)
         logger.warning(f'Miss! {track_sep}')
-        album_metadata_parsed = {}
+        album_metadata_parsed = {"tivo_found_match": False}
     # Combine all the metadata dictionaries into a single dictionary
     all_metadata = (
             track_metadata |
-            add_missing_keys(artist_metadata_parsed, ARTIST_METADATA_FIELDS) |
+            # add_missing_keys(artist_metadata_parsed, ARTIST_METADATA_FIELDS) |
             add_missing_keys(album_metadata_parsed, ALBUM_METADATA_FIELDS)
     )
-    return add_missing_keys(all_metadata, ["tivo_artist_name", "tivo_album_name"], str)
+    return add_missing_keys(all_metadata, ["tivo_album_name"], str)
 
 
 def main():
@@ -266,7 +171,7 @@ def main():
     logger.info(f'Found {len(all_tracks)} tracks to get TiVo metadata for!')
     with trange(len(all_tracks), desc='Processing...') as t:
         # Iterate over every track in both datasets
-        for track_path in all_tracks:
+        for track_path in all_tracks[50:]:
             # This is where we'll save our new metadata
             tivo_metadata_path = os.path.join(track_path, 'metadata_tivo.json')
             # If we've already processed the track, we can skip over it
@@ -276,10 +181,11 @@ def main():
             # Otherwise, grab the metadata from the API and dump in the folder for this track
             else:
                 track_metadata = parse_all_metadata(track_path)
-                dump_metadata_json(track_metadata, tivo_metadata_path)
+                utils.write_json(track_metadata, tivo_metadata_path)
             # Update the TQDM progress bar
             t.set_postfix(hits=ALBUM_HITS, misses=len(ALBUM_MISSES))
             t.update(1)
+    # TODO: we should create an empty metadata_tivo file for tracks from bushgrafts/jja?
     # List the tracks that are misses in the console
     misses_fmt = "\n".join(ALBUM_MISSES)
     logger.info('Done!')
@@ -288,4 +194,5 @@ def main():
 
 if __name__ == "__main__":
     assert os.path.isdir(DATA_ROOT), f'Could not find data at {DATA_ROOT}!'
+    utils.seed_everything(utils.SEED)
     main()
