@@ -7,7 +7,7 @@ import unittest
 
 from deepdiff import DeepDiff
 
-from jazz_style_conditioned_generation.preprocessing import scrape_tivo_metadata as stm
+from jazz_style_conditioned_generation.preprocessing.tivo import scrape_tivo_album_metadata as stm
 
 
 def compare_nested_dicts(d1, d2) -> int:
