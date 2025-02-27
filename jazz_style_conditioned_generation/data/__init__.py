@@ -7,7 +7,7 @@ from .conditions import (
     validate_conditions, get_mapping_for_condition, get_special_tokens_for_condition
 )
 from .dataloader import (
-    DATA_DIR, DatasetMIDICondition
+    DATA_DIR, DatasetMIDIExhaustive, DatasetMIDIRandomChunk
 )
 from .splits import SPLIT_DIR, SPLIT_TYPES, check_all_splits_unique
 from .tokenizer import (
