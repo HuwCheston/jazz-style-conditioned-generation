@@ -36,6 +36,21 @@ MAX_SEQUENCE_LENGTH = 512
 CHUNK_OVERLAP_BARS = 8
 
 
+def get_project_root() -> str:
+    """Returns the root directory of the project"""
+    # Possibly the root directory, but doesn't work when running from the CLI for some reason
+    poss_path = str(Path(__file__).parent.parent)
+    # The root directory should always have these files (this is pretty hacky)
+    if all(fp in os.listdir(poss_path) for fp in ["config", "checkpoints", "data", "outputs", "setup.py"]):
+        return poss_path
+    else:
+        return os.path.abspath(os.curdir)
+
+
+# These are the names of all the datasets we're using: one "folder" per dataset
+DATASETS = [i for i in os.listdir(os.path.join(get_project_root(), "data/raw")) if ".gitkeep" not in i]
+
+
 def seed_everything(seed: int = SEED) -> None:
     """Sets all random seeds for reproducible results."""
     torch.manual_seed(seed)
@@ -63,17 +78,6 @@ def timer(name: str) -> ContextManager[None]:
     else:
         end = time()
         logger.debug(f"Took {end - start:.2f} seconds to {name}.")
-
-
-def get_project_root() -> str:
-    """Returns the root directory of the project"""
-    # Possibly the root directory, but doesn't work when running from the CLI for some reason
-    poss_path = str(Path(__file__).parent.parent)
-    # The root directory should always have these files (this is pretty hacky)
-    if all(fp in os.listdir(poss_path) for fp in ["config", "checkpoints", "data", "outputs", "setup.py"]):
-        return poss_path
-    else:
-        return os.path.abspath(os.curdir)
 
 
 @lru_cache(maxsize=None)
