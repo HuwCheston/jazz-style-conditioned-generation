@@ -129,19 +129,19 @@ class TivoScrape(unittest.TestCase):
             ]
         }
         expected = {
-            "album_moods": [
+            "moods": [
                 {
                     "name": "moody-mood",
                     "weight": 12
                 }
             ],
-            "album_themes": [
+            "themes": [
                 {
                     "name": "themey-theme",
                     "weight": 1
                 }
             ],
-            "album_genres": [
+            "genres": [
                 {
                     "name": "subgenrey-subgenre",
                     "weight": 4
@@ -155,8 +155,8 @@ class TivoScrape(unittest.TestCase):
                     "weight": 123
                 },
             ],
-            "album_review": ["text text"],
-            "album_flags": ["flag1", "flag2"],
+            "review": ["text text"],
+            "flags": ["flag1", "flag2"],
             "tivo_album_name": "albumy-album",
             "tivo_album_artists": []
         }

@@ -16,9 +16,22 @@ from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
 
+__all__ = [
+    "DATA_DIR",
+    "add_beginning_and_ending_tokens_to_sequence",
+    "pad_sequence",
+    "randomly_slice_sequence",
+    "get_pitch_augmentation_value",
+    "data_augmentation",
+    "PITCH_AUGMENT_RANGE",
+    "DURATION_AUGMENT_RANGE",
+    "DatasetMIDIExhaustive",
+    "DatasetMIDIRandomChunk"
+]
+
 DATA_DIR = os.path.join(utils.get_project_root(), "data")
 
-DEFAULT_AUGMENTATION_PROB = 0.5
+# DEFAULT_AUGMENTATION_PROB = 0.5
 PITCH_AUGMENT_RANGE = range(-3, 3)  # as in Music Transformer
 DURATION_AUGMENT_RANGE = [0.95, 0.975, 1.0, 1.025, 1.05]  # as in Music Transformer
 

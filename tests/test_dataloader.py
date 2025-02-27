@@ -3,11 +3,16 @@
 
 """Test suite for dataloader"""
 
+import os
 import unittest
 
+from miditok import REMI
+from symusic import Score
+
+from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.dataloader import *
 
-TEST_MIDI = os.path.join(utils.get_project_root(), "test/test_resources/test_midi1.mid")
+TEST_MIDI = os.path.join(utils.get_project_root(), "tests/test_resources/test_midi1.mid")
 
 
 class DataloaderTest(unittest.TestCase):
