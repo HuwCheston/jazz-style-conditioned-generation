@@ -1,12 +1,942 @@
 [
   {
-    "bandleader": "Ray Brown",
-    "album_name": "3 Dimensional",
-    "album_name_fixed": "Three Dimensional"
+    "album_name": "The Only One",
+    "pianist": "Kenny Barron",
+    "tivo_id": "MW0000263645"
   },
   {
-    "bandleader": "Toshiko Akiyoshi",
+    "album_name": "Live in Japan 2003",
+    "pianist": "Kenny Barron",
+    "tivo_id": "MW0001492045"
+  },
+  {
+    "album_name": "The Montreal Tapes",
+    "pianist": "Paul Bley",
+    "tivo_id": "MW0000645014"
+  },
+  {
+    "album_name": "Live at the Loa  Summer Wind",
+    "pianist": "Gene Harris",
+    "tivo_id": "MW0000309204"
+  },
+  {
+    "album_name": "3 Dimensional",
+    "pianist": "Gene Harris",
+    "tivo_id": "MW0000614822"
+  },
+  {
+    "album_name": "Seven Classic Albums",
+    "pianist": "Sonny Clark",
+    "tivo_id": "MW0002452029"
+  },
+  {
+    "album_name": "Prayer",
+    "pianist": "Kenny Barron",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Ancestry",
+    "pianist": "Kenny Barron",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Live",
+    "pianist": "Kenny Barron",
+    "tivo_id": null
+  },
+  {
+    "album_name": "The Man Complete Recordings 19461959",
+    "pianist": "Hank Jones",
+    "tivo_id": null
+  },
+  {
+    "album_name": "The Beginning",
+    "pianist": "Chick Corea",
+    "tivo_id": "MW0000613805"
+  },
+  {
+    "album_name": "Live at Copenhagen Jazz House",
+    "pianist": "Stanley Cowell",
+    "tivo_id": "MW0000732635"
+  },
+  {
+    "album_name": "Live in Europe II",
+    "pianist": "Bill Evans",
+    "tivo_id": "MW0000915921"
+  },
+  {
+    "album_name": "Blue in Green The Concert in Canada",
+    "pianist": "Bill Evans",
+    "tivo_id": "MW0000890131"
+  },
+  {
+    "album_name": "Bill Evans Trio at Shellys ManneHole Hollywood California",
+    "pianist": "Bill Evans",
+    "tivo_id": "MW0000204082"
+  },
+  {
+    "album_name": "Kind of Evans",
+    "pianist": "Bill Evans",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Bill Evans at Town Hall Volume 1",
+    "pianist": "Bill Evans",
+    "tivo_id": "MW0000191772"
+  },
+  {
+    "album_name": "A Jazz Hour With Bill Evans Autumn Leaves",
+    "pianist": "Bill Evans",
+    "tivo_id": "MW0000648989"
+  },
+  {
+    "album_name": "Bill Evans Live In Tokyo",
+    "pianist": "Bill Evans",
+    "tivo_id": "MW0000197493"
+  },
+  {
+    "album_name": "Bill Evans Vol 2",
+    "pianist": "Bill Evans",
+    "tivo_id": "MW0000279530"
+  },
+  {
+    "album_name": "The Tommy Flanagan Tokyo Recital",
+    "pianist": "Tommy Flanagan",
+    "tivo_id": "MW0000091858"
+  },
+  {
+    "album_name": "Giant Steps In Memory of John Coltrane",
+    "pianist": "Tommy Flanagan",
+    "tivo_id": "MW0000059564"
+  },
+  {
+    "album_name": "The Seance",
+    "pianist": "Hampton Hawes",
+    "tivo_id": "MW0000316637"
+  },
+  {
+    "album_name": "Is That So",
+    "pianist": "John Hicks",
+    "tivo_id": "MW0000612741"
+  },
+  {
+    "album_name": "A Billy Strayhorn Songbook Something to Live For",
+    "pianist": "John Hicks",
+    "tivo_id": "MW0000044450"
+  },
+  {
+    "album_name": "Newklear Music",
+    "pianist": "John Hicks",
+    "tivo_id": "MW0000019950"
+  },
+  {
+    "album_name": "Scratch",
+    "pianist": "Kenny Barron",
+    "tivo_id": "MW0000187668"
+  },
+  {
+    "album_name": "The Life of a Song",
+    "pianist": "Geri Allen",
+    "tivo_id": "MW0000151431"
+  },
+  {
+    "album_name": "The Oracle",
+    "pianist": "Hank Jones",
+    "tivo_id": "MW0000267788"
+  },
+  {
+    "album_name": "Round Midnight at the Montmartre",
+    "pianist": "Abdullah Ibrahim",
+    "tivo_id": "MW0002615769"
+  },
+  {
+    "album_name": "Anatomy of a South African Village",
+    "pianist": "Abdullah Ibrahim",
+    "tivo_id": "MW0000100757"
+  },
+  {
+    "album_name": "Ahmad Jamal Eight Classic Albums",
+    "pianist": "Ahmad Jamal",
+    "tivo_id": "MW0002365335"
+  },
+  {
+    "album_name": "The Complete Ahmad Jamal Trio Argo Sessions 195662",
+    "pianist": "Ahmad Jamal",
+    "tivo_id": "MW0002097615"
+  },
+  {
+    "album_name": "Emerald City Nights Live At The Penthouse 19651966",
+    "pianist": "Ahmad Jamal",
+    "tivo_id": "MW0003834688"
+  },
+  {
+    "album_name": "Complete Recordings",
+    "pianist": "Ahmad Jamal",
+    "tivo_id": "MW0000721945"
+  },
+  {
+    "album_name": "In Search of Momentum 110",
+    "pianist": "Ahmad Jamal",
+    "tivo_id": "MW0000019313"
+  },
+  {
+    "album_name": "Standards Volume 1",
+    "pianist": "Keith Jarrett",
+    "tivo_id": "MW0000188229"
+  },
+  {
+    "album_name": "Up for It",
+    "pianist": "Keith Jarrett",
+    "tivo_id": "MW0000030116"
+  },
+  {
+    "album_name": "Somewhere Before The Atlantic Years 19681975",
+    "pianist": "Keith Jarrett",
+    "tivo_id": "MW0000196472"
+  },
+  {
+    "album_name": "Last Recording",
+    "pianist": "Hank Jones",
+    "tivo_id": "MW0002682261"
+  },
+  {
+    "album_name": "Autumn Leaves",
+    "pianist": "Wynton Kelly",
+    "tivo_id": "MW0002539764"
+  },
+  {
+    "album_name": "Six Classic Albums",
+    "pianist": "Wynton Kelly",
+    "tivo_id": "MW0002539764"
+  },
+  {
+    "album_name": "The Complete Vee Jay Paul ChambersWynton Kelly Sessions 195961",
+    "pianist": "Wynton Kelly",
+    "tivo_id": "MW0001556998"
+  },
+  {
+    "album_name": "Smokin in Seattle Live at the Penthouse",
+    "pianist": "Wynton Kelly",
+    "tivo_id": "MW0003038026"
+  },
+  {
+    "album_name": "Live at Caf Loup",
+    "pianist": "Junior Mance",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Milestones",
+    "pianist": "Junior Mance",
+    "tivo_id": "MW0000242673"
+  },
+  {
+    "album_name": "Blues Ballads and a Train",
+    "pianist": "Junior Mance",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Complete 1947  1952 Blue Note Recordings",
+    "pianist": "Thelonious Monk",
+    "tivo_id": "MW0000218074"
+  },
+  {
+    "album_name": "Modern Jazz Archive Thelonious Monk",
+    "pianist": "Thelonious Monk",
+    "tivo_id": "MW0000588018"
+  },
+  {
+    "album_name": "19441948",
+    "pianist": "Thelonious Monk",
+    "tivo_id": "MW0000671761"
+  },
+  {
+    "album_name": "Oscar Peterson plays My Fair Lady and the Music from Fiorello",
+    "pianist": "Oscar Peterson",
+    "tivo_id": "MW0000116465"
+  },
+  {
+    "album_name": "West Side Story  Oscar Peterson Plays Porgy  Bess",
+    "pianist": "Oscar Peterson",
+    "tivo_id": "MW0002467084"
+  },
+  {
+    "album_name": "Oscar Peterson Plays the George Gershwin Songbook",
+    "pianist": "Oscar Peterson",
+    "tivo_id": "MW0000900710"
+  },
+  {
+    "album_name": "The Sound of the Trio  The Trio  Night Train",
+    "pianist": "Oscar Peterson",
+    "tivo_id": "MW0000672397"
+  },
+  {
+    "album_name": "Live The Champslyses 1965 Pleyel 1966",
+    "pianist": "Oscar Peterson",
+    "tivo_id": "MW0000432034"
+  },
+  {
+    "album_name": "Live At The Barbican London 1984",
+    "pianist": "Oscar Peterson",
+    "tivo_id": "MW0000067043"
+  },
+  {
+    "album_name": "The Best of Bud Powell 194462 Vol 1",
+    "pianist": "Bud Powell",
+    "tivo_id": "MW0002710174"
+  },
+  {
+    "album_name": "The Amazing Bud Powell Vol 13",
+    "pianist": "Bud Powell",
+    "tivo_id": "MW0000884927"
+  },
+  {
+    "album_name": "The Chronological Classics Bud Powell 19511953",
+    "pianist": "Bud Powell",
+    "tivo_id": "MW0000140720"
+  },
+  {
+    "album_name": "Six Classic Albums",
+    "pianist": "Bobby Timmons",
+    "tivo_id": "MW0002580312"
+  },
+  {
+    "album_name": "ChunKing",
+    "pianist": "Bobby Timmons",
+    "tivo_id": "MW0000558094"
+  },
+  {
+    "album_name": "Lennie Tristano Personal Recordings 19461970",
+    "pianist": "Lennie Tristano",
+    "tivo_id": "MW0003606383"
+  },
+  {
+    "album_name": "McCoy Tyner plays John Coltrane Live at the Village Vanguard",
+    "pianist": "McCoy Tyner",
+    "tivo_id": "MW0000555250"
+  },
+  {
+    "album_name": "Walton Carter  DeJohnette",
+    "pianist": "Cedar Walton",
+    "tivo_id": "MW0000870476"
+  },
+  {
+    "album_name": "The Trio Volume 2",
+    "pianist": "Cedar Walton",
+    "tivo_id": "MW0000200168"
+  },
+  {
+    "album_name": "Unknown",
+    "pianist": "Herbie Hancock",
+    "tivo_id": null
+  },
+  {
+    "album_name": "By Myself",
+    "pianist": "Beegie Adair",
+    "tivo_id": "MW0002591652"
+  },
+  {
     "album_name": "The Maybeck Recital Series Vol 36",
-    "album_name_fixed": "Toshiko Akiyoshi at Maybeck"
+    "pianist": "Toshiko Akiyoshi",
+    "tivo_id": "MW0000126434"
+  },
+  {
+    "album_name": "Eclipse",
+    "pianist": "Joey Alexander",
+    "tivo_id": "MW0003154607"
+  },
+  {
+    "album_name": "Solo",
+    "pianist": "Monty Alexander",
+    "tivo_id": "MW0000344298"
+  },
+  {
+    "album_name": "Home Grown",
+    "pianist": "Geri Allen",
+    "tivo_id": "MW0001885479"
+  },
+  {
+    "album_name": "Flying Toward the Sound A Solo Piano Excursion Inspired by Cecil Taylor Mccoy Tyner and Herbie Hancock",
+    "pianist": "Geri Allen",
+    "tivo_id": "MW0001960314"
+  },
+  {
+    "album_name": "From the Heart",
+    "pianist": "Chris Anderson",
+    "tivo_id": "MW0001447104"
+  },
+  {
+    "album_name": "Oscar With Love   The Songs of Oscar Peterson",
+    "pianist": "Lance Anderson",
+    "tivo_id": "MW0002907516"
+  },
+  {
+    "album_name": "Solo",
+    "pianist": "Lynne Arriale",
+    "tivo_id": "MW0002315616"
+  },
+  {
+    "album_name": "Live At Maybeck Recital Hall Volume 10",
+    "pianist": "Kenny Barron",
+    "tivo_id": "MW0000264634"
+  },
+  {
+    "album_name": "Oscar With Love   The Songs of Oscar Peterson",
+    "pianist": "Kenny Barron",
+    "tivo_id": "MW0002907516"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 19",
+    "pianist": "Richard Beirach",
+    "tivo_id": "MW0000081932"
+  },
+  {
+    "album_name": "SelfPortrait",
+    "pianist": "David Berkman",
+    "tivo_id": "MW0002387520"
+  },
+  {
+    "album_name": "Plays the Music of John Coltrane and Pete Seeger",
+    "pianist": "David Berkman",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Steinway Standards",
+    "pianist": "Adam Birnbaum",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Cole Porter on a Steinway Vol 1",
+    "pianist": "Adam Birnbaum",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Oscar With Love   The Songs of Oscar Peterson",
+    "pianist": "Robi Botos",
+    "tivo_id": "MW0002907516"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 1",
+    "pianist": "Joanne Brackeen",
+    "tivo_id": "MW0000203912"
+  },
+  {
+    "album_name": "To the Evening Star",
+    "pianist": "Alan Broadbent",
+    "tivo_id": null
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 14",
+    "pianist": "Alan Broadbent",
+    "tivo_id": "MW0000272805"
+  },
+  {
+    "album_name": "In the Back Room Live",
+    "pianist": "Ray Bryant",
+    "tivo_id": "MW0001709253"
+  },
+  {
+    "album_name": "Inimitable Live",
+    "pianist": "Ray Bryant",
+    "tivo_id": null
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 17",
+    "pianist": "Jaki Byard",
+    "tivo_id": "MW0000077073"
+  },
+  {
+    "album_name": "You Dont Know Me Vol 2",
+    "pianist": "George Cables",
+    "tivo_id": "MW0000503925"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 35",
+    "pianist": "George Cables",
+    "tivo_id": "MW0000123581"
+  },
+  {
+    "album_name": "You Dont Know Me Volume I",
+    "pianist": "George Cables",
+    "tivo_id": "MW0000503925"
+  },
+  {
+    "album_name": "Live in London",
+    "pianist": "Michel Camilo",
+    "tivo_id": "MW0003109163"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 29",
+    "pianist": "John Campbell",
+    "tivo_id": "MW0000622128"
+  },
+  {
+    "album_name": "Oscar With Love   The Songs of Oscar Peterson",
+    "pianist": "Bill Charlap",
+    "tivo_id": "MW0002907516"
+  },
+  {
+    "album_name": "Oscar With Love   The Songs of Oscar Peterson",
+    "pianist": "Gerald Clayton",
+    "tivo_id": "MW0002907516"
+  },
+  {
+    "album_name": "TwoShade",
+    "pianist": "Gerald Clayton",
+    "tivo_id": "MW0001770750"
+  },
+  {
+    "album_name": "Small Room",
+    "pianist": "George Colligan",
+    "tivo_id": null
+  },
+  {
+    "album_name": "John",
+    "pianist": "Marc Copland",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Oscar With Love   The Songs of Oscar Peterson",
+    "pianist": "Chick Corea",
+    "tivo_id": "MW0002907516"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 5",
+    "pianist": "Stanley Cowell",
+    "tivo_id": "MW0000309395"
+  },
+  {
+    "album_name": "Cunliffe Bill   Satisfaction",
+    "pianist": "Bill Cunliffe",
+    "tivo_id": "MW0000238634"
+  },
+  {
+    "album_name": "That Time of Year",
+    "pianist": "Bill Cunliffe",
+    "tivo_id": "MW0002533365"
+  },
+  {
+    "album_name": "Cole Porter on a Steinway Vol 1",
+    "pianist": "Jed Distler",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Quiet Now",
+    "pianist": "Jed Distler",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Letter to Liz",
+    "pianist": "Eldar Djangirov",
+    "tivo_id": null
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 39",
+    "pianist": "Kenny Drew Jr",
+    "tivo_id": "MW0000644552"
+  },
+  {
+    "album_name": "SoloDuo",
+    "pianist": "Kenny Drew",
+    "tivo_id": "MW0000085523"
+  },
+  {
+    "album_name": "Solos And Duets",
+    "pianist": "Eliane Elias",
+    "tivo_id": "MW0000178320"
+  },
+  {
+    "album_name": "Just Me",
+    "pianist": "Clare Fischer",
+    "tivo_id": "MW0000179725"
+  },
+  {
+    "album_name": "Alone Together",
+    "pianist": "Clare Fischer",
+    "tivo_id": "MW0000017956"
+  },
+  {
+    "album_name": "Lost and Found",
+    "pianist": "Mitchel Forman",
+    "tivo_id": "MW0002067067"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 33",
+    "pianist": "Don Friedman",
+    "tivo_id": "MW0000117104"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 6",
+    "pianist": "Hal Galper",
+    "tivo_id": "MW0000317871"
+  },
+  {
+    "album_name": "Greens Blues",
+    "pianist": "Benny Green",
+    "tivo_id": "MW0000005113"
+  },
+  {
+    "album_name": "Oscar With Love   The Songs of Oscar Peterson",
+    "pianist": "Benny Green",
+    "tivo_id": "MW0002907516"
+  },
+  {
+    "album_name": "Out of Thin Air",
+    "pianist": "Don Grusin",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Solo Piano",
+    "pianist": "Roland Hanna",
+    "tivo_id": "MW0000913668"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 32",
+    "pianist": "Roland Hanna",
+    "tivo_id": "MW0000116749"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 12",
+    "pianist": "Barry Harris",
+    "tivo_id": "MW0000676810"
+  },
+  {
+    "album_name": "Listen To Barry HarrisSolo Piano Reissue",
+    "pianist": "Barry Harris",
+    "tivo_id": "MW0000046433"
+  },
+  {
+    "album_name": "Solo",
+    "pianist": "Barry Harris",
+    "tivo_id": "MW0001652560"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 23",
+    "pianist": "Gene Harris",
+    "tivo_id": "MW0000094162"
+  },
+  {
+    "album_name": "Thelonious   Fred Hersch Plays Monk",
+    "pianist": "Fred Hersch",
+    "tivo_id": "MW0000031063"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 31",
+    "pianist": "Fred Hersch",
+    "tivo_id": "MW0000112610"
+  },
+  {
+    "album_name": "Solo",
+    "pianist": "Fred Hersch",
+    "tivo_id": "MW0002863188"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 7",
+    "pianist": "John Hicks",
+    "tivo_id": null
+  },
+  {
+    "album_name": "I Remember You Recorded Live in Concert 2006",
+    "pianist": "John Hicks",
+    "tivo_id": "MW0000674258"
+  },
+  {
+    "album_name": "Oscar With Love   The Songs of Oscar Peterson",
+    "pianist": "Hiromi",
+    "tivo_id": "MW0002907516"
+  },
+  {
+    "album_name": "Century Of Jazz Piano 5cddvd",
+    "pianist": "Dick Hyman",
+    "tivo_id": "MW0000833794"
+  },
+  {
+    "album_name": "Solo At The Sacramento Jazz Festivals 19831988",
+    "pianist": "Dick Hyman",
+    "tivo_id": "MW0003038584"
+  },
+  {
+    "album_name": "Broadway Songbook",
+    "pianist": "Dick Hyman",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Blues in the Night   Dick Hyman Plays Harold Arlen",
+    "pianist": "Dick Hyman",
+    "tivo_id": "MW0000203992"
+  },
+  {
+    "album_name": "Dick Hyman Plays Variations on Richard Rodgers   Rodgers  Hammerstein",
+    "pianist": "Dick Hyman",
+    "tivo_id": "MW0001486412"
+  },
+  {
+    "album_name": "Dick Hyman Plays Variations on Richard Rodgers   Rodgers  Hart",
+    "pianist": "Dick Hyman",
+    "tivo_id": "MW0001491241"
+  },
+  {
+    "album_name": "There Will Never Be Another You Piano Solo Live",
+    "pianist": "Dick Hyman",
+    "tivo_id": "MW0001016067"
+  },
+  {
+    "album_name": "In Recital Live",
+    "pianist": "Dick Hyman",
+    "tivo_id": "MW0000044362"
+  },
+  {
+    "album_name": "September Song  Dick Hyman Plays the Music of Kurt Weill",
+    "pianist": "Dick Hyman",
+    "tivo_id": "MW0002066059"
+  },
+  {
+    "album_name": "Did You Hear That Sound",
+    "pianist": "Abdullah Ibrahim",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Ode to Duke Ellington At Dukes Place",
+    "pianist": "Abdullah Ibrahim",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Oscar With Love   The Songs of Oscar Peterson",
+    "pianist": "Justin Kauflin",
+    "tivo_id": "MW0002907516"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 11",
+    "pianist": "Roger Kellaway",
+    "tivo_id": "MW0000675314"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 13",
+    "pianist": "Steve Kuhn",
+    "tivo_id": "MW0000676803"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 22",
+    "pianist": "Ellis Larkins",
+    "tivo_id": "MW0000091772"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 28",
+    "pianist": "Andy Laverne",
+    "tivo_id": "MW0000103910"
+  },
+  {
+    "album_name": "Oscar With Love   The Songs of Oscar Peterson",
+    "pianist": "Michel Legrand",
+    "tivo_id": "MW0002907516"
+  },
+  {
+    "album_name": "Oscar With Love   The Songs of Oscar Peterson",
+    "pianist": "Ramsey Lewis",
+    "tivo_id": "MW0002907516"
+  },
+  {
+    "album_name": "Piano Solos",
+    "pianist": "Mary Lou Williams",
+    "tivo_id": "MW0000873218"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 24",
+    "pianist": "Adam Makowicz",
+    "tivo_id": "MW0000095361"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 26",
+    "pianist": "Bill Mays",
+    "tivo_id": "MW0000104662"
+  },
+  {
+    "album_name": "Dave Fingers McKenna",
+    "pianist": "Dave McKenna",
+    "tivo_id": "MW0000067136"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 2",
+    "pianist": "Dave McKenna",
+    "tivo_id": "MW0000654887"
+  },
+  {
+    "album_name": "This Is New   Teddi King Sings Ira Gershwin",
+    "pianist": "Dave McKenna",
+    "tivo_id": "MW0003863511"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 20",
+    "pianist": "Jim McNeely",
+    "tivo_id": "MW0000086482"
+  },
+  {
+    "album_name": "Marian McPartlands Piano Jazz with Brad Mehldau",
+    "pianist": "Brad Mehldau",
+    "tivo_id": "MW0000454896"
+  },
+  {
+    "album_name": "Mulgrew Miller Solo",
+    "pianist": "Mulgrew Miller",
+    "tivo_id": null
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 15",
+    "pianist": "Buddy Montgomery",
+    "tivo_id": "MW0000274726"
+  },
+  {
+    "album_name": "Solo Piano",
+    "pianist": "Tete Montoliu",
+    "tivo_id": "MW0000765921"
+  },
+  {
+    "album_name": "American Songbook",
+    "pianist": "Simon Mulligan",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Cole Porter on a Steinway Vol 1",
+    "pianist": "Simon Mulligan",
+    "tivo_id": null
+  },
+  {
+    "album_name": "American Songbook Vol 2",
+    "pianist": "Simon Mulligan",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Solo Piano",
+    "pianist": "Phineas Newborn Jr",
+    "tivo_id": "MW0000253204"
+  },
+  {
+    "album_name": "Oscar With Love   The Songs of Oscar Peterson",
+    "pianist": "Makoto Ozone",
+    "tivo_id": "MW0002907516"
+  },
+  {
+    "album_name": "In Copenhagen",
+    "pianist": "Horace Parlan",
+    "tivo_id": "MW0001684363"
+  },
+  {
+    "album_name": "Solo",
+    "pianist": "Alan Pasqua",
+    "tivo_id": "MW0001525193"
+  },
+  {
+    "album_name": "Soliloquy",
+    "pianist": "Alan Pasqua",
+    "tivo_id": "MW0003239945"
+  },
+  {
+    "album_name": "Day Dream",
+    "pianist": "Alan Pasqua",
+    "tivo_id": "MW0003541787"
+  },
+  {
+    "album_name": "Tracks Remastered",
+    "pianist": "Oscar Peterson",
+    "tivo_id": "MW0000319509"
+  },
+  {
+    "album_name": "Solo",
+    "pianist": "Oscar Peterson",
+    "tivo_id": "MW0000662325"
+  },
+  {
+    "album_name": "Marian McPartlands Piano Jazz Radio Broadcast",
+    "pianist": "Oscar Peterson",
+    "tivo_id": "MW0000966594"
+  },
+  {
+    "album_name": "Exclusively for My Friends   My Favorite Instrument Vol IV",
+    "pianist": "Oscar Peterson",
+    "tivo_id": "MW0000616105"
+  },
+  {
+    "album_name": "Marcus Roberts   The Joy of Joplin",
+    "pianist": "Marcus Roberts",
+    "tivo_id": "MW0000045907"
+  },
+  {
+    "album_name": "Oscar With Love   The Songs of Oscar Peterson",
+    "pianist": "Renee Rosnes",
+    "tivo_id": "MW0002907516"
+  },
+  {
+    "album_name": "Solo",
+    "pianist": "Gonzalo Rubalcaba",
+    "tivo_id": "MW0000533514"
+  },
+  {
+    "album_name": "F",
+    "pianist": "Gonzalo Rubalcaba",
+    "tivo_id": null
+  },
+  {
+    "album_name": "Solo Live",
+    "pianist": "Edward Simon",
+    "tivo_id": "MW0003628640"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 30",
+    "pianist": "Ralph Sutton",
+    "tivo_id": "MW0000107040"
+  },
+  {
+    "album_name": "Songs And Variations",
+    "pianist": "John Taylor",
+    "tivo_id": "MW0000375245"
+  },
+  {
+    "album_name": "Mirror",
+    "pianist": "Jacky Terrasson",
+    "tivo_id": "MW0000553663"
+  },
+  {
+    "album_name": "Things Aint What They Used To Be Live",
+    "pianist": "McCoy Tyner",
+    "tivo_id": "MW0000689914"
+  },
+  {
+    "album_name": "Blues For Myself Piano Solo",
+    "pianist": "Cedar Walton",
+    "tivo_id": "MW0000181388"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 34",
+    "pianist": "Kenny Werner",
+    "tivo_id": "MW0000122177"
+  },
+  {
+    "album_name": "Solo Piano Compositions",
+    "pianist": "Jessica Williams",
+    "tivo_id": null
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 21",
+    "pianist": "Jessica Williams",
+    "tivo_id": "MW0000089843"
+  },
+  {
+    "album_name": "Marian McPartlands Piano Jazz Radio Broadcast",
+    "pianist": "Teddy Wilson",
+    "tivo_id": "MW0001021674"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 18",
+    "pianist": "Mike Wofford",
+    "tivo_id": "MW0000085016"
+  },
+  {
+    "album_name": "The Maybeck Recital Series Vol 27",
+    "pianist": "Denny Zeitlin",
+    "tivo_id": "MW0000104664"
+  },
+  {
+    "album_name": "Homecoming",
+    "pianist": "Denny Zeitlin",
+    "tivo_id": "MW0000192448"
   }
 ]
