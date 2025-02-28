@@ -296,7 +296,8 @@ class DatasetMIDIRandomChunk:
             max_seq_len: int,
             do_augmentation: bool = True,
             do_conditioning: bool = True,
-            condition_mapping: dict[str, dict] = None
+            condition_mapping: dict[str, dict] = None,
+            n_clips: int = None
     ):
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len
@@ -305,6 +306,9 @@ class DatasetMIDIRandomChunk:
         # MIDI file paths
         self.files_paths = files_paths
         validate_paths(self.files_paths, expected_extension=".mid")
+        if n_clips is not None:
+            self.files_paths = self.files_paths[:n_clips]
+            random.shuffle(self.files_paths)
 
         # Conditioning
         self.do_conditioning = do_conditioning
@@ -403,7 +407,8 @@ class DatasetMIDIExhaustive:
             max_seq_len: int,
             do_augmentation: bool = False,
             do_conditioning: bool = True,
-            condition_mapping: dict[str, dict] = None
+            condition_mapping: dict[str, dict] = None,
+            n_clips: int = None
     ):
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len
@@ -422,6 +427,9 @@ class DatasetMIDIExhaustive:
         validate_paths(files_paths, expected_extension=".mid")
         # [filename1, filename2, ...]
         self.files_paths = files_paths
+        if n_clips is not None:
+            self.files_paths = self.files_paths[:n_clips]
+            random.shuffle(self.files_paths)
         # [(filename1, chunk1), (filename1, chunk2), (filename2, chunk1), ...]
         self.chunk_paths_and_idxs = list(self.get_chunks_per_track())
 
