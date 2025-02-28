@@ -217,10 +217,16 @@ def note_list_to_score(note_list: list[Note], ticks_per_quarter: int) -> Score:
 
 def preprocess_score(score: Score) -> Score:
     """Applies our own preprocessing to a Score object: removes short notes, merges duplicates"""
-    # We should only ever have one track (i.e., piano)
-    assert len(score.tracks) == 1
-    # Now we do our own preprocessing
-    note_list = score.tracks[0].notes
+    # If we somehow have more than one track (occasionally happens in the bushgrafts corpus)
+    if len(score.tracks) > 1:
+        # Get all the piano tracks
+        is_piano = [p for p in score.tracks if p.program == utils.MIDI_PIANO_PROGRAM]
+        # Keep the one with the most notes
+        desired_track = max(is_piano, key=lambda x: len(x.notes))
+        note_list = desired_track.notes
+    # Otherwise, we can just grab the track directly
+    else:
+        note_list = score.tracks[0].notes
     # First, we remove notes with a very short duration
     no_short_notes = remove_short_notes(note_list)
     # Next, we merge successive notes with the same pitch and a very short onset-offset time into the same pitch
@@ -276,9 +282,9 @@ def create_padding_mask(x, pad_token_id: int) -> torch.tensor:
     """Create masking tensor that gives 0 when token is pad_token_id, 1 elsewhere"""
     # NB. be aware that causal masks are handled by models: this mask is for padding only
     #  This is identical to the approach in miditok.pytorch_data.DataCollator
-    if not isinstance(x, type(torch.tensor)):
+    if isinstance(x, list):
         x = torch.tensor(x, dtype=torch.long)
-    return (x != pad_token_id).int()
+    return (x != pad_token_id).float()
 
 
 class DatasetMIDIRandomChunk:
