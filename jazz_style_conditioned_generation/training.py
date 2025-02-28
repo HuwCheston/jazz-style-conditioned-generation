@@ -10,7 +10,6 @@ import mlflow
 import numpy as np
 import torch
 from loguru import logger
-from miditok import Structured
 from tqdm import tqdm
 from transformers import GPT2Config, GPT2LMHeadModel
 
@@ -18,6 +17,7 @@ from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data import (
     validate_conditions,
     DATA_DIR,
+    get_tokenizer,
     DatasetMIDIExhaustive,
     DatasetMIDIRandomChunk,
     get_condition_special_tokens,
@@ -100,8 +100,7 @@ class TrainingModule:
             f"Initialising tokenizer with method {tokenizer_method}, "
             f"training {training_method}, parameters {tokenizer_kws}"
         )
-        self.tokenizer = Structured(params=os.path.join(utils.get_project_root(),
-                                                        "outputs/tokenizers/structured_20000_bpe_25_02_25_21:02:55.json"))
+        self.tokenizer = get_tokenizer(tokenizer_method, training_method, tokenizer_kws)
 
         # CONDITIONS
         validate_conditions(self.conditions)
@@ -249,6 +248,7 @@ class TrainingModule:
             return torch.optim.lr_scheduler.LinearLR(self.optimizer, **sched_kws)
         elif sched_type == "music-transformer":
             sched = MusicTransformerScheduler(**sched_kws)
+            # This possibly won't work when resuming from a checkpoint?
             return torch.optim.lr_scheduler.LambdaLR(self.optimizer, sched.step)
         else:
             valid_types = ", ".join([i if i is not None else "None" for i in valids])

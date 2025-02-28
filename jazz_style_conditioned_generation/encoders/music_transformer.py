@@ -34,13 +34,13 @@ class MusicTransformer(nn.Module):
     def __init__(
             self,
             tokenizer,
-            n_layers=6,
-            num_heads=8,
-            d_model=512,
-            dim_feedforward=1024,
-            dropout=0.1,
-            max_sequence=2048,
-            rpr=False
+            n_layers: int = 6,
+            num_heads: int = 8,
+            d_model: int = 512,
+            dim_feedforward: int = 1024,
+            dropout: float = 0.1,
+            max_sequence: int = utils.MAX_SEQUENCE_LENGTH,
+            rpr: bool = False
     ):
         super(MusicTransformer, self).__init__()
 

@@ -31,7 +31,7 @@ MAX_VELOCITY = 127
 MIDDLE_C = 60
 OCTAVE = 12
 
-MAX_SEQUENCE_LENGTH = 512
+MAX_SEQUENCE_LENGTH = 2048  # close to Music Transformer
 # This is important: it ensures that two chunks overlap slightly, to allow a causal chain between the
 #  end of one chunk and the beginning of the next. The MIDITok default is 1: increasing this seems to work better
 CHUNK_OVERLAP_BARS = 8
