@@ -14,10 +14,9 @@ from lxml import html
 from pretty_midi import PrettyMIDI
 from tqdm import tqdm
 
-import utils
+from jazz_style_conditioned_generation import utils
 
 WEB_ROOT = "https://bushgrafts.com/jazz/Midi%20site/"
-PIANO_PROGRAM = 0
 OUTPUT_DIR = os.path.join(utils.get_project_root(), "data/raw/bushgrafts")
 
 
@@ -48,17 +47,19 @@ def validate_midi(midi_str: str) -> tuple[PrettyMIDI, str] | None:
     pm.time_signature_changes = []
     # We just have one instrument, so it'll be piano
     if len(pm.instruments) == 1:
-        if pm.instruments[0].program == PIANO_PROGRAM:
+        if pm.instruments[0].program == utils.MIDI_PIANO_PROGRAM:
             return pm, "unaccompanied"
         else:
-            logger.error(f'File {midi_str} contains one instrument but the program is not {PIANO_PROGRAM}, skipping!')
+            logger.error(f'File {midi_str} contains one instrument but the '
+                         f'program is not {utils.MIDI_PIANO_PROGRAM}, skipping!')
             return None
     else:
         try:
             # Get the instrument which has the correct program
-            piano = [i for i in pm.instruments if i.program == PIANO_PROGRAM][0]
+            piano = [i for i in pm.instruments if i.program == utils.MIDI_PIANO_PROGRAM][0]
         except IndexError:
-            logger.error(f'File {midi_str} does not have any instruments with program == {PIANO_PROGRAM}, skipping!')
+            logger.error(f'File {midi_str} does not have any instruments '
+                         f'with program == {utils.MIDI_PIANO_PROGRAM}, skipping!')
             return None
         else:
             # Subset the instruments to remove all non-piano instruments

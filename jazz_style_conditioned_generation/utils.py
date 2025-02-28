@@ -23,6 +23,7 @@ from symusic import Score
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 SEED = 42
 
+MIDI_PIANO_PROGRAM = 0
 PIANO_KEYS = 88
 FPS = 100
 MIDI_OFFSET = 21
