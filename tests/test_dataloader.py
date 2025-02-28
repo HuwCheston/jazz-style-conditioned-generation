@@ -13,7 +13,7 @@ from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.dataloader import *
 
 TEST_RESOURCES = os.path.join(utils.get_project_root(), "tests/test_resources")
-TEST_MIDI = os.path.join(TEST_RESOURCES, "test_midi1.mid")
+TEST_MIDI = os.path.join(TEST_RESOURCES, "test_midi1/piano_midi.mid")
 
 
 class DataloaderTest(unittest.TestCase):
@@ -79,7 +79,8 @@ class DataloaderTest(unittest.TestCase):
             tokenizer=REMI(),
             files_paths=[TEST_MIDI],
             do_augmentation=False,
-            max_seq_len=512
+            max_seq_len=512,
+            do_conditioning=False
         )
         gotitem = ds.__getitem__(0)
         input_ids, targets = gotitem["input_ids"], gotitem["labels"]
@@ -95,7 +96,8 @@ class DataloaderTest(unittest.TestCase):
             tokenizer=REMI(),
             files_paths=[TEST_MIDI],
             do_augmentation=False,
-            max_seq_len=10
+            max_seq_len=10,
+            do_conditioning=False
         )
         self.assertEqual(len(ds), 1)
 
@@ -128,6 +130,32 @@ class DataloaderTest(unittest.TestCase):
         self.assertEqual(actual_inputs, seq)
         self.assertEqual(actual_targets, [4, 5, 6, 7, 8, 9, 10, 11, 12, 0])
 
+    def test_dataset_random_chunk_with_conditioning(self):
+        token_factory = REMI()
+        token_factory.add_to_vocab("PIANIST_KennyBarron")
+        token_factory.add_to_vocab("GENRES_HardBop")
+        ds = DatasetMIDIRandomChunk(
+            tokenizer=token_factory,
+            files_paths=[TEST_MIDI],
+            do_augmentation=False,
+            max_seq_len=10,
+            do_conditioning=True,
+            condition_mapping={
+                "pianist": {"Kenny Barron": "PIANIST_KennyBarron"},
+                "genres": {"Hard Bop": "GENRES_HardBop"},
+            }
+        )
+        self.assertEqual(len(ds), 1)
+        item = ds.__getitem__(0)
+        input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
+        # Input IDs should start with the expected conditioning tokens
+        self.assertEqual(input_ids[0], token_factory["GENRES_HardBop"])
+        self.assertEqual(input_ids[1], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(targets[0], token_factory["PIANIST_KennyBarron"])
+        # Should be the desired length
+        self.assertEqual(len(input_ids), 10)
+        self.assertEqual(len(targets), 10)
+
     def test_dataset_exhaustive(self):
         tokenizer = REMI()
         # Test with a low max_seq_len (== lots of chunks)
@@ -135,7 +163,8 @@ class DataloaderTest(unittest.TestCase):
             tokenizer=tokenizer,
             files_paths=[TEST_MIDI],
             do_augmentation=False,
-            max_seq_len=10
+            max_seq_len=10,
+            do_conditioning=False
         )
         self.assertTrue(len(ds_small) > 1)
         # Test with a high max_seq_len (== few chunks)
@@ -143,7 +172,8 @@ class DataloaderTest(unittest.TestCase):
             tokenizer=REMI(),
             files_paths=[TEST_MIDI],
             do_augmentation=False,
-            max_seq_len=100000
+            max_seq_len=100000,
+            do_conditioning=False
         )
         self.assertTrue(len(ds_big) == 1)
 
@@ -158,6 +188,43 @@ class DataloaderTest(unittest.TestCase):
             actual_ids = [i_ for i_ in actual_inputs.tolist() if i_ != tokenizer["PAD_None"]]
             self.assertTrue(actual_ids[-1] == tokenizer["EOS_None"])
 
+    def test_dataset_exhaustive_with_conditioning(self):
+        token_factory = REMI()
+        token_factory.add_to_vocab("PIANIST_KennyBarron")
+        token_factory.add_to_vocab("GENRES_HardBop")
+        ds = DatasetMIDIExhaustive(
+            tokenizer=token_factory,
+            files_paths=[TEST_MIDI],
+            do_augmentation=False,
+            max_seq_len=10,
+            do_conditioning=True,
+            condition_mapping={
+                "pianist": {"Kenny Barron": "PIANIST_KennyBarron"},
+                "genres": {"Hard Bop": "GENRES_HardBop"},
+            }
+        )
+        item = ds.__getitem__(0)
+        input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
+        # Input IDs should start with BOS, followed by the expected conditioning tokens
+        self.assertEqual(input_ids[0], token_factory["BOS_None"])
+        self.assertEqual(input_ids[1], token_factory["GENRES_HardBop"])
+        self.assertEqual(input_ids[2], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(targets[0], token_factory["GENRES_HardBop"])
+        self.assertEqual(targets[1], token_factory["PIANIST_KennyBarron"])
+        # Should be the desired length
+        self.assertEqual(len(input_ids), 10)
+        self.assertEqual(len(targets), 10)
+        # Testing the final chunk
+        final_item = ds.__getitem__(len(ds) - 1)
+        input_ids, targets = final_item["input_ids"].tolist(), final_item["labels"].tolist()
+        # Should start with the condition tokens now
+        self.assertEqual(input_ids[0], token_factory["GENRES_HardBop"])
+        self.assertEqual(input_ids[1], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(targets[0], token_factory["PIANIST_KennyBarron"])
+        # and end with the EOS token, after padding is removed
+        input_ids_no_pad = [i for i in input_ids if i != token_factory["PAD_None"]]
+        self.assertEqual(input_ids_no_pad[-1], token_factory["EOS_None"])
+
     def test_non_existing_filepath(self):
         tokenizer = REMI()
         # This API is the same for both datasets
@@ -166,7 +233,8 @@ class DataloaderTest(unittest.TestCase):
                 tokenizer=tokenizer,
                 files_paths=[TEST_MIDI],
                 do_augmentation=False,
-                max_seq_len=10
+                max_seq_len=10,
+                do_conditioning=False
             )
             # Modify the file paths
             ds_init.files_paths = ["a/fake/file"]
@@ -253,6 +321,25 @@ class DataloaderTest(unittest.TestCase):
         self.assertTrue(actual.tracks[0].notes[0].time == 100)
         self.assertTrue(actual.tracks[0].notes[0].duration == 100)
         self.assertTrue(actual.tracks[0].notes[0].pitch == 80)
+
+    def test_add_condition_tokens_to_sequence(self):
+        dummy = [1, 3, 3, 3, 5, 6]
+        condition_tokens = [100, 200, 300]
+        # Treat 1 as BOS token: condition tokens should be added after
+        expected_inputs = [1, 100, 200, 300, 3, 3]
+        expected_targets = [100, 200, 300, 3, 3, 3]
+        actual_inputs, actual_targets = add_condition_tokens_to_sequence(dummy, condition_tokens, bos_token_id=1)
+        self.assertEqual(expected_inputs, actual_inputs)
+        self.assertEqual(expected_targets, actual_targets)
+        # Treat 1000 as BOS token: condition tokens should be added to start of sequence
+        expected_inputs = [100, 200, 300, 1, 3, 3]
+        expected_targets = [200, 300, 1, 3, 3, 3]
+        actual_inputs, actual_targets = add_condition_tokens_to_sequence(dummy, condition_tokens, bos_token_id=1000)
+        self.assertEqual(expected_inputs, actual_inputs)
+        self.assertEqual(expected_targets, actual_targets)
+        # Testing with adding no condition tokens
+        condition_tokens = []
+        self.assertRaises(AssertionError, add_condition_tokens_to_sequence, dummy, condition_tokens, 1)
 
 
 if __name__ == '__main__':

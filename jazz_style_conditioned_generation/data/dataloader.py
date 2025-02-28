@@ -6,6 +6,7 @@
 import os
 import random
 from copy import deepcopy
+from time import time
 
 import numpy as np
 import torch
@@ -15,6 +16,9 @@ from symusic import Score, Track, Note
 from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
+from jazz_style_conditioned_generation.data.conditions import (
+    validate_conditions, get_condition_special_tokens
+)
 
 __all__ = [
     "DATA_DIR",
@@ -26,6 +30,8 @@ __all__ = [
     "note_list_to_score",
     "remove_short_notes",
     "merge_repeated_notes",
+    "add_condition_tokens_to_sequence",
+    "get_conditions_for_track",
     "PITCH_AUGMENT_RANGE",
     "DURATION_AUGMENT_RANGE",
     "DatasetMIDIExhaustive",
@@ -82,11 +88,11 @@ def data_augmentation(
     )
 
 
-def validate_midi_paths(midi_filepaths: list[str]):
-    """Validates that all midi paths exist on disk"""
-    for file in midi_filepaths:
-        assert os.path.isfile(file), f"File {file} does not exist!"
-        assert file.endswith(".mid"), f"File {file} does not appear to be a MIDI file!"
+def validate_paths(filepaths: list[str], expected_extension: str = ".mid"):
+    """Validates that all paths exist on disk and have an expected extension"""
+    for file in filepaths:
+        assert os.path.isfile(file), f"File {file} does not exist on the disk!"
+        assert file.endswith(expected_extension), f"File {file} does not have expected extension {expected_extension}!"
 
 
 def add_beginning_and_ending_tokens_to_sequence(
@@ -222,6 +228,48 @@ def preprocess_score(score: Score) -> Score:
     return note_list_to_score(merged_notes, score.ticks_per_quarter)
 
 
+def get_conditions_for_track(
+        conditions_and_mapping: dict[str, dict],
+        metadata: dict,
+        tokenizer
+) -> list[int]:
+    """Given a mapping {condition: {val1: token1}}, convert track metadata into token format"""
+    condition_tokens = []
+    # By sorting, we ensure that tokens are always inserted in a consistent order
+    conditions = sorted(list(conditions_and_mapping.keys()))
+    for condition in conditions:
+        mapper = conditions_and_mapping[condition]
+        values_for_track = metadata[condition]
+        if isinstance(values_for_track, list):
+            tokens_for_track = [mapper[c["name"]] for c in values_for_track if c["name"] in mapper.keys()]
+        else:
+            tokens_for_track = [mapper[values_for_track]]
+        condition_tokens.extend(tokens_for_track)
+    # Sort the tokens alphabetically and return the indices
+    return [tokenizer[c] for c in sorted(condition_tokens)]
+
+
+def add_condition_tokens_to_sequence(
+        sequence: list[int],
+        condition_tokens: list[int],
+        bos_token_id: int,
+) -> tuple[list[int], list[int]]:
+    """Add condition tokens to a sequence, preserving length and beginning-of-sequence token (if present)"""
+    assert len(condition_tokens) > 0, "Condition token list is empty"
+    max_seq_len = len(sequence)
+    # This is the beginning of the whole document: condition tokens should go AFTER the BOS token
+    if sequence[0] == bos_token_id:
+        comb = [sequence[0]] + condition_tokens + sequence[1:]
+    # This is a chunk of the whole document taken from midway: condition tokens should go at the START of the sequence
+    else:
+        comb = condition_tokens + sequence
+    # Chunk everything to the required length and sanity check
+    x = comb[:max_seq_len]
+    targets = comb[1:max_seq_len + 1]
+    assert len(x) == len(targets) == len(sequence)
+    return x, targets
+
+
 class DatasetMIDIRandomChunk:
     """Dataloader that returns a random chunk of `max_seq_len` for a single track"""
     def __init__(
@@ -230,12 +278,29 @@ class DatasetMIDIRandomChunk:
             files_paths: list[str],
             max_seq_len: int,
             do_augmentation: bool = True,
+            do_conditioning: bool = True,
+            condition_mapping: dict[str, dict] = None
     ):
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len
         self.do_augmentation = do_augmentation
-        validate_midi_paths(files_paths)
+
+        # MIDI file paths
         self.files_paths = files_paths
+        validate_paths(self.files_paths, expected_extension=".mid")
+
+        # Conditioning
+        self.do_conditioning = do_conditioning
+        if self.do_conditioning:
+            if not condition_mapping:
+                raise AttributeError("Passed `do_conditioning == True`, but did not pass `condition_mapping`")
+            self.conditions = list(condition_mapping.keys())
+            self.condition_mapping = condition_mapping
+            validate_conditions(self.conditions)
+            self.metadata_paths = [
+                fp.replace("piano_midi.mid", "metadata_tivo.json") for fp in self.files_paths
+            ]
+            validate_paths(self.metadata_paths, expected_extension=".json")
 
     def __len__(self):
         return len(self.files_paths)
@@ -255,6 +320,9 @@ class DatasetMIDIRandomChunk:
         x = x[:-1]  # remove the final token to get the desired length
         assert len(targets) == len(x) == self.max_seq_len
         return x, targets
+
+    def add_conditioning_tokens(self):
+        pass
 
     def __getitem__(self, idx: int) -> dict[str, torch.LongTensor]:
         # Get the filepath for the corresponding track
@@ -280,9 +348,23 @@ class DatasetMIDIRandomChunk:
         tokseq_ids = add_beginning_and_ending_tokens_to_sequence(
             temp_ids, self.tokenizer["BOS_None"], self.tokenizer["EOS_None"]
         )
-        # TODO: here is where we can add conditioning tokens
         # TODO: potentially remove bar/tempo tokens here (they have no meaning)
+        # Get a random chunk from the sequence
         input_ids, targets = self.chunk_sequence(tokseq_ids)
+        # Add the conditioning tokens in to the start of the sequence, if required
+        if self.do_conditioning:
+            # Read the metadata JSON file (with a large cache to prevent redundant reads)
+            metadata_read = utils.read_json_cached(self.metadata_paths[idx])
+            # Grab the condition tokens for this track
+            condition_tokens = get_conditions_for_track(self.condition_mapping, metadata_read, self.tokenizer)
+            # If we actually have condition tokens
+            if len(condition_tokens) > 0:
+                # Add them to the sequence, preserving the target length and the BOS token (if this is present)
+                input_ids, targets = add_condition_tokens_to_sequence(
+                    sequence=input_ids,
+                    condition_tokens=condition_tokens,
+                    bos_token_id=self.tokenizer["BOS_None"]
+                )
         return {
             "input_ids": torch.tensor(input_ids, dtype=torch.long),
             "labels": torch.tensor(targets, dtype=torch.long)
@@ -304,16 +386,35 @@ class DatasetMIDIExhaustive:
             files_paths: list[str],
             max_seq_len: int,
             do_augmentation: bool = False,
+            do_conditioning: bool = True,
+            condition_mapping: dict[str, dict] = None
     ):
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len
         if do_augmentation:
             raise NotImplementedError("Data augmentation not implemented for exhaustive MIDI loader")
-        validate_midi_paths(files_paths)
+
+        # Conditioning
+        self.do_conditioning = do_conditioning
+        if self.do_conditioning and not condition_mapping:
+            raise AttributeError("Passed `do_conditioning == True`, but no conditions were passed")
+        if self.do_conditioning:
+            self.conditions = list(condition_mapping.keys())
+            self.condition_mapping = condition_mapping
+            validate_conditions(self.conditions)
+
+        validate_paths(files_paths, expected_extension=".mid")
         # [filename1, filename2, ...]
         self.files_paths = files_paths
         # [(filename1, chunk1), (filename1, chunk2), (filename2, chunk1), ...]
         self.chunk_paths_and_idxs = list(self.get_chunks_per_track())
+
+        if self.do_conditioning:
+            self.metadata_paths = [
+                fp.replace("piano_midi.mid", "metadata_tivo.json")
+                for fp, _ in self.chunk_paths_and_idxs
+            ]
+            validate_paths(self.metadata_paths, expected_extension=".json")
 
     def chunker(self, score: Score) -> list[list[int]]:
         """Chunks a symusic.Score object into chunks of `max_seq_len` size"""
@@ -354,7 +455,6 @@ class DatasetMIDIExhaustive:
         # Apply our own preprocessing to the score
         preprocessed_score = preprocess_score(score)
         # Convert the whole score into chunks
-        # TODO: what about conditioning tokens?
         chunked = self.chunker(preprocessed_score)
         # Get the chunk we desire
         desired_chunk = chunked[chunk_idx]
@@ -366,6 +466,20 @@ class DatasetMIDIExhaustive:
         # Remove the last token from the desired sequence
         input_ids = desired_chunk[:-1]
         assert len(targets) == len(input_ids) == self.max_seq_len
+        # Add the conditioning tokens in to the start of the sequence, if required
+        if self.do_conditioning:
+            # Read the metadata JSON file (with a large cache to prevent redundant reads)
+            metadata_read = utils.read_json_cached(self.metadata_paths[idx])
+            # Grab the condition tokens for this track
+            condition_tokens = get_conditions_for_track(self.condition_mapping, metadata_read, self.tokenizer)
+            # If we actually have condition tokens
+            if len(condition_tokens) > 0:
+                # Add them to the sequence, preserving the target length and the BOS token (if this is present)
+                input_ids, targets = add_condition_tokens_to_sequence(
+                    sequence=input_ids,
+                    condition_tokens=condition_tokens,
+                    bos_token_id=self.tokenizer["BOS_None"]
+                )
         # Assemble everything into the dictionary format
         return {
             "input_ids": torch.tensor(input_ids, dtype=torch.long),
@@ -388,28 +502,43 @@ if __name__ == "__main__":
     # Get a tokenizer with default arguments
     token_factory = REMI()
     # Get filepaths for all MIDI files in the /data/raw/ directories
-    midi_paths = utils.get_data_files_with_ext(ext="**/*.mid")[:10]
+    midi_paths = utils.get_data_files_with_ext(ext="**/*.mid")[:100]
+
+    # Create condition mapping
+    cmap = {c: get_condition_special_tokens(c) for c in ["genres", "pianist"]}
+    for mapping in cmap.values():
+        for token in mapping.values():
+            token_factory.add_to_vocab(token)
 
     # Test out our random chunking dataloader
     dm = DatasetMIDIRandomChunk(
         token_factory,
         midi_paths,
         max_seq_len=100,
-        do_augmentation=True
+        do_augmentation=True,
+        do_conditioning=True,
+        condition_mapping=cmap
     )
     print(dm)
-    for i in range(10):
+
+    all_times = []
+    for i in range(len(midi_paths)):
+        starter = time()
         item = dm.__getitem__(i)
+        all_times.append(time() - starter)
         print(f'Item {i}, inputs shape {item["input_ids"].size(0)}, labels shape {item["labels"].size(0)}')
+    print(np.mean(all_times))
 
     # Test out our exhaustive dataloader
     dm = DatasetMIDIExhaustive(
         token_factory,
         midi_paths,
         max_seq_len=100,
-        do_augmentation=False
+        do_augmentation=False,
+        do_conditioning=True,
+        condition_mapping=cmap
     )
     print(dm)
-    for i in range(10):
+    for i in range(len(dm)):
         item = dm.__getitem__(i)
         print(f'Item {i}, inputs shape {item["input_ids"].size(0)}, labels shape {item["labels"].size(0)}')
