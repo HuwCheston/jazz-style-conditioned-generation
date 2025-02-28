@@ -78,6 +78,10 @@
     {
       "name": "Jazz Instrument",
       "weight": 5
+    },
+    {
+      "name": "Calypso",
+      "weight": 10
     }
   ],
   "themes": [],

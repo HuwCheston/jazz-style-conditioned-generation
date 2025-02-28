@@ -89,6 +89,12 @@ class ConditionsTest(unittest.TestCase):
         self.assertEqual(sorted(list(actual.keys())), sorted(expected_keys))
         self.assertEqual(sorted(list(actual.values())), sorted(expected_values))
 
+    def test_validate_condition_values(self):
+        values = ["African Folk", "Adult Alternative Pop/Rock", "African Folk", "Guitar Jazz"]
+        expected = ["African", "Pop/Rock"]
+        actual = cond.validate_condition_values(values, "genres")
+        self.assertEqual(actual, expected)
+
 
 if __name__ == '__main__':
     unittest.main()

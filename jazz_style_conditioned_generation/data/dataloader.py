@@ -17,7 +17,7 @@ from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.conditions import (
-    validate_conditions, get_condition_special_tokens
+    validate_conditions, get_condition_special_tokens, validate_condition_values
 )
 
 __all__ = [
@@ -241,10 +241,11 @@ def get_conditions_for_track(
         mapper = conditions_and_mapping[condition]
         values_for_track = metadata[condition]
         if isinstance(values_for_track, list):
-            tokens_for_track = [mapper[c["name"]] for c in values_for_track if c["name"] in mapper.keys()]
-        else:
-            tokens_for_track = [mapper[values_for_track]]
-        condition_tokens.extend(tokens_for_track)
+            values_for_track = [c["name"] for c in values_for_track]
+        # This merges similar values together, removes invalid values etc.
+        validated_condition_values = validate_condition_values(values_for_track, condition)
+        # This converts values into their token form
+        condition_tokens.extend([mapper[c] for c in validated_condition_values if c in mapper.keys()])
     # Sort the tokens alphabetically and return the indices
     return [tokenizer[c] for c in sorted(condition_tokens)]
 

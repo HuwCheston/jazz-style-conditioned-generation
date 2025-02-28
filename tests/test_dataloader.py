@@ -225,6 +225,49 @@ class DataloaderTest(unittest.TestCase):
         input_ids_no_pad = [i for i in input_ids if i != token_factory["PAD_None"]]
         self.assertEqual(input_ids_no_pad[-1], token_factory["EOS_None"])
 
+    def test_dataset_with_conditioning_merges(self):
+        token_factory = REMI()
+        # This track has the tag "Calypso". We are expecting this to be merged with the tag "GENRES_Caribbean"
+        token_factory.add_to_vocab("PIANIST_KennyBarron")
+        token_factory.add_to_vocab("GENRES_HardBop")
+        token_factory.add_to_vocab("GENRES_Caribbean")
+        ds = DatasetMIDIExhaustive(
+            tokenizer=token_factory,
+            files_paths=[TEST_MIDI],
+            do_augmentation=False,
+            max_seq_len=10,
+            do_conditioning=True,
+            condition_mapping={
+                "pianist": {"Kenny Barron": "PIANIST_KennyBarron"},
+                "genres": {"Caribbean": "GENRES_Caribbean", "Hard Bop": "GENRES_HardBop"},
+            }
+        )
+        item = ds.__getitem__(0)
+        input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
+        # Input IDs should start with BOS, followed by the expected conditioning tokens
+        self.assertEqual(input_ids[0], token_factory["BOS_None"])
+        self.assertEqual(input_ids[1], token_factory["GENRES_Caribbean"])
+        self.assertEqual(input_ids[2], token_factory["GENRES_HardBop"])
+        self.assertEqual(input_ids[3], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(targets[0], token_factory["GENRES_Caribbean"])
+        self.assertEqual(targets[1], token_factory["GENRES_HardBop"])
+        self.assertEqual(targets[2], token_factory["PIANIST_KennyBarron"])
+        # Should be the desired length
+        self.assertEqual(len(input_ids), 10)
+        self.assertEqual(len(targets), 10)
+        # Testing the final chunk
+        final_item = ds.__getitem__(len(ds) - 1)
+        input_ids, targets = final_item["input_ids"].tolist(), final_item["labels"].tolist()
+        # Should start with the condition tokens now
+        self.assertEqual(input_ids[0], token_factory["GENRES_Caribbean"])
+        self.assertEqual(input_ids[1], token_factory["GENRES_HardBop"])
+        self.assertEqual(input_ids[2], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(targets[0], token_factory["GENRES_HardBop"])
+        self.assertEqual(targets[1], token_factory["PIANIST_KennyBarron"])
+        # and end with the EOS token, after padding is removed
+        input_ids_no_pad = [i for i in input_ids if i != token_factory["PAD_None"]]
+        self.assertEqual(input_ids_no_pad[-1], token_factory["EOS_None"])
+
     def test_non_existing_filepath(self):
         tokenizer = REMI()
         # This API is the same for both datasets

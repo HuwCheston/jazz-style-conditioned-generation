@@ -11,10 +11,91 @@ from jazz_style_conditioned_generation import utils
 ACCEPT_CONDITIONS = ["moods", "genres", "pianist", "themes"]
 # Each list should be populated with values for a condition that we don't want to use
 EXCLUDE = {
-    "genres": ["Jazz Instrument", "Jazz", "Piano Jazz"],  # i.e., nearly every track tagged with these values
+    "genres": [
+        # Nearly every track could be described as one of these genres
+        "Jazz Instrument",
+        "Jazz",
+        "Piano Jazz",
+        "Keyboard",
+        "Solo Instrumental",
+        "Improvisation",
+        # These tags seem incorrect given the type of music we know to be in the dataset
+        "Big Band",
+        "Choral",
+        "Electronic",
+        "Guitar Jazz",
+        "Modern Big Band",
+        "Orchestral",
+        "Saxophone Jazz",
+        "Symphony",
+        "Trumpet Jazz",
+        "Vibraphone/Marimba Jazz",
+        "Vocal",
+        "Vocal Music",
+        "Vocal Pop",
+    ],
     "moods": [],
     "pianist": [],
     "themes": [],
+}
+MERGE = {
+    "genres": {
+        "Adult Alternative Pop/Rock": "Pop/Rock",
+        "Alternative/Indie Rock": "Pop/Rock",
+        "African Folk": "African",
+        "African Jazz": "African",
+        "African Traditions": "African",
+        "American Popular Song": "Pop/Rock",
+        "Avant-Garde Jazz": "Avant-Garde",
+        "Ballet": "Stage & Screen",
+        "Brazilian Pop": "Brazilian",
+        "Brazilian Jazz": "Brazilian",
+        "Brazilian Traditions": "Brazilian",
+        "Black Gospel": "Gospel",
+        "Cast Recordings": "Stage & Screen",
+        "Calypso": "Caribbean",
+        "Caribbean Traditions": "Caribbean",
+        "Central/West Asian Traditions": "Asian",
+        "Chamber Jazz": "Chamber",
+        "Chamber Music": "Chamber",
+        "Christmas": "Holiday",
+        "Classical Crossover": "Classical",
+        "Concerto": "Classical",
+        "Contemporary Jazz": "Modern Jazz",
+        "Club/Dance": "Electronic",
+        "Cuban Jazz": "Afro-Cuban Jazz",
+        "Electro": "Electronic",
+        "European Folk": "European",
+        "French": "European",
+        "Film Score": "Stage & Screen",
+        "Film Music": "Stage & Screen",
+        "Global Jazz": "International",
+        "Holidays": "Holiday",
+        "Jazz Blues": "Blues",
+        "Jazz-Funk": "Funk",
+        "Jazz-Pop": "Pop/Rock",
+        "Latin": "Latin Jazz",
+        "Modern Composition": "Modern Jazz",
+        "Modern Creative": "Modern Jazz",
+        "Modern Free": "Modern Jazz",
+        "Musical Theater": "Stage & Screen",
+        "New Orleans Jazz Revival": "New Orleans Jazz",
+        "Original Score": "Stage & Screen",
+        "Piano/Easy Listening": "Easy Listening",
+        "Show Tunes": "Stage & Screen",
+        "Show/Musical": "Stage & Screen",
+        "Soundtracks": "Stage & Screen",
+        "South African Folk": "African",
+        "South American Traditions": "Southern American",
+        "Spirituals": "Gospel",
+        "Spy Music": "Stage & Screen",
+        "Traditional Pop": "Pop/Rock",
+        "Western European Traditions": "European",
+        "Venezuelan": "Southern American"
+    },
+    "moods": {},
+    "pianist": {},
+    "themes": {},
 }
 
 
@@ -61,6 +142,23 @@ def get_inner_json_values(metadata: dict, key: str):
     yield from res
 
 
+def validate_condition_values(condition_values: list[str] | str, condition_key: str) -> list[str]:
+    """Validates values for a given condition by merging similar entries, removing invalid ones, etc."""
+    new_values = []
+    # Allow both single strings and list of strings as input
+    if isinstance(condition_values, str):
+        condition_values = [condition_values]
+    for c in condition_values:
+        # Merge similar values together
+        if c in MERGE[condition_key].keys():
+            c = MERGE[condition_key][c]
+        # Remove any values for this condition that we don't want to use
+        if c not in EXCLUDE[condition_key]:
+            new_values.append(c)
+    # Remove duplicates and sort
+    return list(sorted(set(new_values)))
+
+
 def get_condition_special_tokens(condition: str, metadata_dicts: list[dict] | dict = None):
     """Given a condition in ACCEPT_CONDITIONS, extract all observed values from all metadata dicts"""
     # Check that the condition we've passed in is valid
@@ -72,22 +170,19 @@ def get_condition_special_tokens(condition: str, metadata_dicts: list[dict] | di
     elif metadata_dicts is None:
         metadata_dicts = load_tivo_metadata()
     # We'll skip over these values
-    res = []
+    condition_values = []
     for metadata in metadata_dicts:
         # This will give us e.g., ["artist_genres", "album_genres"] for the input "genres"
         accept_keys = [k for k in metadata.keys() if condition.lower() in k.lower()]
         # Iterate over all of these keys and get the required value from the metadata dictionary
         for accept_key in accept_keys:
-            res.extend(get_inner_json_values(metadata, accept_key))
-    # Remove any keys for this condition that we don't want to use
-    # i.e., [African Jazz, Bebop, Post-Bop] for genre, [Sophisticated, Relaxed, Frantic] for mood
-    condition_values = [r for r in res if r not in EXCLUDE[condition]]
-    # Remove duplicates and sort
-    condition_values_deduped_sorted = sorted(set(condition_values))
+            condition_values.extend(get_inner_json_values(metadata, accept_key))
+    # Merge similar values, remove exclude values + duplicates, and sort alphabetically
+    condition_values_validated_deduped_sorted = validate_condition_values(condition_values, condition)
     # Return a mapping of condition value: special token
     return {
         s: f'{condition.upper()}_{utils.remove_punctuation(s).replace(" ", "")}'
-        for s in condition_values_deduped_sorted
+        for s in condition_values_validated_deduped_sorted
     }
 
 
