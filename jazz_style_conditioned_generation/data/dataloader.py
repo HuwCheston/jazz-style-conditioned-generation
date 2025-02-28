@@ -11,7 +11,7 @@ import numpy as np
 import torch
 from miditok.constants import SCORE_LOADING_EXCEPTION
 from miditok.data_augmentation import augment_score
-from symusic import Score
+from symusic import Score, Track, Note
 from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
@@ -23,6 +23,9 @@ __all__ = [
     "randomly_slice_sequence",
     "get_pitch_augmentation_value",
     "data_augmentation",
+    "note_list_to_score",
+    "remove_short_notes",
+    "merge_repeated_notes",
     "PITCH_AUGMENT_RANGE",
     "DURATION_AUGMENT_RANGE",
     "DatasetMIDIExhaustive",
@@ -34,6 +37,9 @@ DATA_DIR = os.path.join(utils.get_project_root(), "data")
 # DEFAULT_AUGMENTATION_PROB = 0.5
 PITCH_AUGMENT_RANGE = range(-3, 3)  # as in Music Transformer
 DURATION_AUGMENT_RANGE = [0.95, 0.975, 1.0, 1.025, 1.05]  # as in Music Transformer
+
+OVERLAP_TICKS = 25  # If two notes with the same pitch have less than this offset-onset time, they will be merged
+MIN_DURATION_TICKS = 10  # We remove notes that have a duration of less than this value
 
 
 def get_pitch_augmentation_value(score: Score, pitch_augmentation_range: list) -> int:
@@ -127,6 +133,95 @@ def randomly_slice_sequence(
     return sequence[start:end]
 
 
+def remove_short_notes(note_list: list[Note]) -> list[Note]:
+    """Removes symusic.Note objects with a duration of less than MIN_DURATION_TICKS from a list of Note objects"""
+    newnotes = []
+    for note in note_list:
+        # Notes with a duration this short are transcription errors usually
+        if note.duration >= MIN_DURATION_TICKS:
+            newnotes.append(note)
+    return newnotes
+
+
+def merge_repeated_notes(note_list: list[Note]) -> list[Note]:
+    """Merge successive notes at the same pitch with an offset-onset time < OVERLAP_TICKS to a single, long note"""
+    newnotes = []
+    # Iterate over all MIDI pitches
+    for pitch in range(utils.MIDI_OFFSET, utils.MIDI_OFFSET + utils.PIANO_KEYS + 1):
+        # Get the notes played at this pitch
+        notes_at_pitch = [note for note in note_list if note.pitch == pitch]
+        # If this pitch only appears once
+        if len(notes_at_pitch) < 2:
+            # We can just use it straight away
+            newnotes.extend(notes_at_pitch)
+        # Otherwise, if we have multiple appearances of this pitch
+        else:
+            # Sort notes by onset time
+            notes_sorted = sorted(notes_at_pitch, key=lambda x: x.time)
+            seen_notes = []  # Tracks already processed notes
+            # Iterate over successive pairs of notes (note1, note2), (note2, note3)...
+            for note_idx in range(len(notes_sorted) - 1):
+                # Unpack to get desired notes
+                note1 = notes_sorted[note_idx]
+                note2 = notes_sorted[note_idx + 1]
+                # Check if this note pair has already been merged and processed
+                if note1 in seen_notes:
+                    continue
+                # Unpack everything
+                note1_end = note1.time + note1.duration
+                note2_start = note2.time
+                overlap = note2_start - note1_end
+                # If the overlap between these two notes is short
+                if overlap < OVERLAP_TICKS:
+                    # Combine both notes into a single note
+                    newnote = Note(
+                        # Just use the onset time of the earliest note
+                        time=note1.time,
+                        # Combine the durations of both notes + the overlap duration
+                        duration=note1.duration + overlap + note2.duration,
+                        # Pitch should just be the same
+                        pitch=note1.pitch,
+                        # Take the midpoint of both velocity values
+                        velocity=(note1.velocity + note2.velocity) // 2,
+                        ttype=note1.ttype
+                    )
+                    newnotes.append(newnote)
+                    seen_notes.append(note1)  # Mark note1 as processed
+                    seen_notes.append(note2)  # Mark note2 as processed
+                else:
+                    # No overlap, append note1 to the newnotes list
+                    newnotes.append(note1)
+                    seen_notes.append(note1)  # Mark note1 as processed
+            # Ensure the last note is added (it might not be part of any overlap)
+            if notes_sorted[-1] not in seen_notes:
+                newnotes.append(notes_sorted[-1])
+    return newnotes
+
+
+def note_list_to_score(note_list: list[Note], ticks_per_quarter: int) -> Score:
+    """Converts a list of symusic.Note objects to a single symusic.Score"""
+    # This API is fairly similar to pretty_midi
+    newscore = Score()
+    newscore.ticks_per_quarter = ticks_per_quarter
+    newscore.tracks = [Track()]
+    newscore.tracks[0].notes = note_list
+    return newscore
+
+
+def preprocess_score(score: Score) -> Score:
+    """Applies our own preprocessing to a Score object: removes short notes, merges duplicates"""
+    # We should only ever have one track (i.e., piano)
+    assert len(score.tracks) == 1
+    # Now we do our own preprocessing
+    note_list = score.tracks[0].notes
+    # First, we remove notes with a very short duration
+    no_short_notes = remove_short_notes(note_list)
+    # Next, we merge successive notes with the same pitch and a very short onset-offset time into the same pitch
+    merged_notes = merge_repeated_notes(no_short_notes)
+    # Finally, we convert everything back to a Score object
+    return note_list_to_score(merged_notes, score.ticks_per_quarter)
+
+
 class DatasetMIDIRandomChunk:
     """Dataloader that returns a random chunk of `max_seq_len` for a single track"""
     def __init__(
@@ -169,13 +264,15 @@ class DatasetMIDIRandomChunk:
             score = Score(fp)
         except SCORE_LOADING_EXCEPTION:
             return {"input_ids": None, "labels": None}
+        # Apply our own preprocessing to the score
+        preprocessed_score = preprocess_score(score)
         # Perform data augmentation on the score object if required
         if self.do_augmentation:
-            score = data_augmentation(score)
-        # Preprocess the music file
-        score = self.tokenizer.preprocess_score(score)
+            preprocessed_score = data_augmentation(preprocessed_score)
+        # Now we can do the MIDItok preprocessing
+        before_tokenize = self.tokenizer.preprocess_score(preprocessed_score)
         # Tokenize it
-        tokseq = self.tokenizer.encode(score, no_preprocess_score=True)
+        tokseq = self.tokenizer.encode(before_tokenize, no_preprocess_score=True)
         # Add BOS and EOS tokens in
         # MIDITok only adds a BOS and EOS token at the beginning and ending of the track
         temp_ids = deepcopy(tokseq[0].ids)
@@ -220,7 +317,7 @@ class DatasetMIDIExhaustive:
 
     def chunker(self, score: Score) -> list[list[int]]:
         """Chunks a symusic.Score object into chunks of `max_seq_len` size"""
-        # Preprocess the music file
+        # Preprocess the music file with the tokenizer
         score = self.tokenizer.preprocess_score(score)
         # Tokenize it
         tokseq = self.tokenizer.encode(score, no_preprocess_score=True)
@@ -238,8 +335,10 @@ class DatasetMIDIExhaustive:
         for file in tqdm(self.files_paths, desc='Getting track chunks...'):
             # Open file as a symusic score object
             score = Score(file)
+            # Apply our own preprocessing to the score
+            preprocessed_score = preprocess_score(score)
             # Convert into chunks
-            chunked_file = self.chunker(score)
+            chunked_file = self.chunker(preprocessed_score)
             # Yield tuples of (filename, chunk_idx)
             for chunk_idx in range(len(chunked_file)):
                 yield file, chunk_idx
@@ -252,10 +351,11 @@ class DatasetMIDIExhaustive:
             score = Score(fp)
         except SCORE_LOADING_EXCEPTION:
             return {"input_ids": None, "labels": None}
-        # TODO: currently no data augmentation implemented
+        # Apply our own preprocessing to the score
+        preprocessed_score = preprocess_score(score)
         # Convert the whole score into chunks
         # TODO: what about conditioning tokens?
-        chunked = self.chunker(score)
+        chunked = self.chunker(preprocessed_score)
         # Get the chunk we desire
         desired_chunk = chunked[chunk_idx]
         # Pad the chunk if required

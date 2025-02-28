@@ -7,12 +7,13 @@ import os
 import unittest
 
 from miditok import REMI
-from symusic import Score
+from symusic import Score, Note
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.dataloader import *
 
-TEST_MIDI = os.path.join(utils.get_project_root(), "tests/test_resources/test_midi1.mid")
+TEST_RESOURCES = os.path.join(utils.get_project_root(), "tests/test_resources")
+TEST_MIDI = os.path.join(TEST_RESOURCES, "test_midi1.mid")
 
 
 class DataloaderTest(unittest.TestCase):
@@ -152,8 +153,8 @@ class DataloaderTest(unittest.TestCase):
             actual_inputs, _ = first_chunk["input_ids"], first_chunk["labels"]
             self.assertTrue(actual_inputs[0].item() == tokenizer["BOS_None"])
             # Last chunk should end with EOS
-            first_chunk = ds.__getitem__(len(ds) - 1)
-            actual_inputs, _ = first_chunk["input_ids"], first_chunk["labels"]
+            last_chunk = ds.__getitem__(-1)
+            actual_inputs, _ = last_chunk["input_ids"], last_chunk["labels"]
             actual_ids = [i_ for i_ in actual_inputs.tolist() if i_ != tokenizer["PAD_None"]]
             self.assertTrue(actual_ids[-1] == tokenizer["EOS_None"])
 
@@ -174,6 +175,84 @@ class DataloaderTest(unittest.TestCase):
             gotitem = ds_init.__getitem__(0)
             self.assertIsNone(gotitem["input_ids"])
             self.assertIsNone(gotitem["labels"])
+
+    def test_remove_short_notes_dummy(self):
+        # Test with a dummy example
+        notelist = [
+            # Keep this one
+            Note(pitch=80, duration=100, time=100, velocity=80, ttype="tick"),
+            # Remove this one
+            Note(pitch=70, duration=1, time=100, velocity=80, ttype="tick")
+        ]
+        expected = [Note(pitch=80, duration=100, time=100, velocity=80, ttype="tick")]
+        actual = remove_short_notes(notelist)
+        self.assertEqual(actual, expected)
+
+    def test_remove_short_notes_real(self):
+        # Test with a real example
+        # The example has 4 notes at pitch 68 (G#4): three are of a normal length, one is really short
+        real_example = Score(os.path.join(TEST_RESOURCES, "test_midi_repeatnotes.mid"))
+        # Test the input
+        notelist = real_example.tracks[0].notes
+        init_len = len([i for i in notelist if i.pitch == 68])
+        self.assertEqual(init_len, 4)
+        # Test the output
+        actual = remove_short_notes(notelist)
+        actual_len = len([i for i in actual if i.pitch == 68])
+        self.assertEqual(actual_len, 3)
+        self.assertLess(actual_len, init_len)
+
+    def test_merge_repeated_notes_dummy(self):
+        # These notes should be merged into one
+        notelist = [
+            Note(pitch=80, duration=5, time=100, velocity=80, ttype="tick"),
+            Note(pitch=80, duration=5, time=110, velocity=90, ttype="tick"),  # velocities will be merged too
+        ]
+        # Duration should be note1_duration + (note2_onset - note1_onset) + note2_duration
+        expected = [Note(pitch=80, duration=15, time=100, velocity=85, ttype="tick")]
+        actual = merge_repeated_notes(notelist)
+        self.assertEqual(actual, expected)
+        # Even these notes are adjacent, they shouldn't be merged as they are different pitches
+        notelist = [
+            Note(pitch=90, duration=5, time=110, velocity=80, ttype="tick"),
+            Note(pitch=91, duration=5, time=120, velocity=80, ttype="tick"),
+        ]
+        expected = notelist
+        actual = merge_repeated_notes(notelist)
+        self.assertEqual(actual, expected)
+        # These notes are not adjacent, so shouldn't be touched
+        notelist = [
+
+            Note(pitch=90, duration=5, time=110, velocity=80, ttype="tick"),
+            Note(pitch=90, duration=5, time=1000, velocity=80, ttype="tick"),
+        ]
+        expected = notelist
+        actual = merge_repeated_notes(notelist)
+        self.assertEqual(actual, expected)
+
+    def test_merge_repeated_notes_real(self):
+        # Test with a real example
+        # The example has 8 notes at pitch 75 (D#5): two of these should be merged together to make 7 total notes
+        real_example = Score(os.path.join(TEST_RESOURCES, "test_midi_repeatnotes.mid"))
+        # Test before processing
+        notelist = real_example.tracks[0].notes
+        init_len = len([i for i in notelist if i.pitch == 75])
+        self.assertEqual(8, init_len)
+        # Test after processing
+        actual = merge_repeated_notes(notelist)
+        actual_len = len([i for i in actual if i.pitch == 75])
+        self.assertEqual(7, actual_len)
+        self.assertLess(actual_len, init_len)
+
+    def test_notelist_to_score(self):
+        notelist = [Note(pitch=80, duration=100, time=100, velocity=80, ttype="tick")]
+        actual = note_list_to_score(notelist, 100)
+        self.assertTrue(isinstance(actual, Score))
+        self.assertTrue(len(actual.tracks) == 1)
+        self.assertTrue(len(actual.tracks[0].notes) == 1)
+        self.assertTrue(actual.tracks[0].notes[0].time == 100)
+        self.assertTrue(actual.tracks[0].notes[0].duration == 100)
+        self.assertTrue(actual.tracks[0].notes[0].pitch == 80)
 
 
 if __name__ == '__main__':
