@@ -32,6 +32,7 @@ __all__ = [
     "merge_repeated_notes",
     "add_condition_tokens_to_sequence",
     "get_conditions_for_track",
+    "create_padding_mask",
     "PITCH_AUGMENT_RANGE",
     "DURATION_AUGMENT_RANGE",
     "DatasetMIDIExhaustive",
@@ -271,6 +272,15 @@ def add_condition_tokens_to_sequence(
     return x, targets
 
 
+def create_padding_mask(x, pad_token_id: int) -> torch.tensor:
+    """Create masking tensor that gives 0 when token is pad_token_id, 1 elsewhere"""
+    # NB. be aware that causal masks are handled by models: this mask is for padding only
+    #  This is identical to the approach in miditok.pytorch_data.DataCollator
+    if not isinstance(x, type(torch.tensor)):
+        x = torch.tensor(x, dtype=torch.long)
+    return (x != pad_token_id).int()
+
+
 class DatasetMIDIRandomChunk:
     """Dataloader that returns a random chunk of `max_seq_len` for a single track"""
     def __init__(
@@ -322,9 +332,6 @@ class DatasetMIDIRandomChunk:
         assert len(targets) == len(x) == self.max_seq_len
         return x, targets
 
-    def add_conditioning_tokens(self):
-        pass
-
     def __getitem__(self, idx: int) -> dict[str, torch.LongTensor]:
         # Get the filepath for the corresponding track
         fp = self.files_paths[idx]
@@ -368,7 +375,9 @@ class DatasetMIDIRandomChunk:
                 )
         return {
             "input_ids": torch.tensor(input_ids, dtype=torch.long),
-            "labels": torch.tensor(targets, dtype=torch.long)
+            "labels": torch.tensor(targets, dtype=torch.long),
+            # Mask is for padding only: causal mask is handled by models
+            "attention_mask": create_padding_mask(input_ids, self.tokenizer.pad_token_id)
         }
 
     def __repr__(self) -> str:
@@ -484,7 +493,9 @@ class DatasetMIDIExhaustive:
         # Assemble everything into the dictionary format
         return {
             "input_ids": torch.tensor(input_ids, dtype=torch.long),
-            "labels": torch.tensor(targets, dtype=torch.long)
+            "labels": torch.tensor(targets, dtype=torch.long),
+            # Mask is for padding only: causal mask is handled by models
+            "attention_mask": create_padding_mask(input_ids, self.tokenizer.pad_token_id)
         }
 
     def __len__(self):

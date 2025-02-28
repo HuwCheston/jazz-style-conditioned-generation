@@ -89,6 +89,8 @@ class DataloaderTest(unittest.TestCase):
         self.assertEqual(targets.size(0), 512)
         # Labels should be the input IDs shifted by one
         self.assertEqual(input_ids.tolist()[1:], targets.tolist()[:-1])
+        # We shouldn't have any 0s (i.e., pad tokens) in our attention mask
+        self.assertFalse(0 in gotitem["attention_mask"])
 
     def test_dataset_random_chunk(self):
         max_seq_length = 10
@@ -383,6 +385,48 @@ class DataloaderTest(unittest.TestCase):
         # Testing with adding no condition tokens
         condition_tokens = []
         self.assertRaises(AssertionError, add_condition_tokens_to_sequence, dummy, condition_tokens, 1)
+
+    def test_attention_mask(self):
+        # Testing with padding at end
+        tokseq = [1, 2, 3, 4, 82, 234, 62, 0, 0, 0]
+        expected = [1, 1, 1, 1, 1, 1, 1, 0, 0, 0]
+        actual = create_padding_mask(tokseq, pad_token_id=0)
+        self.assertEqual(expected, actual.tolist())
+        # Testing with no padding
+        tokseq = [55, 55, 55, 55, 55, 55, 55, 66, 66, 66, ]
+        expected = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ]
+        actual = create_padding_mask(tokseq, pad_token_id=0)
+        self.assertEqual(expected, actual.tolist())
+
+    def test_dataset_attention_mask(self):
+        # Test exhaustive dataloader
+        token_factory = REMI()
+        ds = DatasetMIDIExhaustive(
+            tokenizer=token_factory,
+            files_paths=[TEST_MIDI],
+            do_augmentation=False,
+            max_seq_len=10,
+            do_conditioning=False
+        )
+        # First chunk should not have any padding
+        first_chunk = ds.__getitem__(0)
+        self.assertFalse(0 in first_chunk["attention_mask"])
+        # Last chunk should have padding
+        last_chunk = ds.__getitem__(len(ds) - 1)
+        self.assertTrue(0 in last_chunk["attention_mask"])
+
+        # Test random chunk dataloader
+        ds = DatasetMIDIRandomChunk(
+            tokenizer=token_factory,
+            files_paths=[TEST_MIDI],
+            do_augmentation=False,
+            max_seq_len=10,
+            do_conditioning=False
+        )
+        # Random chunks FROM THIS TRACK (WHICH IS LONG) should not have any padding
+        #  NB., if we had a track which was very short, we would expect some padding here
+        first_chunk = ds.__getitem__(0)
+        self.assertFalse(0 in first_chunk["attention_mask"])
 
 
 if __name__ == '__main__':
