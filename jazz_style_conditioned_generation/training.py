@@ -4,26 +4,23 @@
 """Training module"""
 
 import os
-from pathlib import Path
 from time import time
 
 import mlflow
 import numpy as np
 import torch
 from loguru import logger
-from miditok.pytorch_data import DataCollator
-from miditok.utils import split_files_for_training
+from miditok import Structured
 from tqdm import tqdm
 from transformers import GPT2Config, GPT2LMHeadModel
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data import (
     validate_conditions,
-    get_mapping_for_condition,
-    get_special_tokens_for_condition,
     DATA_DIR,
-    DatasetMIDICondition,
-    get_tokenizer,
+    DatasetMIDIExhaustive,
+    DatasetMIDIRandomChunk,
+    get_condition_special_tokens,
     DEFAULT_TOKENIZER_CONFIG,
     DEFAULT_TOKENIZER_CLASS,
     DEFAULT_TRAINING_METHOD,
@@ -31,6 +28,7 @@ from jazz_style_conditioned_generation.data import (
     SPLIT_TYPES,
     check_all_splits_unique
 )
+from jazz_style_conditioned_generation.encoders import MusicTransformer, MusicTransformerScheduler
 
 
 class DummyModule(torch.nn.Module):
@@ -93,16 +91,6 @@ class TrainingModule:
         # Initialise the current epoch at 0
         self.current_epoch = 0
 
-        # CONDITIONS
-        validate_conditions(self.conditions)
-        # this maps e.g. {"genre": {"African Jazz": 0, "African Folk": 1}, "moods": {"Aggressive": 0}, ...}
-        self.condition_mapping = {c: get_mapping_for_condition(c) for c in self.conditions}
-        logger.debug(f"Using conditions: " + ", ".join(self.conditions))
-        n_unique_conditions = sum(len(list(v)) for v in self.condition_mapping.values())
-        logger.debug(
-            "Unique conditions: " + ", ".join([f'{k}: {len(list(v))}' for k, v in self.condition_mapping.items()])
-        )
-
         # TOKENIZER
         tokenizer_method = self.tokenizer_cfg.get("tokenizer_str", DEFAULT_TOKENIZER_CLASS)
         training_method = self.tokenizer_cfg.get("training_method", DEFAULT_TRAINING_METHOD)
@@ -112,17 +100,21 @@ class TrainingModule:
             f"Initialising tokenizer with method {tokenizer_method}, "
             f"training {training_method}, parameters {tokenizer_kws}"
         )
-        self.tokenizer = get_tokenizer(tokenizer_method, training_method, tokenizer_kws)
+        self.tokenizer = Structured(params=os.path.join(utils.get_project_root(),
+                                                        "outputs/tokenizers/structured_20000_bpe_25_02_25_21:02:55.json"))
 
-        # SPECIAL TOKENS
-        sts = [get_special_tokens_for_condition(c, self.condition_mapping[c]) for c in self.conditions]
-        # This is a list of e.g. ["GENRE_0", "GENRE_1", "GENRE_2", ...]
-        self.special_tokens = [x for xs in sts for x in xs]
-        assert len(self.special_tokens) == n_unique_conditions
-        logger.debug(f"Got {len(self.special_tokens)} condition tokens")
-        # Add special tokens into tokenizer vocabulary
-        for st in self.special_tokens:
-            self.tokenizer.add_to_vocab(st, special_token=True)
+        # CONDITIONS
+        validate_conditions(self.conditions)
+        # this maps e.g. {"genre": {"African Jazz": 0, "African Folk": 1}, "moods": {"Aggressive": 0}, ...}
+        self.condition_mapping = {c: get_condition_special_tokens(c) for c in self.conditions}
+        logger.debug(f"Using conditions: " + ", ".join(self.conditions))
+        logger.debug(
+            "Unique conditions: " + ", ".join([f'{k}: {len(list(v))}' for k, v in self.condition_mapping.items()])
+        )
+        # Add condition tokens to tokenizer vocabulary
+        for mapping in self.condition_mapping.values():
+            for token in mapping.values():
+                self.tokenizer.add_to_vocab(token)
 
         # DATA SPLITS
         self.track_splits = {split_type: list(self.read_tracks_for_split(split_type)) for split_type in SPLIT_TYPES}
@@ -131,19 +123,12 @@ class TrainingModule:
         logger.debug(f"Loaded {len(self.track_paths)} tracks from {os.path.join(DATA_DIR, 'raw')}")
         logger.debug("Split tracks: " + ", ".join([f'{k}: {len(list(v))}' for k, v in self.track_splits.items()]))
 
-        # DATA CHUNKING
-        self.chunk_paths = self.get_midi_chunks()
-        self.chunk_splits = self.chunk_paths_to_splits(self.track_splits, self.chunk_paths)
-        check_all_splits_unique(*list(self.chunk_splits.values()))
-        logger.debug(f"Loaded {len(self.chunk_paths)} MIDI chunks from {os.path.join(DATA_DIR, 'chunks')}")
-        logger.debug("Split chunks: " + ", ".join([f'{k}: {len(list(v))}' for k, v in self.chunk_splits.items()]))
-
         # DATALOADERS
         logger.debug(f'Initialising training loader with args {self.train_dataset_cfg}')
-        self.train_loader = self.create_dataloader("train", self.train_dataset_cfg)
-        self.test_loader = self.create_dataloader("test", self.test_dataset_cfg)
+        self.train_loader = self.create_dataloader(DatasetMIDIRandomChunk, "train", self.train_dataset_cfg)
         logger.debug(f'Initialising testing + validation loaders with args {self.test_dataset_cfg}')
-        self.validation_loader = self.create_dataloader("validation", self.test_dataset_cfg)  # reuse test config
+        self.test_loader = self.create_dataloader(DatasetMIDIExhaustive, "test", self.test_dataset_cfg)
+        self.validation_loader = self.create_dataloader(DatasetMIDIExhaustive, "validation", self.test_dataset_cfg)
 
         # MODEL
         model_type = self.model_cfg.get("model_type", "gpt2-lm")
@@ -168,33 +153,30 @@ class TrainingModule:
         sched_type = self.scheduler_cfg.get("scheduler_type", None)
         sched_kws = self.scheduler_cfg.get("scheduler_kws", dict())
         logger.debug(f'Initialising LR scheduler {sched_type} with parameters {sched_kws}...')
-        self.scheduler = self.get_scheduler(sched_type)(self.optimizer, **sched_kws)
+        self.scheduler = self.get_scheduler(sched_type, sched_kws)
 
         # CHECKPOINTS
         if self.checkpoint_cfg.get("load_checkpoints", True):
             self.load_most_recent_checkpoint()
 
-    def create_dataloader(self, split: str, dataset_cfg: dict) -> torch.utils.data.DataLoader:
+    def create_dataloader(
+            self,
+            dataset_constructor,
+            split: str,
+            dataset_cfg: dict
+    ) -> torch.utils.data.DataLoader:
         """Creates a dataloader for a given split and configuration"""
-        dataset = DatasetMIDICondition(
-            condition_mapping=self.condition_mapping,
-            files_paths=self.chunk_splits[split],
+        dataset = dataset_constructor(
             tokenizer=self.tokenizer,
+            files_paths=self.track_splits[split],
             max_seq_len=utils.MAX_SEQUENCE_LENGTH,
-            bos_token_id=self.tokenizer["BOS_None"],
-            eos_token_id=self.tokenizer["EOS_None"],
+            condition_mapping=self.condition_mapping,
             **dataset_cfg
         )
-        collator = DataCollator(
-            self.tokenizer.pad_token_id,
-            copy_inputs_as_labels=True,
-            shift_labels=True
-
-        )
+        # We don't need a collate function here
         return torch.utils.data.DataLoader(
             dataset,
             batch_size=self.batch_size,
-            collate_fn=collator,
             shuffle=True,
             drop_last=False,
         )
@@ -215,17 +197,24 @@ class TrainingModule:
 
     def get_model(self, model_type: str, model_cfg: dict):
         """Given a string, returns the correct model"""
-        valids = ["gpt2-lm", None]
+        valids = ["gpt2-lm", "music-transformer", None]
         # GPT-2 with language modelling head
         if model_type == "gpt2-lm":
             cfg = GPT2Config(
                 vocab_size=self.tokenizer.vocab_size,
-                n_positions=utils.MAX_SEQUENCE_LENGTH * 2,  # TODO: FIX THIS!
+                n_positions=utils.MAX_SEQUENCE_LENGTH,
                 bos_token_id=self.tokenizer["BOS_None"],
                 eos_token_id=self.tokenizer["EOS_None"],
                 **model_cfg
             )
             return GPT2LMHeadModel(cfg)
+        # Music Transformer
+        elif model_type == "music-transformer":
+            return MusicTransformer(
+                tokenizer=self.tokenizer,
+                max_sequence=utils.MAX_SEQUENCE_LENGTH,
+                **model_cfg
+            )
         # For debug purposes
         elif model_type is None:
             return DummyModule(**model_cfg)
@@ -244,52 +233,26 @@ class TrainingModule:
         else:
             raise ValueError(f'`optim_type` must be one of {", ".join(valids)} but got {optim_type}')
 
-    @staticmethod
-    def get_scheduler(sched_type: str | None):
+    def get_scheduler(self, sched_type: str | None, sched_kws: dict):
         """Given a string, returns the correct optimizer"""
-        valids = ["plateau", "cosine", "step", "linear", None]
+        valids = ["plateau", "cosine", "step", "linear", "music-transformer", None]
         # This scheduler won't modify anything, but provides the same API for simplicity
         if sched_type is None:
             return DummyScheduler
         elif sched_type == "reduce":
-            return torch.optim.lr_scheduler.ReduceLROnPlateau
+            return torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, **sched_kws)
         elif sched_type == "cosine":
-            return torch.optim.lr_scheduler.CosineAnnealingLR
+            return torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, **sched_kws)
         elif sched_type == "step":
-            return torch.optim.lr_scheduler.StepLR
+            return torch.optim.lr_scheduler.StepLR(self.optimizer, **sched_kws)
         elif sched_type == "linear":
-            return torch.optim.lr_scheduler.LinearLR
+            return torch.optim.lr_scheduler.LinearLR(self.optimizer, **sched_kws)
+        elif sched_type == "music-transformer":
+            sched = MusicTransformerScheduler(**sched_kws)
+            return torch.optim.lr_scheduler.LambdaLR(self.optimizer, sched.step)
         else:
             valid_types = ", ".join([i if i is not None else "None" for i in valids])
             raise ValueError(f'`sched_type` must be one of {valid_types} but got {sched_type}')
-
-    def get_midi_chunks(self) -> list[str]:
-        """Split full MIDI tracks into chunks for training using MIDITok"""
-        # Define file paths: MIDITok requires these to be pathlib.Path objects, not strings
-        dataset_chunks_dir = Path(os.path.join(DATA_DIR, "chunks"))
-        logger.debug(f"MIDI chunks will be stored at {str(dataset_chunks_dir)}")
-        files_paths = sorted([Path(t) for t in self.track_paths])
-        # This will pull from a cache if we've already chunked these files
-        try:
-            env = os.environ["PYTHONHASHSEED"]
-        except KeyError:
-            logger.warning('Hash randomization is enabled! MIDITok will not pull cached chunks correctly! '
-                           'Pass PYTHONHASHSEED=0 as environment variable.')
-        else:
-            if env != "0":
-                logger.warning('Hash randomization is enabled! MIDITok will not pull cached chunks correctly! '
-                               'Pass PYTHONHASHSEED=0 as environment variable.')
-
-        chunk_paths = split_files_for_training(
-            files_paths=files_paths,
-            tokenizer=self.tokenizer,
-            save_dir=dataset_chunks_dir,
-            max_seq_len=utils.MAX_SEQUENCE_LENGTH,  # TODO: this should be MAX_SEQUENCE_LENGTH - MAX_CONDITION_TOKENS?
-            # This is important: it ensures that two chunks overlap slightly, to allow a causal chain between the
-            #  end of one chunk and the beginning of the next
-            num_overlap_bars=utils.CHUNK_OVERLAP_BARS
-        )
-        return sorted([str(cp) for cp in chunk_paths])
 
     @staticmethod
     def chunk_paths_to_splits(track_splits: dict[str, list[str]], chunk_paths: list[str]) -> dict[str, list[str]]:
@@ -412,7 +375,7 @@ class TrainingModule:
     def accuracy_score(self, logits: torch.tensor, labels: torch.tensor) -> torch.tensor:
         """Given logits with shape (batch, sequence, vocab), compute accuracy vs labels of shape (batch, sequence)"""
         # For each step in the sequence, this is the predicted label
-        predicted = torch.argmax(logits, -1)
+        predicted = torch.argmax(torch.softmax(logits, dim=-1), dim=-1)
         # True if the label is not a padding token, False if it is a padding token
         non_padded: torch.tensor = labels != self.tokenizer.pad_token_id
         # Get the cases where the predicted label is the same as the actual label
