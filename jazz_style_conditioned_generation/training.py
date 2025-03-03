@@ -10,6 +10,7 @@ import mlflow
 import numpy as np
 import torch
 from loguru import logger
+from miditok import REMI, Structured, TSD, PerTok, MIDILike, TokenizerConfig
 from tqdm import tqdm
 from transformers import GPT2Config, GPT2LMHeadModel
 
@@ -17,7 +18,7 @@ from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data import (
     validate_conditions,
     DATA_DIR,
-    get_tokenizer,
+    DEFAULT_VOCAB_SIZE,
     DatasetMIDIExhaustive,
     DatasetMIDIRandomChunk,
     get_condition_special_tokens,
@@ -91,16 +92,28 @@ class TrainingModule:
         # Initialise the current epoch at 0
         self.current_epoch = 0
 
+        # DATA SPLITS
+        self.track_splits = {split_type: list(self.read_tracks_for_split(split_type)) for split_type in SPLIT_TYPES}
+        check_all_splits_unique(*list(self.track_splits.values()))
+        self.track_paths = sorted([x for xs in self.track_splits.values() for x in xs])  # unpack to a flat list
+        logger.debug(f"Loaded {len(self.track_paths)} tracks from {os.path.join(DATA_DIR, 'raw')}")
+        logger.debug("Split tracks: " + ", ".join([f'{k}: {len(list(v))}' for k, v in self.track_splits.items()]))
+
         # TOKENIZER
         tokenizer_method = self.tokenizer_cfg.get("tokenizer_str", DEFAULT_TOKENIZER_CLASS)
-        training_method = self.tokenizer_cfg.get("training_method", DEFAULT_TRAINING_METHOD)
         tokenizer_kws = self.tokenizer_cfg.get("tokenizer_kws", DEFAULT_TOKENIZER_CONFIG)
+        # Add in any missing parameters with defaults
         tokenizer_kws = utils.update_dictionary(tokenizer_kws, DEFAULT_TOKENIZER_CONFIG)
-        logger.debug(
-            f"Initialising tokenizer with method {tokenizer_method}, "
-            f"training {training_method}, parameters {tokenizer_kws}"
-        )
-        self.tokenizer = get_tokenizer(tokenizer_method, training_method, tokenizer_kws)
+        logger.debug(f'Initialising tokenizer type {tokenizer_method} with params {tokenizer_kws}')
+        cfg = TokenizerConfig(**tokenizer_kws)
+        self.tokenizer = self.get_tokenizer(tokenizer_method)(cfg)
+
+        # TRAINING THE TOKENIZER
+        if self.tokenizer_cfg.get("do_training", False):
+            training_method = self.tokenizer_cfg.get("training_method", DEFAULT_TRAINING_METHOD)
+            vocab_size = self.tokenizer_cfg.get("vocab_size", DEFAULT_VOCAB_SIZE)
+            logger.debug(f'Training tokenizer with method {training_method}, vocab size {vocab_size}')
+            self.tokenizer.train(vocab_size=vocab_size, model=training_method, files_paths=self.track_paths)
 
         # CONDITIONS
         validate_conditions(self.conditions)
@@ -114,13 +127,6 @@ class TrainingModule:
         for mapping in self.condition_mapping.values():
             for token in mapping.values():
                 self.tokenizer.add_to_vocab(token)
-
-        # DATA SPLITS
-        self.track_splits = {split_type: list(self.read_tracks_for_split(split_type)) for split_type in SPLIT_TYPES}
-        check_all_splits_unique(*list(self.track_splits.values()))
-        self.track_paths = sorted([x for xs in self.track_splits.values() for x in xs])  # unpack to a flat list
-        logger.debug(f"Loaded {len(self.track_paths)} tracks from {os.path.join(DATA_DIR, 'raw')}")
-        logger.debug("Split tracks: " + ", ".join([f'{k}: {len(list(v))}' for k, v in self.track_splits.items()]))
 
         # DATALOADERS
         logger.debug(f'Initialising training loader with args {self.train_dataset_cfg}')
@@ -194,6 +200,21 @@ class TrainingModule:
                     raise FileNotFoundError(f'Could not find metadata for track at {path}')
                 yield os.path.join(DATA_DIR, "raw", path, "piano_midi.mid")
 
+    @staticmethod
+    def get_tokenizer(tokenizer_type: str):
+        if tokenizer_type == "REMI":
+            return REMI
+        elif tokenizer_type == "MIDILike":
+            return MIDILike
+        elif tokenizer_type == "TSD":
+            return TSD
+        elif tokenizer_type == "Structured":
+            return Structured
+        elif tokenizer_type == "PerTok":
+            return PerTok
+        else:
+            raise ValueError(f'`tokenizer_str` {tokenizer_type} is not recognized')
+
     def get_model(self, model_type: str, model_cfg: dict):
         """Given a string, returns the correct model"""
         valids = ["gpt2-lm", "music-transformer", None]
@@ -237,7 +258,7 @@ class TrainingModule:
         valids = ["plateau", "cosine", "step", "linear", "music-transformer", None]
         # This scheduler won't modify anything, but provides the same API for simplicity
         if sched_type is None:
-            return DummyScheduler
+            return DummyScheduler(self.optimizer, **sched_kws)
         elif sched_type == "reduce":
             return torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, **sched_kws)
         elif sched_type == "cosine":
@@ -368,7 +389,7 @@ class TrainingModule:
         """Tries to return current LR from scheduler. Returns 0. on error, for safety with MLFlow logging"""
         try:
             return self.scheduler.get_last_lr()[0]
-        except (IndexError, AttributeError, RuntimeError) as sched_e:
+        except (IndexError, AttributeError, RuntimeError, TypeError) as sched_e:
             logger.warning(f"Failed to get LR from scheduler! Returning 0.0... {sched_e}")
             return 0.
 

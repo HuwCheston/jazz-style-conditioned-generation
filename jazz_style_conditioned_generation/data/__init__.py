@@ -11,7 +11,7 @@ from .dataloader import (
 )
 from .splits import SPLIT_DIR, SPLIT_TYPES, check_all_splits_unique
 from .tokenizer import (
-    get_tokenizer, DEFAULT_TOKENIZER_CLASS, DEFAULT_TRAINING_METHOD, DEFAULT_TOKENIZER_CONFIG
+    get_tokenizer, DEFAULT_TOKENIZER_CLASS, DEFAULT_TRAINING_METHOD, DEFAULT_TOKENIZER_CONFIG, DEFAULT_VOCAB_SIZE
 )
 
 __all__ = [
@@ -27,5 +27,6 @@ __all__ = [
     "DEFAULT_TOKENIZER_CLASS",
     "SPLIT_TYPES",
     "SPLIT_DIR",
-    "check_all_splits_unique"
+    "check_all_splits_unique",
+    "DEFAULT_VOCAB_SIZE"
 ]

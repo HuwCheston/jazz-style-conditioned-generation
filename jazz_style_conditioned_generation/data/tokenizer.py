@@ -8,13 +8,13 @@ import os
 from random import choice
 
 from loguru import logger
-from miditok import REMI, MIDILike, TSD, PerTok, Structured, TokenizerConfig, constants
+from miditok import REMI, MIDILike, TSD, PerTok, Structured, TokenizerConfig
 
 from jazz_style_conditioned_generation import utils
 
 DEFAULT_TOKENIZER_CONFIG = {
-    "pitch_range": (21, 109),
-    # "beat_res": {(0, 4): 8, (4, 12): 4},
+    "pitch_range": (utils.MIDI_OFFSET, utils.MIDI_OFFSET + utils.PIANO_KEYS),
+    "beat_res": {(0, 4): 8, (4, 12): 8},
     "num_velocities": 32,
     "special_tokens": [
         "PAD",  # add for short inputs to ensure consistent sequence length for all inputs
@@ -22,20 +22,18 @@ DEFAULT_TOKENIZER_CONFIG = {
         "EOS",  # end of sequence
         "MASK",  # prevent attention to future tokens
     ],
-    "use_chords": True,
+    "use_chords": False,
     "use_rests": True,
     "use_tempos": False,
     "use_time_signatures": False,
     "use_programs": False,
     "use_sustain_pedals": False,
     "use_pitch_bends": False,
-    "chord_maps": constants.CHORD_MAPS,  # TODO: think more about this
+    # "chord_maps": constants.CHORD_MAPS,  # TODO: think more about this
     "remove_duplicated_notes": True,
 }
-# TODO: add a way to parameterize these
-VOCAB_SIZE = 20000
+DEFAULT_VOCAB_SIZE = 1000
 DEFAULT_TRAINING_METHOD = "BPE"
-# TODO: we should almost definitely use the `PerTok` tokenizer here
 DEFAULT_TOKENIZER_CLASS = "TSD"
 
 OUTPUT_DIR = os.path.join(utils.get_project_root(), 'outputs/tokenizers')
@@ -107,10 +105,11 @@ def train_tokenizer(tokenizer_str: str, training_method: str, tokenizer_config: 
     tc = TokenizerConfig(**tokenizer_config)
     tokenizer = get_tokenizer_class_from_string(tokenizer_str)(tc)
     # Train the tokenizer on our MIDI paths
-    tokenizer.train(vocab_size=VOCAB_SIZE, model=training_method, files_paths=midi_paths)
+    # tokenizer.train(vocab_size=VOCAB_SIZE, model=training_method, files_paths=midi_paths)
     # Dump the tokenizer instance
     tokenizer.save(
-        os.path.join(OUTPUT_DIR, f'{tokenizer_str.lower()}_{VOCAB_SIZE}_{training_method.lower()}_{utils.now()}.json')
+        os.path.join(OUTPUT_DIR,
+                     f'{tokenizer_str.lower()}_{DEFAULT_VOCAB_SIZE}_{training_method.lower()}_{utils.now()}.json')
     )
     return tokenizer
 
