@@ -133,7 +133,7 @@ def randomly_slice_sequence(
         desired_len: int,
 ) -> list[int]:
     """Randomly slices a sequence into desired length"""
-    assert len(sequence) > desired_len
+    assert len(sequence) >= desired_len, f"Expected at least {desired_len} tokens but got {len(sequence)}!"
     end_range = len(sequence) - desired_len
     start = random.randint(0, end_range)
     end = start + desired_len
@@ -284,7 +284,8 @@ def create_padding_mask(x, pad_token_id: int) -> torch.tensor:
     #  This is identical to the approach in miditok.pytorch_data.DataCollator
     if isinstance(x, list):
         x = torch.tensor(x, dtype=torch.long)
-    return (x != pad_token_id).float()
+    # Should be True if padding, False otherwise
+    return x == pad_token_id
 
 
 class DatasetMIDIRandomChunk:
