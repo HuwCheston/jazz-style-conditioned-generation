@@ -15,19 +15,25 @@ from tqdm import tqdm
 from transformers import GPT2Config, GPT2LMHeadModel
 
 from jazz_style_conditioned_generation import utils
-from jazz_style_conditioned_generation.data import (
+from jazz_style_conditioned_generation.data.conditions import (
     validate_conditions,
-    DATA_DIR,
-    DEFAULT_VOCAB_SIZE,
+    get_condition_special_tokens
+)
+from jazz_style_conditioned_generation.data.dataloader import (
     DatasetMIDIExhaustive,
     DatasetMIDIRandomChunk,
-    get_condition_special_tokens,
-    DEFAULT_TOKENIZER_CONFIG,
-    DEFAULT_TOKENIZER_CLASS,
-    DEFAULT_TRAINING_METHOD,
-    SPLIT_DIR,
+    DATA_DIR
+)
+from jazz_style_conditioned_generation.data.splits import (
     SPLIT_TYPES,
+    SPLIT_DIR,
     check_all_splits_unique
+)
+from jazz_style_conditioned_generation.data.tokenizer import (
+    DEFAULT_TOKENIZER_CLASS,
+    DEFAULT_TOKENIZER_CONFIG,
+    DEFAULT_VOCAB_SIZE,
+    DEFAULT_TRAINING_METHOD
 )
 from jazz_style_conditioned_generation.encoders import MusicTransformer, MusicTransformerScheduler
 
