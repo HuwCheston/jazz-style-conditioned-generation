@@ -4,17 +4,46 @@
 """Music Transformer module, taken from https://github.com/gwinndr/MusicTransformer-Pytorch"""
 
 import math
-import random
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
 import torch
 import torch.nn as nn
-from torch.nn.modules.normalization import LayerNorm
 from transformers.utils import ModelOutput
 
 from jazz_style_conditioned_generation import utils
+from jazz_style_conditioned_generation.data.dataloader import create_padding_mask
 from jazz_style_conditioned_generation.encoders.rpr import TransformerEncoderRPR, TransformerEncoderLayerRPR
+
+
+def top_k_top_p_filtering(
+        logits: torch.Tensor,
+        top_k: int = 0,
+        top_p: float = 1.0,
+        filter_value: float = -float("Inf"),
+        min_tokens_to_keep: int = 1,
+) -> torch.Tensor:
+    """ Copied from transformers"""
+    if top_k > 0:
+        top_k = min(max(top_k, min_tokens_to_keep), logits.size(-1))  # Safety check
+        # Remove all tokens with a probability less than the last token of the top-k
+        indices_to_remove = logits < torch.topk(logits, top_k)[0][..., -1, None]
+        logits[indices_to_remove] = filter_value
+    if top_p < 1.0:
+        sorted_logits, sorted_indices = torch.sort(logits, descending=True)
+        cumulative_probs = torch.cumsum(torch.nn.functional.softmax(sorted_logits, dim=-1), dim=-1)
+        # Remove tokens with cumulative probability above the threshold (token with 0 are kept)
+        sorted_indices_to_remove = cumulative_probs > top_p
+        if min_tokens_to_keep > 1:
+            # Keep at least min_tokens_to_keep (set to min_tokens_to_keep-1 because we add the first one below)
+            sorted_indices_to_remove[..., :min_tokens_to_keep] = 0
+        # Shift the indices to the right to keep also the first token above the threshold
+        sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone()
+        sorted_indices_to_remove[..., 0] = 0
+        # scatter sorted tensors to original indexing
+        indices_to_remove = sorted_indices_to_remove.scatter(1, sorted_indices, sorted_indices_to_remove)
+        logits[indices_to_remove] = filter_value
+    return logits
 
 
 @dataclass
@@ -75,7 +104,7 @@ class MusicTransformer(nn.Module):
             )
         # RPR Transformer
         else:
-            encoder_norm = LayerNorm(self.d_model)
+            encoder_norm = nn.modules.normalization.LayerNorm(self.d_model)
             encoder_layer = TransformerEncoderLayerRPR(
                 self.d_model,
                 self.nhead,
@@ -101,7 +130,12 @@ class MusicTransformer(nn.Module):
         # Calculate loss internally within the class, as in `transformers`
         self.loss = nn.CrossEntropyLoss(ignore_index=self.tokenizer.pad_token_id)
 
-    def forward(self, input_ids, labels, attention_mask):
+    def forward(
+            self,
+            input_ids: torch.tensor,
+            labels: torch.tensor,
+            attention_mask: torch.tensor
+    ) -> MusicTransformerOutput:
         """Takes an input sequence and outputs predictions using a sequence to sequence method."""
         # Create causal mask
         mask = self.transformer.generate_square_subsequent_mask(input_ids.shape[1]).to(utils.DEVICE)
@@ -133,60 +167,64 @@ class MusicTransformer(nn.Module):
             logits=logits
         )
 
-    def generate(self, primer=None, target_seq_length=1024, beam=0, beam_chance=1.0):
-        """Generates midi given a primer sample."""
+    def generate(
+            self,
+            primer: torch.tensor = None,
+            target_seq_length: int = utils.MAX_SEQUENCE_LENGTH,
+            top_p: float = 1.,
+            top_k: int = 0
+    ):
+        """Generates midi given a primer sample with nucleus sampling."""
         assert not self.training, "Cannot generate while in training mode"
-        print("Generating sequence of max length:", target_seq_length)
+        if primer.dim() > 1:
+            raise ValueError(f"Expected a tensor with 1 dimension for generation, but got {primer.dim()} dimensions!")
 
+        # Create an empty array with the target sequence length
         gen_seq = torch.full(
             (1, target_seq_length),
             self.tokenizer["PAD_None"],
             dtype=torch.long,
             device=utils.DEVICE
         )
-
-        num_primer = len(primer)
-        gen_seq[..., :num_primer] = primer.type(torch.long).to(utils.DEVICE)
-
-        # print("primer:",primer)
-        # print(gen_seq)
-        cur_i = num_primer
+        # This counter keeps track of where we are in the sequence
+        cur_i = 1
+        # Add the BOS token at the start of the sequence, if it is not present already
+        if gen_seq[:, 0] != self.tokenizer["BOS_None"]:
+            gen_seq[:, 0] = self.tokenizer["BOS_None"]
+        # Fill in the empty array with our primer sequence if we've provided this
+        if primer is not None:
+            num_primer = len(primer) + 1
+            gen_seq[:, 1: num_primer] = primer.type(torch.long).to(utils.DEVICE)
+            cur_i = num_primer
+        # Keep iterating until we hit the desired sequence length
         while cur_i < target_seq_length:
-            # gen_seq_batch     = gen_seq.clone()
-            # TODO: this is broken
-            y = self.softmax(self.forward(gen_seq[..., :cur_i]))[..., :self.tokenizer["EOS_None"]]
-            token_probs = y[:, cur_i - 1, :]
-
-            if beam == 0:
-                beam_ran = 2.0
-            else:
-                beam_ran = random.uniform(0, 1)
-
-            if beam_ran <= beam_chance:
-                token_probs = token_probs.flatten()
-                top_res, top_i = torch.topk(token_probs, beam)
-
-                beam_rows = top_i // self.tokenizer.vocab_size
-                beam_cols = top_i % self.tokenizer.vocab_size
-
-                gen_seq = gen_seq[beam_rows, :]
-                gen_seq[..., cur_i] = beam_cols
-
-            else:
-                distrib = torch.distributions.categorical.Categorical(probs=token_probs)
-                next_token = distrib.sample()
-                # print("next token:",next_token)
-                gen_seq[:, cur_i] = next_token
-
-                # Let the transformer decide to end if it wants to
-                if next_token == self.tokenizer["EOS_None"]:
-                    print("Model called end of sequence at:", cur_i, "/", target_seq_length)
-                    break
-
+            # Unpack everything from the currently generated sequence
+            input_ids = gen_seq[:, :cur_i]
+            labels = gen_seq[:, 1: cur_i + 1]
+            attention_mask = create_padding_mask(input_ids, self.tokenizer["PAD_None"])
+            # Through the model to get the logits: shape (1, sequence_length, vocab_size)
+            logits = self.forward(input_ids, labels, attention_mask).logits
+            # This gets the probabilities for the next token: shape (1, vocab_size)
+            token_probs = logits[:, cur_i - 1, :]
+            # Filter to get the top-k and top-p
+            # Elements not in top-k/top-p are replaced with 0
+            topk_topp = top_k_top_p_filtering(token_probs, top_k, top_p, filter_value=0.)
+            # Apply the softmax
+            smaxed = self.softmax(topk_topp)
+            # Create the distribution
+            dist = torch.distributions.Categorical(probs=smaxed)
+            # Get the next token by sampling from the distribution
+            # Elements not in top-k/top-p have probability 0
+            next_token = dist.sample()
+            # Sanity check, we shouldn't predict an element with probability of 0.
+            assert smaxed[:, next_token].item() != 0.
+            # Add the next token into the sequence
+            gen_seq[:, cur_i] = next_token
+            # Increment the counter
             cur_i += 1
-            if cur_i % 50 == 0:
-                print(cur_i, "/", target_seq_length)
-
+            # Let the transformer decide to end the sequence early if it wants to
+            if next_token == self.tokenizer["EOS_None"] or cur_i >= target_seq_length:
+                break
         return gen_seq[:, :cur_i]
 
 
@@ -227,15 +265,21 @@ class PositionalEncoding(nn.Module):
 
 if __name__ == "__main__":
     from miditok import REMI
-    from jazz_style_conditioned_generation.data.dataloader import create_padding_mask
 
+    # Create the model
     token_factory = REMI()
     mt = MusicTransformer(token_factory, max_sequence=2048).to(utils.DEVICE)
-    dummy_tensor = torch.randint(0, 100, (4, 2049))
-
+    # Create a dummy sequence of inputs: IDs, targets, and padding mask
+    dummy_tensor = torch.randint(0, 100, (4, 2049)).to(utils.DEVICE)
     inp = dummy_tensor[:, :-1].to(utils.DEVICE)
     targ = dummy_tensor[:, 1:].to(utils.DEVICE)
     padding_mask = create_padding_mask(dummy_tensor, token_factory.pad_token_id)[:, :-1].to(utils.DEVICE)
-
+    # Pass through the model
     out = mt(inp, targ, padding_mask)
     print(f'Dummy loss: {out.loss.item()}')
+    # Do some generation with the dummy tensor
+    mt.eval()
+    gen = mt.generate(primer=dummy_tensor[0, :10].squeeze(0))
+    # Convert back to a score
+    retok = token_factory(gen)
+    print(f'Dummy generation: {retok}')

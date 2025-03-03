@@ -9,6 +9,7 @@ from time import time
 import mlflow
 import numpy as np
 import torch
+import yaml
 from loguru import logger
 from miditok import REMI, Structured, TSD, PerTok, MIDILike, TokenizerConfig
 from tqdm import tqdm
@@ -113,6 +114,7 @@ class TrainingModule:
         logger.debug(f'Initialising tokenizer type {tokenizer_method} with params {tokenizer_kws}')
         cfg = TokenizerConfig(**tokenizer_kws)
         self.tokenizer = self.get_tokenizer(tokenizer_method)(cfg)
+        logger.debug(f'... got tokenizer: {self.tokenizer}')
 
         # TRAINING THE TOKENIZER
         if self.tokenizer_cfg.get("do_training", False):
@@ -120,6 +122,7 @@ class TrainingModule:
             vocab_size = self.tokenizer_cfg.get("vocab_size", DEFAULT_VOCAB_SIZE)
             logger.debug(f'Training tokenizer with method {training_method}, vocab size {vocab_size}')
             self.tokenizer.train(vocab_size=vocab_size, model=training_method, files_paths=self.track_paths)
+            logger.debug(f'... trained tokenizer: {self.tokenizer}')
 
         # CONDITIONS
         validate_conditions(self.conditions)
@@ -208,15 +211,15 @@ class TrainingModule:
 
     @staticmethod
     def get_tokenizer(tokenizer_type: str):
-        if tokenizer_type == "REMI":
+        if tokenizer_type == "remi":
             return REMI
-        elif tokenizer_type == "MIDILike":
+        elif tokenizer_type == "midilike":
             return MIDILike
-        elif tokenizer_type == "TSD":
+        elif tokenizer_type == "tsd":
             return TSD
-        elif tokenizer_type == "Structured":
+        elif tokenizer_type == "structured":
             return Structured
-        elif tokenizer_type == "PerTok":
+        elif tokenizer_type == "pertok":
             return PerTok
         else:
             raise ValueError(f'`tokenizer_str` {tokenizer_type} is not recognized')
@@ -666,7 +669,6 @@ def add_run_id_to_config_yaml(config_fname: str, mlflow_run_id: str) -> None:
 
 if __name__ == "__main__":
     import argparse
-    import yaml
 
     # Seed everything for reproducible results
     utils.seed_everything(utils.SEED)
