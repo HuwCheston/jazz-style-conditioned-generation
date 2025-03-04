@@ -1,0 +1,27 @@
+{
+  "track_name": "A Kiss To Build A Dream On",
+  "album_name": "Best Of Beegie Adair   Solo Piano Performances",
+  "recording_year": 2020,
+  "bandleader": "Beegie Adair",
+  "pianist": "Beegie Adair",
+  "mbz_id": "atpjnzap-sb28-dsy8-symf-lt8bty1qc33b",
+  "live": false,
+  "fname": "adairb-akisstobuildadream-unaccompanied-xxxx-atpjnzap",
+  "moods": [],
+  "genres": [
+    {
+      "name": "Jazz",
+      "weight": 5
+    }
+  ],
+  "themes": [],
+  "tivo_album_name": "Best of Beegie Adair: Solo Piano Performances",
+  "tivo_album_artists": [
+    "Beegie Adair"
+  ],
+  "review": [],
+  "flags": [
+    "Compilation"
+  ],
+  "tivo_found_match": true
+}

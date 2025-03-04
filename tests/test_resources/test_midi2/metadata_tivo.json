@@ -1,0 +1,27 @@
+{
+  "track_name": "Again",
+  "album_name": "Best Of Beegie Adair   Solo Piano Performances",
+  "recording_year": 2020,
+  "bandleader": "Beegie Adair",
+  "pianist": "Beegie Adair",
+  "mbz_id": "o6n2ibg6-y7bo-an5t-jy8r-zxg5wpsqld8h",
+  "live": false,
+  "fname": "adairb-again-unaccompanied-xxxx-o6n2ibg6",
+  "moods": [],
+  "genres": [
+    {
+      "name": "Jazz",
+      "weight": 5
+    }
+  ],
+  "themes": [],
+  "tivo_album_name": "Best of Beegie Adair: Solo Piano Performances",
+  "tivo_album_artists": [
+    "Beegie Adair"
+  ],
+  "review": [],
+  "flags": [
+    "Compilation"
+  ],
+  "tivo_found_match": true
+}
