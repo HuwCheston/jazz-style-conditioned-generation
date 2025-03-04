@@ -61,7 +61,9 @@ class TrainingModule:
             checkpoint_cfg: dict,
             tokenizer_cfg: dict,
             mlflow_cfg: dict,
-            generate_cfg: dict
+            generate_cfg: dict,
+            data_dir: str = None,
+            split_dir: str = None,
     ):
         # Set all keyword arguments to class parameters
         self.experiment = experiment
@@ -78,6 +80,8 @@ class TrainingModule:
         self.tokenizer_cfg = tokenizer_cfg
         self.mlflow_cfg = mlflow_cfg
         self.generate_cfg = generate_cfg
+        self._data_dir = data_dir
+        self._split_dir = split_dir
 
         # Initialise the current epoch at 0
         self.current_epoch = 0
@@ -86,7 +90,7 @@ class TrainingModule:
         self.track_splits = {split_type: list(self.read_tracks_for_split(split_type)) for split_type in SPLIT_TYPES}
         check_all_splits_unique(*list(self.track_splits.values()))
         self.track_paths = sorted([x for xs in self.track_splits.values() for x in xs])  # unpack to a flat list
-        logger.debug(f"Loaded {len(self.track_paths)} tracks from {os.path.join(DATA_DIR, 'raw')}")
+        logger.debug(f"Loaded {len(self.track_paths)} tracks from {self.data_dir}")
         logger.debug("Split tracks: " + ", ".join([f'{k}: {len(list(v))}' for k, v in self.track_splits.items()]))
 
         # TOKENIZER
@@ -169,19 +173,18 @@ class TrainingModule:
             drop_last=False,
         )
 
-    @staticmethod
-    def read_tracks_for_split(split_type: str) -> list[str]:
+    def read_tracks_for_split(self, split_type: str) -> list[str]:
         """Reads a txt file containing a one line per string and returns as a list of strings"""
-        split_fp = os.path.join(SPLIT_DIR, split_type + '_split.txt')
+        split_fp = os.path.join(self.split_dir, split_type + '_split.txt')
         with open(split_fp, 'r') as fp:
             all_paths = fp.read().strip().split('\n')
             # Check that the path exists on the local file structure
             for path in all_paths:
-                if not os.path.isfile(os.path.join(DATA_DIR, "raw", path, "piano_midi.mid")):
+                if not os.path.isfile(os.path.join(self.data_dir, path, "piano_midi.mid")):
                     raise FileNotFoundError(f'Could not find MIDI for track at {path}')
-                if not os.path.isfile(os.path.join(DATA_DIR, "raw", path, "metadata_tivo.json")):
+                if not os.path.isfile(os.path.join(self.data_dir, path, "metadata_tivo.json")):
                     raise FileNotFoundError(f'Could not find metadata for track at {path}')
-                yield os.path.join(DATA_DIR, "raw", path, "piano_midi.mid")
+                yield os.path.join(self.data_dir, path, "piano_midi.mid")
 
     def get_model(self, model_type: str, model_cfg: dict):
         """Given a string, returns the correct model"""
@@ -242,19 +245,6 @@ class TrainingModule:
         else:
             valid_types = ", ".join([i if i is not None else "None" for i in valids])
             raise ValueError(f'`sched_type` must be one of {valid_types} but got {sched_type}')
-
-    @staticmethod
-    def chunk_paths_to_splits(track_splits: dict[str, list[str]], chunk_paths: list[str]) -> dict[str, list[str]]:
-        """For any MIDI track, we can have multiple chunks. We need to parse these into the original splits"""
-        chunk_splits = {sp: [] for sp in SPLIT_TYPES}
-        for chunk in chunk_paths:
-            chunk_dirname = os.path.join(os.path.dirname(chunk).replace('chunks', 'raw'), "piano_midi.mid")
-            for split_type in SPLIT_TYPES:
-                if chunk_dirname in track_splits[split_type]:
-                    chunk_splits[split_type].append(chunk)
-        # We should have exactly the same number of MIDI chunks that we started with
-        assert sum(len(list(v)) for v in chunk_splits.values()) == len(chunk_paths)
-        return chunk_splits
 
     def load_checkpoint(self, checkpoint_path: str) -> None:
         """Load the checkpoint at the given fpath"""
@@ -317,6 +307,26 @@ class TrainingModule:
             os.path.join(path),
         )
         logger.debug(f'Saved a checkpoint to {run_folder}')
+
+    @property
+    def data_dir(self) -> str:
+        if self._data_dir is not None:
+            if utils.get_project_root() not in self._data_dir:
+                self._data_dir = os.path.join(utils.get_project_root(), self._data_dir)
+            assert os.path.isdir(self._data_dir), f"Data directory {self._data_dir} does not exist!"
+            return self._data_dir
+        else:
+            return os.path.join(DATA_DIR, "raw")
+
+    @property
+    def split_dir(self) -> str:
+        if self._split_dir is not None:
+            if utils.get_project_root() not in self._split_dir:
+                self._split_dir = os.path.join(utils.get_project_root(), self._split_dir)
+            assert os.path.isdir(self._split_dir), f"Data directory {self._split_dir} does not exist!"
+            return self._split_dir
+        else:
+            return SPLIT_DIR
 
     @property
     def checkpoint_dir(self) -> str:
