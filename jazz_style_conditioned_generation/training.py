@@ -180,10 +180,12 @@ class TrainingModule:
             all_paths = fp.read().strip().split('\n')
             # Check that the path exists on the local file structure
             for path in all_paths:
-                if not os.path.isfile(os.path.join(self.data_dir, path, "piano_midi.mid")):
-                    raise FileNotFoundError(f'Could not find MIDI for track at {path}')
-                if not os.path.isfile(os.path.join(self.data_dir, path, "metadata_tivo.json")):
-                    raise FileNotFoundError(f'Could not find metadata for track at {path}')
+                track_path = os.path.join(self.data_dir, path, "piano_midi.mid")
+                if not os.path.isfile(track_path):
+                    raise FileNotFoundError(f'Could not find MIDI for track at {track_path}')
+                metadata_path = os.path.join(self.data_dir, path, "metadata_tivo.json")
+                if not os.path.isfile(metadata_path):
+                    raise FileNotFoundError(f'Could not find metadata for track at {metadata_path}')
                 yield os.path.join(self.data_dir, path, "piano_midi.mid")
 
     def get_model(self, model_type: str, model_cfg: dict):
