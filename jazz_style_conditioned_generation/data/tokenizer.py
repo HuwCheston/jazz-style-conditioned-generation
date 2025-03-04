@@ -43,12 +43,16 @@ DEFAULT_TOKENIZER_CONFIG = {
     "use_programs": False,
     "use_sustain_pedals": False,
     "use_pitch_bends": False,
+    "use_velocities": True,
     # "chord_maps": constants.CHORD_MAPS,  # TODO: think more about this
     "remove_duplicated_notes": True,
+    "encode_ids_split": "no",
+    "use_pitchdrum_tokens": False,
+    "programs": [0],  # only piano
 }
 DEFAULT_VOCAB_SIZE = 1000
 DEFAULT_TRAINING_METHOD = "BPE"
-DEFAULT_TOKENIZER_CLASS = "TSD"
+DEFAULT_TOKENIZER_CLASS = "tsd"
 
 OUTPUT_MIDI_DIR = os.path.join(utils.get_project_root(), 'outputs/midi/tokenized')
 
@@ -184,6 +188,7 @@ def encode_decode_midi(tokenizer, midi_fpath: str = None):
 def get_tokenizer_class_from_string(tokenizer_type: str):
     """Given a string, return the correct tokenizer class"""
     valids = ["remi", "midilike", "tsd", "structured", "pertok"]
+    tokenizer_type = tokenizer_type.lower()
     if tokenizer_type == "remi":
         return REMI
     elif tokenizer_type == "midilike":
