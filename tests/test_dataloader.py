@@ -60,14 +60,14 @@ class DataloaderTest(unittest.TestCase):
         score = Score(TEST_MIDI)
         prev_min_pitch, prev_max_pitch = 34, 98
         # Test with transposition up one semitone
-        augmented = data_augmentation(
+        augmented = random_data_augmentation(
             score, pitch_augmentation_range=[1], duration_augmentation_range=[1.]
         )
         new_min_pitch, new_max_pitch = utils.get_pitch_range(augmented)
         self.assertEqual(new_min_pitch, prev_min_pitch + 1)
         self.assertEqual(new_max_pitch, prev_max_pitch + 1)
         # Test with transposition down two semitones
-        augmented = data_augmentation(
+        augmented = random_data_augmentation(
             score, pitch_augmentation_range=[-2], duration_augmentation_range=[1.]
         )
         new_min_pitch, new_max_pitch = utils.get_pitch_range(augmented)
@@ -427,6 +427,54 @@ class DataloaderTest(unittest.TestCase):
         #  NB., if we had a track which was very short, we would expect some padding here
         first_chunk = ds.__getitem__(0)
         self.assertFalse(True in first_chunk["attention_mask"])
+
+    def test_remove_invalid_notes(self):
+        notes = [
+            # This note is valid
+            Note(pitch=90, duration=5, time=110, velocity=80, ttype="tick"),
+            # This note is too low
+            Note(pitch=1, duration=10, time=1000, velocity=50, ttype="tick"),
+            # This note is too high
+            Note(pitch=125, duration=10, time=2000, velocity=50, ttype="tick"),
+            # This note is valid
+            Note(pitch=50, duration=10, time=3000, velocity=60, ttype="tick"),
+        ]
+        expected_len = 2
+        actual_len = len(remove_out_of_range_notes(notes))
+        self.assertEqual(expected_len, actual_len)
+
+    def test_deterministic_augmentation(self):
+        # Test pitch augmentation: up five semitones
+        notes = [
+            Note(pitch=50, duration=10, time=1000, velocity=50, ttype="tick")
+        ]
+        sc = note_list_to_score(notes, 100)
+        augment = deterministic_data_augmentation(sc, 5, 1.0)
+        expected_pitch = 55
+        actual_pitch = augment.tracks[0].notes[0].pitch
+        self.assertEqual(expected_pitch, actual_pitch)
+        # Test pitch augmentation: down three semitones
+        notes = [
+            Note(pitch=50, duration=10, time=1000, velocity=50, ttype="tick"),
+            Note(pitch=40, duration=10, time=1000, velocity=50, ttype="tick")
+        ]
+        sc = note_list_to_score(notes, 100)
+        augment = deterministic_data_augmentation(sc, -3, 0.9)
+        expected_pitch = [47, 37]
+        actual_pitch = [n.pitch for n in augment.tracks[0].notes]
+        self.assertEqual(expected_pitch, actual_pitch)
+        # Test duration augmentation
+        notes = [
+            Note(pitch=50, duration=100, time=1000, velocity=50, ttype="tick")
+        ]
+        sc = note_list_to_score(notes, 100)
+        augment = deterministic_data_augmentation(sc, 0, 0.5)
+        expected_duration = 50
+        actual_duration = augment.tracks[0].notes[0].duration
+        self.assertEqual(expected_duration, actual_duration)
+        expected_start = 500
+        actual_start = augment.tracks[0].notes[0].time
+        self.assertEqual(expected_start, actual_start)
 
 
 if __name__ == '__main__':

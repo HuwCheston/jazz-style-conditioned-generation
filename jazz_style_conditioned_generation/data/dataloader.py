@@ -26,7 +26,10 @@ __all__ = [
     "pad_sequence",
     "randomly_slice_sequence",
     "get_pitch_augmentation_value",
-    "data_augmentation",
+    "random_data_augmentation",
+    "deterministic_data_augmentation",
+    "remove_out_of_range_notes",
+    "preprocess_score",
     "note_list_to_score",
     "remove_short_notes",
     "merge_repeated_notes",
@@ -42,7 +45,7 @@ __all__ = [
 DATA_DIR = os.path.join(utils.get_project_root(), "data")
 
 # DEFAULT_AUGMENTATION_PROB = 0.5
-PITCH_AUGMENT_RANGE = range(-3, 3)  # as in Music Transformer
+PITCH_AUGMENT_RANGE = range(-3, 4)  # as in Music Transformer
 DURATION_AUGMENT_RANGE = [0.95, 0.975, 1.0, 1.025, 1.05]  # as in Music Transformer
 
 OVERLAP_TICKS = 25  # If two notes with the same pitch have less than this offset-onset time, they will be merged
@@ -65,7 +68,27 @@ def get_pitch_augmentation_value(score: Score, pitch_augmentation_range: list) -
     return pitch_augment
 
 
-def data_augmentation(
+def deterministic_data_augmentation(
+        score: Score,
+        pitch_augment_value: int,
+        duration_augment_value: float
+) -> Score:
+    """Applies pitch and duration augmentation with specified values to a Score object"""
+    # We can just apply the pitch augmentation directly using the MIDITok function
+    augmented = augment_score(score, pitch_offset=pitch_augment_value, augment_copy=True, duration_offset=0., )
+    # Sanity check: pitches should be within the range of the piano keyboard
+    aug_min, aug_max = utils.get_pitch_range(augmented)
+    assert aug_min >= utils.MIDI_OFFSET
+    assert aug_max <= utils.MIDI_OFFSET + utils.PIANO_KEYS
+    # We need to use the symusic pretty_midi-like function to do duration augmentation
+    return augmented.adjust_time(
+        [augmented.start(), augmented.end()],
+        [augmented.start(), int(augmented.end() * duration_augment_value)],
+        inplace=False
+    )
+
+
+def random_data_augmentation(
         score: Score,
         pitch_augmentation_range: list = None,
         duration_augmentation_range: list = None
@@ -76,17 +99,11 @@ def data_augmentation(
     if duration_augmentation_range is None:
         duration_augmentation_range = DURATION_AUGMENT_RANGE
 
-    # Get augmentation values
+    # Get random augmentation value from the ranges provided
     pitch_augment = get_pitch_augmentation_value(score, pitch_augmentation_range)
-    # We can augment pitch directly with the MIDItok function
-    augmented = augment_score(score, pitch_offset=pitch_augment, augment_copy=True, duration_offset=0, )
-    # We need to use symusic to adjust the durations
     duration_augment = np.random.choice(duration_augmentation_range)
-    return augmented.adjust_time(
-        [augmented.start(), augmented.end()],
-        [augmented.start(), int(augmented.end() * duration_augment)],
-        inplace=False
-    )
+    # Apply data augmentation with the randomly selected values
+    return deterministic_data_augmentation(score, pitch_augment, duration_augment)
 
 
 def validate_paths(filepaths: list[str], expected_extension: str = ".mid"):
@@ -205,6 +222,11 @@ def merge_repeated_notes(note_list: list[Note]) -> list[Note]:
     return newnotes
 
 
+def remove_out_of_range_notes(note_list: list[Note]) -> list[Note]:
+    """Remove notes from a list that are outside the range of the piano keyboard"""
+    return [n for n in note_list if utils.MIDI_OFFSET <= n.pitch <= utils.MIDI_OFFSET + utils.PIANO_KEYS]
+
+
 def note_list_to_score(note_list: list[Note], ticks_per_quarter: int) -> Score:
     """Converts a list of symusic.Note objects to a single symusic.Score"""
     # This API is fairly similar to pretty_midi
@@ -227,11 +249,13 @@ def preprocess_score(score: Score) -> Score:
     # Otherwise, we can just grab the track directly
     else:
         note_list = score.tracks[0].notes
-    # First, we remove notes with a very short duration
-    no_short_notes = remove_short_notes(note_list)
+    # First, we remove notes that are outside the range of the piano keyboard
+    validated_notes = remove_out_of_range_notes(note_list)
+    # Then, we remove notes with a very short duration
+    no_short_notes = remove_short_notes(validated_notes)
     # Next, we merge successive notes with the same pitch and a very short onset-offset time into the same pitch
     merged_notes = merge_repeated_notes(no_short_notes)
-    # Finally, we convert everything back to a Score object
+    # Finally, we convert everything back to a Score object that can be passed to our tokenizer
     return note_list_to_score(merged_notes, score.ticks_per_quarter)
 
 
@@ -336,6 +360,7 @@ class DatasetMIDIRandomChunk:
             x = pad_sequence(sequence, desired_len=full_seq_length, pad_token_id=self.tokenizer.pad_token_id)
         # Randomly chunking the sequence
         else:
+            # TODO: we should probably allow for padding here so that we see the EOS token during training
             x = randomly_slice_sequence(sequence, desired_len=full_seq_length)
         # Shift labels by one for autoregression
         targets = x[1:]
@@ -355,7 +380,7 @@ class DatasetMIDIRandomChunk:
         preprocessed_score = preprocess_score(score)
         # Perform data augmentation on the score object if required
         if self.do_augmentation:
-            preprocessed_score = data_augmentation(preprocessed_score)
+            preprocessed_score = random_data_augmentation(preprocessed_score)
         # Now we can do the MIDItok preprocessing
         before_tokenize = self.tokenizer.preprocess_score(preprocessed_score)
         # Tokenize it
