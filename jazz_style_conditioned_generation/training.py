@@ -107,22 +107,38 @@ class TrainingModule:
         logger.debug("Split tracks: " + ", ".join([f'{k}: {len(list(v))}' for k, v in self.track_splits.items()]))
 
         # TOKENIZER
+        tokenizer_path = os.path.join(
+            utils.get_project_root(),
+            "outputs/tokenizers",
+            f"{self.experiment}_{self.run}.json"
+        )
+        # Get the variables from the config dictionary
         tokenizer_method = self.tokenizer_cfg.get("tokenizer_str", DEFAULT_TOKENIZER_CLASS)
         tokenizer_kws = self.tokenizer_cfg.get("tokenizer_kws", DEFAULT_TOKENIZER_CONFIG)
         # Add in any missing parameters with defaults
         tokenizer_kws = utils.update_dictionary(tokenizer_kws, DEFAULT_TOKENIZER_CONFIG)
         logger.debug(f'Initialising tokenizer type {tokenizer_method} with params {tokenizer_kws}')
-        cfg = TokenizerConfig(**tokenizer_kws)
-        self.tokenizer = self.get_tokenizer(tokenizer_method)(cfg)
-        logger.debug(f'... got tokenizer: {self.tokenizer}')
-
-        # TRAINING THE TOKENIZER
-        if self.tokenizer_cfg.get("do_training", False):
-            training_method = self.tokenizer_cfg.get("training_method", DEFAULT_TRAINING_METHOD)
-            vocab_size = self.tokenizer_cfg.get("vocab_size", DEFAULT_VOCAB_SIZE)
-            logger.debug(f'Training tokenizer with method {training_method}, vocab size {vocab_size}')
-            self.tokenizer.train(vocab_size=vocab_size, model=training_method, files_paths=self.track_paths)
-            logger.debug(f'... trained tokenizer: {self.tokenizer}')
+        # If we've already trained the tokenizer for this run
+        if os.path.isfile(tokenizer_path):
+            self.tokenizer = self.get_tokenizer_class_from_string(tokenizer_method)(params=tokenizer_path)
+            logger.debug(f'... loading tokenizer from {tokenizer_path}')
+        # Otherwise, we need to create the tokenizer from scratch
+        else:
+            logger.debug('... could not find saved tokenizer for this experiment/run, creating it from scratch!')
+            cfg = TokenizerConfig(**tokenizer_kws)
+            self.tokenizer = self.get_tokenizer_class_from_string(tokenizer_method)(cfg)
+            # If we want to train the tokenizer
+            if self.tokenizer_cfg.get("do_training", False):
+                # Get the parameters again from the dictionary
+                training_method = self.tokenizer_cfg.get("training_method", DEFAULT_TRAINING_METHOD)
+                vocab_size = self.tokenizer_cfg.get("vocab_size", DEFAULT_VOCAB_SIZE)
+                logger.debug(f'... training tokenizer with method {training_method}, vocab size {vocab_size}')
+                self.tokenizer.train(vocab_size=vocab_size, model=training_method, files_paths=self.track_paths)
+                logger.debug(f'... successfully trained tokenizer')
+            # Finally, we can dump the tokenizer so that we reload it on future runs
+            self.tokenizer.save(tokenizer_path)
+            logger.debug(f'... tokenizer saved to {tokenizer_path}')
+        logger.debug(f'... tokenizer initialised: {self.tokenizer}')
 
         # CONDITIONS
         validate_conditions(self.conditions)
@@ -210,7 +226,9 @@ class TrainingModule:
                 yield os.path.join(DATA_DIR, "raw", path, "piano_midi.mid")
 
     @staticmethod
-    def get_tokenizer(tokenizer_type: str):
+    def get_tokenizer_class_from_string(tokenizer_type: str):
+        """Given a string, return the correct tokenizer class"""
+        valids = ["remi", "midilike", "tsd", "structured", "pertok"]
         if tokenizer_type == "remi":
             return REMI
         elif tokenizer_type == "midilike":
@@ -222,7 +240,7 @@ class TrainingModule:
         elif tokenizer_type == "pertok":
             return PerTok
         else:
-            raise ValueError(f'`tokenizer_str` {tokenizer_type} is not recognized')
+            raise ValueError(f'`tokenizer_type` must be one of {", ".join(valids)} but got {tokenizer_type}')
 
     def get_model(self, model_type: str, model_cfg: dict):
         """Given a string, returns the correct model"""
