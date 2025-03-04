@@ -37,9 +37,11 @@ class DataloaderTest(unittest.TestCase):
     def test_randomly_slice(self):
         tokseq = [2, 2, 2, 3, 4, 5, 7, 6, 4, 3, 8, ]
         desired_len = 5
-        returned = randomly_slice_sequence(tokseq, desired_len)
-        self.assertTrue(len(returned) < len(tokseq))
-        self.assertEqual(len(returned), desired_len)
+        # Test a few times
+        for _ in range(10):
+            returned = randomly_slice_sequence(tokseq, desired_len, end_overlap=0.)
+            self.assertTrue(len(returned) < len(tokseq))
+            self.assertEqual(len(returned), desired_len)
 
     def test_get_pitch_range(self):
         score = Score(TEST_MIDI)
@@ -80,7 +82,8 @@ class DataloaderTest(unittest.TestCase):
             files_paths=[TEST_MIDI],
             do_augmentation=False,
             max_seq_len=512,
-            do_conditioning=False
+            do_conditioning=False,
+            chunk_end_overlap=0.
         )
         gotitem = ds.__getitem__(0)
         input_ids, targets = gotitem["input_ids"], gotitem["labels"]
@@ -89,7 +92,7 @@ class DataloaderTest(unittest.TestCase):
         self.assertEqual(targets.size(0), 512)
         # Labels should be the input IDs shifted by one
         self.assertEqual(input_ids.tolist()[1:], targets.tolist()[:-1])
-        # We shouldn't have any 0s (i.e., pad tokens) in our attention mask
+        # With a chunk_end_overlap of 0., we shouldn't have any padding tokens in the output
         self.assertFalse(True in gotitem["attention_mask"])
 
     def test_dataset_random_chunk(self):
@@ -99,7 +102,8 @@ class DataloaderTest(unittest.TestCase):
             files_paths=[TEST_MIDI],
             do_augmentation=False,
             max_seq_len=10,
-            do_conditioning=False
+            do_conditioning=False,
+            chunk_end_overlap=0.
         )
         self.assertEqual(len(ds), 1)
 
@@ -142,6 +146,7 @@ class DataloaderTest(unittest.TestCase):
             do_augmentation=False,
             max_seq_len=10,
             do_conditioning=True,
+            chunk_end_overlap=0.,
             condition_mapping={
                 "pianist": {"Kenny Barron": "PIANIST_KennyBarron"},
                 "genres": {"Hard Bop": "GENRES_HardBop"},
@@ -335,7 +340,6 @@ class DataloaderTest(unittest.TestCase):
         self.assertEqual(actual, expected)
         # These notes are not adjacent, so shouldn't be touched
         notelist = [
-
             Note(pitch=90, duration=5, time=110, velocity=80, ttype="tick"),
             Note(pitch=90, duration=5, time=1000, velocity=80, ttype="tick"),
         ]
@@ -421,7 +425,8 @@ class DataloaderTest(unittest.TestCase):
             files_paths=[TEST_MIDI],
             do_augmentation=False,
             max_seq_len=10,
-            do_conditioning=False
+            do_conditioning=False,
+            chunk_end_overlap=0.
         )
         # Random chunks FROM THIS TRACK (WHICH IS LONG) should not have any padding
         #  NB., if we had a track which was very short, we would expect some padding here
@@ -475,6 +480,30 @@ class DataloaderTest(unittest.TestCase):
         expected_start = 500
         actual_start = augment.tracks[0].notes[0].time
         self.assertEqual(expected_start, actual_start)
+
+    def test_random_chunk_end_overlap(self):
+        # With a sequence of 10 items and an end overlap of 0.9, our sequence can vary in length from 1:8 items
+        seq = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        desired_len = 8
+        end_overlap = 0.9
+        # Test a few times
+        for i in range(10):
+            out = randomly_slice_sequence(seq, desired_len, end_overlap)
+            self.assertTrue(1 <= len(out) <= desired_len)
+        # Test this out with a dataloader
+        token_factory = REMI()
+        ds = DatasetMIDIRandomChunk(
+            tokenizer=token_factory,
+            files_paths=[TEST_MIDI],
+            do_augmentation=False,
+            max_seq_len=100000,
+            do_conditioning=False,
+            chunk_end_overlap=0.9
+        )
+        # We've constructed the loader such that we'll expect padding
+        first_chunk = ds.__getitem__(0)
+        self.assertTrue(token_factory["PAD_None"] in first_chunk["input_ids"])
+        self.assertTrue(True in first_chunk["attention_mask"])
 
 
 if __name__ == '__main__':

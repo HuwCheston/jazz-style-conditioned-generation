@@ -148,10 +148,16 @@ def pad_sequence(
 def randomly_slice_sequence(
         sequence: list[int],
         desired_len: int,
+        end_overlap: float = 0.5
 ) -> list[int]:
-    """Randomly slices a sequence into desired length"""
+    """Randomly slices a sequence into desired length, allowing for some overlap with the end of the sequence"""
     assert len(sequence) >= desired_len, f"Expected at least {desired_len} tokens but got {len(sequence)}!"
-    end_range = len(sequence) - desired_len
+    # end_overlap is the fraction of the total sequence length that we should allow to possibly overlap at the end
+    #  so, with a sequence of length 100 and a desired_len of 50, an end_overlap of 0.5 would mean that we can possibly
+    #  create chunks that have indices 75 and 125. This will result in shorter-than-desired sequences, so must be padded
+    #  with an end_overlap of 0, chunks will never overlap the end of the sequence and will always be the desired length
+    assert 0. <= end_overlap < 1., f'`end_overlap` must be in range 0. <= x < 1. but got {end_overlap}'
+    end_range = int(len(sequence) - (desired_len * (1 - end_overlap)))
     start = random.randint(0, end_range)
     end = start + desired_len
     return sequence[start:end]
@@ -322,11 +328,13 @@ class DatasetMIDIRandomChunk:
             do_augmentation: bool = True,
             do_conditioning: bool = True,
             condition_mapping: dict[str, dict] = None,
-            n_clips: int = None
+            n_clips: int = None,
+            chunk_end_overlap: float = 0.5
     ):
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len
         self.do_augmentation = do_augmentation
+        self.chunk_end_overlap = chunk_end_overlap
 
         # MIDI file paths
         self.files_paths = files_paths
@@ -360,8 +368,9 @@ class DatasetMIDIRandomChunk:
             x = pad_sequence(sequence, desired_len=full_seq_length, pad_token_id=self.tokenizer.pad_token_id)
         # Randomly chunking the sequence
         else:
-            # TODO: we should probably allow for padding here so that we see the EOS token during training
-            x = randomly_slice_sequence(sequence, desired_len=full_seq_length)
+            x = randomly_slice_sequence(sequence, desired_len=full_seq_length, end_overlap=self.chunk_end_overlap)
+            if len(x) < full_seq_length:
+                x = pad_sequence(x, desired_len=full_seq_length, pad_token_id=self.tokenizer.pad_token_id)
         # Shift labels by one for autoregression
         targets = x[1:]
         x = x[:-1]  # remove the final token to get the desired length
