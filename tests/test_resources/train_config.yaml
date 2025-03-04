@@ -1,0 +1,36 @@
+experiment: tester
+run: tester_config
+conditions: [ ]
+batch_size: 2
+epochs: 1
+data_dir: tests/test_resources
+split_dir: tests/test_resources/splits
+train_dataset_cfg:
+  do_augmentation: false
+  do_conditioning: false
+test_dataset_cfg:
+  do_augmentation: false
+  do_conditioning: false
+model_cfg:
+  model_type: music-transformer
+  model_kws:
+    rpr: true
+optimizer_cfg:
+  optimizer_type: adam
+  optimizer_kws:
+    lr: 2.0e-5
+scheduler_cfg:
+  scheduler_type: null
+  scheduler_kws: { }
+checkpoint_cfg:
+  save_checkpoints: false
+  load_checkpoints: false
+  checkpoint_after_n_epochs: 10
+tokenizer_cfg:
+  tokenizer_str: structured
+  training_method: BPE
+  train_tokenizer: false
+generate_cfg:
+  do_generation: false
+mlflow_cfg:
+  use: false
