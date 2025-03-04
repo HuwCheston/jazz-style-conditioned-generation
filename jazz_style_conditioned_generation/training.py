@@ -11,31 +11,14 @@ import numpy as np
 import torch
 import yaml
 from loguru import logger
-from miditok import REMI, Structured, TSD, PerTok, MIDILike, TokenizerConfig
 from tqdm import tqdm
 from transformers import GPT2Config, GPT2LMHeadModel
 
 from jazz_style_conditioned_generation import utils
-from jazz_style_conditioned_generation.data.conditions import (
-    validate_conditions,
-    get_condition_special_tokens
-)
-from jazz_style_conditioned_generation.data.dataloader import (
-    DatasetMIDIExhaustive,
-    DatasetMIDIRandomChunk,
-    DATA_DIR
-)
-from jazz_style_conditioned_generation.data.splits import (
-    SPLIT_TYPES,
-    SPLIT_DIR,
-    check_all_splits_unique
-)
-from jazz_style_conditioned_generation.data.tokenizer import (
-    DEFAULT_TOKENIZER_CLASS,
-    DEFAULT_TOKENIZER_CONFIG,
-    DEFAULT_VOCAB_SIZE,
-    DEFAULT_TRAINING_METHOD
-)
+from jazz_style_conditioned_generation.data.conditions import validate_conditions, get_condition_special_tokens
+from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIExhaustive, DatasetMIDIRandomChunk, DATA_DIR
+from jazz_style_conditioned_generation.data.splits import SPLIT_TYPES, SPLIT_DIR, check_all_splits_unique
+from jazz_style_conditioned_generation.data.tokenizer import load_or_train_tokenizer
 from jazz_style_conditioned_generation.encoders import MusicTransformer, MusicTransformerScheduler
 
 
@@ -112,32 +95,7 @@ class TrainingModule:
             "outputs/tokenizers",
             f"{self.experiment}_{self.run}.json"
         )
-        # Get the variables from the config dictionary
-        tokenizer_method = self.tokenizer_cfg.get("tokenizer_str", DEFAULT_TOKENIZER_CLASS)
-        tokenizer_kws = self.tokenizer_cfg.get("tokenizer_kws", DEFAULT_TOKENIZER_CONFIG)
-        # Add in any missing parameters with defaults
-        tokenizer_kws = utils.update_dictionary(tokenizer_kws, DEFAULT_TOKENIZER_CONFIG)
-        logger.debug(f'Initialising tokenizer type {tokenizer_method} with params {tokenizer_kws}')
-        # If we've already trained the tokenizer for this run
-        if os.path.isfile(tokenizer_path):
-            self.tokenizer = self.get_tokenizer_class_from_string(tokenizer_method)(params=tokenizer_path)
-            logger.debug(f'... loading tokenizer from {tokenizer_path}')
-        # Otherwise, we need to create the tokenizer from scratch
-        else:
-            logger.debug('... could not find saved tokenizer for this experiment/run, creating it from scratch!')
-            cfg = TokenizerConfig(**tokenizer_kws)
-            self.tokenizer = self.get_tokenizer_class_from_string(tokenizer_method)(cfg)
-            # If we want to train the tokenizer
-            if self.tokenizer_cfg.get("do_training", False):
-                # Get the parameters again from the dictionary
-                training_method = self.tokenizer_cfg.get("training_method", DEFAULT_TRAINING_METHOD)
-                vocab_size = self.tokenizer_cfg.get("vocab_size", DEFAULT_VOCAB_SIZE)
-                logger.debug(f'... training tokenizer with method {training_method}, vocab size {vocab_size}')
-                self.tokenizer.train(vocab_size=vocab_size, model=training_method, files_paths=self.track_paths)
-                logger.debug(f'... successfully trained tokenizer')
-            # Finally, we can dump the tokenizer so that we reload it on future runs
-            self.tokenizer.save(tokenizer_path)
-            logger.debug(f'... tokenizer saved to {tokenizer_path}')
+        self.tokenizer = load_or_train_tokenizer(tokenizer_path, self.tokenizer_cfg, self.track_paths)
         logger.debug(f'... tokenizer initialised: {self.tokenizer}')
 
         # CONDITIONS
@@ -224,23 +182,6 @@ class TrainingModule:
                 if not os.path.isfile(os.path.join(DATA_DIR, "raw", path, "metadata_tivo.json")):
                     raise FileNotFoundError(f'Could not find metadata for track at {path}')
                 yield os.path.join(DATA_DIR, "raw", path, "piano_midi.mid")
-
-    @staticmethod
-    def get_tokenizer_class_from_string(tokenizer_type: str):
-        """Given a string, return the correct tokenizer class"""
-        valids = ["remi", "midilike", "tsd", "structured", "pertok"]
-        if tokenizer_type == "remi":
-            return REMI
-        elif tokenizer_type == "midilike":
-            return MIDILike
-        elif tokenizer_type == "tsd":
-            return TSD
-        elif tokenizer_type == "structured":
-            return Structured
-        elif tokenizer_type == "pertok":
-            return PerTok
-        else:
-            raise ValueError(f'`tokenizer_type` must be one of {", ".join(valids)} but got {tokenizer_type}')
 
     def get_model(self, model_type: str, model_cfg: dict):
         """Given a string, returns the correct model"""
