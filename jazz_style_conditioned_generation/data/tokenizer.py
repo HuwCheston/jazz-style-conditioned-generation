@@ -29,7 +29,7 @@ from jazz_style_conditioned_generation.data.dataloader import (
 
 DEFAULT_TOKENIZER_CONFIG = {
     "pitch_range": (utils.MIDI_OFFSET, utils.MIDI_OFFSET + utils.PIANO_KEYS),
-    "beat_res": {(0, 4): 8, (4, 12): 8},
+    "beat_res": {(0, 4): 32},
     "num_velocities": 32,
     "special_tokens": [
         "PAD",  # add for short inputs to ensure consistent sequence length for all inputs
@@ -38,7 +38,7 @@ DEFAULT_TOKENIZER_CONFIG = {
         "MASK",  # prevent attention to future tokens
     ],
     "use_chords": False,
-    "use_rests": True,
+    "use_rests": False,
     "use_tempos": False,
     "use_time_signatures": False,
     "use_programs": False,
