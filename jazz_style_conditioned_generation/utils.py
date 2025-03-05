@@ -18,7 +18,7 @@ import numpy as np
 import torch
 import transformers
 from loguru import logger
-from symusic import Score
+from symusic import Score, Synthesizer, BuiltInSF3, dump_wav
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 SEED = 42
@@ -180,6 +180,16 @@ def string_to_bool(v) -> bool:
         return False
     else:
         raise ValueError(f'Could not coerce argument {v} to a boolean.')
+
+
+def synthesize_score(score: Score, out_path: str = None) -> np.ndarray:
+    """Synthesises a symusic.Score object and returns the waveform: if `out_path` is given, will also save the audio."""
+    sf_path = BuiltInSF3.MuseScoreGeneral().path(download=True)
+    synth = Synthesizer(sf_path=sf_path, sample_rate=44100)
+    audio = synth.render(score, stereo=True)
+    if out_path is not None:
+        dump_wav(out_path, audio, sample_rate=44100, use_int16=True)
+    return audio
 
 
 if __name__ == "__main__":

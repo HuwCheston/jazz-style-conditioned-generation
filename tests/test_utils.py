@@ -56,22 +56,19 @@ class TestUtils(unittest.TestCase):
         # Test for various truthy values
         truthy_values = ['yes', 'true', 't', 'y', '1']
         for value in truthy_values:
-            with self.subTest(value=value):
-                self.assertTrue(utils.string_to_bool(value))
+            self.assertTrue(utils.string_to_bool(value))
         # Test for various falsy values
         falsy_values = ['no', 'false', 'f', 'n', '0']
         for value in falsy_values:
-            with self.subTest(value=value):
-                self.assertFalse(utils.string_to_bool(value))
+            self.assertFalse(utils.string_to_bool(value))
         # Test for already boolean inputs
         self.assertTrue(utils.string_to_bool(True))
         self.assertFalse(utils.string_to_bool(False))
         # Test for invalid values that should raise ValueError
         invalid_values = ['maybe', 'something', '123', 'null', '', ]
         for value in invalid_values:
-            with self.subTest(value=value):
-                with self.assertRaises(ValueError):
-                    utils.string_to_bool(value)
+            with self.assertRaises(ValueError):
+                utils.string_to_bool(value)
 
 
 if __name__ == '__main__':
