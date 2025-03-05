@@ -138,7 +138,7 @@ class MusicTransformer(nn.Module):
     ) -> MusicTransformerOutput:
         """Takes an input sequence and outputs predictions using a sequence to sequence method."""
         # Create causal mask
-        mask = self.transformer.generate_square_subsequent_mask(input_ids.shape[1]).to(utils.DEVICE)
+        mask = self.transformer.generate_square_subsequent_mask(input_ids.shape[1]).to(input_ids.device)
         x = self.embedding(input_ids)
         # Input shape is (max_seq, batch_size, d_model)
         x = x.permute(1, 0, 2)
