@@ -29,7 +29,7 @@ checkpoint_cfg:
 tokenizer_cfg:
   tokenizer_str: structured
   training_method: BPE
-  train_tokenizer: false
+  do_training: false
 generate_cfg:
   do_generation: false
 mlflow_cfg:
