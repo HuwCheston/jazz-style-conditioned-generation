@@ -8,17 +8,19 @@ import random
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import torch
 from miditok import TokenizerConfig, Structured
 from miditok.pytorch_data import DatasetMIDI, DataCollator
 from miditok.utils import split_files_for_training
 from tqdm import tqdm
-from transformers import GPT2Config, GPT2LMHeadModel
+
+from jazz_style_conditioned_generation.encoders import MusicTransformer
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 MAX_SEQUENCE_LEN = 1024
 N_FILES = 1000
-N_EPOCHS_PER_VOCAB = 3
+N_EPOCHS_PER_VOCAB = 10
 
 # We'll train a model with this vocab size for N_EPOCHS_PER_SETTING epochs
 VOCAB_SIZES = [-1, 500, 1000, 5000, 10000]  # -1 vocab size == no training of tokenizer
@@ -35,7 +37,8 @@ def seed_everything(seed: int = 42) -> None:
 def forwards_pass(batch, model, pad_token_id) -> tuple[torch.tensor, torch.tensor]:
     input_ids = batch["input_ids"].to(DEVICE)
     labels = batch["labels"].to(DEVICE)
-    attention_mask = batch["attention_mask"].to(DEVICE)  # boolean required for music transformer
+    labels[labels == -100] = pad_token_id  # data collator seems to somehow replace 0 (pad) with -100 for labels?
+    attention_mask = (input_ids == pad_token_id).float().to(DEVICE)  # boolean required for music transformer
     outputs = model(input_ids=input_ids, labels=labels, attention_mask=attention_mask)
     accuracy = accuracy_score(outputs.logits, labels, pad_token_id)
     return outputs.loss, accuracy
@@ -67,6 +70,12 @@ def get_data_files_with_ext(dir_from_root: str = "data/raw", ext: str = "**/*.mi
     return [p for p in Path(os.path.join(get_project_root(), dir_from_root)).glob(ext)]
 
 
+def save_results(res: list[dict]) -> None:
+    df = pd.DataFrame(res)
+    out = os.path.join(get_project_root(), "training_sanitycheck_results.csv")
+    df.to_csv(out)
+
+
 def main():
     # Grab N MIDI files
     midi_paths = get_data_files_with_ext("data/raw", "**/*.mid")[:N_FILES]
@@ -78,6 +87,7 @@ def main():
     midi_paths_test = midi_paths[:num_files_test]
     midi_paths_train = midi_paths[num_files_test:]
     print(f'N {len(midi_paths_train)} train, N {len(midi_paths_test)} test')
+    results = []
 
     for vocab in VOCAB_SIZES:
         # Train structured tokenizer using all default settings
@@ -87,50 +97,53 @@ def main():
         if vocab > tokenizer.vocab_size:
             tokenizer.train(files_paths=midi_paths, vocab_size=vocab)
         print(f'Using tokenizer: {tokenizer}')
-        # Create model
-        model_cfg = GPT2Config(
-            vocab_size=tokenizer.vocab_size,
-            n_positions=MAX_SEQUENCE_LEN,
-            bos_token_id=tokenizer["BOS_None"],
-            eos_token_id=tokenizer["EOS_None"],
-        )
-        model = GPT2LMHeadModel(model_cfg).to(DEVICE)
+        # Create model: hyperparameters should be mostly identical to original music transformer paper
+        model = MusicTransformer(
+            tokenizer,
+            n_layers=6,
+            num_heads=8,
+            d_model=512,
+            dim_feedforward=1024,
+            dropout=0.1,
+            max_sequence=MAX_SEQUENCE_LEN,
+            rpr=False
+        ).to(DEVICE)
         optimizer = torch.optim.Adam(model.parameters(), lr=2e-5)
 
-        # Iterate through each subset
-        for files_paths, subset_name in (
-                (midi_paths_train, "train"), (midi_paths_test, "test")
-        ):
-            # Split the MIDIs into chunks of sizes approximately about 1024 tokens
-            subset_chunks_dir = Path(f"dataset_{subset_name}")
-            split_paths = split_files_for_training(
-                files_paths=files_paths,
-                tokenizer=tokenizer,
-                save_dir=subset_chunks_dir,
-                max_seq_len=MAX_SEQUENCE_LEN,
-                num_overlap_bars=2,
-            )
-            # Create dataloader
-            dataloader = torch.utils.data.DataLoader(
-                DatasetMIDI(
-                    split_paths,
+        # Iterate over for the required number of epochs
+        for n_epoch in range(1, N_EPOCHS_PER_VOCAB + 1):
+            # Iterate through each subset
+            for files_paths, subset_name in (
+                    (midi_paths_train, "train"), (midi_paths_test, "test")
+            ):
+                # Split the MIDIs into chunks of sizes approximately about 1024 tokens
+                subset_chunks_dir = Path(f"dataset_{subset_name}")
+                split_paths = split_files_for_training(
+                    files_paths=files_paths,
                     tokenizer=tokenizer,
-                    max_seq_len=MAX_SEQUENCE_LEN
-                ),
-                batch_size=4,
-                collate_fn=DataCollator(
-                    pad_token_id=tokenizer.pad_token_id,
-                    copy_inputs_as_labels=True,
-                    shift_labels=True
+                    save_dir=subset_chunks_dir,
+                    max_seq_len=MAX_SEQUENCE_LEN,
+                    num_overlap_bars=2,
                 )
-            )
-            # Set model into the correct mode
-            if subset_name == "train":
-                model.train()
-            else:
-                model.eval()
-            # Iterate over for the required number of epochs
-            for n_epoch in range(1, N_EPOCHS_PER_VOCAB + 1):
+                # Create dataloader
+                dataloader = torch.utils.data.DataLoader(
+                    DatasetMIDI(
+                        split_paths,
+                        tokenizer=tokenizer,
+                        max_seq_len=MAX_SEQUENCE_LEN
+                    ),
+                    batch_size=20,
+                    collate_fn=DataCollator(
+                        pad_token_id=tokenizer.pad_token_id,
+                        copy_inputs_as_labels=True,
+                        shift_labels=True
+                    )
+                )
+                # Set model into the correct mode
+                if subset_name == "train":
+                    model.train()
+                else:
+                    model.eval()
                 epoch_loss, epoch_acc = [], []
                 for batch in tqdm(dataloader, desc=f"{subset_name.title()}ing, vocab {vocab}, epoch {n_epoch}"):
                     # Backwards pass for training only
@@ -148,6 +161,14 @@ def main():
                 # Log to the console
                 print(f'Stage {subset_name}, vocab {vocab}, epoch {n_epoch} '
                       f'loss: {np.mean(epoch_loss):.3f}, accuracy: {np.mean(epoch_acc):.3f}')
+                results.append(dict(
+                    epoch=n_epoch,
+                    stage=subset_name,
+                    vocab_size=vocab,
+                    loss=np.mean(epoch_loss),
+                    accuracy=np.mean(epoch_acc)
+                ))
+                save_results(results)
 
 
 if __name__ == "__main__":
