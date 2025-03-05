@@ -249,6 +249,10 @@ def preprocess_score(
         overlap_ticks: int = OVERLAP_TICKS
 ) -> Score:
     """Applies our own preprocessing to a Score object: removes short notes, merges duplicates"""
+    # Resample the score if required to the value which is used in JTD + PiJAMA
+    if score.ticks_per_quarter != utils.TICKS_PER_QUARTER:
+        score = score.resample(utils.TICKS_PER_QUARTER)
+    assert score.ticks_per_quarter == utils.TICKS_PER_QUARTER
     # If we somehow have more than one track (occasionally happens in the bushgrafts corpus)
     if len(score.tracks) > 1:
         # Get all the piano tracks

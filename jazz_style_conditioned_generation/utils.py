@@ -25,7 +25,7 @@ SEED = 42
 
 MIDI_PIANO_PROGRAM = 0
 PIANO_KEYS = 88
-FPS = 100
+TICKS_PER_QUARTER = 384  # By far, the vast majority of tracks have this TPQ. We'll resample any others to this value.
 MIDI_OFFSET = 21
 MAX_VELOCITY = 127
 MIDDLE_C = 60

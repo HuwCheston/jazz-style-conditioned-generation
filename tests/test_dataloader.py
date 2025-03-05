@@ -505,6 +505,15 @@ class DataloaderTest(unittest.TestCase):
         self.assertTrue(token_factory["PAD_None"] in first_chunk["input_ids"])
         self.assertTrue(True in first_chunk["attention_mask"])
 
+    def test_resample(self):
+        notes = [
+            Note(pitch=50, duration=10, time=1000, velocity=50, ttype="tick"),
+            Note(pitch=40, duration=10, time=1000, velocity=50, ttype="tick")
+        ]
+        score = note_list_to_score(notes, 100)  # has a ticks-per-quarter of 100
+        preproc_score = preprocess_score(score)
+        self.assertTrue(preproc_score.ticks_per_quarter == utils.TICKS_PER_QUARTER)
+
 
 if __name__ == '__main__':
     unittest.main()
