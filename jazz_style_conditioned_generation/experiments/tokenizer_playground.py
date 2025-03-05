@@ -96,6 +96,9 @@ def main(tokenizers: list[str], vocabs: list[str], train_model: bool):
     res = []
     # Iterate through all the experiments we want to do
     for num, (tok_type, vocab_size) in enumerate(test_configs, 1):
+        if isinstance(vocab_size, str):
+            vocab_size = int(vocab_size)
+
         logger.info(f"----------EXPERIMENT {num}/{total}: TOK_TYPE {tok_type}, VOCAB_SIZE {vocab_size}------------")
         # Grab the training module, this will also train the tokenizer for us
         tm = init_training_module(tok_type, vocab_size)
