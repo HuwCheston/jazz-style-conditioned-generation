@@ -5,12 +5,13 @@
 
 import os
 import random
+from argparse import ArgumentParser
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import torch
-from miditok import TokenizerConfig, Structured
+from miditok import TokenizerConfig, REMI, MIDILike, TSD, Structured, PerTok
 from miditok.pytorch_data import DatasetMIDI, DataCollator
 from miditok.utils import split_files_for_training
 from tqdm import tqdm
@@ -20,10 +21,28 @@ from jazz_style_conditioned_generation.encoders import MusicTransformer
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 MAX_SEQUENCE_LEN = 1024
 N_FILES = 1000
-N_EPOCHS_PER_VOCAB = 10
+N_EPOCHS_PER_VOCAB = 5
 
 # We'll train a model with this vocab size for N_EPOCHS_PER_SETTING epochs
 VOCAB_SIZES = [-1, 500, 1000, 5000, 10000]  # -1 vocab size == no training of tokenizer
+
+
+def get_tokenizer_class_from_string(tokenizer_type: str):
+    """Given a string, return the correct tokenizer class"""
+    valids = ["remi", "midilike", "tsd", "structured", "pertok"]
+    tokenizer_type = tokenizer_type.lower()
+    if tokenizer_type == "remi":
+        return REMI
+    elif tokenizer_type == "midilike":
+        return MIDILike
+    elif tokenizer_type == "tsd":
+        return TSD
+    elif tokenizer_type == "structured":
+        return Structured
+    elif tokenizer_type == "pertok":
+        return PerTok
+    else:
+        raise ValueError(f'`tokenizer_type` must be one of {", ".join(valids)} but got {tokenizer_type}')
 
 
 def seed_everything(seed: int = 42) -> None:
@@ -70,13 +89,13 @@ def get_data_files_with_ext(dir_from_root: str = "data/raw", ext: str = "**/*.mi
     return [p for p in Path(os.path.join(get_project_root(), dir_from_root)).glob(ext)]
 
 
-def save_results(res: list[dict]) -> None:
+def save_results(res: list[dict], tokeniser_type: str) -> None:
     df = pd.DataFrame(res)
-    out = os.path.join(get_project_root(), "training_sanitycheck_results.csv")
+    out = os.path.join(get_project_root(), f"training_sanitycheck_results_{tokeniser_type}.csv")
     df.to_csv(out)
 
 
-def main():
+def main(tokeniser_type: str):
     # Grab N MIDI files
     midi_paths = get_data_files_with_ext("data/raw", "**/*.mid")[:N_FILES]
 
@@ -92,7 +111,7 @@ def main():
     for vocab in VOCAB_SIZES:
         # Train structured tokenizer using all default settings
         tokenizer_cfg = TokenizerConfig()
-        tokenizer = Structured(tokenizer_cfg)
+        tokenizer = get_tokenizer_class_from_string(tokeniser_type)(tokenizer_cfg)
         # Train tokenizer only when required
         if vocab > tokenizer.vocab_size:
             tokenizer.train(files_paths=midi_paths, vocab_size=vocab)
@@ -116,7 +135,7 @@ def main():
             for files_paths, subset_name in (
                     (midi_paths_train, "train"), (midi_paths_test, "test")
             ):
-                # Split the MIDIs into chunks of sizes approximately about 1024 tokens
+                # Split the MIDIs into chunks of sizes approximately 1024 tokens
                 subset_chunks_dir = Path(f"dataset_{subset_name}")
                 split_paths = split_files_for_training(
                     files_paths=files_paths,
@@ -166,11 +185,16 @@ def main():
                     stage=subset_name,
                     vocab_size=vocab,
                     loss=np.mean(epoch_loss),
-                    accuracy=np.mean(epoch_acc)
+                    accuracy=np.mean(epoch_acc),
+                    tokeniser_type=tokeniser_type
                 ))
-                save_results(results)
+                save_results(results, tokeniser_type)
 
 
 if __name__ == "__main__":
     seed_everything()
-    main()
+
+    parser = ArgumentParser(description="Simple training script that allows different tokenisers to be evaluated")
+    parser.add_argument("--tokeniser-type", type=str, default="remi", help="Tokeniser type to use")
+    args = vars(parser.parse_args())
+    main(args["tokeniser_type"])
