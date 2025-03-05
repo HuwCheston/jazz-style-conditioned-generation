@@ -49,6 +49,12 @@ TOKENIZER_CFG = {
     "use_pitchdrum_tokens": False,
     "programs": [0],  # only piano
 }
+PERTOK_CFG = {  # only for use in pertok!
+    "use_microtiming": True,
+    "ticks_per_quarter": 384,
+    "max_microtiming_shift": 0.125,
+    "num_microtiming_bins": 30,
+}
 
 
 def get_tokenizer_class_from_string(tokenizer_type: str):
@@ -135,7 +141,8 @@ def main(tokeniser_type: str):
 
     for vocab in VOCAB_SIZES:
         # Train structured tokenizer using all default settings
-        tokenizer_cfg = TokenizerConfig(**TOKENIZER_CFG)
+        tokcfg = TOKENIZER_CFG if tokeniser_type != "pertok" else TOKENIZER_CFG | PERTOK_CFG
+        tokenizer_cfg = TokenizerConfig(**tokcfg)
         tokenizer = get_tokenizer_class_from_string(tokeniser_type)(tokenizer_cfg)
         # Train tokenizer only when required
         if vocab > tokenizer.vocab_size:
