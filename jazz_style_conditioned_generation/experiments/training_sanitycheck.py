@@ -26,6 +26,30 @@ N_EPOCHS_PER_VOCAB = 5
 # We'll train a model with this vocab size for N_EPOCHS_PER_SETTING epochs
 VOCAB_SIZES = [-1, 500, 1000, 5000, 10000]  # -1 vocab size == no training of tokenizer
 
+TOKENIZER_CFG = {
+    "pitch_range": (21, 109),
+    "beat_res": {(0, 4): 8, (4, 12): 8},
+    "num_velocities": 32,
+    "special_tokens": [
+        "PAD",  # add for short inputs to ensure consistent sequence length for all inputs
+        "BOS",  # beginning of sequence
+        "EOS",  # end of sequence
+        "MASK",  # prevent attention to future tokens
+    ],
+    "use_chords": True,
+    "use_rests": True,
+    "use_tempos": False,
+    "use_time_signatures": False,
+    "use_programs": False,
+    "use_sustain_pedals": False,
+    "use_pitch_bends": False,
+    "use_velocities": True,
+    "remove_duplicated_notes": True,
+    "encode_ids_split": "no",
+    "use_pitchdrum_tokens": False,
+    "programs": [0],  # only piano
+}
+
 
 def get_tokenizer_class_from_string(tokenizer_type: str):
     """Given a string, return the correct tokenizer class"""
@@ -106,11 +130,12 @@ def main(tokeniser_type: str):
     midi_paths_test = midi_paths[:num_files_test]
     midi_paths_train = midi_paths[num_files_test:]
     print(f'N {len(midi_paths_train)} train, N {len(midi_paths_test)} test')
+    print(f'Tokenizer configuration: {TOKENIZER_CFG}')
     results = []
 
     for vocab in VOCAB_SIZES:
         # Train structured tokenizer using all default settings
-        tokenizer_cfg = TokenizerConfig()
+        tokenizer_cfg = TokenizerConfig(**TOKENIZER_CFG)
         tokenizer = get_tokenizer_class_from_string(tokeniser_type)(tokenizer_cfg)
         # Train tokenizer only when required
         if vocab > tokenizer.vocab_size:
