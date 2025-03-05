@@ -170,5 +170,17 @@ def write_json(metadata_dict: dict, filepath: str) -> None:
         json.dump(metadata_dict, f, indent=4, ensure_ascii=False, sort_keys=False)
 
 
+def string_to_bool(v) -> bool:
+    """Coerces an argument to a boolean"""
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise ValueError(f'Could not coerce argument {v} to a boolean.')
+
+
 if __name__ == "__main__":
     logger.info(f"Root directory: {get_project_root()}")
