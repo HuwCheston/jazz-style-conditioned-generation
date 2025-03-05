@@ -4,6 +4,7 @@
 """Experiment with different tokenizer types and vocab sizes, training for a few epochs with each and measuring loss"""
 
 import os
+from argparse import ArgumentParser
 from copy import deepcopy
 from itertools import product
 from time import time
@@ -16,7 +17,7 @@ from jazz_style_conditioned_generation.training import TrainingModule
 
 TOKENIZER_TYPES = ["structured", "pertok"]
 VOCAB_SIZES = [500, 750, 1000, 2500, 5000, 7500, 10000, 20000]
-TEST_CONFIGS = list(product(TOKENIZER_TYPES, VOCAB_SIZES))
+TEST_CONFIGS = sorted(list(product(TOKENIZER_TYPES, VOCAB_SIZES)), key=lambda x: x[1])
 
 N_EPOCHS_PER_CONFIG = 3
 
@@ -63,6 +64,7 @@ TRAINING_CONFIG = {
 
 
 def init_training_module(tokenizer_type: str, vocab_size: int) -> TrainingModule:
+    """Initialises the training module with the given tokenizer values"""
     cfg = deepcopy(TRAINING_CONFIG)
     cfg["run"] = f"tokenizer_playground_{tokenizer_type}_{vocab_size}"
     cfg["tokenizer_cfg"] = {
@@ -82,17 +84,24 @@ def init_training_module(tokenizer_type: str, vocab_size: int) -> TrainingModule
     return TrainingModule(**cfg)
 
 
-def main():
-    res = []
-    logger.info("----------VOCAB SIZE EXPERIMENT----------")
+def main(tokenizers: list[str], vocabs: list[str], train_model: bool):
+    logger.info("----------TOKENIZER PLAYGROUND----------")
+    # Get the product of all tokenizers and vocab types, sort by vocab type (increasing)
+    test_configs = sorted(list(product(tokenizers, vocabs)), key=lambda x: x[1])
     # Log the total number of experiments
-    total = len(TEST_CONFIGS)
+    total = len(test_configs)
     logger.info(f"----------RUNNING {total} EXPERIMENTS----------")
+    logger.info(f'EXPERIMENT CONFIGS: {test_configs}')
+    # We'll use this to store the results if we're training the model
+    res = []
     # Iterate through all the experiments we want to do
-    for num, (tok_type, vocab_size) in enumerate(TEST_CONFIGS, 1):
+    for num, (tok_type, vocab_size) in enumerate(test_configs, 1):
         logger.info(f"----------EXPERIMENT {num}/{total}: TOK_TYPE {tok_type}, VOCAB_SIZE {vocab_size}------------")
-        # Grab the training module
+        # Grab the training module, this will also train the tokenizer for us
         tm = init_training_module(tok_type, vocab_size)
+        # If we don't want to train the model, we can just skip to the next tokenizer type + vocab size
+        if not train_model:
+            continue
         # Iterate over all the epochs
         for epoch in range(tm.current_epoch, N_EPOCHS_PER_CONFIG):
             start_time = time()
@@ -116,11 +125,39 @@ def main():
                 "validation_loss": validation_loss,
                 "validation_accuracy": validation_accuracy
             })
-    df = pd.DataFrame(res)
-    df.to_csv(os.path.join(utils.get_project_root(), "references/vocab_size_experiment.csv"))
+    # If we've got results from training the models with each tokenizer, dump this to a CSV
+    if len(res) > 1:
+        df = pd.DataFrame(res)
+        df.to_csv(os.path.join(utils.get_project_root(), "references/vocab_size_experiment.csv"))
+    logger.info('Done!')
 
 
 if __name__ == "__main__":
     # For reproducible results!
     utils.seed_everything(utils.SEED)
-    main()
+    # Parsing arguments from the command line interface
+    parser = ArgumentParser(description="Experiment with training different tokenizer types + vocab sizes")
+    parser.add_argument(
+        '-t', '--tokenizers',
+        nargs='+',
+        help='Tokenizer types to use',
+        default=TOKENIZER_TYPES
+    )
+    parser.add_argument(
+        '-v', '--vocab-size',
+        nargs='+',
+        help='Vocab sizes to use',
+        default=VOCAB_SIZES,
+    )
+    parser.add_argument(
+        '-m', '--train-model',
+        type=utils.string_to_bool,
+        nargs='?',
+        const=True,
+        default=False,
+        help="Whether or not to train the model as well as the tokenizer"
+    )
+    # Parse all arguments from the CLI
+    args = vars(parser.parse_args())
+    # Run the experiments with the given values
+    main(args["tokenizers"], args["vocab_size"], args["train_model"])
