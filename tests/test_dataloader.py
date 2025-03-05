@@ -203,7 +203,7 @@ class DataloaderTest(unittest.TestCase):
             tokenizer=token_factory,
             files_paths=[TEST_MIDI],
             do_augmentation=False,
-            max_seq_len=10,
+            max_seq_len=100,
             do_conditioning=True,
             condition_mapping={
                 "pianist": {"Kenny Barron": "PIANIST_KennyBarron"},
@@ -219,8 +219,8 @@ class DataloaderTest(unittest.TestCase):
         self.assertEqual(targets[0], token_factory["GENRES_HardBop"])
         self.assertEqual(targets[1], token_factory["PIANIST_KennyBarron"])
         # Should be the desired length
-        self.assertEqual(len(input_ids), 10)
-        self.assertEqual(len(targets), 10)
+        self.assertEqual(len(input_ids), 100)
+        self.assertEqual(len(targets), 100)
         # Testing the final chunk
         final_item = ds.__getitem__(len(ds) - 1)
         input_ids, targets = final_item["input_ids"].tolist(), final_item["labels"].tolist()
@@ -242,7 +242,7 @@ class DataloaderTest(unittest.TestCase):
             tokenizer=token_factory,
             files_paths=[TEST_MIDI],
             do_augmentation=False,
-            max_seq_len=10,
+            max_seq_len=100,
             do_conditioning=True,
             condition_mapping={
                 "pianist": {"Kenny Barron": "PIANIST_KennyBarron"},
@@ -260,8 +260,8 @@ class DataloaderTest(unittest.TestCase):
         self.assertEqual(targets[1], token_factory["GENRES_HardBop"])
         self.assertEqual(targets[2], token_factory["PIANIST_KennyBarron"])
         # Should be the desired length
-        self.assertEqual(len(input_ids), 10)
-        self.assertEqual(len(targets), 10)
+        self.assertEqual(len(input_ids), 100)
+        self.assertEqual(len(targets), 100)
         # Testing the final chunk
         final_item = ds.__getitem__(len(ds) - 1)
         input_ids, targets = final_item["input_ids"].tolist(), final_item["labels"].tolist()
@@ -324,10 +324,10 @@ class DataloaderTest(unittest.TestCase):
         # These notes should be merged into one
         notelist = [
             Note(pitch=80, duration=5, time=100, velocity=80, ttype="tick"),
-            Note(pitch=80, duration=5, time=110, velocity=90, ttype="tick"),  # velocities will be merged too
+            Note(pitch=80, duration=5, time=105, velocity=90, ttype="tick"),  # velocities will be merged too
         ]
         # Duration should be note1_duration + (note2_onset - note1_onset) + note2_duration
-        expected = [Note(pitch=80, duration=15, time=100, velocity=85, ttype="tick")]
+        expected = [Note(pitch=80, duration=10, time=100, velocity=85, ttype="tick")]
         actual = merge_repeated_notes(notelist)
         self.assertEqual(actual, expected)
         # Even these notes are adjacent, they shouldn't be merged as they are different pitches
@@ -356,7 +356,7 @@ class DataloaderTest(unittest.TestCase):
         init_len = len([i for i in notelist if i.pitch == 75])
         self.assertEqual(8, init_len)
         # Test after processing
-        actual = merge_repeated_notes(notelist)
+        actual = merge_repeated_notes(notelist, overlap_ticks=25)
         actual_len = len([i for i in actual if i.pitch == 75])
         self.assertEqual(7, actual_len)
         self.assertLess(actual_len, init_len)
@@ -409,7 +409,7 @@ class DataloaderTest(unittest.TestCase):
             tokenizer=token_factory,
             files_paths=[TEST_MIDI],
             do_augmentation=False,
-            max_seq_len=10,
+            max_seq_len=100,
             do_conditioning=False
         )
         # First chunk should not have any padding

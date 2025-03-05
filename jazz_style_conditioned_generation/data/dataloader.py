@@ -48,8 +48,8 @@ DATA_DIR = os.path.join(utils.get_project_root(), "data")
 PITCH_AUGMENT_RANGE = range(-3, 4)  # as in Music Transformer
 DURATION_AUGMENT_RANGE = [0.95, 0.975, 1.0, 1.025, 1.05]  # as in Music Transformer
 
-OVERLAP_TICKS = 25  # If two notes with the same pitch have less than this offset-onset time, they will be merged
-MIN_DURATION_TICKS = 10  # We remove notes that have a duration of less than this value
+OVERLAP_TICKS = 7  # If two notes with the same pitch have less than this offset-onset time, they will be merged
+MIN_DURATION_TICKS = 20  # We remove notes that have a duration of less than this value
 
 
 def get_pitch_augmentation_value(score: Score, pitch_augmentation_range: list) -> int:
@@ -163,17 +163,17 @@ def randomly_slice_sequence(
     return sequence[start:end]
 
 
-def remove_short_notes(note_list: list[Note]) -> list[Note]:
+def remove_short_notes(note_list: list[Note], min_duration_ticks: int = MIN_DURATION_TICKS) -> list[Note]:
     """Removes symusic.Note objects with a duration of less than MIN_DURATION_TICKS from a list of Note objects"""
     newnotes = []
     for note in note_list:
         # Notes with a duration this short are transcription errors usually
-        if note.duration >= MIN_DURATION_TICKS:
+        if note.duration >= min_duration_ticks:
             newnotes.append(note)
     return newnotes
 
 
-def merge_repeated_notes(note_list: list[Note]) -> list[Note]:
+def merge_repeated_notes(note_list: list[Note], overlap_ticks: int = OVERLAP_TICKS) -> list[Note]:
     """Merge successive notes at the same pitch with an offset-onset time < OVERLAP_TICKS to a single, long note"""
     newnotes = []
     # Iterate over all MIDI pitches
@@ -202,7 +202,7 @@ def merge_repeated_notes(note_list: list[Note]) -> list[Note]:
                 note2_start = note2.time
                 overlap = note2_start - note1_end
                 # If the overlap between these two notes is short
-                if overlap < OVERLAP_TICKS:
+                if overlap < overlap_ticks:
                     # Combine both notes into a single note
                     newnote = Note(
                         # Just use the onset time of the earliest note
@@ -243,7 +243,11 @@ def note_list_to_score(note_list: list[Note], ticks_per_quarter: int) -> Score:
     return newscore
 
 
-def preprocess_score(score: Score) -> Score:
+def preprocess_score(
+        score: Score,
+        min_duration_ticks: int = MIN_DURATION_TICKS,
+        overlap_ticks: int = OVERLAP_TICKS
+) -> Score:
     """Applies our own preprocessing to a Score object: removes short notes, merges duplicates"""
     # If we somehow have more than one track (occasionally happens in the bushgrafts corpus)
     if len(score.tracks) > 1:
@@ -258,9 +262,9 @@ def preprocess_score(score: Score) -> Score:
     # First, we remove notes that are outside the range of the piano keyboard
     validated_notes = remove_out_of_range_notes(note_list)
     # Then, we remove notes with a very short duration
-    no_short_notes = remove_short_notes(validated_notes)
+    no_short_notes = remove_short_notes(validated_notes, min_duration_ticks=min_duration_ticks)
     # Next, we merge successive notes with the same pitch and a very short onset-offset time into the same pitch
-    merged_notes = merge_repeated_notes(no_short_notes)
+    merged_notes = merge_repeated_notes(no_short_notes, overlap_ticks=overlap_ticks)
     # Finally, we convert everything back to a Score object that can be passed to our tokenizer
     return note_list_to_score(merged_notes, score.ticks_per_quarter)
 
@@ -329,12 +333,18 @@ class DatasetMIDIRandomChunk:
             do_conditioning: bool = True,
             condition_mapping: dict[str, dict] = None,
             n_clips: int = None,
-            chunk_end_overlap: float = 0.5
+            chunk_end_overlap: float = 0.5,
+            min_duration_ticks: int = MIN_DURATION_TICKS,
+            overlap_ticks: int = OVERLAP_TICKS
     ):
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len
         self.do_augmentation = do_augmentation
         self.chunk_end_overlap = chunk_end_overlap
+
+        # For preprocessing
+        self.min_duration_ticks = min_duration_ticks
+        self.overlap_ticks = overlap_ticks
 
         # MIDI file paths
         self.files_paths = files_paths
@@ -386,7 +396,11 @@ class DatasetMIDIRandomChunk:
         except SCORE_LOADING_EXCEPTION:
             return {"input_ids": None, "labels": None}
         # Apply our own preprocessing to the score
-        preprocessed_score = preprocess_score(score)
+        preprocessed_score = preprocess_score(
+            score,
+            min_duration_ticks=self.min_duration_ticks,
+            overlap_ticks=self.overlap_ticks
+        )
         # Perform data augmentation on the score object if required
         if self.do_augmentation:
             preprocessed_score = random_data_augmentation(preprocessed_score)
@@ -443,12 +457,18 @@ class DatasetMIDIExhaustive:
             do_augmentation: bool = False,
             do_conditioning: bool = True,
             condition_mapping: dict[str, dict] = None,
-            n_clips: int = None
+            n_clips: int = None,
+            min_duration_ticks: int = MIN_DURATION_TICKS,
+            overlap_ticks: int = OVERLAP_TICKS
     ):
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len
         if do_augmentation:
             raise NotImplementedError("Data augmentation not implemented for exhaustive MIDI loader")
+
+        # For preprocessing
+        self.min_duration_ticks = min_duration_ticks
+        self.overlap_ticks = overlap_ticks
 
         # Conditioning
         self.do_conditioning = do_conditioning
@@ -496,7 +516,11 @@ class DatasetMIDIExhaustive:
             # Open file as a symusic score object
             score = Score(file)
             # Apply our own preprocessing to the score
-            preprocessed_score = preprocess_score(score)
+            preprocessed_score = preprocess_score(
+                score,
+                min_duration_ticks=self.min_duration_ticks,
+                overlap_ticks=self.overlap_ticks
+            )
             # Convert into chunks
             chunked_file = self.chunker(preprocessed_score)
             # Yield tuples of (filename, chunk_idx)
@@ -512,7 +536,11 @@ class DatasetMIDIExhaustive:
         except SCORE_LOADING_EXCEPTION:
             return {"input_ids": None, "labels": None}
         # Apply our own preprocessing to the score
-        preprocessed_score = preprocess_score(score)
+        preprocessed_score = preprocess_score(
+            score,
+            min_duration_ticks=self.min_duration_ticks,
+            overlap_ticks=self.overlap_ticks
+        )
         # Convert the whole score into chunks
         chunked = self.chunker(preprocessed_score)
         # Get the chunk we desire
