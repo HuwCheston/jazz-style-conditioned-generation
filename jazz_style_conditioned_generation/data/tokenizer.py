@@ -9,6 +9,7 @@ from pathlib import Path
 from random import choice
 from typing import Sequence
 
+import numpy as np
 from loguru import logger
 from miditok import MusicTokenizer, TokSequence, TokenizerConfig
 from miditok.attribute_controls import create_random_ac_indexes
@@ -203,6 +204,20 @@ def get_tokenizer_class_from_string(tokenizer_type: str):
         raise ValueError(f'`tokenizer_type` must be one of {", ".join(valids)} but got {tokenizer_type}')
 
 
+def fix_pertok_microtiming_bug(tokenizer: PerTok) -> None:
+    """Fixes https://github.com/Natooz/MidiTok/issues/227 by setting a missing attribute for the PerTok tokenizer"""
+    if not hasattr(tokenizer, "microtiming_tick_values"):
+        # This just copies the code from miditok.tokenizers.pertok, line 138
+        mt_bins = tokenizer.config.additional_params["num_microtiming_bins"]
+        tokenizer.microtiming_tick_values = np.linspace(
+            -tokenizer.max_mt_shift,
+            tokenizer.max_mt_shift,
+            mt_bins + 1,
+            dtype=np.intc
+        )
+        assert hasattr(tokenizer, "microtiming_tick_values")
+
+
 def load_or_train_tokenizer(
         tokenizer_path: str,
         tokenizer_cfg: dict,
@@ -220,6 +235,10 @@ def load_or_train_tokenizer(
     if os.path.isfile(tokenizer_path):
         tokenizer = get_tokenizer_class_from_string(tokenizer_method)(params=tokenizer_path)
         logger.debug(f'... loading tokenizer from {tokenizer_path}')
+        # Fix a MIDITok bug related to loading a pre-trained PerTok tokenizer
+        if tokenizer_method == "pertok":
+            fix_pertok_microtiming_bug(tokenizer)
+
     # Otherwise, we need to create the tokenizer from scratch
     else:
         logger.debug('... could not find saved tokenizer for this experiment/run, creating it from scratch!')
