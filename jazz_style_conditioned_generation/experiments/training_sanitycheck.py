@@ -3,32 +3,36 @@
 
 """Sanity check simple training that just uses default settings for everything"""
 
+import json
 import os
 import random
 from argparse import ArgumentParser
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 import torch
 from miditok import TokenizerConfig, REMI, MIDILike, TSD, Structured, PerTok
 from miditok.pytorch_data import DatasetMIDI, DataCollator
 from miditok.utils import split_files_for_training
+from torchmetrics.text import Perplexity
 from tqdm import tqdm
 
+from jazz_style_conditioned_generation import metrics
 from jazz_style_conditioned_generation.encoders import MusicTransformer
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 MAX_SEQUENCE_LEN = 1024
 N_FILES = 1000
-N_EPOCHS_PER_VOCAB = 5
+N_EPOCHS_PER_VOCAB = 10
+N_EXAMPLES_TO_GENERATE = 50
 
 # We'll train a model with this vocab size for N_EPOCHS_PER_SETTING epochs
-VOCAB_SIZES = [-1, 500, 1000, 5000, 10000]  # -1 vocab size == no training of tokenizer
+VOCAB_SIZES = [-1, 500, 750, 1000, 2500, 5000, 7500, 10000]  # -1 vocab size == no training of tokenizer
+TOKENIZER_TYPES = ["midilike", "structured", "tsd", "pertok"]
 
 TOKENIZER_CFG = {
     "pitch_range": (21, 109),
-    "beat_res": {(0, 4): 8, (4, 12): 8},
+    "beat_res": {(0, 1): 128},
     "num_velocities": 32,
     "special_tokens": [
         "PAD",  # add for short inputs to ensure consistent sequence length for all inputs
@@ -36,8 +40,8 @@ TOKENIZER_CFG = {
         "EOS",  # end of sequence
         "MASK",  # prevent attention to future tokens
     ],
-    "use_chords": True,
-    "use_rests": True,
+    "use_chords": False,
+    "use_rests": False,
     "use_tempos": False,
     "use_time_signatures": False,
     "use_programs": False,
@@ -83,14 +87,15 @@ def seed_everything(seed: int = 42) -> None:
     np.random.seed(seed)
 
 
-def forwards_pass(batch, model, pad_token_id) -> tuple[torch.tensor, torch.tensor]:
+def forwards_pass(batch, model, pad_token_id) -> tuple[torch.tensor, torch.tensor, torch.tensor]:
     input_ids = batch["input_ids"].to(DEVICE)
     labels = batch["labels"].to(DEVICE)
     labels[labels == -100] = pad_token_id  # data collator seems to somehow replace 0 (pad) with -100 for labels?
     attention_mask = (input_ids == pad_token_id).float().to(DEVICE)  # boolean required for music transformer
     outputs = model(input_ids=input_ids, labels=labels, attention_mask=attention_mask)
+    ppl = Perplexity(ignore_index=pad_token_id).to(DEVICE)
     accuracy = accuracy_score(outputs.logits, labels, pad_token_id)
-    return outputs.loss, accuracy
+    return outputs.loss, accuracy, ppl(outputs.logits, labels)
 
 
 def accuracy_score(logits: torch.tensor, labels: torch.tensor, pad_token_id: int) -> torch.tensor:
@@ -120,12 +125,34 @@ def get_data_files_with_ext(dir_from_root: str = "data/raw", ext: str = "**/*.mi
 
 
 def save_results(res: list[dict], tokeniser_type: str) -> None:
-    df = pd.DataFrame(res)
-    out = os.path.join(get_project_root(), f"training_sanitycheck_results_{tokeniser_type}.csv")
-    df.to_csv(out)
+    out = os.path.join(get_project_root(), "outputs/sanity_check", f"sanitycheck_results_{tokeniser_type}.json")
+    with open(out, "w") as fp:
+        json.dump(res, fp, indent=4, ensure_ascii=False, sort_keys=False)
 
 
-def main(tokeniser_type: str):
+def generate_examples(
+        test_dataloader: torch.utils.data.DataLoader,
+        model: MusicTransformer,
+        primer_len: int = 128,
+        n_generations: int = N_EXAMPLES_TO_GENERATE
+) -> dict:
+    gens = []
+    with tqdm(total=n_generations, desc="Generating...") as pgbar:
+        for example in test_dataloader:
+            for primer in example["input_ids"]:
+                no_pad = [i for i in primer if i != model.tokenizer.pad_token_id and i != -100]
+                primer_trunc = torch.tensor(no_pad[:primer_len])
+                gen = model.generate(primer_trunc, MAX_SEQUENCE_LEN)
+                if len(gens) > n_generations:
+                    break
+                gens.append(gen.detach().to("cpu"))
+                pgbar.update(1)
+            if len(gens) > n_generations:
+                break
+    return gens
+
+
+def main(tokeniser_type: str, vocab_sizes: list[int]):
     # Grab N MIDI files
     midi_paths = get_data_files_with_ext("data/raw", "**/*.mid")[:N_FILES]
 
@@ -136,10 +163,10 @@ def main(tokeniser_type: str):
     midi_paths_test = midi_paths[:num_files_test]
     midi_paths_train = midi_paths[num_files_test:]
     print(f'N {len(midi_paths_train)} train, N {len(midi_paths_test)} test')
-    print(f'Tokenizer configuration: {TOKENIZER_CFG}')
+    print(f'Tokenizer type {tokeniser_type}, configuration: {TOKENIZER_CFG}')
     results = []
 
-    for vocab in VOCAB_SIZES:
+    for vocab in vocab_sizes:
         # Train structured tokenizer using all default settings
         tokcfg = TOKENIZER_CFG if tokeniser_type != "pertok" else TOKENIZER_CFG | PERTOK_CFG
         tokenizer_cfg = TokenizerConfig(**tokcfg)
@@ -147,7 +174,11 @@ def main(tokeniser_type: str):
         # Train tokenizer only when required
         if vocab > tokenizer.vocab_size:
             tokenizer.train(files_paths=midi_paths, vocab_size=vocab)
-        print(f'Using tokenizer: {tokenizer}')
+        # Measure musical statistics from data using tokenizer
+        # mp = metrics.compute_metrics_for_dataset(midi_paths, tokenizer)
+        # for metric_name, metric_val in mp.items():
+        #     print(f'{metric_name}: {metric_val}')
+        # results.append(dict(epoch=-1, tokenizer_type=tokeniser_type, stage="initial", vocab_size=vocab) | mp)
         # Create model: hyperparameters should be mostly identical to original music transformer paper
         model = MusicTransformer(
             tokenizer,
@@ -195,31 +226,54 @@ def main(tokeniser_type: str):
                     model.train()
                 else:
                     model.eval()
-                epoch_loss, epoch_acc = [], []
+                epoch_loss, epoch_acc, epoch_perp = [], [], []
                 for batch in tqdm(dataloader, desc=f"{subset_name.title()}ing, vocab {vocab}, epoch {n_epoch}"):
                     # Backwards pass for training only
                     if subset_name == "train":
-                        loss, accuracy = forwards_pass(batch, model, tokenizer["PAD_None"])
+                        loss, accuracy, perplexity = forwards_pass(batch, model, tokenizer["PAD_None"])
                         optimizer.zero_grad()
                         loss.backward()
                         optimizer.step()
                     # No backwards pass for testing
                     else:
                         with torch.no_grad():
-                            loss, accuracy = forwards_pass(batch, model, tokenizer["PAD_None"])
+                            loss, accuracy, perplexity = forwards_pass(batch, model, tokenizer["PAD_None"])
                     epoch_loss.append(loss.item())
                     epoch_acc.append(accuracy)
+                    epoch_perp.append(perplexity.item())
                 # Log to the console
-                print(f'Stage {subset_name}, vocab {vocab}, epoch {n_epoch} '
-                      f'loss: {np.mean(epoch_loss):.3f}, accuracy: {np.mean(epoch_acc):.3f}')
-                results.append(dict(
+                acc = np.mean(epoch_acc)
+                norm_acc = acc / tokenizer.vocab_size
+                perp = np.mean(epoch_perp)
+                loss = np.mean(epoch_loss)
+                print(f'Stage {subset_name}, vocab {vocab}, epoch {n_epoch}, '
+                      f'loss: {loss:.3f}, accuracy: {acc:.3f}, normalised acc: {norm_acc:.3f}, perplexity: {perp:.3f}')
+                res_dict = dict(
                     epoch=n_epoch,
                     stage=subset_name,
                     vocab_size=vocab,
-                    loss=np.mean(epoch_loss),
-                    accuracy=np.mean(epoch_acc),
+                    loss=loss,
+                    accuracy=acc,
+                    normalised_accuracy=norm_acc,
+                    perplexity=perp,
                     tokeniser_type=tokeniser_type
-                ))
+                )
+
+                # Generating examples
+                if subset_name == "test":
+                    examples = generate_examples(dataloader, model)
+                    # Randomly select one example to dump to MIDI
+                    to_dump = random.choices(examples, k=1)[0]
+                    out_path = os.path.join(
+                        get_project_root(),
+                        "outputs/sanity_check",
+                        f"sanitycheck_{tokeniser_type}_{vocab}_{n_epoch}.mid"
+                    )
+                    tokenizer.decode(to_dump).dump_midi(out_path)
+                    # Compute metrics for all the examples
+                    gen_metrics = metrics.compute_metrics_for_sequences(examples, tokenizer)
+                    res_dict = res_dict | gen_metrics
+                results.append(res_dict)
                 save_results(results, tokeniser_type)
 
 
@@ -227,6 +281,23 @@ if __name__ == "__main__":
     seed_everything()
 
     parser = ArgumentParser(description="Simple training script that allows different tokenisers to be evaluated")
-    parser.add_argument("--tokeniser-type", type=str, default="remi", help="Tokeniser type to use")
+    parser.add_argument(
+        '-t', '--tokenizers',
+        nargs='+',
+        help='Tokenizer types to use',
+        default=TOKENIZER_TYPES,
+        type=str
+    )
+    parser.add_argument(
+        '-v', '--vocab-sizes',
+        nargs='+',
+        help='Vocab sizes to use',
+        default=VOCAB_SIZES,
+        type=str
+    )
     args = vars(parser.parse_args())
-    main(args["tokeniser_type"])
+    tokenizers = args["tokenizers"]
+    vs = args["vocab_sizes"]
+    print(f'Using tokenizers {tokenizers}, vocab_sizes {vs}')
+    for tk in tokenizers:
+        main(tk, vs)
