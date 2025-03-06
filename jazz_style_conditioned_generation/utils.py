@@ -12,7 +12,7 @@ from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
 from time import time, sleep
-from typing import ContextManager
+from typing import ContextManager, Callable
 
 import numpy as np
 import torch
@@ -190,6 +190,13 @@ def synthesize_score(score: Score, out_path: str = None) -> np.ndarray:
     if out_path is not None:
         dump_wav(out_path, audio, sample_rate=44100, use_int16=True)
     return audio
+
+
+def get_original_function(func: Callable) -> Callable:
+    """Traverses a function signature to get the original function when wrapped with multiple decoratoes"""
+    while hasattr(func, "__wrapped__"):
+        func = func.__wrapped__
+    return func
 
 
 if __name__ == "__main__":
