@@ -298,20 +298,15 @@ def get_conditions_for_track(
 def add_condition_tokens_to_sequence(
         sequence: list[int],
         condition_tokens: list[int],
-        bos_token_id: int,
 ) -> tuple[list[int], list[int]]:
-    """Add condition tokens to a sequence, preserving length and beginning-of-sequence token (if present)"""
+    """Add condition tokens to a sequence, preserving length"""
     assert len(condition_tokens) > 0, "Condition token list is empty"
     max_seq_len = len(sequence)
-    # This is the beginning of the whole document: condition tokens should go AFTER the BOS token
-    if sequence[0] == bos_token_id:
-        comb = [sequence[0]] + condition_tokens + sequence[1:]
-    # This is a chunk of the whole document taken from midway: condition tokens should go at the START of the sequence
-    else:
-        comb = condition_tokens + sequence
+    # Condition tokens go before the beginning of the sequence
+    comb = condition_tokens + sequence
     # Chunk everything to the required length and sanity check
     x = comb[:max_seq_len]
-    targets = comb[1:max_seq_len + 1]
+    targets = comb[1: max_seq_len + 1]
     assert len(x) == len(targets) == len(sequence)
     return x, targets
 
@@ -434,7 +429,6 @@ class DatasetMIDIRandomChunk:
                 input_ids, targets = add_condition_tokens_to_sequence(
                     sequence=input_ids,
                     condition_tokens=condition_tokens,
-                    bos_token_id=self.tokenizer["BOS_None"]
                 )
         return {
             "input_ids": torch.tensor(input_ids, dtype=torch.long),
@@ -569,7 +563,6 @@ class DatasetMIDIExhaustive:
                 input_ids, targets = add_condition_tokens_to_sequence(
                     sequence=input_ids,
                     condition_tokens=condition_tokens,
-                    bos_token_id=self.tokenizer["BOS_None"]
                 )
         # Assemble everything into the dictionary format
         return {

@@ -212,12 +212,12 @@ class DataloaderTest(unittest.TestCase):
         )
         item = ds.__getitem__(0)
         input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
-        # Input IDs should start with BOS, followed by the expected conditioning tokens
-        self.assertEqual(input_ids[0], token_factory["BOS_None"])
-        self.assertEqual(input_ids[1], token_factory["GENRES_HardBop"])
-        self.assertEqual(input_ids[2], token_factory["PIANIST_KennyBarron"])
-        self.assertEqual(targets[0], token_factory["GENRES_HardBop"])
-        self.assertEqual(targets[1], token_factory["PIANIST_KennyBarron"])
+        # Input IDs should start with condition tokens, followed by BOS
+        self.assertEqual(input_ids[0], token_factory["GENRES_HardBop"])
+        self.assertEqual(input_ids[1], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(input_ids[2], token_factory["BOS_None"])
+        self.assertEqual(targets[0], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(targets[1], token_factory["BOS_None"])
         # Should be the desired length
         self.assertEqual(len(input_ids), 100)
         self.assertEqual(len(targets), 100)
@@ -252,20 +252,20 @@ class DataloaderTest(unittest.TestCase):
         item = ds.__getitem__(0)
         input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
         # Input IDs should start with BOS, followed by the expected conditioning tokens
-        self.assertEqual(input_ids[0], token_factory["BOS_None"])
-        self.assertEqual(input_ids[1], token_factory["GENRES_Caribbean"])
-        self.assertEqual(input_ids[2], token_factory["GENRES_HardBop"])
-        self.assertEqual(input_ids[3], token_factory["PIANIST_KennyBarron"])
-        self.assertEqual(targets[0], token_factory["GENRES_Caribbean"])
-        self.assertEqual(targets[1], token_factory["GENRES_HardBop"])
-        self.assertEqual(targets[2], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(input_ids[0], token_factory["GENRES_Caribbean"])
+        self.assertEqual(input_ids[1], token_factory["GENRES_HardBop"])
+        self.assertEqual(input_ids[2], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(input_ids[3], token_factory["BOS_None"])
+        self.assertEqual(targets[0], token_factory["GENRES_HardBop"])
+        self.assertEqual(targets[1], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(targets[2], token_factory["BOS_None"])
         # Should be the desired length
         self.assertEqual(len(input_ids), 100)
         self.assertEqual(len(targets), 100)
         # Testing the final chunk
         final_item = ds.__getitem__(len(ds) - 1)
         input_ids, targets = final_item["input_ids"].tolist(), final_item["labels"].tolist()
-        # Should start with the condition tokens now
+        # Should start with the condition tokens
         self.assertEqual(input_ids[0], token_factory["GENRES_Caribbean"])
         self.assertEqual(input_ids[1], token_factory["GENRES_HardBop"])
         self.assertEqual(input_ids[2], token_factory["PIANIST_KennyBarron"])
@@ -374,21 +374,15 @@ class DataloaderTest(unittest.TestCase):
     def test_add_condition_tokens_to_sequence(self):
         dummy = [1, 3, 3, 3, 5, 6]
         condition_tokens = [100, 200, 300]
-        # Treat 1 as BOS token: condition tokens should be added after
-        expected_inputs = [1, 100, 200, 300, 3, 3]
-        expected_targets = [100, 200, 300, 3, 3, 3]
-        actual_inputs, actual_targets = add_condition_tokens_to_sequence(dummy, condition_tokens, bos_token_id=1)
-        self.assertEqual(expected_inputs, actual_inputs)
-        self.assertEqual(expected_targets, actual_targets)
-        # Treat 1000 as BOS token: condition tokens should be added to start of sequence
+        # Condition tokens should be added before the start of the sequence, and it should be truncated to fit
         expected_inputs = [100, 200, 300, 1, 3, 3]
         expected_targets = [200, 300, 1, 3, 3, 3]
-        actual_inputs, actual_targets = add_condition_tokens_to_sequence(dummy, condition_tokens, bos_token_id=1000)
+        actual_inputs, actual_targets = add_condition_tokens_to_sequence(dummy, condition_tokens)
         self.assertEqual(expected_inputs, actual_inputs)
         self.assertEqual(expected_targets, actual_targets)
         # Testing with adding no condition tokens
         condition_tokens = []
-        self.assertRaises(AssertionError, add_condition_tokens_to_sequence, dummy, condition_tokens, 1)
+        self.assertRaises(AssertionError, add_condition_tokens_to_sequence, dummy, condition_tokens)
 
     def test_attention_mask(self):
         # Testing with padding at end
