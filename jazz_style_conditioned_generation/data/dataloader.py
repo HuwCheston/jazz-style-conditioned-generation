@@ -48,7 +48,7 @@ DATA_DIR = os.path.join(utils.get_project_root(), "data")
 PITCH_AUGMENT_RANGE = range(-3, 4)  # as in Music Transformer
 DURATION_AUGMENT_RANGE = [0.95, 0.975, 1.0, 1.025, 1.05]  # as in Music Transformer
 
-OVERLAP_TICKS = 7  # If two notes with the same pitch have less than this offset-onset time, they will be merged
+OVERLAP_TICKS = 3  # If two notes with the same pitch have less than this offset-onset time, they will be merged
 MIN_DURATION_TICKS = 20  # We remove notes that have a duration of less than this value
 
 
