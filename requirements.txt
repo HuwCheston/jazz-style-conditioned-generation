@@ -22,3 +22,5 @@ dotenv
 pydantic
 lxml
 pretty-midi
+torchmetrics
+muspy
