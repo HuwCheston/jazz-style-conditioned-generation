@@ -15,7 +15,7 @@ from symusic import Score
 from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
-from jazz_style_conditioned_generation.data.augmentation import random_data_augmentation
+from jazz_style_conditioned_generation.data.augmentation import data_augmentation
 from jazz_style_conditioned_generation.data.conditions import (
     validate_conditions,
     get_condition_special_tokens,
@@ -190,7 +190,7 @@ class DatasetMIDIRandomChunk:
         )
         # Perform data augmentation on the score object if required
         if self.do_augmentation:
-            preprocessed_score = random_data_augmentation(preprocessed_score)
+            preprocessed_score = data_augmentation(preprocessed_score)
         # Now we can do the MIDItok preprocessing
         before_tokenize = preprocess_score(preprocessed_score)
         # Tokenize it

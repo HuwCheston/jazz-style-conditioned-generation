@@ -20,7 +20,7 @@ from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.augmentation import (
-    deterministic_data_augmentation,
+    _data_augmentation_deterministic,
     PITCH_AUGMENT_RANGE,
     DURATION_AUGMENT_RANGE
 )
@@ -100,7 +100,7 @@ class TokTrainingIteratorAugmentation(TokTrainingIterator):
         # Apply our own preprocessing to the score
         score = preprocess_score(score)
         # Apply the desired augmentations to the score
-        score = deterministic_data_augmentation(score, pitch_aug, dur_aug)
+        score = _data_augmentation_deterministic(score, pitch_aug, dur_aug)
 
         # Everything below is copied from MIDITok.tokenizer_training_iterator.TokTrainingIterator
         # Preprocess first to already have the appropriate tracks idx in case of deletes

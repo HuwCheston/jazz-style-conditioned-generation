@@ -29,7 +29,7 @@ def get_pitch_augmentation_value(score: Score, pitch_augmentation_range: list) -
     return pitch_augment
 
 
-def deterministic_data_augmentation(
+def _data_augmentation_deterministic(
         score: Score,
         pitch_augment_value: int,
         duration_augment_value: float
@@ -49,7 +49,7 @@ def deterministic_data_augmentation(
     )
 
 
-def random_data_augmentation(
+def data_augmentation(
         score: Score,
         pitch_augmentation_range: list = None,
         duration_augmentation_range: list = None
@@ -64,4 +64,4 @@ def random_data_augmentation(
     pitch_augment = get_pitch_augmentation_value(score, pitch_augmentation_range)
     duration_augment = np.random.choice(duration_augmentation_range)
     # Apply data augmentation with the randomly selected values
-    return deterministic_data_augmentation(score, pitch_augment, duration_augment)
+    return _data_augmentation_deterministic(score, pitch_augment, duration_augment)

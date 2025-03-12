@@ -12,8 +12,8 @@ from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.augmentation import (
     get_pitch_augmentation_value,
     PITCH_AUGMENT_RANGE,
-    random_data_augmentation,
-    deterministic_data_augmentation
+    data_augmentation,
+    _data_augmentation_deterministic
 )
 from jazz_style_conditioned_generation.data.scores import load_score, note_list_to_score
 
@@ -41,26 +41,26 @@ class AugmentationTest(unittest.TestCase):
         score = load_score(TEST_MIDI)
         prev_min_pitch, prev_max_pitch = 34, 98
         # Test with transposition up one semitone
-        augmented = random_data_augmentation(
+        augmented = data_augmentation(
             score, pitch_augmentation_range=[1], duration_augmentation_range=[1.]
         )
         new_min_pitch, new_max_pitch = utils.get_pitch_range(augmented)
         self.assertEqual(new_min_pitch, prev_min_pitch + 1)
         self.assertEqual(new_max_pitch, prev_max_pitch + 1)
         # Test with transposition down two semitones
-        augmented = random_data_augmentation(
+        augmented = data_augmentation(
             score, pitch_augmentation_range=[-2], duration_augmentation_range=[1.]
         )
         new_min_pitch, new_max_pitch = utils.get_pitch_range(augmented)
         self.assertEqual(new_min_pitch, prev_min_pitch - 2)
         self.assertEqual(new_max_pitch, prev_max_pitch - 2)
         # Test with shortening duration
-        augmented = random_data_augmentation(
+        augmented = data_augmentation(
             score, pitch_augmentation_range=[0], duration_augmentation_range=[0.9]
         )
         self.assertLess(augmented.end(), score.end())
         # Test with increasing duration
-        augmented = random_data_augmentation(
+        augmented = data_augmentation(
             score, pitch_augmentation_range=[0], duration_augmentation_range=[1.1]
         )
         self.assertGreater(augmented.end(), score.end())
@@ -71,7 +71,7 @@ class AugmentationTest(unittest.TestCase):
             Note(pitch=50, duration=10, time=1000, velocity=50, ttype="tick")
         ]
         sc = note_list_to_score(notes, 100)
-        augment = deterministic_data_augmentation(sc, 5, 1.0)
+        augment = _data_augmentation_deterministic(sc, 5, 1.0)
         expected_pitch = 55
         actual_pitch = augment.tracks[0].notes[0].pitch
         self.assertEqual(expected_pitch, actual_pitch)
@@ -81,7 +81,7 @@ class AugmentationTest(unittest.TestCase):
             Note(pitch=40, duration=10, time=1000, velocity=50, ttype="tick")
         ]
         sc = note_list_to_score(notes, 100)
-        augment = deterministic_data_augmentation(sc, -3, 0.9)
+        augment = _data_augmentation_deterministic(sc, -3, 0.9)
         expected_pitch = [47, 37]
         actual_pitch = [n.pitch for n in augment.tracks[0].notes]
         self.assertEqual(expected_pitch, actual_pitch)
@@ -90,7 +90,7 @@ class AugmentationTest(unittest.TestCase):
             Note(pitch=50, duration=100, time=1000, velocity=50, ttype="tick")
         ]
         sc = note_list_to_score(notes, 100)
-        augment = deterministic_data_augmentation(sc, 0, 0.5)
+        augment = _data_augmentation_deterministic(sc, 0, 0.5)
         expected_duration = 50
         actual_duration = augment.tracks[0].notes[0].duration
         self.assertEqual(expected_duration, actual_duration)
