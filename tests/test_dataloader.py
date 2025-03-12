@@ -11,7 +11,11 @@ from miditok import MIDILike
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.dataloader import *
-from jazz_style_conditioned_generation.data.tokenizer import add_tempos_to_vocab, add_timesignatures_to_vocab
+from jazz_style_conditioned_generation.data.tokenizer import (
+    add_conditions_to_vocab,
+    add_tempos_to_vocab,
+    add_timesignatures_to_vocab
+)
 
 TEST_RESOURCES = os.path.join(utils.get_project_root(), "tests/test_resources")
 TEST_MIDI = os.path.join(TEST_RESOURCES, "test_midi1/piano_midi.mid")
@@ -108,9 +112,11 @@ class DataloaderTest(unittest.TestCase):
 
     def test_dataset_random_chunk_with_conditioning(self):
         token_factory = deepcopy(TOKENIZER)
-        # Add only a few condition tokens in
-        token_factory.add_to_vocab("PIANIST_KennyBarron")
-        token_factory.add_to_vocab("GENRES_HardBop")
+        condition_mapping = {
+            "pianist": {"Kenny Barron": "PIANIST_KennyBarron"},
+            "genres": {"Hard Bop": "GENRES_HardBop"},
+        }
+        add_conditions_to_vocab(token_factory, condition_mapping)
         # Add some tempo and time signature tokens in too
         add_tempos_to_vocab(token_factory, (80, 300), 32)
         add_timesignatures_to_vocab(token_factory, [3, 4])
@@ -122,10 +128,7 @@ class DataloaderTest(unittest.TestCase):
             max_seq_len=10,
             do_conditioning=True,
             chunk_end_overlap=0.,
-            condition_mapping={
-                "pianist": {"Kenny Barron": "PIANIST_KennyBarron"},
-                "genres": {"Hard Bop": "GENRES_HardBop"},
-            }
+            condition_mapping=condition_mapping
         )
         self.assertEqual(len(ds), 1)
         item = ds.__getitem__(0)
@@ -179,8 +182,11 @@ class DataloaderTest(unittest.TestCase):
     def test_dataset_exhaustive_with_conditioning(self):
         token_factory = deepcopy(TOKENIZER)
         # Add only a few condition tokens in
-        token_factory.add_to_vocab("PIANIST_KennyBarron")
-        token_factory.add_to_vocab("GENRES_HardBop")
+        condition_mapping = {
+            "pianist": {"Kenny Barron": "PIANIST_KennyBarron"},
+            "genres": {"Hard Bop": "GENRES_HardBop"},
+        }
+        add_conditions_to_vocab(token_factory, condition_mapping)
         # Add some tempo and time signature tokens in too
         add_tempos_to_vocab(token_factory, (80, 300), 32)
         add_timesignatures_to_vocab(token_factory, [3, 4])
@@ -191,10 +197,7 @@ class DataloaderTest(unittest.TestCase):
             do_augmentation=False,
             max_seq_len=100,
             do_conditioning=True,
-            condition_mapping={
-                "pianist": {"Kenny Barron": "PIANIST_KennyBarron"},
-                "genres": {"Hard Bop": "GENRES_HardBop"},
-            }
+            condition_mapping=condition_mapping
         )
         item = ds.__getitem__(0)
         input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
@@ -220,10 +223,12 @@ class DataloaderTest(unittest.TestCase):
 
     def test_dataset_with_conditioning_merges(self):
         token_factory = deepcopy(TOKENIZER)
+        condition_mapping = {
+            "pianist": {"Kenny Barron": "PIANIST_KennyBarron"},
+            "genres": {"Caribbean": "GENRES_Caribbean", "Hard Bop": "GENRES_HardBop"},
+        }
+        add_conditions_to_vocab(token_factory, condition_mapping)
         # This track has the tag "Calypso". We are expecting this to be merged with the tag "GENRES_Caribbean"
-        token_factory.add_to_vocab("PIANIST_KennyBarron")
-        token_factory.add_to_vocab("GENRES_HardBop")
-        token_factory.add_to_vocab("GENRES_Caribbean")
         # Add some tempo and time signature tokens in too
         add_tempos_to_vocab(token_factory, (80, 300), 32)
         add_timesignatures_to_vocab(token_factory, [3, 4])
@@ -234,10 +239,7 @@ class DataloaderTest(unittest.TestCase):
             do_augmentation=False,
             max_seq_len=100,
             do_conditioning=True,
-            condition_mapping={
-                "pianist": {"Kenny Barron": "PIANIST_KennyBarron"},
-                "genres": {"Caribbean": "GENRES_Caribbean", "Hard Bop": "GENRES_HardBop"},
-            }
+            condition_mapping=condition_mapping
         )
         item = ds.__getitem__(0)
         input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()

@@ -10,6 +10,9 @@ from miditok import REMI, TSD, Structured, PerTok, MIDILike, TokenizerConfig
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.tokenizer import (
+    add_tempos_to_vocab,
+    add_timesignatures_to_vocab,
+    add_conditions_to_vocab,
     get_tokenizer_class_from_string,
     TokTrainingIteratorAugmentation,
     load_or_train_tokenizer,
@@ -70,6 +73,39 @@ class TokenizerTest(unittest.TestCase):
         self.assertTrue(len(noteon_toks) == utils.PIANO_KEYS)
         noteoff_toks = [i for i in tok.vocab.keys() if "NoteOff" in i]
         self.assertTrue(len(noteoff_toks) == utils.PIANO_KEYS)
+
+    def test_add_tempos(self):
+        tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
+        prev_vocab = tok.vocab_size
+        # Adding eleven tempo tokens -- [100, 110, 120, ..., 200]
+        add_tempos_to_vocab(tok, (100, 200), 11)
+        expected_vocab = prev_vocab + 11
+        self.assertEqual(tok.vocab_size, expected_vocab)
+        self.assertTrue("TEMPOCUSTOM_100" in tok.vocab.keys())
+        self.assertTrue("TEMPOCUSTOM_150" in tok.vocab.keys())
+        self.assertTrue("TEMPOCUSTOM_200" in tok.vocab.keys())
+
+    def test_add_timesignatures(self):
+        tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
+        prev_vocab = tok.vocab_size
+        # Adding three time signature tokens
+        add_timesignatures_to_vocab(tok, [3, 4, 5])
+        expected_vocab = prev_vocab + 3
+        self.assertEqual(tok.vocab_size, expected_vocab)
+        self.assertTrue("TIMESIGNATURECUSTOM_34" in tok.vocab.keys())
+        self.assertTrue("TIMESIGNATURECUSTOM_44" in tok.vocab.keys())
+        self.assertTrue("TIMESIGNATURECUSTOM_54" in tok.vocab.keys())
+
+    def test_add_conditions(self):
+        tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
+        prev_vocab = tok.vocab_size
+        # Adding in one genre and one pianist condition token
+        mapping = {"genres": {"African Jazz": "GENRES_AfricanJazz"}, "pianist": {"Billy Bob": "PIANIST_BillyBob"}}
+        add_conditions_to_vocab(tok, mapping)
+        expected_vocab = prev_vocab + 2
+        self.assertEqual(tok.vocab_size, expected_vocab)
+        self.assertTrue("GENRES_AfricanJazz" in tok.vocab.keys())
+        self.assertTrue("PIANIST_BillyBob" in tok.vocab.keys())
 
 
 if __name__ == '__main__':
