@@ -27,11 +27,13 @@ N_EPOCHS_PER_VOCAB = 10
 N_EXAMPLES_TO_GENERATE = 50
 
 # We'll train a model with this vocab size for N_EPOCHS_PER_SETTING epochs
+SKIP_VOCAB, SKIP_TOKENIZER = [], []
 VOCAB_SIZES = [-1, 500, 750, 1000, 2500, 5000, 7500, 10000]  # -1 vocab size == no training of tokenizer
 TOKENIZER_TYPES = ["midilike", "structured", "tsd", "pertok"]
 
 TOKENIZER_CFG = {
     "pitch_range": (21, 109),
+    # TODO:for safety, this should probably be {(0, 4): 32}
     "beat_res": {(0, 1): 128},
     "num_velocities": 32,
     "special_tokens": [
@@ -124,8 +126,9 @@ def get_data_files_with_ext(dir_from_root: str = "data/raw", ext: str = "**/*.mi
     return [p for p in Path(os.path.join(get_project_root(), dir_from_root)).glob(ext)]
 
 
-def save_results(res: list[dict], tokeniser_type: str) -> None:
-    out = os.path.join(get_project_root(), "outputs/sanity_check", f"sanitycheck_results_{tokeniser_type}.json")
+def save_results(res: list[dict], tokeniser_type: str, vocab_size: str) -> None:
+    out = os.path.join(get_project_root(), "outputs/sanity_check",
+                       f"sanitycheck_results_{tokeniser_type}_{vocab_size}.json")
     with open(out, "w") as fp:
         json.dump(res, fp, indent=4, ensure_ascii=False, sort_keys=False)
 
@@ -154,12 +157,12 @@ def generate_examples(
 
 def main(tokeniser_type: str, vocab_sizes: list[int]):
     # Grab N MIDI files
-    midi_paths = get_data_files_with_ext("data/raw", "**/*.mid")[:N_FILES]
+    midi_paths = sorted(get_data_files_with_ext("data/raw", "**/*.mid"))[:N_FILES]
 
     # Create dummy data splits
     total_num_files = len(midi_paths)
     num_files_test = round(total_num_files * 0.2)  # 80-20 train-test split
-    random.shuffle(midi_paths)
+    # random.shuffle(midi_paths)
     midi_paths_test = midi_paths[:num_files_test]
     midi_paths_train = midi_paths[num_files_test:]
     print(f'N {len(midi_paths_train)} train, N {len(midi_paths_test)} test')
@@ -167,6 +170,9 @@ def main(tokeniser_type: str, vocab_sizes: list[int]):
     results = []
 
     for vocab in vocab_sizes:
+        if vocab in SKIP_VOCAB and tokeniser_type in SKIP_TOKENIZER:
+            continue
+
         # Train structured tokenizer using all default settings
         tokcfg = TOKENIZER_CFG if tokeniser_type != "pertok" else TOKENIZER_CFG | PERTOK_CFG
         tokenizer_cfg = TokenizerConfig(**tokcfg)
@@ -175,10 +181,10 @@ def main(tokeniser_type: str, vocab_sizes: list[int]):
         if vocab > tokenizer.vocab_size:
             tokenizer.train(files_paths=midi_paths, vocab_size=vocab)
         # Measure musical statistics from data using tokenizer
-        # mp = metrics.compute_metrics_for_dataset(midi_paths, tokenizer)
-        # for metric_name, metric_val in mp.items():
-        #     print(f'{metric_name}: {metric_val}')
-        # results.append(dict(epoch=-1, tokenizer_type=tokeniser_type, stage="initial", vocab_size=vocab) | mp)
+        mp = metrics.compute_metrics_for_dataset(midi_paths, tokenizer)
+        for metric_name, metric_val in mp.items():
+            print(f'{metric_name}: {metric_val}')
+        results.append(dict(epoch=-1, tokenizer_type=tokeniser_type, stage="initial", vocab_size=vocab) | mp)
         # Create model: hyperparameters should be mostly identical to original music transformer paper
         model = MusicTransformer(
             tokenizer,
@@ -214,7 +220,7 @@ def main(tokeniser_type: str, vocab_sizes: list[int]):
                         tokenizer=tokenizer,
                         max_seq_len=MAX_SEQUENCE_LEN
                     ),
-                    batch_size=20,
+                    batch_size=5,
                     collate_fn=DataCollator(
                         pad_token_id=tokenizer.pad_token_id,
                         copy_inputs_as_labels=True,
@@ -274,7 +280,7 @@ def main(tokeniser_type: str, vocab_sizes: list[int]):
                     gen_metrics = metrics.compute_metrics_for_sequences(examples, tokenizer)
                     res_dict = res_dict | gen_metrics
                 results.append(res_dict)
-                save_results(results, tokeniser_type)
+                save_results(results, tokeniser_type, vocab)
 
 
 if __name__ == "__main__":
@@ -293,7 +299,7 @@ if __name__ == "__main__":
         nargs='+',
         help='Vocab sizes to use',
         default=VOCAB_SIZES,
-        type=str
+        type=int
     )
     args = vars(parser.parse_args())
     tokenizers = args["tokenizers"]
