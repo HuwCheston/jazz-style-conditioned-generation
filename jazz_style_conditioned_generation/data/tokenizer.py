@@ -24,10 +24,7 @@ from jazz_style_conditioned_generation.data.augmentation import (
     PITCH_AUGMENT_RANGE,
     DURATION_AUGMENT_RANGE
 )
-from jazz_style_conditioned_generation.data.dataloader import (
-    preprocess_score,
-    load_score
-)
+from jazz_style_conditioned_generation.data.scores import load_score, preprocess_score
 
 DEFAULT_TOKENIZER_CONFIG = {
     "pitch_range": (utils.MIDI_OFFSET, utils.MIDI_OFFSET + utils.PIANO_KEYS),

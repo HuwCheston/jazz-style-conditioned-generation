@@ -14,7 +14,7 @@ from symusic import Note
 
 from jazz_style_conditioned_generation import metrics
 from jazz_style_conditioned_generation import utils
-from jazz_style_conditioned_generation.data.dataloader import note_list_to_score
+from jazz_style_conditioned_generation.data.scores import note_list_to_score
 
 
 class MetricsTest(unittest.TestCase):

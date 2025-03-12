@@ -9,7 +9,7 @@ import torch
 from loguru import logger
 
 from jazz_style_conditioned_generation import utils
-from jazz_style_conditioned_generation.data.dataloader import load_score, preprocess_score
+from jazz_style_conditioned_generation.data.scores import load_score, preprocess_score
 from jazz_style_conditioned_generation.training import TrainingModule, parse_config_yaml
 
 OUTPUT_DIR = os.path.join(utils.get_project_root(), "outputs/generation")

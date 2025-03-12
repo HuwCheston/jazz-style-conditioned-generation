@@ -15,7 +15,7 @@ from jazz_style_conditioned_generation.data.augmentation import (
     random_data_augmentation,
     deterministic_data_augmentation
 )
-from jazz_style_conditioned_generation.data.dataloader import load_score, note_list_to_score
+from jazz_style_conditioned_generation.data.scores import load_score, note_list_to_score
 
 TEST_RESOURCES = os.path.join(utils.get_project_root(), "tests/test_resources")
 TEST_MIDI = os.path.join(TEST_RESOURCES, "test_midi1/piano_midi.mid")
