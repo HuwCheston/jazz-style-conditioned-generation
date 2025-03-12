@@ -54,6 +54,16 @@ class AugmentationTest(unittest.TestCase):
         new_min_pitch, new_max_pitch = utils.get_pitch_range(augmented)
         self.assertEqual(new_min_pitch, prev_min_pitch - 2)
         self.assertEqual(new_max_pitch, prev_max_pitch - 2)
+        # Test with shortening duration
+        augmented = random_data_augmentation(
+            score, pitch_augmentation_range=[0], duration_augmentation_range=[0.9]
+        )
+        self.assertLess(augmented.end(), score.end())
+        # Test with increasing duration
+        augmented = random_data_augmentation(
+            score, pitch_augmentation_range=[0], duration_augmentation_range=[1.1]
+        )
+        self.assertGreater(augmented.end(), score.end())
 
     def test_deterministic_augmentation(self):
         # Test pitch augmentation: up five semitones
