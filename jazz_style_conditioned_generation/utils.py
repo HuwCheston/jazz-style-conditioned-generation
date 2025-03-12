@@ -138,7 +138,7 @@ def add_to_tensor_at_idx(input_tensor: torch.tensor, insert_tensor: torch.tensor
 
 def now() -> str:
     """Returns the current time, formatted nicely"""
-    return datetime.now().strftime('%y_%m_%d_%H:%M:%S')
+    return datetime.now().strftime('%y_%m_%d_%H_%M_%S')
 
 
 def random_probability() -> float:
