@@ -20,6 +20,8 @@ from jazz_style_conditioned_generation.data.conditions import (
     validate_conditions,
     get_condition_special_tokens,
     get_conditions_for_track,
+    get_tempo_token,
+    get_time_signature_token,
     add_condition_tokens_to_sequence
 )
 from jazz_style_conditioned_generation.data.scores import (
@@ -178,7 +180,9 @@ class DatasetMIDIRandomChunk:
         preprocessed_score = preprocess_score(score)
         # Perform data augmentation on the score object if required
         if self.do_augmentation:
-            preprocessed_score = data_augmentation(preprocessed_score)
+            preprocessed_score, tempo_scale = data_augmentation(preprocessed_score)
+        else:
+            tempo_scale = 1.
         # Now we can do the MIDItok preprocessing
         before_tokenize = preprocess_score(preprocessed_score)
         # Tokenize it
@@ -198,15 +202,32 @@ class DatasetMIDIRandomChunk:
         if self.do_conditioning:
             # Read the metadata JSON file (with a large cache to prevent redundant reads)
             metadata_read = utils.read_json_cached(self.metadata_paths[idx])
-            # Grab the condition tokens for this track
-            condition_tokens = get_conditions_for_track(self.condition_mapping, metadata_read, self.tokenizer)
+            # Grab the condition tokens for this track (genre, pianist)
+            extra_tokens = get_conditions_for_track(self.condition_mapping, metadata_read, self.tokenizer)
+            if "tempo" in metadata_read.keys():
+                tempo = metadata_read["tempo"] * tempo_scale  # accounts for data augmentation
+                extra_tokens.append(get_tempo_token(tempo, self.tokenizer))
+            if "time_signature" in metadata_read.keys():
+                extra_tokens.append(get_time_signature_token(metadata_read["time_signature"], self.tokenizer))
+            # By sorting the list, we get tokens in the order GENRE, PIANIST, TEMPO, TIME SIGNATURE
+            #  In other words, we start with the least specific and progress to the most specific
+            extra_tokens.sort()
+            # Convert the extra tokens into token indices
+            extra_token_idxs = [self.tokenizer[et] for et in extra_tokens]
             # If we actually have condition tokens
-            if len(condition_tokens) > 0:
+            if len(extra_token_idxs) > 0:
                 # Add them to the sequence, preserving the target length and the BOS token (if this is present)
                 input_ids, targets = add_condition_tokens_to_sequence(
                     sequence=input_ids,
-                    condition_tokens=condition_tokens,
+                    condition_tokens=extra_token_idxs,
                 )
+                # Sanity checking
+                assert len(input_ids) == self.max_seq_len
+                assert len(targets) == self.max_seq_len
+                # NB: to "see" the raw tokens from input_ids (i.e., removing any BPE), we can do the following
+                # tokens = self.tokenizer._convert_sequence_to_tokseq(torch.tensor([input_ids]))
+                # self.tokenizer._preprocess_tokseq_before_decoding(tokens[0])
+                # print(tokens[0].tokens)
         return {
             "input_ids": torch.tensor(input_ids, dtype=torch.long),
             "labels": torch.tensor(targets, dtype=torch.long),
@@ -316,17 +337,20 @@ class DatasetMIDIExhaustive:
         input_ids = desired_chunk[:-1]
         assert len(targets) == len(input_ids) == self.max_seq_len
         # Add the conditioning tokens in to the start of the sequence, if required
+        # TODO: fix this (should be its own function)
         if self.do_conditioning:
             # Read the metadata JSON file (with a large cache to prevent redundant reads)
             metadata_read = utils.read_json_cached(self.metadata_paths[idx])
-            # Grab the condition tokens for this track
+            # Grab the condition tokens for this track (genre, pianist)
             condition_tokens = get_conditions_for_track(self.condition_mapping, metadata_read, self.tokenizer)
+            # Convert the extra tokens into token indices
+            extra_token_idxs = [self.tokenizer[et] for et in condition_tokens]
             # If we actually have condition tokens
-            if len(condition_tokens) > 0:
+            if len(extra_token_idxs) > 0:
                 # Add them to the sequence, preserving the target length and the BOS token (if this is present)
                 input_ids, targets = add_condition_tokens_to_sequence(
                     sequence=input_ids,
-                    condition_tokens=condition_tokens,
+                    condition_tokens=extra_token_idxs,
                 )
         # Assemble everything into the dictionary format
         return {
@@ -347,24 +371,30 @@ class DatasetMIDIExhaustive:
 
 
 if __name__ == "__main__":
-    from miditok import REMI
+    from miditok import MIDILike, TokenizerConfig
+    from jazz_style_conditioned_generation.data.tokenizer import (
+        DEFAULT_TOKENIZER_CONFIG,
+        add_conditions_to_vocab,
+        add_tempos_to_vocab,
+        add_timesignatures_to_vocab
+    )
 
     # Get a tokenizer with default arguments
-    token_factory = REMI()
+    token_factory = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
     # Get filepaths for all MIDI files in the /data/raw/ directories
     midi_paths = utils.get_data_files_with_ext(ext="**/*.mid")[:100]
-
-    # Create condition mapping
+    # Add all of our condition tokens to the tokenizer
     cmap = {c: get_condition_special_tokens(c) for c in ["genres", "pianist"]}
-    for mapping in cmap.values():
-        for token in mapping.values():
-            token_factory.add_to_vocab(token)
-
+    add_conditions_to_vocab(token_factory, cmap)
+    add_tempos_to_vocab(token_factory, (80, 300), 32)
+    add_timesignatures_to_vocab(token_factory, [3, 4])
+    # Train the tokenizer with BPE
+    token_factory.train(vocab_size=1000, model="BPE", files_paths=midi_paths)
     # Test out our random chunking dataloader
     dm = DatasetMIDIRandomChunk(
         token_factory,
         midi_paths,
-        max_seq_len=100,
+        max_seq_len=2048,
         do_augmentation=True,
         do_conditioning=True,
         condition_mapping=cmap

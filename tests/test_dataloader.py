@@ -11,6 +11,7 @@ from miditok import MIDILike
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.dataloader import *
+from jazz_style_conditioned_generation.data.tokenizer import add_tempos_to_vocab, add_timesignatures_to_vocab
 
 TEST_RESOURCES = os.path.join(utils.get_project_root(), "tests/test_resources")
 TEST_MIDI = os.path.join(TEST_RESOURCES, "test_midi1/piano_midi.mid")
@@ -107,11 +108,16 @@ class DataloaderTest(unittest.TestCase):
 
     def test_dataset_random_chunk_with_conditioning(self):
         token_factory = deepcopy(TOKENIZER)
+        # Add only a few condition tokens in
         token_factory.add_to_vocab("PIANIST_KennyBarron")
         token_factory.add_to_vocab("GENRES_HardBop")
+        # Add some tempo and time signature tokens in too
+        add_tempos_to_vocab(token_factory, (80, 300), 32)
+        add_timesignatures_to_vocab(token_factory, [3, 4])
+        # Create the dataset
         ds = DatasetMIDIRandomChunk(
             tokenizer=token_factory,
-            files_paths=[TEST_MIDI],
+            files_paths=[TEST_MIDI],  # this track has a bpm of 297-ish and a time signature of 4/4
             do_augmentation=False,
             max_seq_len=10,
             do_conditioning=True,
@@ -125,9 +131,15 @@ class DataloaderTest(unittest.TestCase):
         item = ds.__getitem__(0)
         input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
         # Input IDs should start with the expected conditioning tokens
+        #  IDs are sorted in order of GENRE -> PIANIST -> TEMPO -> TIMESIG
         self.assertEqual(input_ids[0], token_factory["GENRES_HardBop"])
         self.assertEqual(input_ids[1], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(input_ids[2], token_factory["TEMPOCUSTOM_300"])  # closest match to our provided tempo
+        self.assertEqual(input_ids[3], token_factory["TIMESIGNATURECUSTOM_44"])
+        # Targets are just the inputs shifted by one
         self.assertEqual(targets[0], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(targets[1], token_factory["TEMPOCUSTOM_300"])
+        self.assertEqual(targets[2], token_factory["TIMESIGNATURECUSTOM_44"])
         # Should be the desired length
         self.assertEqual(len(input_ids), 10)
         self.assertEqual(len(targets), 10)
@@ -166,8 +178,13 @@ class DataloaderTest(unittest.TestCase):
 
     def test_dataset_exhaustive_with_conditioning(self):
         token_factory = deepcopy(TOKENIZER)
+        # Add only a few condition tokens in
         token_factory.add_to_vocab("PIANIST_KennyBarron")
         token_factory.add_to_vocab("GENRES_HardBop")
+        # Add some tempo and time signature tokens in too
+        add_tempos_to_vocab(token_factory, (80, 300), 32)
+        add_timesignatures_to_vocab(token_factory, [3, 4])
+        # Create the dataset
         ds = DatasetMIDIExhaustive(
             tokenizer=token_factory,
             files_paths=[TEST_MIDI],
@@ -207,6 +224,10 @@ class DataloaderTest(unittest.TestCase):
         token_factory.add_to_vocab("PIANIST_KennyBarron")
         token_factory.add_to_vocab("GENRES_HardBop")
         token_factory.add_to_vocab("GENRES_Caribbean")
+        # Add some tempo and time signature tokens in too
+        add_tempos_to_vocab(token_factory, (80, 300), 32)
+        add_timesignatures_to_vocab(token_factory, [3, 4])
+        # Create the dataset
         ds = DatasetMIDIExhaustive(
             tokenizer=token_factory,
             files_paths=[TEST_MIDI],
