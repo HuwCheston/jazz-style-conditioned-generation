@@ -6,14 +6,15 @@
 import os
 import unittest
 
-from miditok import REMI, TSD, Structured, PerTok, MIDILike
+from miditok import REMI, TSD, Structured, PerTok, MIDILike, TokenizerConfig
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.tokenizer import (
     get_tokenizer_class_from_string,
     TokTrainingIteratorAugmentation,
     load_or_train_tokenizer,
-    DEFAULT_TOKENIZER_CLASS
+    DEFAULT_TOKENIZER_CLASS,
+    DEFAULT_TOKENIZER_CONFIG
 )
 
 
@@ -58,6 +59,17 @@ class TokenizerTest(unittest.TestCase):
         # We should dump the tokenizer to a json
         self.assertTrue(os.path.isfile("tmp.json"))
         os.remove("tmp.json")
+
+    def test_default_tokenizer_config(self):
+        tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
+        # Expecting exactly 100 evenly-spaced timeshift tokens
+        tshift_toks = [i for i in tok.vocab.keys() if "TimeShift" in i]
+        self.assertTrue(len(tshift_toks) == 100)
+        # Expecting 88 note-on/note-off tokens
+        noteon_toks = [i for i in tok.vocab.keys() if "NoteOn" in i]
+        self.assertTrue(len(noteon_toks) == utils.PIANO_KEYS)
+        noteoff_toks = [i for i in tok.vocab.keys() if "NoteOff" in i]
+        self.assertTrue(len(noteoff_toks) == utils.PIANO_KEYS)
 
 
 if __name__ == '__main__':
