@@ -19,10 +19,12 @@ from miditok.tokenizer_training_iterator import TokTrainingIterator
 from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
-from jazz_style_conditioned_generation.data.dataloader import (
-    PITCH_AUGMENT_RANGE,
-    DURATION_AUGMENT_RANGE,
+from jazz_style_conditioned_generation.data.augmentation import (
     deterministic_data_augmentation,
+    PITCH_AUGMENT_RANGE,
+    DURATION_AUGMENT_RANGE
+)
+from jazz_style_conditioned_generation.data.dataloader import (
     preprocess_score,
     load_score
 )
