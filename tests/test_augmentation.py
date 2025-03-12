@@ -41,29 +41,33 @@ class AugmentationTest(unittest.TestCase):
         score = load_score(TEST_MIDI)
         prev_min_pitch, prev_max_pitch = 34, 98
         # Test with transposition up one semitone
-        augmented = data_augmentation(
+        augmented, duration_augment_val = data_augmentation(
             score, pitch_augmentation_range=[1], duration_augmentation_range=[1.]
         )
         new_min_pitch, new_max_pitch = utils.get_pitch_range(augmented)
         self.assertEqual(new_min_pitch, prev_min_pitch + 1)
         self.assertEqual(new_max_pitch, prev_max_pitch + 1)
+        self.assertEqual(duration_augment_val, 1)
         # Test with transposition down two semitones
-        augmented = data_augmentation(
+        augmented, duration_augment_val = data_augmentation(
             score, pitch_augmentation_range=[-2], duration_augmentation_range=[1.]
         )
         new_min_pitch, new_max_pitch = utils.get_pitch_range(augmented)
         self.assertEqual(new_min_pitch, prev_min_pitch - 2)
         self.assertEqual(new_max_pitch, prev_max_pitch - 2)
+        self.assertEqual(duration_augment_val, 1)
         # Test with shortening duration
-        augmented = data_augmentation(
+        augmented, duration_augment_val = data_augmentation(
             score, pitch_augmentation_range=[0], duration_augmentation_range=[0.9]
         )
         self.assertLess(augmented.end(), score.end())
+        self.assertEqual(duration_augment_val, 0.9)
         # Test with increasing duration
-        augmented = data_augmentation(
+        augmented, duration_augment_val = data_augmentation(
             score, pitch_augmentation_range=[0], duration_augmentation_range=[1.1]
         )
         self.assertGreater(augmented.end(), score.end())
+        self.assertEqual(duration_augment_val, 1.1)
 
     def test_deterministic_augmentation(self):
         # Test pitch augmentation: up five semitones

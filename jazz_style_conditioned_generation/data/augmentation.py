@@ -53,7 +53,7 @@ def data_augmentation(
         score: Score,
         pitch_augmentation_range: list = None,
         duration_augmentation_range: list = None
-) -> Score:
+) -> tuple[Score, float]:
     """Applies pitch and duration augmentation to a Score object"""
     if pitch_augmentation_range is None:
         pitch_augmentation_range = PITCH_AUGMENT_RANGE
@@ -64,4 +64,5 @@ def data_augmentation(
     pitch_augment = get_pitch_augmentation_value(score, pitch_augmentation_range)
     duration_augment = np.random.choice(duration_augmentation_range)
     # Apply data augmentation with the randomly selected values
-    return _data_augmentation_deterministic(score, pitch_augment, duration_augment)
+    #  Also need to return the amount we're augmenting by, so we can adjust our tempo
+    return _data_augmentation_deterministic(score, pitch_augment, duration_augment), duration_augment
