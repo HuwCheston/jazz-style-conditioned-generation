@@ -5,6 +5,9 @@
 
 import os
 
+import numpy as np
+from miditok import MusicTokenizer
+
 from jazz_style_conditioned_generation import utils
 
 # These are the only conditions we'll accept values for
@@ -189,8 +192,8 @@ def get_condition_special_tokens(condition: str, metadata_dicts: list[dict] | di
 def get_conditions_for_track(
         conditions_and_mapping: dict[str, dict],
         metadata: dict,
-        tokenizer
-) -> list[int]:
+        tokenizer: MusicTokenizer
+) -> list[str]:
     """Given a mapping {condition: {val1: token1}}, convert track metadata into token format"""
     condition_tokens = []
     # By sorting, we ensure that tokens are always inserted in a consistent order
@@ -204,8 +207,44 @@ def get_conditions_for_track(
         validated_condition_values = validate_condition_values(values_for_track, condition)
         # This converts values into their token form
         condition_tokens.extend([mapper[c] for c in validated_condition_values if c in mapper.keys()])
-    # Sort the tokens alphabetically and return the indices
-    return [tokenizer[c] for c in sorted(condition_tokens)]
+    for c in condition_tokens:
+        assert c in tokenizer.vocab.keys()
+    # Sort the tokens alphabetically
+    return sorted(condition_tokens)
+
+
+def get_tempo_token(tempo: float, tokenizer: MusicTokenizer, _raise_on_difference_exceeding: int = 50) -> str:
+    """Given a tempo for a track, get the closest tempo token from the tokenizer"""
+    # Get the tempo tokens from the tokenizer
+    tempo_tokens = [i for i in tokenizer.vocab.keys() if "TEMPOCUSTOM" in i]
+    assert len(tempo_tokens) > 0, "Custom tempo tokens not added to tokenizer!"
+    # Get tempo values as integers, rather than strings
+    tempo_stripped = np.array([int(i.replace("TEMPOCUSTOM_", "")) for i in tempo_tokens])
+    # Get the difference between the passed tempo and the tempo tokens used by the tokenizer
+    sub = np.abs(tempo - tempo_stripped)
+    # Raise an error if the closest tempo token is too far away from the actual token
+    if np.min(sub) > _raise_on_difference_exceeding:
+        raise ValueError(f"Closest tempo token is too far from passed tempo! Smallest difference is {sub}")
+    # Get the actual tempo token
+    tempo_token = tempo_tokens[np.argmin(sub)]
+    # Sanity check
+    assert "TEMPOCUSTOM" in tempo_token
+    # Return the idx of the token, ready to be added to the sequence
+    return tempo_token
+
+
+def get_time_signature_token(time_signature: int, tokenizer: MusicTokenizer) -> str:
+    # Get the time signature tokens from the tokenizer
+    timesig_tokens = [i for i in tokenizer.vocab.keys() if "TIMESIGNATURECUSTOM" in i]
+    assert len(timesig_tokens) > 0, "Custom time signature tokens not added to tokenizer!"
+    # Get the corresponding token
+    timesig_token = f'TIMESIGNATURECUSTOM_{time_signature}4'
+    # Return the idx, ready to be added to the sequence
+    if timesig_token in timesig_tokens:
+        return timesig_token
+    # Raise an error if the token isn't in the vocabulary (should never happen)
+    else:
+        raise AttributeError(f"Tokenizer does not have token {timesig_token} in vocabulary!")
 
 
 def add_condition_tokens_to_sequence(

@@ -138,7 +138,8 @@ class ConditionsTest(unittest.TestCase):
             ]
         }
         expected = [tokenizer["GENRES_African"], tokenizer["GENRES_AvantGarde"]]
-        actual = cond.get_conditions_for_track(condition_mapping, metadata, tokenizer)
+        actual_strs = cond.get_conditions_for_track(condition_mapping, metadata, tokenizer)
+        actual = [tokenizer[t] for t in actual_strs]
         self.assertEqual(expected, actual)
 
 

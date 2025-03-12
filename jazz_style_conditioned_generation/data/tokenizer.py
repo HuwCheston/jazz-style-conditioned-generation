@@ -6,7 +6,6 @@
 import os
 from itertools import product
 from pathlib import Path
-from random import choice
 from typing import Sequence
 
 import numpy as np
@@ -169,20 +168,27 @@ class TokTrainingIteratorAugmentation(TokTrainingIterator):
         return f"{self.tokenizer} - {len(self.files_paths)} tracks, {len(self)} augmented tracks"
 
 
-def encode_decode_midi(tokenizer, midi_fpath: str = None):
-    """Encodes a MIDI with a tokenizer, decodes it, then saves. For sanity checking the tokenization process."""
-    # If we don't pass in a MIDI file, make a random selection from all the available MIDI files
-    if midi_fpath is None:
-        midi_paths = utils.get_data_files_with_ext(ext="**/*.mid")
-        midi_fpath = choice(midi_paths)
-    # Make sure that the path exists
-    assert os.path.exists(midi_fpath), f'Could not find MIDI at {midi_fpath}'
-    # Encode as tokens and then decode back to MIDI
-    tokens = tokenizer(midi_fpath)
-    decoded = tokenizer(tokens)
-    # Dump the MIDI into the output directory
-    out_fname = midi_fpath.split(os.path.sep)[-2] + '_encoded.mid'
-    decoded.dump_midi(os.path.join(OUTPUT_MIDI_DIR, out_fname))
+def add_conditions_to_vocab(tokenizer: MusicTokenizer, condition_mapping: dict) -> None:
+    """Given a mapping with form {condition_type: {condition1: token1, ...}}, add tokens to tokenizer"""
+    for mapping in condition_mapping.values():
+        for token in mapping.values():
+            tokenizer.add_to_vocab(token)
+    # No need to return, add_to_vocab works inplace
+
+
+def add_timesignatures_to_vocab(tokenizer: MusicTokenizer, time_signatures: list[int]) -> None:
+    """Given a list of time signatures, add these to the vocabulary as custom tokens (shouldn't be used in decoding)"""
+    for time_signature in time_signatures:
+        tok_id = f'TIMESIGNATURECUSTOM_{time_signature}4'
+        tokenizer.add_to_vocab(tok_id)
+
+
+def add_tempos_to_vocab(tokenizer: MusicTokenizer, tempo_range: tuple, n_tempos: int = 32) -> None:
+    """Given a range of tempos, add these to the vocabulary as custom tokens (shouldn't be used in decoding)"""
+    tempo_range = np.linspace(*tempo_range, n_tempos).round().astype(int)
+    for tempo in tempo_range:
+        tok_id = f'TEMPOCUSTOM_{tempo}'
+        tokenizer.add_to_vocab(tok_id)
 
 
 def get_tokenizer_class_from_string(tokenizer_type: str):
@@ -251,6 +257,7 @@ def load_or_train_tokenizer(
             vocab_size = tokenizer_cfg.get("vocab_size", DEFAULT_VOCAB_SIZE)
             logger.debug(f'... training tokenizer with method {training_method}, vocab size {vocab_size}')
             # TODO: this should use our custom load_score function
+            # TODO: we need to add our condition tokens in BEFORE training the tokenizer or else we'll get errors
             tokenizer.train(vocab_size=vocab_size, model=training_method, files_paths=track_paths)
 
             # Create the iterator which we use to train with augmentation
