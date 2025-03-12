@@ -17,7 +17,10 @@ from tqdm import tqdm
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.augmentation import random_data_augmentation
 from jazz_style_conditioned_generation.data.conditions import (
-    validate_conditions, get_condition_special_tokens, validate_condition_values
+    validate_conditions,
+    get_condition_special_tokens,
+    get_conditions_for_track,
+    add_condition_tokens_to_sequence
 )
 
 __all__ = [
@@ -30,8 +33,6 @@ __all__ = [
     "note_list_to_score",
     "remove_short_notes",
     "merge_repeated_notes",
-    "add_condition_tokens_to_sequence",
-    "get_conditions_for_track",
     "create_padding_mask",
     "DatasetMIDIExhaustive",
     "DatasetMIDIRandomChunk",
@@ -244,44 +245,6 @@ def preprocess_score(
     # Finally, we convert everything back to a Score object that can be passed to our tokenizer
     score.tracks[0].notes = merged_notes
     return score
-
-
-def get_conditions_for_track(
-        conditions_and_mapping: dict[str, dict],
-        metadata: dict,
-        tokenizer
-) -> list[int]:
-    """Given a mapping {condition: {val1: token1}}, convert track metadata into token format"""
-    condition_tokens = []
-    # By sorting, we ensure that tokens are always inserted in a consistent order
-    conditions = sorted(list(conditions_and_mapping.keys()))
-    for condition in conditions:
-        mapper = conditions_and_mapping[condition]
-        values_for_track = metadata[condition]
-        if isinstance(values_for_track, list):
-            values_for_track = [c["name"] for c in values_for_track]
-        # This merges similar values together, removes invalid values etc.
-        validated_condition_values = validate_condition_values(values_for_track, condition)
-        # This converts values into their token form
-        condition_tokens.extend([mapper[c] for c in validated_condition_values if c in mapper.keys()])
-    # Sort the tokens alphabetically and return the indices
-    return [tokenizer[c] for c in sorted(condition_tokens)]
-
-
-def add_condition_tokens_to_sequence(
-        sequence: list[int],
-        condition_tokens: list[int],
-) -> tuple[list[int], list[int]]:
-    """Add condition tokens to a sequence, preserving length"""
-    assert len(condition_tokens) > 0, "Condition token list is empty"
-    max_seq_len = len(sequence)
-    # Condition tokens go before the beginning of the sequence
-    comb = condition_tokens + sequence
-    # Chunk everything to the required length and sanity check
-    x = comb[:max_seq_len]
-    targets = comb[1: max_seq_len + 1]
-    assert len(x) == len(targets) == len(sequence)
-    return x, targets
 
 
 def create_padding_mask(x, pad_token_id: int) -> torch.tensor:

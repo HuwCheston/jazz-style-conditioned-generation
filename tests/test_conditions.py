@@ -5,6 +5,8 @@
 
 import unittest
 
+from miditok import REMI
+
 from jazz_style_conditioned_generation.data import conditions as cond
 
 TEST_DICT = [
@@ -94,6 +96,50 @@ class ConditionsTest(unittest.TestCase):
         expected = ["African", "Pop/Rock"]
         actual = cond.validate_condition_values(values, "genres")
         self.assertEqual(actual, expected)
+
+    def test_add_condition_tokens_to_sequence(self):
+        dummy = [1, 3, 3, 3, 5, 6]
+        condition_tokens = [100, 200, 300]
+        # Condition tokens should be added before the start of the sequence, and it should be truncated to fit
+        expected_inputs = [100, 200, 300, 1, 3, 3]
+        expected_targets = [200, 300, 1, 3, 3, 3]
+        actual_inputs, actual_targets = cond.add_condition_tokens_to_sequence(dummy, condition_tokens)
+        self.assertEqual(expected_inputs, actual_inputs)
+        self.assertEqual(expected_targets, actual_targets)
+        # Testing with adding no condition tokens
+        condition_tokens = []
+        self.assertRaises(AssertionError, cond.add_condition_tokens_to_sequence, dummy, condition_tokens)
+
+    def test_get_condition_tokens_for_track(self):
+        # Create fake mapping of genres -> token strings
+        condition_mapping = {
+            'genres': {
+                'African': 'GENRES_African',
+                'Afro-Cuban Jazz': 'GENRES_AfroCubanJazz',
+                'Asian': 'GENRES_Asian',
+                'Avant-Garde': 'GENRES_AvantGarde',
+            }
+        }
+        # Create the tokenizer and add to the vocabulary
+        tokenizer = REMI()
+        for token in condition_mapping["genres"].values():
+            tokenizer.add_to_vocab(token)
+        # Create the metadata for a track
+        metadata = {
+            "genres": [
+                {
+                    "name": "African",
+                    "weight": 5
+                },
+                {
+                    "name": "Avant-Garde",
+                    "weight": 9
+                }
+            ]
+        }
+        expected = [tokenizer["GENRES_African"], tokenizer["GENRES_AvantGarde"]]
+        actual = cond.get_conditions_for_track(condition_mapping, metadata, tokenizer)
+        self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':

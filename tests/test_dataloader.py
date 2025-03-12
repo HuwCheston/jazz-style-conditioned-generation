@@ -399,19 +399,6 @@ class PreProcessingScoreTest(unittest.TestCase):
         self.assertTrue(actual.tracks[0].notes[0].duration == 100)
         self.assertTrue(actual.tracks[0].notes[0].pitch == 80)
 
-    def test_add_condition_tokens_to_sequence(self):
-        dummy = [1, 3, 3, 3, 5, 6]
-        condition_tokens = [100, 200, 300]
-        # Condition tokens should be added before the start of the sequence, and it should be truncated to fit
-        expected_inputs = [100, 200, 300, 1, 3, 3]
-        expected_targets = [200, 300, 1, 3, 3, 3]
-        actual_inputs, actual_targets = add_condition_tokens_to_sequence(dummy, condition_tokens)
-        self.assertEqual(expected_inputs, actual_inputs)
-        self.assertEqual(expected_targets, actual_targets)
-        # Testing with adding no condition tokens
-        condition_tokens = []
-        self.assertRaises(AssertionError, add_condition_tokens_to_sequence, dummy, condition_tokens)
-
     def test_attention_mask(self):
         # Testing with padding at end
         tokseq = [1, 2, 3, 4, 82, 234, 62, 0, 0, 0]
