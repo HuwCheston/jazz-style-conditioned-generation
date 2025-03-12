@@ -7,10 +7,9 @@ import os
 
 import torch
 from loguru import logger
-from symusic import Score
 
 from jazz_style_conditioned_generation import utils
-from jazz_style_conditioned_generation.data.dataloader import preprocess_score
+from jazz_style_conditioned_generation.data.dataloader import load_score, preprocess_score
 from jazz_style_conditioned_generation.training import TrainingModule, parse_config_yaml
 
 OUTPUT_DIR = os.path.join(utils.get_project_root(), "outputs/generation")
@@ -43,7 +42,7 @@ def main(
         # Load the primer file
         assert os.path.isfile(primer_fp), f"Could not find MIDI file at {primer_fp}!"
         # Convert to a symusic object
-        sc = Score(primer_fp)
+        sc = load_score(primer_fp)
         # Do our preprocessing
         sc = preprocess_score(sc)
         # Pass the score through the tokenizer

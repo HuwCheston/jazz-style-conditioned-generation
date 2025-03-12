@@ -12,7 +12,7 @@ import numpy as np
 import torch
 from miditok.constants import SCORE_LOADING_EXCEPTION
 from miditok.data_augmentation import augment_score
-from symusic import Score, Track, Note
+from symusic import Score, Track, Note, Tempo, TimeSignature
 from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
@@ -39,7 +39,8 @@ __all__ = [
     "PITCH_AUGMENT_RANGE",
     "DURATION_AUGMENT_RANGE",
     "DatasetMIDIExhaustive",
-    "DatasetMIDIRandomChunk"
+    "DatasetMIDIRandomChunk",
+    "load_score"
 ]
 
 DATA_DIR = os.path.join(utils.get_project_root(), "data")
@@ -48,8 +49,54 @@ DATA_DIR = os.path.join(utils.get_project_root(), "data")
 PITCH_AUGMENT_RANGE = range(-3, 4)  # as in Music Transformer
 DURATION_AUGMENT_RANGE = [0.95, 0.975, 1.0, 1.025, 1.05]  # as in Music Transformer
 
-OVERLAP_TICKS = 3  # If two notes with the same pitch have less than this offset-onset time, they will be merged
-MIN_DURATION_TICKS = 20  # We remove notes that have a duration of less than this value
+OVERLAP_MILLISECONDS = 3  # If two notes with the same pitch have less than this offset-onset time, they will be merged
+MIN_DURATION_MILLISECONDS = 20  # We remove notes that have a duration of less than this value
+
+
+def get_notes_from_score(score: Score) -> list[Note]:
+    """Given a score that may have multiple tracks, we only want to get the notes from the correct (piano) track"""
+    # If we somehow have more than one track (occasionally happens in the bushgrafts corpus)
+    if len(score.tracks) > 1:
+        # Get all the piano tracks
+        is_piano = [p for p in score.tracks if p.program == utils.MIDI_PIANO_PROGRAM]
+        # Keep the one with the most notes
+        desired_track = max(is_piano, key=lambda x: len(x.notes))
+        return sorted(desired_track.notes, key=lambda x: x.start)
+    # Otherwise, we can just grab the track directly
+    else:
+        return sorted(score.tracks[0].notes, key=lambda x: x.start)
+
+
+def load_score(filepath: str) -> Score:
+    """Loads a MIDI file and resamples such that 1 tick == 1 millisecond in real time"""
+    # Load as a symusic object with time sampled in seconds and sort the notes by onset time
+    score_as_secs = Score(filepath, ttype="Second")  # this preserves tempo, time signature information etc.
+    secs_notes = get_notes_from_score(score_as_secs)
+    # Create an EMPTY symusic object with time sampled in ticks
+    score_as_ticks = Score(ttype="Tick").resample(tpq=utils.TICKS_PER_QUARTER)
+    # Add in required attributes: tracks, tempo, time signatures
+    score_as_ticks.tracks = [Track(program=0, ttype="Tick")]
+    score_as_ticks.tempos = [Tempo(time=0, qpm=utils.TEMPO, ttype="Tick")]
+    score_as_ticks.time_signatures = [
+        TimeSignature(time=0, numerator=utils.TIME_SIGNATURE, denominator=4, ttype="Tick")
+    ]
+    # Iterate over the notes sampled in seconds
+    newnotes = []
+    for n in secs_notes:
+        # Convert their time into ticks/milliseconds
+        new_start = utils.base_round(n.time * 1000, 10)  # rounding to the nearest 10 milliseconds
+        new_duration = utils.base_round(n.duration * 1000, 10)  # rounding to the nearest 10 milliseconds
+        newnote = Note(
+            time=new_start,
+            duration=new_duration,
+            pitch=n.pitch,
+            velocity=n.velocity,
+            ttype="Tick"
+        )
+        newnotes.append(newnote)
+    # Set the notes correctly
+    score_as_ticks.tracks[0].notes = newnotes
+    return score_as_ticks
 
 
 def get_pitch_augmentation_value(score: Score, pitch_augmentation_range: list) -> int:
@@ -163,7 +210,7 @@ def randomly_slice_sequence(
     return sequence[start:end]
 
 
-def remove_short_notes(note_list: list[Note], min_duration_ticks: int = MIN_DURATION_TICKS) -> list[Note]:
+def remove_short_notes(note_list: list[Note], min_duration_ticks: int = MIN_DURATION_MILLISECONDS) -> list[Note]:
     """Removes symusic.Note objects with a duration of less than MIN_DURATION_TICKS from a list of Note objects"""
     newnotes = []
     for note in note_list:
@@ -173,7 +220,7 @@ def remove_short_notes(note_list: list[Note], min_duration_ticks: int = MIN_DURA
     return newnotes
 
 
-def merge_repeated_notes(note_list: list[Note], overlap_ticks: int = OVERLAP_TICKS) -> list[Note]:
+def merge_repeated_notes(note_list: list[Note], overlap_ticks: int = OVERLAP_MILLISECONDS) -> list[Note]:
     """Merge successive notes at the same pitch with an offset-onset time < OVERLAP_TICKS to a single, long note"""
     newnotes = []
     # Iterate over all MIDI pitches
@@ -245,24 +292,12 @@ def note_list_to_score(note_list: list[Note], ticks_per_quarter: int) -> Score:
 
 def preprocess_score(
         score: Score,
-        min_duration_ticks: int = MIN_DURATION_TICKS,
-        overlap_ticks: int = OVERLAP_TICKS
+        min_duration_ticks: int = MIN_DURATION_MILLISECONDS,
+        overlap_ticks: int = OVERLAP_MILLISECONDS
 ) -> Score:
     """Applies our own preprocessing to a Score object: removes short notes, merges duplicates"""
-    # Resample the score if required to the value which is used in JTD + PiJAMA
-    if score.ticks_per_quarter != utils.TICKS_PER_QUARTER:
-        score = score.resample(utils.TICKS_PER_QUARTER)
-    assert score.ticks_per_quarter == utils.TICKS_PER_QUARTER
-    # If we somehow have more than one track (occasionally happens in the bushgrafts corpus)
-    if len(score.tracks) > 1:
-        # Get all the piano tracks
-        is_piano = [p for p in score.tracks if p.program == utils.MIDI_PIANO_PROGRAM]
-        # Keep the one with the most notes
-        desired_track = max(is_piano, key=lambda x: len(x.notes))
-        note_list = desired_track.notes
-    # Otherwise, we can just grab the track directly
-    else:
-        note_list = score.tracks[0].notes
+    # Get the notes from the score
+    note_list = get_notes_from_score(score)
     # First, we remove notes that are outside the range of the piano keyboard
     validated_notes = remove_out_of_range_notes(note_list)
     # Then, we remove notes with a very short duration
@@ -270,7 +305,8 @@ def preprocess_score(
     # Next, we merge successive notes with the same pitch and a very short onset-offset time into the same pitch
     merged_notes = merge_repeated_notes(no_short_notes, overlap_ticks=overlap_ticks)
     # Finally, we convert everything back to a Score object that can be passed to our tokenizer
-    return note_list_to_score(merged_notes, score.ticks_per_quarter)
+    score.tracks[0].notes = merged_notes
+    return score
 
 
 def get_conditions_for_track(
@@ -333,8 +369,8 @@ class DatasetMIDIRandomChunk:
             condition_mapping: dict[str, dict] = None,
             n_clips: int = None,
             chunk_end_overlap: float = 0.5,
-            min_duration_ticks: int = MIN_DURATION_TICKS,
-            overlap_ticks: int = OVERLAP_TICKS
+            min_duration_ticks: int = MIN_DURATION_MILLISECONDS,
+            overlap_ticks: int = OVERLAP_MILLISECONDS
     ):
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len
@@ -391,7 +427,7 @@ class DatasetMIDIRandomChunk:
         fp = self.files_paths[idx]
         # Convert into a Symusic Score object
         try:
-            score = Score(fp)
+            score = load_score(fp)
         except SCORE_LOADING_EXCEPTION:
             return {"input_ids": None, "labels": None}
         # Apply our own preprocessing to the score
@@ -456,8 +492,8 @@ class DatasetMIDIExhaustive:
             do_conditioning: bool = True,
             condition_mapping: dict[str, dict] = None,
             n_clips: int = None,
-            min_duration_ticks: int = MIN_DURATION_TICKS,
-            overlap_ticks: int = OVERLAP_TICKS
+            min_duration_ticks: int = MIN_DURATION_MILLISECONDS,
+            overlap_ticks: int = OVERLAP_MILLISECONDS
     ):
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len
@@ -512,7 +548,7 @@ class DatasetMIDIExhaustive:
         # Iterate over every file
         for file in tqdm(self.files_paths, desc='Getting track chunks...'):
             # Open file as a symusic score object
-            score = Score(file)
+            score = load_score(file)
             # Apply our own preprocessing to the score
             preprocessed_score = preprocess_score(
                 score,
@@ -530,7 +566,7 @@ class DatasetMIDIExhaustive:
         fp, chunk_idx = self.chunk_paths_and_idxs[idx]
         # Convert into a Symusic Score object
         try:
-            score = Score(fp)
+            score = load_score(fp)
         except SCORE_LOADING_EXCEPTION:
             return {"input_ids": None, "labels": None}
         # Apply our own preprocessing to the score

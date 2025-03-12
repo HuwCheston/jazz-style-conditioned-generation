@@ -16,7 +16,6 @@ from miditok.attribute_controls import create_random_ac_indexes
 from miditok.constants import SCORE_LOADING_EXCEPTION
 from miditok.tokenizations import REMI, MIDILike, TSD, Structured, PerTok
 from miditok.tokenizer_training_iterator import TokTrainingIterator
-from symusic import Score
 from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
@@ -24,12 +23,13 @@ from jazz_style_conditioned_generation.data.dataloader import (
     PITCH_AUGMENT_RANGE,
     DURATION_AUGMENT_RANGE,
     deterministic_data_augmentation,
-    preprocess_score
+    preprocess_score,
+    load_score
 )
 
 DEFAULT_TOKENIZER_CONFIG = {
     "pitch_range": (utils.MIDI_OFFSET, utils.MIDI_OFFSET + utils.PIANO_KEYS),
-    "beat_res": {(0, 4): 32},
+    "beat_res": {(0, utils.TIME_SIGNATURE): 100 // utils.TIME_SIGNATURE},  # 100 tokens per "bar", 10ms each
     "num_velocities": 32,
     "special_tokens": [
         "PAD",  # add for short inputs to ensure consistent sequence length for all inputs
@@ -75,7 +75,7 @@ class TokTrainingIteratorAugmentation(TokTrainingIterator):
         """Iterates through all files and returns tuples of (filepath, pitch_augmentation, duration_augmentation)"""
         for f in tqdm(self.files_paths, desc=f"Getting all augmentations for {len(self.files_paths)} tracks..."):
             # Load as a score object
-            sc = Score(f)
+            sc = load_score(f)
             # Apply our preprocessing to remove invalid notes, merge repeated notes etc.
             preproc = preprocess_score(sc)
             # Get the minimum and maximum pitch of the preprocessed scores
@@ -94,7 +94,7 @@ class TokTrainingIteratorAugmentation(TokTrainingIterator):
         """Load a file, apply augmentation, and convert to a byte representation"""
         # Load and tokenize file
         try:
-            score = Score(path)
+            score = load_score(path)
         except SCORE_LOADING_EXCEPTION:
             return []
 
@@ -244,17 +244,21 @@ def load_or_train_tokenizer(
         logger.debug('... could not find saved tokenizer for this experiment/run, creating it from scratch!')
         cfg = TokenizerConfig(**tokenizer_kws)
         tokenizer = get_tokenizer_class_from_string(tokenizer_method)(cfg)
+        logger.debug(f'... got tokenizer: {tokenizer}')
         # If we want to train the tokenizer
         if tokenizer_cfg.get("do_training", False):
             # Get the parameters again from the dictionary
             training_method = tokenizer_cfg.get("training_method", DEFAULT_TRAINING_METHOD)
             vocab_size = tokenizer_cfg.get("vocab_size", DEFAULT_VOCAB_SIZE)
             logger.debug(f'... training tokenizer with method {training_method}, vocab size {vocab_size}')
+            # TODO: this should use our custom load_score function
+            tokenizer.train(vocab_size=vocab_size, model=training_method, files_paths=track_paths)
+
             # Create the iterator which we use to train with augmentation
-            tti = TokTrainingIteratorAugmentation(tokenizer, track_paths)
-            logger.debug(f'... using iterator: {tti}')
-            # Train the tokenizer
-            tokenizer.train(vocab_size=vocab_size, model=training_method, iterator=tti)
+            # tti = TokTrainingIteratorAugmentation(tokenizer, track_paths)
+            # logger.debug(f'... using iterator: {tti}')
+            # # Train the tokenizer
+            # tokenizer.train(vocab_size=vocab_size, model=training_method, iterator=tti)
             logger.debug(f'... successfully trained tokenizer')
         # Finally, we can dump the tokenizer so that we reload it on future runs
         tokenizer.save(tokenizer_path)

@@ -25,11 +25,15 @@ SEED = 42
 
 MIDI_PIANO_PROGRAM = 0
 PIANO_KEYS = 88
-TICKS_PER_QUARTER = 384  # By far, the vast majority of tracks have this TPQ. We'll resample any others to this value.
 MIDI_OFFSET = 21
 MAX_VELOCITY = 127
 MIDDLE_C = 60
 OCTAVE = 12
+
+# We'll resample input files to use these values
+TICKS_PER_QUARTER = 500
+TEMPO = 120
+TIME_SIGNATURE = 2
 
 MAX_SEQUENCE_LENGTH = 2048  # close to Music Transformer
 # This is important: it ensures that two chunks overlap slightly, to allow a causal chain between the
@@ -197,6 +201,11 @@ def get_original_function(func: Callable) -> Callable:
     while hasattr(func, "__wrapped__"):
         func = func.__wrapped__
     return func
+
+
+def base_round(x: float, base: int = 10) -> int:
+    """Rounds a number to the nearest base"""
+    return int(base * round(float(x) / base))
 
 
 if __name__ == "__main__":
