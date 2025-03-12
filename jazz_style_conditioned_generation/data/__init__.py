@@ -13,11 +13,6 @@ from .dataloader import (
     DatasetMIDIExhaustive,
     DatasetMIDIRandomChunk
 )
-from .splits import (
-    SPLIT_DIR,
-    SPLIT_TYPES,
-    check_all_splits_unique
-)
 from .tokenizer import (
     DEFAULT_TOKENIZER_CLASS,
     DEFAULT_TOKENIZER_CONFIG,

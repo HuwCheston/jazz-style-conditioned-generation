@@ -17,9 +17,9 @@ from transformers import GPT2Config, GPT2LMHeadModel
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.conditions import validate_conditions, get_condition_special_tokens
 from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIExhaustive, DatasetMIDIRandomChunk, DATA_DIR
-from jazz_style_conditioned_generation.data.splits import SPLIT_TYPES, SPLIT_DIR, check_all_splits_unique
 from jazz_style_conditioned_generation.data.tokenizer import load_or_train_tokenizer
 from jazz_style_conditioned_generation.encoders import MusicTransformer, MusicTransformerScheduler
+from jazz_style_conditioned_generation.preprocessing.splits import SPLIT_TYPES, SPLIT_DIR, check_all_splits_unique
 
 
 class DummyModule(torch.nn.Module):
