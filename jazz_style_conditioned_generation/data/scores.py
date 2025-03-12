@@ -1,6 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""Files for loading and preprocessing score objects"""
+
 from symusic import Score, Note, Track, Tempo, TimeSignature
 
-import utils
+from jazz_style_conditioned_generation import utils
 
 OVERLAP_MILLISECONDS = 3  # If two notes with the same pitch have less than this offset-onset time, they will be merged
 MIN_DURATION_MILLISECONDS = 20  # We remove notes that have a duration of less than this value
