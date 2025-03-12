@@ -7,8 +7,8 @@ from symusic import Score, Note, Track, Tempo, TimeSignature
 
 from jazz_style_conditioned_generation import utils
 
-OVERLAP_MILLISECONDS = 3  # If two notes with the same pitch have less than this offset-onset time, they will be merged
-MIN_DURATION_MILLISECONDS = 20  # We remove notes that have a duration of less than this value
+OVERLAP_MILLISECONDS = 0  # If two notes with the same pitch have less than this offset-onset time, they will be merged
+MIN_DURATION_MILLISECONDS = 50  # We remove notes that have a duration of less than this value
 
 
 def get_notes_from_score(score: Score) -> list[Note]:
@@ -57,18 +57,18 @@ def load_score(filepath: str) -> Score:
     return score_as_ticks
 
 
-def remove_short_notes(note_list: list[Note], min_duration_ticks: int = MIN_DURATION_MILLISECONDS) -> list[Note]:
-    """Removes symusic.Note objects with a duration of less than MIN_DURATION_TICKS from a list of Note objects"""
+def remove_short_notes(note_list: list[Note], min_duration_milliseconds: int = MIN_DURATION_MILLISECONDS) -> list[Note]:
+    """Removes symusic.Note objects with a duration of less than min_duration_milliseconds from a list of Notes"""
     newnotes = []
     for note in note_list:
         # Notes with a duration this short are transcription errors usually
-        if note.duration >= min_duration_ticks:
+        if note.duration >= min_duration_milliseconds:
             newnotes.append(note)
     return newnotes
 
 
-def merge_repeated_notes(note_list: list[Note], overlap_ticks: int = OVERLAP_MILLISECONDS) -> list[Note]:
-    """Merge successive notes at the same pitch with an offset-onset time < OVERLAP_TICKS to a single, long note"""
+def merge_repeated_notes(note_list: list[Note], overlap_milliseconds: int = OVERLAP_MILLISECONDS) -> list[Note]:
+    """Merge successive notes at the same pitch with an offset-onset time < overlap_milliseconds to a single note"""
     newnotes = []
     # Iterate over all MIDI pitches
     for pitch in range(utils.MIDI_OFFSET, utils.MIDI_OFFSET + utils.PIANO_KEYS + 1):
@@ -96,7 +96,7 @@ def merge_repeated_notes(note_list: list[Note], overlap_ticks: int = OVERLAP_MIL
                 note2_start = note2.time
                 overlap = note2_start - note1_end
                 # If the overlap between these two notes is short
-                if overlap < overlap_ticks:
+                if overlap < overlap_milliseconds:
                     # Combine both notes into a single note
                     newnote = Note(
                         # Just use the onset time of the earliest note
@@ -139,8 +139,8 @@ def note_list_to_score(note_list: list[Note], ticks_per_quarter: int) -> Score:
 
 def preprocess_score(
         score: Score,
-        min_duration_ticks: int = MIN_DURATION_MILLISECONDS,
-        overlap_ticks: int = OVERLAP_MILLISECONDS
+        min_duration_milliseconds: int = MIN_DURATION_MILLISECONDS,
+        overlap_milliseconds: int = OVERLAP_MILLISECONDS
 ) -> Score:
     """Applies our own preprocessing to a Score object: removes short notes, merges duplicates"""
     # Get the notes from the score
@@ -148,9 +148,28 @@ def preprocess_score(
     # First, we remove notes that are outside the range of the piano keyboard
     validated_notes = remove_out_of_range_notes(note_list)
     # Then, we remove notes with a very short duration
-    no_short_notes = remove_short_notes(validated_notes, min_duration_ticks=min_duration_ticks)
+    no_short_notes = remove_short_notes(validated_notes, min_duration_milliseconds=min_duration_milliseconds)
     # Next, we merge successive notes with the same pitch and a very short onset-offset time into the same pitch
-    merged_notes = merge_repeated_notes(no_short_notes, overlap_ticks=overlap_ticks)
+    merged_notes = merge_repeated_notes(no_short_notes, overlap_milliseconds=overlap_milliseconds)
     # Finally, we convert everything back to a Score object that can be passed to our tokenizer
     score.tracks[0].notes = merged_notes
     return score
+
+
+if __name__ == "__main__":
+    import os
+
+    from miditok import MIDILike, TokenizerConfig
+
+    from jazz_style_conditioned_generation.data.tokenizer import DEFAULT_TOKENIZER_CONFIG
+
+    file = "data/raw/pijama/mehldaub-blackbirdlive-unaccompanied-xxxx-wf4yk8ao/piano_midi.mid"
+    mf = os.path.join(utils.get_project_root(), file)
+    loaded = load_score(mf)
+
+    tokenizer = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
+
+    preproc = preprocess_score(loaded)
+    enc = tokenizer.encode(preproc)
+    dec = tokenizer.decode(enc)
+    dec.dump_midi(os.path.join(utils.get_project_root(), f"preproc_bbird.mid"))

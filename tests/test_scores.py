@@ -60,7 +60,7 @@ class PreProcessingScoreTest(unittest.TestCase):
         ]
         # Duration should be note1_duration + (note2_onset - note1_onset) + note2_duration
         expected = [Note(pitch=80, duration=10, time=100, velocity=85, ttype="tick")]
-        actual = merge_repeated_notes(notelist)
+        actual = merge_repeated_notes(notelist, overlap_milliseconds=3)
         self.assertEqual(actual, expected)
         # Even these notes are adjacent, they shouldn't be merged as they are different pitches
         notelist = [
@@ -68,7 +68,7 @@ class PreProcessingScoreTest(unittest.TestCase):
             Note(pitch=91, duration=5, time=120, velocity=80, ttype="tick"),
         ]
         expected = notelist
-        actual = merge_repeated_notes(notelist)
+        actual = merge_repeated_notes(notelist, overlap_milliseconds=3)
         self.assertEqual(actual, expected)
         # These notes are not adjacent, so shouldn't be touched
         notelist = [
@@ -76,7 +76,7 @@ class PreProcessingScoreTest(unittest.TestCase):
             Note(pitch=90, duration=5, time=1000, velocity=80, ttype="tick"),
         ]
         expected = notelist
-        actual = merge_repeated_notes(notelist)
+        actual = merge_repeated_notes(notelist, overlap_milliseconds=3)
         self.assertEqual(actual, expected)
 
     def test_merge_repeated_notes_real(self):
@@ -88,7 +88,7 @@ class PreProcessingScoreTest(unittest.TestCase):
         init_len = len([i for i in notelist if i.pitch == 75])
         self.assertEqual(8, init_len)
         # Test after processing
-        actual = merge_repeated_notes(notelist, overlap_ticks=25)
+        actual = merge_repeated_notes(notelist, overlap_milliseconds=25)
         actual_len = len([i for i in actual if i.pitch == 75])
         self.assertEqual(7, actual_len)
         self.assertLess(actual_len, init_len)
@@ -215,6 +215,12 @@ class LoadScoreTest(unittest.TestCase):
             pm_load = Score(file, ttype="Second")
             # Load with our custom symusic function
             sm_load = load_score(file)
+            # Sanity check that the symusic score is correct
+            self.assertTrue(sm_load.ticks_per_quarter == utils.TICKS_PER_QUARTER)
+            self.assertTrue(len(sm_load.tempos) == 1)
+            self.assertTrue(sm_load.tempos[0].qpm == utils.TEMPO)
+            self.assertTrue(len(sm_load.time_signatures) == 1)
+            self.assertTrue(sm_load.time_signatures[0].numerator == utils.TIME_SIGNATURE)
             # Get the notes from both files and sort by onset time (not sure if this is necessary)
             pm_notes = sorted(pm_load.tracks[0].notes, key=lambda x: x.start)
             sm_notes = sorted(sm_load.tracks[0].notes, key=lambda x: x.start)
@@ -227,4 +233,5 @@ class LoadScoreTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    utils.seed_everything(utils.SEED)
     unittest.main()

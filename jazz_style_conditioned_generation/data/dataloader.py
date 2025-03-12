@@ -23,8 +23,6 @@ from jazz_style_conditioned_generation.data.conditions import (
     add_condition_tokens_to_sequence
 )
 from jazz_style_conditioned_generation.data.scores import (
-    OVERLAP_MILLISECONDS,
-    MIN_DURATION_MILLISECONDS,
     load_score,
     preprocess_score
 )
@@ -121,17 +119,11 @@ class DatasetMIDIRandomChunk:
             condition_mapping: dict[str, dict] = None,
             n_clips: int = None,
             chunk_end_overlap: float = 0.5,
-            min_duration_ticks: int = MIN_DURATION_MILLISECONDS,
-            overlap_ticks: int = OVERLAP_MILLISECONDS
     ):
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len
         self.do_augmentation = do_augmentation
         self.chunk_end_overlap = chunk_end_overlap
-
-        # For preprocessing
-        self.min_duration_ticks = min_duration_ticks
-        self.overlap_ticks = overlap_ticks
 
         # MIDI file paths
         self.files_paths = files_paths
@@ -183,11 +175,7 @@ class DatasetMIDIRandomChunk:
         except SCORE_LOADING_EXCEPTION:
             return {"input_ids": None, "labels": None}
         # Apply our own preprocessing to the score
-        preprocessed_score = preprocess_score(
-            score,
-            min_duration_ticks=self.min_duration_ticks,
-            overlap_ticks=self.overlap_ticks
-        )
+        preprocessed_score = preprocess_score(score)
         # Perform data augmentation on the score object if required
         if self.do_augmentation:
             preprocessed_score = data_augmentation(preprocessed_score)
@@ -245,17 +233,11 @@ class DatasetMIDIExhaustive:
             do_conditioning: bool = True,
             condition_mapping: dict[str, dict] = None,
             n_clips: int = None,
-            min_duration_ticks: int = MIN_DURATION_MILLISECONDS,
-            overlap_ticks: int = OVERLAP_MILLISECONDS
     ):
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_len
         if do_augmentation:
             raise NotImplementedError("Data augmentation not implemented for exhaustive MIDI loader")
-
-        # For preprocessing
-        self.min_duration_ticks = min_duration_ticks
-        self.overlap_ticks = overlap_ticks
 
         # Conditioning
         self.do_conditioning = do_conditioning
@@ -304,11 +286,7 @@ class DatasetMIDIExhaustive:
             # Open file as a symusic score object
             score = load_score(file)
             # Apply our own preprocessing to the score
-            preprocessed_score = preprocess_score(
-                score,
-                min_duration_ticks=self.min_duration_ticks,
-                overlap_ticks=self.overlap_ticks
-            )
+            preprocessed_score = preprocess_score(score)
             # Convert into chunks
             chunked_file = self.chunker(preprocessed_score)
             # Yield tuples of (filename, chunk_idx)
@@ -324,11 +302,7 @@ class DatasetMIDIExhaustive:
         except SCORE_LOADING_EXCEPTION:
             return {"input_ids": None, "labels": None}
         # Apply our own preprocessing to the score
-        preprocessed_score = preprocess_score(
-            score,
-            min_duration_ticks=self.min_duration_ticks,
-            overlap_ticks=self.overlap_ticks
-        )
+        preprocessed_score = preprocess_score(score, )
         # Convert the whole score into chunks
         chunked = self.chunker(preprocessed_score)
         # Get the chunk we desire
