@@ -7,7 +7,7 @@ import numpy as np
 from miditok.data_augmentation import augment_score
 from symusic import Score
 
-import utils
+from jazz_style_conditioned_generation import utils
 
 PITCH_AUGMENT_RANGE = range(-3, 4)  # as in Music Transformer
 DURATION_AUGMENT_RANGE = [0.95, 0.975, 1.0, 1.025, 1.05]  # as in Music Transformer
