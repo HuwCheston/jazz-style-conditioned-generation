@@ -70,6 +70,10 @@ class TestUtils(unittest.TestCase):
             with self.assertRaises(ValueError):
                 utils.string_to_bool(value)
 
+    @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
+    def test_skip_on_github_actions(self):
+        self.assertTrue(len(os.listdir(os.path.join(utils.get_project_root(), "data/raw/pijama"))) > 100)
+
 
 if __name__ == '__main__':
     unittest.main()
