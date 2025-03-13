@@ -1,0 +1,128 @@
+{
+  "moods": [
+    {
+      "name": "Complex",
+      "weight": 7
+    },
+    {
+      "name": "Rollicking",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 8
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 8
+    },
+    {
+      "name": "Organic",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 8
+    },
+    {
+      "name": "Searching",
+      "weight": 4
+    },
+    {
+      "name": "Energetic",
+      "weight": 7
+    },
+    {
+      "name": "Light",
+      "weight": 6
+    },
+    {
+      "name": "Whimsical",
+      "weight": 6
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Exuberant",
+      "weight": 4
+    },
+    {
+      "name": "Lively",
+      "weight": 5
+    },
+    {
+      "name": "Smooth",
+      "weight": 9
+    },
+    {
+      "name": "Earthy",
+      "weight": 5
+    },
+    {
+      "name": "Bright",
+      "weight": 8
+    }
+  ],
+  "genres": [
+    {
+      "name": "Saxophone Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "Horace Parlan",
+      "weight": 8
+    },
+    {
+      "name": "Hank Jones",
+      "weight": 8
+    },
+    {
+      "name": "Kenny Drew",
+      "weight": 9
+    },
+    {
+      "name": "George Cables",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Duke Jordan",
+  "bio": [
+    "Although he had a long career, Duke Jordan will always be best known for being pianist with Charlie Parker's classic 1947 quintet. A little earlier, he worked with the Savoy Sultans, Coleman Hawkins, and the Roy Eldridge big band (1946). After his year with Parker (his piano introductions to such songs as \"Embraceable You\" were classic), Jordan worked with the Sonny Stitt/Gene Ammons quintet (1950-1951) and Stan Getz (1949 and 1952-1953). He started recording as a leader in 1954, debuting his most famous composition, \"Jor-Du,\" the following year. Although he worked steadily during the next few decades (writing part of the soundtrack for the French film Les Liaisons Dangereuses), Jordan was in obscurity until he began recording on a regular basis for Steeplechase in 1973. Duke Jordan, who was married for a time to the talented jazz singer Sheila Jordan, lived in Denmark from 1978 until his death on August 8, 2006. He recorded through the years for Prestige, Savoy, Blue Note, Charlie Parker Records, Muse, Spotlite, and Steeplechase."
+  ]
+}

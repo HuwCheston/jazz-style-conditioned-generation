@@ -1,0 +1,141 @@
+{
+  "moods": [
+    {
+      "name": "Rollicking",
+      "weight": 8
+    },
+    {
+      "name": "Earthy",
+      "weight": 8
+    },
+    {
+      "name": "Energetic",
+      "weight": 7
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Reverent",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 8
+    },
+    {
+      "name": "Complex",
+      "weight": 7
+    },
+    {
+      "name": "Intense",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Bright",
+      "weight": 8
+    },
+    {
+      "name": "Ambitious",
+      "weight": 9
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 7
+    },
+    {
+      "name": "Organic",
+      "weight": 6
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Knotty",
+      "weight": 5
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 4
+    },
+    {
+      "name": "Intimate",
+      "weight": 6
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 3
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Adam Makowicz",
+      "weight": 9
+    },
+    {
+      "name": "Makoto Ozone",
+      "weight": 9
+    },
+    {
+      "name": "Tete Montoliu",
+      "weight": 8
+    },
+    {
+      "name": "Hiromi",
+      "weight": 5
+    },
+    {
+      "name": "Ahmad Jamal",
+      "weight": 5
+    },
+    {
+      "name": "Fred Hersch",
+      "weight": 7
+    },
+    {
+      "name": "Jessica Williams",
+      "weight": 7
+    },
+    {
+      "name": "Abdullah Ibrahim",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Michel Petrucciani",
+  "bio": [
+    "French pianist known as an accomplished technician, with solos that show a masterful harmonic talent.",
+    "Michel Petrucciani overcame the effects of osteogenensis imperfecta (a bone disease that greatly stunted his growth) to become a powerful pianist. Originally greatly influenced by Bill Evans and to a lesser extent Keith Jarrett, Petrucciani developed his own individual voice. He started by playing in the family band with his guitarist father and bassist brother. At the age of 15 he had the opportunity to play with Kenny Clarke and Clark Terry, and at 17 he made his first recording. Petrucciani toured France with Lee Konitz in a duo (1980) and moved to the U.S. in 1982. At that time he coaxed Charles Lloyd out of retirement and toured with his quartet, a mutually beneficial relationship. Petrucciani was a strong attraction in the U.S., usually playing with a quartet (sometimes featuring Adam Holzman's synthesizer for color) or as a soloist; in 1986 he recorded at Montreux with Jim Hall and Wayne Shorter. Although Petrucciani's ability to overcome his affliction was admirable, his impressive playing stood by itself; he died of a pulmonary infection on January 6, 1999."
+  ]
+}

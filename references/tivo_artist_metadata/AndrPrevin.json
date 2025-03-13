@@ -1,0 +1,214 @@
+{
+  "moods": [
+    {
+      "name": "Stylish",
+      "weight": 8
+    },
+    {
+      "name": "Refined",
+      "weight": 7
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Reserved",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 8
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Smooth",
+      "weight": 8
+    },
+    {
+      "name": "Theatrical",
+      "weight": 8
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Restrained",
+      "weight": 5
+    },
+    {
+      "name": "Improvisatory",
+      "weight": 6
+    },
+    {
+      "name": "Melodic",
+      "weight": 7
+    },
+    {
+      "name": "Tense/Anxious",
+      "weight": 5
+    },
+    {
+      "name": "Wistful",
+      "weight": 7
+    },
+    {
+      "name": "Swinging",
+      "weight": 8
+    },
+    {
+      "name": "Suspenseful",
+      "weight": 7
+    },
+    {
+      "name": "Romantic",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 6
+    },
+    {
+      "name": "Lively",
+      "weight": 6
+    },
+    {
+      "name": "Autumnal",
+      "weight": 8
+    },
+    {
+      "name": "Sentimental",
+      "weight": 6
+    },
+    {
+      "name": "Nostalgic",
+      "weight": 8
+    },
+    {
+      "name": "Yearning",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Show Tunes",
+      "weight": 5
+    },
+    {
+      "name": "Bop",
+      "weight": 8
+    },
+    {
+      "name": "Standards",
+      "weight": 5
+    },
+    {
+      "name": "Swing",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 8
+    },
+    {
+      "name": "Jazz-Pop",
+      "weight": 5
+    },
+    {
+      "name": "West Coast Jazz",
+      "weight": 8
+    },
+    {
+      "name": "Concerto",
+      "weight": 6
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Musical Theater",
+      "weight": 5
+    },
+    {
+      "name": "Cool",
+      "weight": 8
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Vocal",
+      "weight": 5
+    },
+    {
+      "name": "Cast Recordings",
+      "weight": 5
+    },
+    {
+      "name": "Stage & Screen",
+      "weight": 5
+    },
+    {
+      "name": "Classical",
+      "weight": 9
+    },
+    {
+      "name": "Orchestral",
+      "weight": 9
+    },
+    {
+      "name": "Choral",
+      "weight": 5
+    },
+    {
+      "name": "Chamber Music",
+      "weight": 5
+    },
+    {
+      "name": "Symphony",
+      "weight": 5
+    },
+    {
+      "name": "Ballet",
+      "weight": 6
+    }
+  ],
+  "similars": [
+    {
+      "name": "George Shearing",
+      "weight": 9
+    },
+    {
+      "name": "Erroll Garner",
+      "weight": 9
+    },
+    {
+      "name": "Michel Legrand",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "André Previn",
+  "bio": [
+    "Prolific jazz pianist and Academy Award-winning film scorer who later found fame as a leading classical conductor.",
+    "Known as a successful classical conductor, jazz pianist, and composer of jazz, classical, and film music, André Previn frequently bridged the gap between popular and so-called \"serious\" music, and in doing so broadened the horizons of both. A German-American who fled Nazi Germany with his family in his youth, he went on to win four Academy Awards, all for his work on film musicals in late '50s and '60s, including his adaptation of My Fair Lady (1964). By the '70s, he had established himself as one of the world's leading classical conductors, with terms at the London Symphony Orchestra (1968-1979), Pittsburgh Symphony Orchestra (1976-1984), and Royal Philharmonic Orchestra (1985-1992). He also served as music director of the Los Angeles Philharmonic from 1985 to 1989. During his tenure at the LSO, the BBC series André Previn's Music Hour made him household name. All the while, his career-spanning jazz recordings included collaborations with artists such as Benny Carter, Herb Ellis, and Shelly Manne, as well as classical artists including Itzhak Perlman, Leontyne Price, and Kiri Te Kanawa. Winner of ten Grammy Awards, Previn was the recipient of the Grammy Lifetime Achievement Award in 2010.\r\nA native of Berlin, Previn's father was an accomplished pianist (though a lawyer by profession) and determined that his son would follow in his musical footsteps. The talented young André received instruction on the piano at the Berlin Hochschule, and also absorbed music in a less formal environment during the many private recitals given in the Previn home. In 1938, the Jewish family fled to France where André continued as a scholarship student at the Paris Conservatoire. In 1939, the Previn family relocated to southern California.\r\nLife was difficult for the family (all their possessions had been left behind in Europe, and Previn's father was qualified only in German law), and though barely ten years old, André supplemented the family income by accompanying films at movie houses and playing in jazz clubs. At 14 he started working at MGM (Charles Previn, André's great uncle, was head of music at Universal Studios), orchestrating and arranging film music, and slowly saved enough money to study composition with Castelnuovo-Tedesco. At 18, André was asked to compose his own full-length film score, 1949's The Sun Comes Up, which resulted in his first experience on the podium in front of a real orchestra.\r\nPrevin, who had taken U.S. citizenship in 1943, served in San Francisco during the Korean War, where he had the opportunity to study conducting with Pierre Monteux. Following discharge from the army, Previn left MGM, but continued to compose, conduct, and arrange film music throughout the '50s, winning Academy Awards for his score adaptations of Gigi (1958) and Porgy & Bess (1959). He also recorded and released a series of best-selling jazz albums, something he would continue to do sporadically throughout the decades.\r\nIn the early '60s, Previn's film scores included such enduring works as Elmer Gantry (1960) and The Four Horsemen of the Apocalypse (1962). Shortly before winning his third and fourth Academy Awards for Irma la Douce (1963) and My Fair Lady (1964), Previn found the courage to abandon Hollywood and pursue his dream of becoming a respected conductor. His professional debut occurred in 1963 with the Saint Louis Symphony Orchestra, and he spent the next several years traveling around the country conducting various little-known orchestras in an effort to gain exposure and develop his own skill on the podium. His first big break occurred in 1967 when he was asked to succeed Sir John Barbirolli as music director of the Houston Symphony. When offered the job of principal conductor for the London Symphony Orchestra in 1968, Previn left Houston. During his 11 years with the orchestra (1968-1979), a series of BBC television productions entitled André Previn's Music Hour made the LSO (and Previn) a household name around the world. Other conducting appointments included the Pittsburgh Symphony (1976-1984), the Los Angeles Philharmonic Orchestra (1985-1989), and the Royal Philharmonic Orchestra (1985-1992).\r\nPrevin readily admitted that he was not driven to compose, doing so mostly by request, but he nevertheless composed a generous quantity of concert music, including a piano concerto for Vladimir Ashkenazy and a cello sonata at the request of Yo-Yo Ma. The year 1998 saw the release of his full-length opera A Streetcar Named Desire at the San Francisco Opera. In 2009, Houston Grand Opera presented his Brief Encounter, based on the 1945 film of the same name and its source material, the Noël Coward play Still Life. That year, Previn's diverse career was celebrated with a series of four concerts at Carnegie Hall in honor of his 80th birthday. A year later, he was presented with the Grammy Lifetime Achievement Award. Previn passed away at the end of February 2019.",
+    "Known as a successful classical conductor, jazz pianist, and composer of jazz, classical, and film music, André Previn frequently bridged the gap between popular and so-called \"serious\" music, and in doing so broadened the horizons of both. A German-American who fled Nazi Germany with his family in his youth, he went on to win four Academy Awards for his work on film musicals in the late '50s and '60s. By the '70s, he had established himself as one of the world's leading classical conductors, a role that extended into the next century. All the while, his career-spanning jazz recordings included collaborations with artists such as Benny Carter, Herb Ellis, and Itzhak Perlman. Winner of ten Grammy Awards, Previn received the Grammy Lifetime Achievement Award in 2010."
+  ]
+}

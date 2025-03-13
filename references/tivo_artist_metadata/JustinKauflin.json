@@ -1,0 +1,73 @@
+{
+  "moods": [
+    {
+      "name": "Cerebral",
+      "weight": 6
+    },
+    {
+      "name": "Reflective",
+      "weight": 6
+    },
+    {
+      "name": "Delicate",
+      "weight": 6
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 6
+    },
+    {
+      "name": "Intimate",
+      "weight": 6
+    },
+    {
+      "name": "Passionate",
+      "weight": 5
+    },
+    {
+      "name": "Lyrical",
+      "weight": 5
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 6
+    },
+    {
+      "name": "Swinging",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 8
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Brad Mehldau",
+      "weight": 5
+    },
+    {
+      "name": "Joey Alexander",
+      "weight": 7
+    }
+  ],
+  "tivo_artist_name": "Justin Kauflin",
+  "bio": [
+    "Highly gifted jazz pianist and protege of both trumpeter Clark Terry and Quincy Jones.",
+    "Pianist Justin Kauflin is a talented jazz musician with a bent toward urbane, swinging post-bop. Born in Silver Spring, Maryland in 1986, Kauflin took to music from a young age, starting with Suzuki violin and piano lessons at age two. By the time he was six years old, Kauflin was already playing concerts and, on several occasions, even leading an orchestra. However, it was also around this time that he was diagnosed with a rare eye disease that would leave him completely blind by age eleven. Undeterred, he continued to play piano and by his teens was performing professionally across the United States. After graduating both from Salem High School and the Governor's School for the Arts where he was valedictorian, Kauflin attended William Paterson University in New Jersey on a Presidential scholarship. While at William Paterson, Kauflin developed a mentorship with famed jazz trumpeter and instructor Clark Terry, a relationship detailed in the 2014 documentary film Keep On Keepin' On. Since graduating William Paterson summa cum laude with an Honors degree in Music/Jazz Performance in 2008, Kauflin has led his own trio and worked regularly as a member of drummer Jae Sinnett's trio. In 2010, he released his debut independent album, Introducing Justin Kauflin. Three years later, upon Terry's recommendation, Kauflin signed a management deal with legendary producer Quincy Jones. In 2015, he released his sophomore album, the Jones-produced Dedication."
+  ]
+}

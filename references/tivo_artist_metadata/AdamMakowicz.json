@@ -1,0 +1,124 @@
+{
+  "moods": [
+    {
+      "name": "Gentle",
+      "weight": 9
+    },
+    {
+      "name": "Warm",
+      "weight": 9
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Elegant",
+      "weight": 5
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Bright",
+      "weight": 9
+    },
+    {
+      "name": "Cerebral",
+      "weight": 5
+    },
+    {
+      "name": "Sparkling",
+      "weight": 9
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 9
+    },
+    {
+      "name": "Earnest",
+      "weight": 9
+    },
+    {
+      "name": "Stylish",
+      "weight": 9
+    },
+    {
+      "name": "Light",
+      "weight": 9
+    },
+    {
+      "name": "Innocent",
+      "weight": 9
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 5
+    },
+    {
+      "name": "Intimate",
+      "weight": 9
+    },
+    {
+      "name": "Complex",
+      "weight": 5
+    },
+    {
+      "name": "Confident",
+      "weight": 9
+    }
+  ],
+  "genres": [
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Standards",
+      "weight": 9
+    },
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 8
+    },
+    {
+      "name": "Swing",
+      "weight": 9
+    },
+    {
+      "name": "Vocal",
+      "weight": 9
+    }
+  ],
+  "similars": [
+    {
+      "name": "Keith Jarrett",
+      "weight": 8
+    },
+    {
+      "name": "James Williams",
+      "weight": 8
+    },
+    {
+      "name": "Michel Petrucciani",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Adam Makowicz",
+  "bio": [
+    "Adam Makowicz made a strong impression when he first came to the U.S. and at the time, he was often compared to Art Tatum. Although his technique is nearly on Tatum's level, Makowicz has long had his own style, mixing together different aspects of jazz, ranging from swing to hard bop. He started playing jazz in the late '50s and with Tomasz Stanko formed one of the first European free jazz groups, the Jazz Darings. He led his own groups in Warsaw from 1965 on and in 1970 played electric piano in Michal Urbaniak's band. Makowicz also worked with Urszula Dudziak and recorded several albums in Poland before coming to the United States in 1977. Although the initial publicity (when he was championed by John Hammond) has long since died down, Makowicz has, if anything, continued to improve as a pianist. He has recorded many records as a leader for such labels as Columbia, Stash, Choice, Sheffield Lab, Novus, and Concord."
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "moods": [
+    {
+      "name": "Reserved",
+      "weight": 8
+    },
+    {
+      "name": "Relaxed",
+      "weight": 7
+    },
+    {
+      "name": "Reverent",
+      "weight": 9
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 5
+    },
+    {
+      "name": "Elegant",
+      "weight": 8
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 6
+    },
+    {
+      "name": "Stylish",
+      "weight": 6
+    },
+    {
+      "name": "Light",
+      "weight": 5
+    },
+    {
+      "name": "Intimate",
+      "weight": 6
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Smooth",
+      "weight": 6
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Swing",
+      "weight": 9
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Ellis Marsalis",
+      "weight": 8
+    },
+    {
+      "name": "Earl Hines",
+      "weight": 9
+    },
+    {
+      "name": "Ray Bryant",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Ellis Larkins",
+  "bio": [
+    "Exquisite, self-effacing pianist considered by many to be the finest accompanist of his generation.",
+    "Famous for his subtle chord voicings and ability to accompany singers, Ellis Larkins has been in great demand throughout his long career. His parents were musicians (his mother played piano while his father was a violinist) and Larkins was hailed as a prodigy early on, appearing with an orchestra when he was 11. After graduating from the Peabody Conservatory and Juilliard, Larkins was part of Edmond Hall's group in the mid-'40s; recorded with Mildred Bailey, Coleman Hawkins, and Dicky Wells; and then worked regularly at the Village Vanguard and the Blue Angel in New York over a 20-year period. His duet records with Ella Fitzgerald and Ruby Braff in the 1950s are masterpieces in subtlety, and he was also a busy studio player. During the 1960s, Larkins worked with singers Joe Williams, Jane Harvey, Georgia Gibbs, and even Eartha Kitt and Harry Belafonte; since then, Larkins has continued playing in New York clubs with a wide variety of singers. He recorded as a leader for Storyville and Decca in the 1950s, for Halcyon and Black & Blue in the 1970s, had additional duets with Braff for Chiaroscuro, and was featured on a couple of dates for Concord, including a 1992 recital at Maybeck Recital Hall.",
+    "One of the finest piano accompanists in jazz and cabaret, Ellis Larkins was born and raised in Baltimore, where he became the first African-American to attend the prestigious Peabody School Of Music. Later on, he attended the Juilliard School in New York and eventually became part of the lively late-'40s 52nd St. jazz scene then flourishing in the city. Accompanying Ella Fitzgerald among many others, Larkins's self-effacement, harmonic sophistication, and exquisite touch eventually gained him a reputation as the ultimate singer's pianist. During the '50s, he also recorded a series of of well-regarded duets with the melodic trumpeter Ruby Braff."
+  ]
+}

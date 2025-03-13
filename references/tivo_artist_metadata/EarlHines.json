@@ -1,0 +1,121 @@
+{
+  "moods": [
+    {
+      "name": "Soothing",
+      "weight": 6
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 7
+    },
+    {
+      "name": "Organic",
+      "weight": 7
+    },
+    {
+      "name": "Cheerful",
+      "weight": 8
+    },
+    {
+      "name": "Complex",
+      "weight": 6
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 7
+    },
+    {
+      "name": "Joyous",
+      "weight": 8
+    },
+    {
+      "name": "Rollicking",
+      "weight": 4
+    },
+    {
+      "name": "Exuberant",
+      "weight": 6
+    },
+    {
+      "name": "Energetic",
+      "weight": 6
+    },
+    {
+      "name": "Stylish",
+      "weight": 8
+    },
+    {
+      "name": "Uplifting",
+      "weight": 7
+    },
+    {
+      "name": "Street-Smart",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Big Band",
+      "weight": 9
+    },
+    {
+      "name": "Early Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Swing",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Stride",
+      "weight": 7
+    }
+  ],
+  "similars": [
+    {
+      "name": "Ralph Sutton",
+      "weight": 9
+    },
+    {
+      "name": "Ellis Larkins",
+      "weight": 9
+    },
+    {
+      "name": "Dick Hyman",
+      "weight": 9
+    },
+    {
+      "name": "Art Tatum",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Earl Hines",
+  "bio": [
+    "Influential pianist whose melodic sense and innovative rhythmic style made him one of the pioneers of modern jazz.",
+    "Once called \"the first modern jazz pianist,\" Earl Hines differed from the stride pianists of the 1920s by breaking up the stride rhythms with unusual accents from his left hand. While his right hand often played octaves so as to ring clearly over ensembles, Hines had the trickiest left hand in the business, often suspending time recklessly but without ever losing the beat. One of the all-time great pianists, Hines was a major influence on Teddy Wilson, Jess Stacy, Joe Sullivan, Nat King Cole, and even to an extent on Art Tatum. He was also an underrated composer responsible for \"Rosetta,\" \"My Monday Date,\" and \"You Can Depend on Me,\" among others.\r\nEarl Hines played trumpet briefly as a youth before switching to piano. His first major job was accompanying vocalist Lois Deppe, and he made his first recordings with Deppe and his orchestra in 1922. The following year, Hines moved to Chicago where he worked with Sammy Stewart and Erskine Tate's Vendome Theatre Orchestra. He started teaming up with Louis Armstrong in 1926, and the two masterful musicians consistently inspired each other. Hines worked briefly in Armstrong's big band (formerly headed by Carroll Dickerson), and they unsuccessfully tried to manage their own club. 1928 was one of Hines' most significant years. He recorded his first ten piano solos, including versions of \"A Monday Date,\" \"Blues in Thirds,\" and \"57 Varieties.\" Hines worked much of the year with Jimmy Noone's Apex Club Orchestra, and their recordings are also considered classic. Hines cut brilliant (and futuristic) sides with Louis Armstrong's Hot Five, resulting in such timeless gems as \"West End Blues,\" \"Fireworks,\" \"Basin Street Blues,\" and their remarkable trumpet-piano duet \"Weather Bird.\" And on his birthday on December 28, Hines debuted with his big band at Chicago's Grand Terrace.\r\nA brilliant ensemble player as well as soloist, Earl Hines would lead big bands for the next 20 years. Among the key players in his band throughout the 1930s were trumpeter/vocalist Walter Fuller, Ray Nance on trumpet and violin (prior to joining Duke Ellington), trombonist Trummy Young, tenor saxophonist Budd Johnson, Omer Simeon and Darnell Howard on reeds, and arranger Jimmy Mundy. In 1940, Billy Eckstine became the band's popular singer, and in 1943 (unfortunately during the musicians' recording strike), Hines welcomed such modernists as Charlie Parker (on tenor), trumpeter Dizzy Gillespie, and singer Sarah Vaughan in what was the first bebop orchestra. By the time the strike ended, Eckstine, Parker, Gillespie, and Vaughan were gone, but tenor Wardell Gray was still around to star with the group during 1945 and 1946.\r\nIn 1948, the economic situation forced Hines to break up his orchestra. He joined the Louis Armstrong All-Stars, but three years of playing second fiddle to his old friend were difficult to take. After leaving Armstrong in 1951, Hines moved to Los Angeles and later San Francisco, heading a Dixieland band. Although his style was much more modern, Hines kept the group working throughout the 1950s, at times featuring Muggsy Spanier, Jimmy Archey, and Darnell Howard. Hines did record on a few occasions, but was largely forgotten in the jazz world by the early '60s. Then, in 1964, jazz writer Stanley Dance arranged for him to play three concerts at New York's Little Theater, both solo and in a quartet with Budd Johnson. The New York critics were amazed by Hines' continuing creativity and vitality, and he had a major comeback that lasted through the rest of his career. Hines traveled the world with his quartet, recorded dozens of albums, and remained famous and renowned up until his death at the age of 79."
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Jazz",
+      "weight": 5
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "Robi Botos",
+  "bio": []
+}

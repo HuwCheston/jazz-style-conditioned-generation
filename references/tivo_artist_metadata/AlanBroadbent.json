@@ -1,0 +1,117 @@
+{
+  "moods": [
+    {
+      "name": "Poignant",
+      "weight": 4
+    },
+    {
+      "name": "Elegant",
+      "weight": 3
+    },
+    {
+      "name": "Intimate",
+      "weight": 8
+    },
+    {
+      "name": "Cerebral",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 8
+    },
+    {
+      "name": "Smooth",
+      "weight": 3
+    },
+    {
+      "name": "Stylish",
+      "weight": 8
+    },
+    {
+      "name": "Gentle",
+      "weight": 6
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 8
+    },
+    {
+      "name": "Sentimental",
+      "weight": 6
+    },
+    {
+      "name": "Soothing",
+      "weight": 4
+    },
+    {
+      "name": "Restrained",
+      "weight": 6
+    }
+  ],
+  "genres": [
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Show/Musical",
+      "weight": 4
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 4
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Film Score",
+      "weight": 2
+    },
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Bill Evans",
+      "weight": 9
+    },
+    {
+      "name": "Oscar Peterson",
+      "weight": 8
+    },
+    {
+      "name": "Roger Kellaway",
+      "weight": 9
+    },
+    {
+      "name": "Bill Charlap",
+      "weight": 7
+    },
+    {
+      "name": "Fred Hersch",
+      "weight": 7
+    },
+    {
+      "name": "Cyrus Chestnut",
+      "weight": 7
+    }
+  ],
+  "tivo_artist_name": "Alan Broadbent",
+  "bio": [
+    "Grammy Award-winning jazz pianist and arranger known for his many trio albums and arranging work with vocalists.",
+    "A highly regarded, Grammy Award-winning jazz pianist and arranger, Alan Broadbent is a lyrical and melodic post-bopper who has cited Bill Evans, Wynton Kelly, Tommy Flanagan, Nat \"King\" Cole, and Red Garland as some of his favorite pianists. Along with his own jazz recordings, Broadbent is an in-demand arranger, having made his reputation as vocalist Natalie Cole's pianist and conductor in the '90s. Since then, he has balanced his love of small-group jazz with larger arranging and conducting work for a bevy of marquee performers. \r\nRaised in New Zealand, he moved to Boston in 1966 to study at the prestigious Berklee College of Music. After staying on the road with Woody Herman (for whom he was a writer, arranger, and soloist) from 1969-1972, he settled in Los Angeles. Broadbent went on to work as a sideman for Chet Baker, tenor saxmen Warne Marsh and Gary Foster, and singer Irene Kral in the '70s, and with Bud Shank and arranger Nelson Riddle in the '80s. Although he appeared on several recordings in the '70s, he made his official debut as leader with several trio sessions, including 1984's Song of Home and 1985's Further Down the Road.  \r\nMore albums followed in the '90s, including Concord label releases like 1994's Pacific Standard Time and 1997's Personal Standards. He also played alongside bassist Charlie Haden, tenor saxman Ernie Watts, and drummer Larance Marable in Haden's Quartet West -- a unique and conceptual L.A.-based group known for including bits of dialogue from film noir movies between bop performances. During this period, he also wrote arrangements for Natalie Cole's Unforgettable: With Love album. He toured with the singer, and soon found himself working in similar fashion for artists including Sheila Jordan, Karrin Allyson, and Marian McPartland, among others. In 1997, he earned his first Grammy Award for his work on Cole's version of \"When I Fall in Love\" from her Stardust album. He then garnered a second Grammy Award for \"Lonely Town\" from Charlie Haden and Quartet West's 1999 album, The Art of the Song, featuring singer Shirley Horn. \r\nBroadbent has stayed active following the turn of the millennium, recording for a handful of smaller labels and delivering albums like 2005's 'Round Midnight, a trio date with bassist Brian Bromberg and drummer Joe La Barbera; 2006's Every Time I Think of You; and 2008's Moment's Notice. He also remains an in-demand arranger/conductor, working with such luminaries as Michael Bublé, Andrea Bocelli, Kristin Chenoweth, Diana Krall, and others. In 2015, he paired with the London Metropolitan Orchestra for Developing Story. He then collaborated with singer Georgia Mancio on 2017's Songbook."
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Gospel",
+      "weight": 6
+    },
+    {
+      "name": "Religious",
+      "weight": 10
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "Lance Anderson",
+  "bio": []
+}

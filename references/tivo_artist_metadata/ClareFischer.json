@@ -1,0 +1,34 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Latin Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Global Jazz",
+      "weight": 9
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "Clare Fischer",
+  "bio": [
+    "Clare Fischer had a varied career as keyboardist, composer, arranger, and bandleader. The composer of two standards, \"Pensativa\" and \"Morning,\" Fischer long had an interest in Latin rhythms. After graduating from Michigan State University, he moved to Los Angeles in 1957, working as accompanist and arranger for the Hi-Lo's. He wrote for a 1960 Dizzy Gillespie album (A Portrait of Duke Ellington) and recorded bossa nova as early as 1962; that same year he recorded two trio sets and the following year he led his first big band date. Fischer, who alternated between the two formats through the years, recorded in a wide variety of settings from solo piano to heading a vocal-dominated Latin group Salsa Picante. Based in Los Angeles, Fischer (who is also an effective organist and a strong electric keyboardist) recorded extensively through the years for such labels as Pacific Jazz/World Pacific, Revelation, Discovery, MPS, and Concord. In 2003, he produced his first classical CD, After the Rain. Clare Fischer died on January 26, 2012 at a Burbank, California hospital after suffering a heart attack two weeks previously. He was 83 years old."
+  ]
+}

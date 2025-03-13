@@ -1,0 +1,161 @@
+{
+  "moods": [
+    {
+      "name": "Reflective",
+      "weight": 4
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 5
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 6
+    },
+    {
+      "name": "Rousing",
+      "weight": 5
+    },
+    {
+      "name": "Earthy",
+      "weight": 5
+    },
+    {
+      "name": "Elegant",
+      "weight": 8
+    },
+    {
+      "name": "Exuberant",
+      "weight": 5
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Rollicking",
+      "weight": 5
+    },
+    {
+      "name": "Intimate",
+      "weight": 5
+    },
+    {
+      "name": "Joyous",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 8
+    },
+    {
+      "name": "Carefree",
+      "weight": 9
+    },
+    {
+      "name": "Energetic",
+      "weight": 5
+    },
+    {
+      "name": "Warm",
+      "weight": 4
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 5
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "Bobby Timmons",
+      "weight": 8
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 8
+    },
+    {
+      "name": "Wynton Kelly",
+      "weight": 9
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 8
+    },
+    {
+      "name": "James Williams",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "George Cables",
+      "weight": 8
+    },
+    {
+      "name": "Sonny Clark",
+      "weight": 8
+    },
+    {
+      "name": "Mary Lou Williams",
+      "weight": 8
+    },
+    {
+      "name": "Paul Bley",
+      "weight": 7
+    },
+    {
+      "name": "Kenny Drew",
+      "weight": 6
+    },
+    {
+      "name": "Teddy Wilson",
+      "weight": 6
+    },
+    {
+      "name": "Oscar Peterson",
+      "weight": 5
+    },
+    {
+      "name": "Hank Jones",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Red Garland",
+  "bio": [
+    "Acclaimed jazz pianist known for his skillful, sophisticated technique and powerful stint in Miles Davis' first classic quintet.",
+    "Red Garland mixed together the usual influences of his generation (Nat Cole, Bud Powell, and Ahmad Jamal) into his own distinctive approach; Garland's block chords themselves became influential on the players of the 1960s. He started out playing clarinet and alto, switching to piano when he was 18. During 1946-1955, he worked steadily in New York and Philadelphia, backing such major players as Charlie Parker, Coleman Hawkins, Lester Young, and Roy Eldridge, but still remaining fairly obscure. That changed when he became a member of the classic Miles Davis Quintet (1955-1958), heading a rhythm section that also included Paul Chambers and Philly Joe Jones. After leaving Miles, Garland had his own popular trio and recorded very frequently for Prestige, Jazzland, and Moodsville during 1956-1962 (the majority of which are available in the Original Jazz Classics series). The pianist eventually returned to Texas and was in semi-retirement, but came back gradually in the 1970s, recording for MPS (1971) and Galaxy (1977-1979) before retiring again."
+  ]
+}

@@ -1,0 +1,157 @@
+{
+  "moods": [
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Energetic",
+      "weight": 7
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Earnest",
+      "weight": 8
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 8
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Exuberant",
+      "weight": 9
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 8
+    },
+    {
+      "name": "Uplifting",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Playful",
+      "weight": 8
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Wry",
+      "weight": 7
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Stately",
+      "weight": 7
+    },
+    {
+      "name": "Rousing",
+      "weight": 7
+    },
+    {
+      "name": "Street-Smart",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "West Coast Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 9
+    },
+    {
+      "name": "Wynton Kelly",
+      "weight": 9
+    },
+    {
+      "name": "Barry Harris",
+      "weight": 8
+    },
+    {
+      "name": "Hampton Hawes",
+      "weight": 9
+    },
+    {
+      "name": "Herbie Nichols",
+      "weight": 8
+    },
+    {
+      "name": "Cedar Walton",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Sonny Clark",
+  "bio": [
+    "Pianist who is a wonderful accompanist and gifted writer, admired especially for his amazing right-hand lines and incredible rhythmic drive.",
+    "Like Fats Navarro and Charlie Parker before him, Sonny Clark's life was short but it burned with musical intensity. Influenced deeply by Bud Powell, Clark nonetheless developed an intricate and hard-swinging harmonic sensibility that was full of nuance and detail. Regarded as the quintessential hard bop pianist, Clark never got his due before he passed away in 1963 at the age of 31, despite the fact that it can be argued that he never played a bad recording date either as a sideman or as a leader. Known mainly for seven records on the Blue Note label with a host of players including such luminaries as John Coltrane, Art Farmer, Donald Byrd, Jackie McLean, Hank Mobley, Art Taylor, Paul Chambers, Wilbur Ware, Philly Joe Jones, and others, Clark actually made his recording debut with Teddy Charles and Wardell Gray, but left soon after to join Buddy DeFranco. His work with the great clarinetist has been documented in full in a Mosaic set that is now sadly out of print. Clark also backed Dinah Washington, Serge Chaloff, and Sonny Criss before assuming his role as a leader in 1957. Clark's classic is regarded as Cool Struttin' but each date he led on Blue Note qualifies as a classic, including his final date, Sonny's Crib with John Coltrane. And though commercial success always eluded him, he was in demand as a sideman and played dozens of Alfred Lion-produced dates, including Tina Brooks' Minor Move. Luckily, Clark's contribution is well documented by Alfred Lion; he has achieved far more critical, musical, and popular acclaim than he ever did in life."
+  ]
+}

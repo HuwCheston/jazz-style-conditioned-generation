@@ -1,0 +1,217 @@
+{
+  "moods": [
+    {
+      "name": "Exuberant",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Rousing",
+      "weight": 7
+    },
+    {
+      "name": "Ambitious",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Uncompromising",
+      "weight": 9
+    },
+    {
+      "name": "Innocent",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Earnest",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Complex",
+      "weight": 9
+    },
+    {
+      "name": "Melancholy",
+      "weight": 9
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Whimsical",
+      "weight": 7
+    },
+    {
+      "name": "Humorous",
+      "weight": 7
+    },
+    {
+      "name": "Boisterous",
+      "weight": 7
+    },
+    {
+      "name": "Provocative",
+      "weight": 9
+    },
+    {
+      "name": "Confident",
+      "weight": 9
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 9
+    },
+    {
+      "name": "Cerebral",
+      "weight": 9
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Rebellious",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Wry",
+      "weight": 7
+    },
+    {
+      "name": "Gritty",
+      "weight": 7
+    },
+    {
+      "name": "Earthy",
+      "weight": 7
+    },
+    {
+      "name": "Greasy",
+      "weight": 7
+    },
+    {
+      "name": "Fiery",
+      "weight": 7
+    },
+    {
+      "name": "Intense",
+      "weight": 6
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Avant-Garde Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Third Stream",
+      "weight": 5
+    },
+    {
+      "name": "Progressive Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Stride",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Thelonious Monk",
+      "weight": 9
+    },
+    {
+      "name": "Dick Hyman",
+      "weight": 6
+    },
+    {
+      "name": "Tommy Flanagan",
+      "weight": 7
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 7
+    },
+    {
+      "name": "John Hicks",
+      "weight": 6
+    },
+    {
+      "name": "Keith Jarrett",
+      "weight": 5
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 7
+    },
+    {
+      "name": "Kenny Barron",
+      "weight": 6
+    }
+  ],
+  "tivo_artist_name": "Jaki Byard",
+  "bio": [
+    "Inventive pianist capable of any style from stride to avant-garde, as well as an ingenious composer and first-rate bandleader.",
+    "The late Jaki Byard was, arguably, the most versatile pianist in jazz, though he also played trombone and was an excellent tenor saxophonist. Born in 1922, he grew up during the golden era, and while younger than Duke Ellington, he embraced, as had his predecessor, all of the changes the music went through, from its origins in New Orleans through the free improvisation era. Byard would, in a single solo concert, reveal his truly awesome mastery of the aforementioned styles, as well as R&B, stride, swing, funk, blues, honky tonk, and the extreme arpeggios of Art Tatum. But Byard's style was completely his own, developed from his early days playing with Earl Bostic in the late '40s and early '50s. After leaving Bostic, he played with Herb Pomeroy and Maynard Ferguson until he won a spot in the legendary Charles Mingus band of 1962-1964 along with Eric Dolphy. He also recorded with Dolphy and Booker Ervin, as well as Charlie Mariano and Rahsaan Roland Kirk. One of his notable achievements was as the pianist in the Mingus band that tore apart concert halls all over Europe in 1964. Between 1961 and 1972, he issued a string of his own dates for Prestige (Hi-Fly, Here's Jaki, and Out Front! among them) and other labels; they embody his finest work, with a rhythm section that included Richard Davis and Alan Dawson, though he never made a bad record. Byard became an educator in the early '70s (after another collaboration with Mingus in 1970), teaching at Harvard, the Hartt School of Music, and the New England Conservatory, and he recorded and performed intermittently the world over until his death from a gunshot wound in 1999."
+  ]
+}

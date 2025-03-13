@@ -1,0 +1,266 @@
+{
+  "moods": [
+    {
+      "name": "Witty",
+      "weight": 6
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Joyous",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Ambitious",
+      "weight": 9
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Provocative",
+      "weight": 7
+    },
+    {
+      "name": "Uncompromising",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Intense",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 6
+    },
+    {
+      "name": "Playful",
+      "weight": 8
+    },
+    {
+      "name": "Stately",
+      "weight": 8
+    },
+    {
+      "name": "Stylish",
+      "weight": 9
+    },
+    {
+      "name": "Urgent",
+      "weight": 8
+    },
+    {
+      "name": "Fiery",
+      "weight": 8
+    },
+    {
+      "name": "Uplifting",
+      "weight": 7
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Energetic",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Bravado",
+      "weight": 7
+    },
+    {
+      "name": "Earnest",
+      "weight": 7
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Rousing",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 9
+    },
+    {
+      "name": "Aggressive",
+      "weight": 7
+    },
+    {
+      "name": "Earthy",
+      "weight": 8
+    },
+    {
+      "name": "Wry",
+      "weight": 7
+    },
+    {
+      "name": "Spiritual",
+      "weight": 7
+    },
+    {
+      "name": "Sprawling",
+      "weight": 7
+    },
+    {
+      "name": "Thoughtful",
+      "weight": 8
+    },
+    {
+      "name": "Street-Smart",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 9
+    },
+    {
+      "name": "Nocturnal",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Modern Big Band",
+      "weight": 7
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 6
+    },
+    {
+      "name": "Avant-Garde Jazz",
+      "weight": 6
+    },
+    {
+      "name": "Modern Creative",
+      "weight": 5
+    },
+    {
+      "name": "Standards",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Modal Music",
+      "weight": 9
+    },
+    {
+      "name": "Progressive Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Afro-Cuban Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Global Jazz",
+      "weight": 6
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Bill Evans",
+      "weight": 7
+    },
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "Geri Allen",
+      "weight": 8
+    },
+    {
+      "name": "Benny Green",
+      "weight": 8
+    },
+    {
+      "name": "Kenny Werner",
+      "weight": 9
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "Marcus Roberts",
+      "weight": 9
+    },
+    {
+      "name": "Joanne Brackeen",
+      "weight": 8
+    },
+    {
+      "name": "George Cables",
+      "weight": 8
+    },
+    {
+      "name": "Herbie Nichols",
+      "weight": 8
+    },
+    {
+      "name": "Herbie Hancock",
+      "weight": 8
+    },
+    {
+      "name": "Chick Corea",
+      "weight": 7
+    },
+    {
+      "name": "Keith Jarrett",
+      "weight": 7
+    },
+    {
+      "name": "Ahmad Jamal",
+      "weight": 6
+    }
+  ],
+  "tivo_artist_name": "McCoy Tyner",
+  "bio": [
+    "Jazz pianist whose inventive two-handed forays, extensive modal solos, and dashing phrases made him arguably the best pianist to debut in the '60s.",
+    "One of the most celebrated and influential jazz pianists of his generation, McCoy Tyner was known for his harmonically expansive modal voicings, commanding two-handed block-chord style, and fearless improvisational lines that touched upon African and Eastern musical traditions. Along with contemporaries Herbie Hancock, Bill Evans, and Chick Corea, Tyner redefined the sound of the modern jazz piano from the '60s onward, and his playing continues to guide up-and-coming musicians. Although primarily recognized for his work as a member of saxophonist John Coltrane's famed quartet with bassist Jimmy Garrison and drummer Elvin Jones, Tyner distinguished himself as a leader in his own right, releasing forward-looking dates like 1967's The Real McCoy, 1972's Sahara, and 1980's Horizon. Those albums found him building upon his time with Coltrane, having already contributed to innovative albums like 1961's Africa/Brass, 1961's My Favorite Things, and 1965's A Love Supreme. Throughout his career, Tyner continued to push himself, arranging for his big band and releasing Grammy-winning albums with 1987's Blues for Coltrane: A Tribute to John Coltrane and 1992's The Turning Point. Active well into his seventies, Tyner remained a vital performer, becoming an NEA Jazz Master in 2002 and winning another Grammy for 2004's Illuminations with Christian McBride and Terence Blanchard. More engaging collaborations followed, including 2007's McCoy Tyner Quartet with Joe Lovano and 2008's Guitars with Bill Frisell, Béla Fleck, Derek Trucks, and others. He further showcased his virtuosity on 2009's Solo: Live from San Francisco and 2013's A Pair of Pianos with Larry Vuckovich.\r\nTyner was born in 1938 in Philadelphia, Pennsylvania, the oldest of three children. His father, Jarvis Tyner, worked in a company that made medicated cream and sang in a church vocal group. His mother, Beatrice (Stevenson) Tyner worked as a beautician. It was his mother who first encouraged him to play piano, starting him on private lessons at age 13 and letting him practice on the piano in her salon. Tyner excelled quickly and further honed his musical skills while attending the West Philadelphia Music School and the Granoff School of Music. As a teenager, he came into contact with his neighbor, bebop pianist Bud Powell, who served as an early influence. Another early influence was Thelonious Monk, whose percussive, architectural sound would remain a touchstone for Tyner for years to come. Around age 17, he converted to Islam via the Ahmadiyya Muslim Community, and subsequently changed his name to Sulieman Saud (although he continued to perform as McCoy Tyner). It was during this period in the '50s that he gained yet more attention, playing around Philadelphia with artists like Lee Morgan and brothers Percy and Jimmy Heath, as well as leading his R&B group the Houserockers. He also befriended saxophonist John Coltrane, then a member of trumpeter Miles Davis' band. In 1959, Tyner joined saxophonist Benny Golson and trumpeter Art Farmer in their group the Jazztet, and made his recorded debut with the group on 1960's Meet the Jazztet. He also appeared on early albums by Freddie Hubbard and Julian Priester. \r\nHowever, after six months with the Jazztet, he left to join Coltrane's soon-to-be classic quartet with bassist Jimmy Garrison and drummer Elvin Jones. From 1960 to 1965, he toured and recorded almost non-stop with Coltrane, applying his powerful sound, and distinctive block chord style to such landmark albums as 1961's Africa/Brass, 1961's My Favorite Things, 1961's Olé Coltrane, 1962's Coltrane, and 1965's monumental A Love Supreme. Along with a deep creative and familial bond, Coltrane's quartet with Tyner found them embracing an innovative mix of Eastern musical ideas, including pentatonic scales and flowing modal structures that evoked the quartet's deep spiritual leanings.\r\nTyner also made his debut as leader during his time with Coltrane, beginning with 1962's Inception on Impulse Records, with bassist Art Davis and fellow Coltrane bandmate Elvin Jones. A handful of equally engaging small-group sessions followed for the label, including 1963's Reaching Fourth with drummer Roy Haynes and bassist Henry Grimes, 1964's Today and Tomorrow with saxophonists John Gilmore and Frank Strozier, trumpeter Thad Jones, bassist Butch Warren, and Elvin Jones, and 1965's McCoy Tyner Plays Ellington (again with his Coltrane section partners Jones and Garrison). He also recorded notable albums with Joe Henderson, Art Blakey, Milt Jackson, and Wayne Shorter. \r\nIn 1965, Tyner parted ways with Coltrane to further explore his own music. The move coincided with an overall shift in American popular music as people moved away from jazz and toward rock and funk sounds. Tyner weathered this change, taking on sideman jobs with Ike & Tina Turner and Jimmy Witherspoon. Despite his difficulties, he remained creatively focused and recorded a series of forward-thinking albums for Blue Note, including 1967's The Real McCoy with Joe Henderson, Ron Carter, and Elvin Jones. A year later, he returned with Expansions, an even more accomplished session that showcased a larger group with trumpeter Woody Shaw, altoist Gary Bartz, tenor saxophonist Wayne Shorter, Ron Carter on cello, bassist Herbie Lewis, and drummer Freddie Waits. He also continued to be an in-demand session player, appearing on albums with Donald Byrd, Stanley Turrentine, Bobby Hutcherson, and others.\r\nWhile remaining committed to a largely acoustic-based sound, Tyner's work continued to expand in the fusion era. He signed with the Milestone label and embarked on a period of increased activity. In 1970, he released Extensions, an all-star sextet session that found him working with Alice Coltrane on harp, altoist Gary Bartz, Wayne Shorter on tenor and soprano, Ron Carter, and Elvin Jones. He picked up his first-ever Grammy nomination for 1972's Sahara, a groundbreaking production that found him exploring a mix of avant-garde and African-influenced sounds alongside saxophonist Sonny Fortune, bassist Calvin Hill, and drummer Alphonse Mouzon. The album also showcased Tyner's skills beyond piano, playing flute, percussion, and the Japanese Koto. A flow of adventurous, eclectic albums followed throughout the decade, many featuring his quartet with saxophonist Azar Lawrence, including 1972's Song for My Lady, 1973's Enlightenment, and 1974's Atlantis. 1976's Trident with Ron Carter and Elvin Jones was Tyner's first trio album in over a decade and found him playing harpsichord and celeste, as well piano. It was also during this period that he began writing for more varied ensembles, including strings on 1976's Fly with the Wind, and a horn section and vocal group on 1977's Inner Voices, and big band on 1981's 13th House.\r\nTyner next signed to Columbia for 1981's La Leyenda de La Hora, featuring flutist Hubert Laws, vibraphonist Bobby Hutcherson, saxophonists Paquito d'Rivera and Chico Freeman, trumpeter Marcus Belgrave, and a seven-piece string section. A year later, he released Looking Out, which included guest appearances by vocalist Phyllis Hyman and guitarist Carlos Santana. He then moved to Elektra for 1984's quintet date Dimensions, featuring altoist Gary Bartz, violinist John Blake, bassist John Lee, and drummer Wilby Fletcher. A collaboration with saxophonist Jackie McLean, It's About Time, arrived in 1985. Tyner also led a trio with bassist Avery Sharpe and drummer Louis Hayes, releasing albums like 1985's Major Changes with Frank Morgan, 1986's Double Trios, and 1987's Bon Voyage. Also in 1987, he won the Grammy for Best Jazz Instrumental Performance, Group for Blues for Coltrane: A Tribute to John Coltrane, which featured bassist Cecil McBee, drummer Roy Haynes, and saxophonists Pharoah Sanders and David Murray. Also in the late '80s, he made a return to Blue Note with three solo piano outings recorded at New York's Merkin Hall, Revelations, Things Ain't What They Used to Be, and Soliloquy. \r\nInto the '90s, Tyner stayed active with his trio, paying homage to the Coltrane with his 1991 trio album, Remembering John. He also continued working with his big band, taking home the Grammy for Best Large Jazz Ensemble Performance for 1991's The Turning Point and 1993's Journey. There were also vigorous dates with Joe Henderson, David Murray, Bobby Hutcherson, Christian McBride, and others. In 1995, he paired with saxophonist Michael Brecker for Infinity, taking home the Grammy for Best Jazz Instrumental Performance (Individual or Group). The album also garnered Brecker the Grammy for Best Jazz Instrumental Solo for his work on their cover of Coltrane's \"Impressions.\" Tyner rounded out the decade with a Burt Bacharach-themed album, a trio album with Stanley Clarke and Al Foster, and an all-star Latin and Afro-Cuban album featuring players like Claudio Roditi, Steve Turre, Dave Valentin, and more. \r\nMore acoustic bop sessions followed in the 2000s, beginning with Jazz Roots: McCoy Tyner Honors Jazz Piano Legends of the 20th Century on Telarc in 2000, followed by McCoy Tyner Plays John Coltrane at the Village Vanguard in 2001 alongside bassist George Mraz and drummer Al Foster. He also picked up yet more accolades, including being named a National Endowment for the Arts Jazz Master in 2002. In 2004, he picked up his fifth Grammy Award for Illuminations, which found him leading a quintet with Terence Blanchard, Gary Bartz, Christian McBride, and Lewis Nash. The following year, he was awarded an Honorary Doctorate of Music from Berklee College of Music. Another studio album, McCoy Tyner Quartet, arrived in 2007 and featured saxophonist Joe Lovano, bassist McBride, and drummer Jeff \"Tain\" Watts. Guitars arrived in 2008 and found Tyner leading a trio with Ron Carter and Jack DeJohnette, and showcasing a handful of genre-crossing string-specialists, including Marc Ribot, John Scofield, banjo player Béla Fleck, Derek Trucks, and Bill Frisell. The pianist was again on his own for 2009's Solo: Live from San Francisco before pairing with Larry Vuckovich for 2013's duo session A Pair of Pianos. Tyner died on March 6, 2020 at his home in New Jersey. He was 81 years old.",
+    "One of the most celebrated and influential jazz pianists of his generation, McCoy Tyner was known for his harmonically expansive modal voicings, commanding two-handed block-chord style, and fearless improvisational lines that touched upon African and Eastern musical traditions. Along with contemporaries Herbie Hancock, Bill Evans, and Chick Corea, Tyner redefined the sound of the modern jazz piano from the '60s onward, and his playing continues to guide up-and-coming musicians. Although primarily recognized for his work as a member of John Coltrane's famed quartet, Tyner distinguished himself as a leader in his own right, releasing forward-looking dates like 1967's The Real McCoy, 1972's Sahara, and 1980's Horizon. Throughout his career, Tyner continued to push himself, arranging for his big band and remaining a vital performer into his seventies."
+  ]
+}

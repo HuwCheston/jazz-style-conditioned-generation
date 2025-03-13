@@ -1,0 +1,113 @@
+{
+  "moods": [
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Soothing",
+      "weight": 8
+    },
+    {
+      "name": "Stylish",
+      "weight": 9
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 7
+    },
+    {
+      "name": "Romantic",
+      "weight": 6
+    },
+    {
+      "name": "Wistful",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 6
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 8
+    },
+    {
+      "name": "Reserved",
+      "weight": 5
+    },
+    {
+      "name": "Literate",
+      "weight": 8
+    },
+    {
+      "name": "Intimate",
+      "weight": 5
+    },
+    {
+      "name": "Theatrical",
+      "weight": 7
+    },
+    {
+      "name": "Gentle",
+      "weight": 6
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "Big Band",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Dixieland",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Alan Broadbent",
+      "weight": 9
+    },
+    {
+      "name": "Dick Hyman",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Roger Kellaway",
+  "bio": [
+    "A well-known piano accompanist who ranged from boogies to bop, plus film scores, a ballet, and orchestral works.",
+    "A virtuosic pianist whose phenomenal technique rivals Dick Hyman's, Roger Kellaway's work in commercial settings prior to the 1980s led to him being initially overlooked in the jazz world. He played piano and bass at the New England Conservatory (1957-1959) and actually left school to play bass with Jimmy McPartland. Switching permanently to piano, Kellaway picked up experience working with Kai Winding, Al Cohn/Zoot Sims, and Clark Terry/Bob Brookmeyer (1963-1965). He recorded with many players, including Ben Webster, Maynard Ferguson, Wes Montgomery, and Sonny Rollins, and in 1966 moved to Los Angeles where he played with Don Ellis' innovative orchestra. Kellaway became Bobby Darin's musical director, worked in the studios (his piano is heard playing the theme of All in the Family), wrote film scores, experimented with electric keyboards, played with Tom Scott, and recorded with his popular (but mostly non-jazz) Cello Quartet. Although he gigged locally with Zoot Sims and Harry \"Sweets\" Edison, it was not until the mid-'80s that Kellaway started playing jazz nearly full-time. His many records since then (for Concord, All Art, Stash, and Chiaroscuro) attest to his impressive talents."
+  ]
+}

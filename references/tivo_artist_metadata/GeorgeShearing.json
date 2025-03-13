@@ -1,0 +1,158 @@
+{
+  "moods": [
+    {
+      "name": "Intimate",
+      "weight": 9
+    },
+    {
+      "name": "Joyous",
+      "weight": 8
+    },
+    {
+      "name": "Cerebral",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 9
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 8
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Reflective",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 8
+    },
+    {
+      "name": "Reserved",
+      "weight": 8
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Detached",
+      "weight": 7
+    },
+    {
+      "name": "Restrained",
+      "weight": 8
+    },
+    {
+      "name": "Sentimental",
+      "weight": 5
+    },
+    {
+      "name": "Rollicking",
+      "weight": 5
+    },
+    {
+      "name": "Soothing",
+      "weight": 8
+    },
+    {
+      "name": "Calm/Peaceful",
+      "weight": 8
+    },
+    {
+      "name": "Smooth",
+      "weight": 8
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Choral",
+      "weight": 2
+    },
+    {
+      "name": "Latin Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Cool",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 4
+    },
+    {
+      "name": "Keyboard",
+      "weight": 2
+    },
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "Swing",
+      "weight": 9
+    },
+    {
+      "name": "Classical",
+      "weight": 2
+    },
+    {
+      "name": "Global Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 7
+    },
+    {
+      "name": "Vocal",
+      "weight": 8
+    },
+    {
+      "name": "American Popular Song",
+      "weight": 8
+    },
+    {
+      "name": "West Coast Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Vocal Pop",
+      "weight": 6
+    }
+  ],
+  "similars": [
+    {
+      "name": "Paul Smith",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "George Shearing",
+  "bio": [
+    "English jazz pianist, born blind, who was renowned for his inventive, melodic and unblushingly romantic solos.",
+    "For a long stretch of time in the 1950s and early '60s, George Shearing had one of the most popular jazz combos on the planet -- so much so that, in the usual jazz tradition of distrusting popular success, he tended to be underappreciated. Shearing's main claim to fame was the invention of a unique quintet sound, derived from a combination of piano, vibraphone, electric guitar, bass, and drums. Within this context, Shearing would play in a style he called \"locked hands,\" which he picked up and refined from Milt Buckner's early '40s work with the Lionel Hampton band, as well as from Glenn Miller's sax section and the King Cole Trio. Stating the melody on the piano with closely knit, harmonized block chords, with the vibes and guitar tripling the melody in unison, Shearing sold millions of records for MGM and Capitol in his heyday. \r\nThe wild success of this urbane sound obscured Shearing's other great contribution during this time, for he was also a pioneer of exciting, small-combo Afro-Cuban jazz in the '50s. Cal Tjader first caught the Latin jazz bug while playing with Shearing, and the English bandleader also employed such esteemed congueros as Mongo Santamaria, Willie Bobo, and Armando Peraza. As a composer, Shearing was best known for the uniquely constructed bop standard \"Lullaby of Birdland,\" as well as \"Conception\" and \"Consternation.\" His solo style, though all his own, reflected the influences of the great boogie-woogie pianists and classical players as well as those of Fats Waller, Earl Hines, Teddy Wilson, Erroll Garner, Art Tatum, and Bud Powell -- and fellow pianists long admired his light, refined touch. He was also known to play accordion and sing on occasion. \r\nShearing, who was born blind, began playing the piano at the age of three, receiving some music training at the Linden Lodge School for the Blind in London as a teenager but picking up the jazz influence from Teddy Wilson and Fats Waller 78s. In the late '30s, he started playing professionally with the Ambrose dance band and made his first recordings in 1937 under the aegis of fellow Brit Leonard Feather. He became a star in Britain, performing for the BBC, playing a key role in the self-exiled Stéphane Grappelli's London-based groups of the early '40s, and winning seven consecutive Melody Maker polls before emigrating in New York City in 1947 at the prompting of Feather. Once there, Shearing quickly absorbed bebop, replacing Garner in the Oscar Pettiford Trio and leading a quartet in tandem with Buddy DeFranco. In 1949, he formed the first and most famous of his quintets, which included Marjorie Hyams on vibes, Chuck Wayne on guitar, John Levy on bass, and Denzil Best on drums. Recording briefly first for Discovery, then Savoy, Shearing settled into lucrative associations with MGM (1950-1955) and Capitol (1955-1969), the latter for which he made albums with Nancy Wilson, Peggy Lee, and Nat King Cole. He also made a lone album for Jazzland with the Montgomery Brothers (including Wes Montgomery) in 1961, and began playing concert dates with symphony orchestras. \r\nAfter leaving Capitol, Shearing began to phase out his by-then-predictable quintet, finally breaking it up in 1978. He started his own label, Sheba, which lasted for a few years into the early '70s, and made some trio recordings for MPS later in the decade. In the '70s, his profile had been lowered considerably, but upon signing with Concord in 1979, Shearing found himself enjoying a renaissance. He made a number of acclaimed albums with Mel Tormé, raising the singer's profile in the process, and recorded with the likes of Ernestine Anderson, Jim Hall, Marian McPartland, Hank Jones, and classical French horn player Barry Tuckwell. He also recorded a number of solo piano albums where his full palette of influences came into play. He signed with Telarc in 1992 and, from that point through the early 2000s, continued to perform and record, most often appearing in a duo or trio setting. Shearing, who had remained largely inactive since 2004 after a fall in his New York City apartment, died of congestive heart failure at New York's Lenox Hill Hospital on February 14, 2011. He was 91.",
+    "London-born George Shearing was a classically trained pianist when he began to absorb the work of the great jazz pianists from records, and brought his training and natural improvisational gifts with him to New York in the late '40s. The historic quintet (piano, vibes, guitar, bass, drums) he led at that time was among the first small jazz groups to achieve widespread popularity. In the late '50s, while performing classical work with symphony orchestras, he would sometimes include arrangements that featured his quintet."
+  ]
+}

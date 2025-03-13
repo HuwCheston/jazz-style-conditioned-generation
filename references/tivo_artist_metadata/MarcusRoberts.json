@@ -1,0 +1,146 @@
+{
+  "moods": [
+    {
+      "name": "Intimate",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 8
+    },
+    {
+      "name": "Organic",
+      "weight": 9
+    },
+    {
+      "name": "Rousing",
+      "weight": 6
+    },
+    {
+      "name": "Reflective",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 8
+    },
+    {
+      "name": "Romantic",
+      "weight": 5
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 6
+    },
+    {
+      "name": "Reverent",
+      "weight": 6
+    },
+    {
+      "name": "Bright",
+      "weight": 8
+    },
+    {
+      "name": "Ambitious",
+      "weight": 6
+    },
+    {
+      "name": "Warm",
+      "weight": 9
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Earnest",
+      "weight": 9
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    },
+    {
+      "name": "Knotty",
+      "weight": 6
+    },
+    {
+      "name": "Elegant",
+      "weight": 8
+    },
+    {
+      "name": "Light",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Christmas",
+      "weight": 8
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Holiday",
+      "weight": 8
+    }
+  ],
+  "similars": [
+    {
+      "name": "Horace Parlan",
+      "weight": 8
+    },
+    {
+      "name": "Ellis Larkins",
+      "weight": 8
+    },
+    {
+      "name": "Ellis Marsalis",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 9
+    },
+    {
+      "name": "Donald Brown",
+      "weight": 9
+    },
+    {
+      "name": "Eric Reed",
+      "weight": 8
+    },
+    {
+      "name": "Bill Charlap",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Marcus Roberts",
+  "bio": [
+    "Wynton Marsalis-associated contemporary pianist with a traditional bent.",
+    "Jazz pianist Marcus Roberts' focus on traditional styles and his willingness to speak sometimes disdainfully of music of more contemporary vintage has not been well accepted in some circles, and for a time he began to engender the type of attacks more often reserved for Wynton Marsalis and others regarded as reactionaries by some members of the jazz press. But Roberts must be credited with going his own way; unlike many of today's jazz pianists, he has little if any ties to McCoy Tyner, Ahmad Jamal, or Bill Evans. He has some Thelonious Monk influence, especially in his phrasing, but Roberts' models have predominantly been Jelly Roll Morton and Fats Waller. While his earliest work reflected pronounced gospel and blues ties, mixed with bebop, Roberts later devoted himself to stride and ragtime, a tactical decision wide open to intense scrutiny and second-guessing. \r\nRoberts studied piano at Florida State University after beginning on the instrument in his youth. He won several competitions in the mid-'80s, then joined Wynton Marsalis' band as his first regular pianist after Kenny Kirkland. Roberts emerged as the Marsalis band's second prime soloist, and the hub of its rhythm section. His swing kept the group focused, and prevented Marsalis' music from getting too stiff or introspective. Roberts' own late-'80s and '90s albums for RCA/Novus, particularly the 1990 release Alone with Three Giants, detailed his commitment to classic music. He continued to explore the past even upon the arrival of the 21st century, with such albums as 2001's Cole After Midnight (a Marcus Roberts Trio concept album featuring interpretations of Nat King Cole and Cole Porter) and 2009's New Orleans Meets Harlem, Vol. 1 (another trio date, this time focusing on the music of Duke Ellington and Scott Joplin as well as Monk, Morton, and Waller), his first album as a leader in eight years. The holiday-themed Celebrating Christmas followed in 2011. While he has received considerable acclaim for his interpretive skills with historic material, whether Marcus Roberts should be considered a dedicated preservationist or unrepentant nostalgia buff still remains open to debate.",
+    "Blind from age five, Marcus Roberts first taught himself piano as a youth. After high school, he attended Florida State University, and studied both classical and jazz piano. At the age of 21, and after winning several competitions, Roberts was taken under the wing of Wynton Marsalis in 1985. (Both musicians share highly traditional views on the purity of jazz.) By the late ‘80s, Roberts was established as a solo artist and composer with albums on major labels. Throughout his career, he has led a trio and often performed classical compositions as a guest soloist. And while well-versed in bebop piano, Roberts has also been mindful of the influences of jazz from the early 20th century -- ragtime, stride, New Orleans, and swing."
+  ]
+}

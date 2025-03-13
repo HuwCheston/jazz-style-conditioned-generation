@@ -1,0 +1,18 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 7
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "John Campbell",
+  "bio": [
+    "Pianist John Campbell, a powerful player who is creative within the tradition, is best known for his associations with Mel Torme and the Terry Gibbs-Buddy DeFranco quintet. He started piano lessons at seven, and in 1977 moved to Chicago. His trio/quartet (known originally as Campbell's Group) was soon in demand to accompany touring artists (including Eddie Jefferson/Richie Cole, Eddie Harris, and James Moody) and, in 1981, he toured Europe with Clark Terry. In 1984, Campbell moved to New York, and he subbed for Jim McNeely with Stan Getz's group. In 1986, he joined Mel Torme, and soon afterward hooked up with Terry Gibbs. In 1993, Campbell recorded a solo disc for Concord (Live at Maybeck Recital Hall, Vol. 29). After a long hiatus, Workin' Out was issued eight years later."
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "moods": [
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 9
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Complex",
+      "weight": 5
+    },
+    {
+      "name": "Elegant",
+      "weight": 7
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Ambitious",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Gentle",
+      "weight": 7
+    },
+    {
+      "name": "Intimate",
+      "weight": 8
+    },
+    {
+      "name": "Melancholy",
+      "weight": 7
+    },
+    {
+      "name": "Enigmatic",
+      "weight": 6
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Earnest",
+      "weight": 8
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Poignant",
+      "weight": 7
+    },
+    {
+      "name": "Earthy",
+      "weight": 7
+    },
+    {
+      "name": "Precious",
+      "weight": 7
+    },
+    {
+      "name": "Joyous",
+      "weight": 6
+    },
+    {
+      "name": "Optimistic",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 8
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 7
+    },
+    {
+      "name": "Reflective",
+      "weight": 9
+    },
+    {
+      "name": "Sensual",
+      "weight": 5
+    },
+    {
+      "name": "Romantic",
+      "weight": 5
+    },
+    {
+      "name": "Restrained",
+      "weight": 4
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Wistful",
+      "weight": 7
+    },
+    {
+      "name": "Yearning",
+      "weight": 7
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Stately",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Intense",
+      "weight": 5
+    },
+    {
+      "name": "Provocative",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Standards",
+      "weight": 6
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Piano Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Modern Creative",
+      "weight": 6
+    },
+    {
+      "name": "Classical",
+      "weight": 2
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 8
+    }
+  ],
+  "similars": [
+    {
+      "name": "Fred Hersch",
+      "weight": 8
+    },
+    {
+      "name": "Gerald Clayton",
+      "weight": 8
+    },
+    {
+      "name": "Joey Alexander",
+      "weight": 7
+    },
+    {
+      "name": "Brad Mehldau",
+      "weight": 8
+    },
+    {
+      "name": "Benny Green",
+      "weight": 6
+    }
+  ],
+  "tivo_artist_name": "Adam Birnbaum",
+  "bio": [
+    "New York-based jazz pianist and composer with a style steeped in both the classical and the post-bop traditions.",
+    "Jazz pianist and composer Adam Birnbaum is one of the leading players on the New York scene with a style steeped in both the classical and the post-bop traditions. A graduate of Juilliard and the winner of the 2004 American Jazz Piano Competition, Birnbaum has showcased his sophisticated blend of classical and jazz on a series of trio albums, including 2006's Ballade Pour Adeline, 2008's Travels, and 2015's Three of Mind. He has also worked on albums with Cecile McLorin Salvant, Darcy James Argue, and Jazz at Lincoln Center, among others. A featured performer with the Chelsea Music Festival since 2012, he released the J.S. Bach-inspired Preludes on the festival's label in 2023.\r\nBorn in 1979 in Boston, Massachusetts, Birnbaum played piano from a young age, starting classical lessons around age eight and teaching himself some jazz standards and songs by the Beatles. He excelled, eventually studying music theory, chamber music, and classic and jazz performance at the New England Conservatory of Music's Preparatory School. In 2001, he graduated from Boston College and moved to New York, where he was selected to join the Juilliard School’s inaugural jazz studies program. Accolades followed, including winning the 2004 American Jazz Piano Competition and becoming the American Pianists Association's Cole Porter fellow in Jazz. In 2006, he received the \"special mention\" prize at the Martial Solal Jazz Piano Competition in Paris. \r\nAs a leader, Birnbaum debuted in 2006 with Ballade Pour Adeline, featuring his trio with bassist Matt Brewer and drummer Quincy Davis. That same year, he also released a second trio album, A Comme Amour, with bassist Ben Wolfe and drummer Rodney Green. Travels, a trio session with Green and bassist Joe Sanders, arrived in 2009 on the Smalls Records label. Also in 2009, he premiered \"Dream Songs,\" a trio suite based on the poetry of John Berryman which was commissioned by Chamber Music America. \r\nAlong with leading his trio, Birnbaum has worked with a bevy of other artists and ensembles, including Regina Carter, the Vanguard Jazz Orchestra, Jazz at Lincoln Center, Darcy James Argue's Secret Society, and Cecile McLorin Salvant. In 2015, he released Three of a Mind, featuring bassist Doug Weiss and drummer Al Foster. Steinway Standards, his first ever solo piano recording, appeared in 2019. \r\nSince 2012, Birnbaum has been featured yearly at the Chelsea Music Festival, arranging classic works by Debussy, Beethoven, and other classical composers for his trio and guests. Preludes, a trio album with bassist Matt Clohesy and drummer Keita Ogawa, appeared in 2023 on the festival's label and featured songs inspired by the work of composer J.S. Bach.",
+    "Jazz pianist and composer Adam Birnbaum is one of the leading players on the New York scene with a style steeped in both the classical and the post-bop traditions. A graduate of Juilliard and the winner of the 2004 American Jazz Piano Competition, Birnbaum has showcased his sophisticated blend of classical and jazz on a series of trio albums, including 2006's Ballade Pour Adeline, 2008's Travels, and 2015's Three of Mind. He has also worked on albums with Cecile McLorin Salvant, Darcy James Argue, and Jazz at Lincoln Center, among others. A featured performer with the Chelsea Music Festival since 2012, he released the J.S. Bach-inspired Preludes on the festival's label in 2023."
+  ]
+}

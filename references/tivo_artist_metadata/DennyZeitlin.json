@@ -1,0 +1,154 @@
+{
+  "moods": [
+    {
+      "name": "Cerebral",
+      "weight": 6
+    },
+    {
+      "name": "Complex",
+      "weight": 5
+    },
+    {
+      "name": "Exciting",
+      "weight": 5
+    },
+    {
+      "name": "Plaintive",
+      "weight": 7
+    },
+    {
+      "name": "Energetic",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 6
+    },
+    {
+      "name": "Confident",
+      "weight": 5
+    },
+    {
+      "name": "Lively",
+      "weight": 5
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Improvisatory",
+      "weight": 5
+    },
+    {
+      "name": "Playful",
+      "weight": 5
+    },
+    {
+      "name": "Nostalgic",
+      "weight": 9
+    },
+    {
+      "name": "Wistful",
+      "weight": 7
+    },
+    {
+      "name": "Thoughtful",
+      "weight": 6
+    },
+    {
+      "name": "Ambitious",
+      "weight": 9
+    },
+    {
+      "name": "Melancholy",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Swinging",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 6
+    }
+  ],
+  "similars": [
+    {
+      "name": "McCoy Tyner",
+      "weight": 8
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 5
+    },
+    {
+      "name": "Sonny Clark",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "George Cables",
+      "weight": 8
+    },
+    {
+      "name": "Herbie Nichols",
+      "weight": 8
+    },
+    {
+      "name": "Keith Jarrett",
+      "weight": 6
+    },
+    {
+      "name": "Paul Bley",
+      "weight": 5
+    },
+    {
+      "name": "Chick Corea",
+      "weight": 6
+    }
+  ],
+  "tivo_artist_name": "Denny Zeitlin",
+  "bio": [
+    "A sophisticated, harmonically rich jazz pianist who balances his time between music and his other career as a practicing psychiatrist.",
+    "An engaging, often exploratory pianist, Denny Zeitlin began his career in the '60s crafting intimate, deeply harmonic acoustic jazz. Issuing albums like 1964's Cathexis and 1967's Zeitgeist, he also balanced his highly respected musical career with his other profession as a practicing psychiatrist and professor. Later experimentations with electronics, as well as forays into classical composition and jazz-rock, fueled his creative engine, informing his soundtrack to the classic 1978 sci-fi/horror remake of Invasion of the Body Snatchers. Though he remains a highly inventive performer, over his 50-year career he has come back around to making thoughtful, delicately rendered acoustic jazz, as on 2014's trio date Stairway to the Stars and 2016's Wayne Shorter tribute Early Wayne. He has collaborated on projects with drummer George Marsh, including 2021's Telepathy. Zeitlin's piano performances are also a regular focus for him, as on 2023's Crazy Rhythms: Exploring George Gershwin.\r\nBorn in Chicago in 1938, Zeitlin grew up the son of a radiologist father and speech pathologist mother, both of whom played music regularly. Starting out on piano at age two, he studied classical music in elementary school and developed an interest in jazz in high school; he was talented and started to play gigs around Chicago while still in his teens. Taking his parents' lead, he enrolled at Columbia University where he pursued his interest in medicine while simultaneously studying composition and theory with George Russell, Alexander Tcherepnin, and Robert Muczynski. While there, he auditioned for legendary Columbia Records' producer/talent scout John Hammond, who was sufficiently impressed and produced several records by Zeitlin including 1964's Cathexis, 1964's Carnival, and 1965's Live at the Trident. Sophisticated and intellectual, yet gorgeously rendered, the albums revealed Zeitlin to be an immensely talented and original artist in the mold of such contemporaries as Bill Evans, Keith Jarrett, and Paul Bley.  \r\nUpon receiving his M.D. from Johns Hopkins University in 1964, Zeitlin relocated to San Francisco, where he balanced his time between working as a psychiatrist (he's been on the teaching faculty at the University of California, San Francisco since 1968) and playing gigs; one of his trios in the mid-'60s included bassist Charlie Haden and drummer Jerry Granelli, both of whom appeared on the pianist's avant-garde-leaning 1967 date Zeitgeist. During this period, he also began experimenting with the prepared piano, which led to an interest in electronic keyboards. For a time, he even quit playing in public, focusing instead on developing his music further. Subsequently, he re-emerged in the '70s, playing a style that combined electronics with elements of jazz, classical, and rock. It was a sound he showcased alongside drummer George Marsh and bassist Mel Graves on 1970's independently produced Expansion, followed by 1977's Syzygy. Zeitlin also branched out into film and television composition, contributing original music to the children's program Sesame Street and most notably supplying the soundtrack for director Philip Kaufman's 1978 remake of the sci-fi classic Invasion of the Body Snatchers. \r\nBy the late '70s, however, he returned to a more acoustic-based sound, an approach evidenced on 1978's Soundings, a collection of free piano improvisations. More intimate acoustic sessions followed, including 1981's duo album with Charlie Haden, Time Remembers One Time Once on ECM, 1983's Tidal Wave, and the 1989 trio date In the Moment. During the '90s, Zeitlin remained active playing with a bevy of prominent musicians, including Herbie Hancock, Pat Metheny, Paul Winter, and Joe Henderson. He also recorded several solo and duo performances for Concord Records as part of their Live at Maybeck Recital Hall series.\r\nIn 2001, he paired with mandolinist David Grisman for New River, followed by the trio session Slickrock with bassist Buster Williams and drummer Matt Wilson in 2004. A solo date, Solo Voyage, appeared in 2005, after which he rejoined Williams and Wilson for a 2009 concert album. \r\nEver the polymath, Zeitlin continued to combine his professional interests, developing the lecture/demonstration \"Unlocking the Creative Impulse: The Psychology of Improvisation,\" which he presented across the U.S. and Europe. However, music remains a primary focus as he continues to split his time between solo piano dates like 2010's Precipice and trio albums like 2014's Stairway to the Stars. In 2016, he paid tribute to influential saxophonist Wayne Shorter with the solo piano album Early Wayne. A year later, he reunited with longtime collaborator George Marsh for the electro-acoustic session Expedition. The Miles Davis-inspired Remembering Miles Davis arrived in 2019, followed in 2021 by another Marsh collaboration, Telepathy. In 2023, he released Crazy Rhythms: Exploring George Gershwin, which captured his 2018 solo piano performance at the Piedmont Piano Company in Oakland, California.",
+    "An engaging, often exploratory pianist, Denny Zeitlin began his career in the 1960s crafting intimate, deeply harmonic acoustic jazz. While issuing albums like 1964's Cathexis and 1967's Zeitgeist, he also balanced his highly respected musical career with his other profession as a practicing psychiatrist and professor. Later experimentations with electronics, as well as forays into classical composition and jazz-rock, fueled Zeitlin's creative engine, informing his soundtrack to the classic 1978 sci-fi/horror remake of Invasion of the Body Snatchers. Though he remains a highly inventive performer, over his 50-year career he has come back around to making thoughtful, delicately rendered acoustic jazz on albums like 2014's trio date Stairway to the Stars and 2016's Wayne Shorter tribute Early Wayne. He has also collaborated on projects with drummer George Marsh, including 2021's Telepathy. Solo piano performances are also a regular focus for Zeitlin, as with 2023's Crazy Rhythms: Exploring George Gershwin."
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "moods": [
+    {
+      "name": "Complex",
+      "weight": 5
+    },
+    {
+      "name": "Elegant",
+      "weight": 5
+    },
+    {
+      "name": "Provocative",
+      "weight": 5
+    },
+    {
+      "name": "Refined",
+      "weight": 5
+    },
+    {
+      "name": "Uncompromising",
+      "weight": 5
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 5
+    },
+    {
+      "name": "Cerebral",
+      "weight": 5
+    },
+    {
+      "name": "Exciting",
+      "weight": 6
+    },
+    {
+      "name": "Confident",
+      "weight": 6
+    },
+    {
+      "name": "Eccentric",
+      "weight": 5
+    },
+    {
+      "name": "Improvisatory",
+      "weight": 6
+    },
+    {
+      "name": "Reflective",
+      "weight": 6
+    },
+    {
+      "name": "Playful",
+      "weight": 6
+    },
+    {
+      "name": "Fractured",
+      "weight": 5
+    },
+    {
+      "name": "Ambitious",
+      "weight": 7
+    },
+    {
+      "name": "Bittersweet",
+      "weight": 9
+    },
+    {
+      "name": "Insular",
+      "weight": 5
+    },
+    {
+      "name": "Intimate",
+      "weight": 8
+    },
+    {
+      "name": "Mysterious",
+      "weight": 5
+    },
+    {
+      "name": "Delicate",
+      "weight": 5
+    },
+    {
+      "name": "Gentle",
+      "weight": 8
+    },
+    {
+      "name": "Wintry",
+      "weight": 5
+    },
+    {
+      "name": "Restrained",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Global Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Progressive Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "M-Base",
+      "weight": 8
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Piano Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 6
+    },
+    {
+      "name": "Modern Creative",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Jason Moran",
+      "weight": 8
+    },
+    {
+      "name": "Geri Allen",
+      "weight": 8
+    },
+    {
+      "name": "Brad Mehldau",
+      "weight": 5
+    },
+    {
+      "name": "Gonzalo Rubalcaba",
+      "weight": 6
+    },
+    {
+      "name": "Tigran Hamasyan",
+      "weight": 5
+    },
+    {
+      "name": "Joey Alexander",
+      "weight": 7
+    }
+  ],
+  "tivo_artist_name": "Vijay Iyer",
+  "bio": [
+    "Elite jazz pianist with an inventive, whimsical style and stunning, highly intelligent music.",
+    "Vijay Iyer is one of the most celebrated jazz musicians of his generation. A composer, pianist, electronic musician, professor, and software developer, he is credited with taking jazz improvisation and composition to entirely new levels. A bandleader as well as a constantly in-demand sideman, he has led several distinct combos including Spirit Complex, the Poisonous Prophets, and the Vijay Iyer Trio, who all appeared on Memorophilia, his 1995 debut album on Asian Improv. Iyer has worked with dozens of acclaimed musicians including Butch Morris, William Parker, Wadada Leo Smith, and Roscoe Mitchell. In addition to leading bands, he has also recorded solo. 2003's Blood Sutra was hailed as a perfect fusion of Indian Carnatic styles, post-bop, and modal jazz. His 2009 offering, Historicity, was nominated for a Grammy in the Best Instrumental Jazz Album category. Iyer won a Doris Duke Performing Artist Fellowship in 2012 and was named a MacArthur Fellow in 2013. The following year he was appointed to a full professorship in Harvard University's music department. 2015's trio outing Break Stuff was heralded as a boundary-breaking achievement, and 2019's Transitory Poems, a collaborative release with Craig Taborn, was hailed as a provocative statement from two of the world's most forward-thinking jazz pianists. That year, Iyer also recorded a trio set for ECM with drummer Tyshawn Sorey and bassist Linda May Han Oh; it was released in 2021 as Uneasy. They re-teamed for 2024's Compassion.\r\nIyer was born in Albany and raised in Fairport, New York. The son of Indian Tamil immigrants, he began studying violin at age three and received 15 years of training. As a child he began playing piano by ear. In college he received undergraduate degrees in mathematics and physics at Yale, then attended the University of California, Berkeley to earn a doctorate in physics. He continued to pursue music, however, playing in various ensembles, and in 1994 he began working with Coleman and composer, improviser, trombonist, and electronicist George Lewis. In 1995, while pursuing a doctorate in musical cognition, he issued Memorophilia, which included participation from Coleman and Lewis, as well as guitarist Liberty Ellman in a variety of musical settings. He played shows in the Bay Area, and toured with Coleman and others, cutting his sophomore outing Architextures with an octet in 1998.\r\nBy the time of Panoptic Modes' release in late 2001, Iyer had a working quartet with alto saxophonist Rudresh Mahanthappa, bassist Stephan Crump, and drummer Derrek Phillips. Phillips gave way to Tyshawn Sorey, and the quartet released Blood Sutra in 2003. Also that year, Iyer worked with hip-hop's Mike Ladd and In What Language?, an examination of the often-dehumanizing aspect of international travel in a post-9/11 world. He continued working with Mahanthappa and Ladd, appearing on Mahanthappa's Mother Tongue in 2004 and Ladd's Negrophilia: The Album in 2005 before releasing his own Reimagining, also in 2005. He was back with Mahanthappa for 2006's Raw Materials and Ladd for 2007's Still Life with Commentator. Tragicomic appeared in 2008. \r\nDuring this same time period, Iyer was composing for orchestra (\"Interventions,\" 2007, with the American Composers Orchestra) and string quartet (\"Mutations I-X,\" 2005, for the string quartet Ethel) as well as for theater (Betrothed, 2007) and film (Teza, 2008). He performed regularly on piano and synth with Greg Tate's Burnt Sugar. Iyer's 2009 release, Historicity, was chosen as the number one Jazz Album of the Year by The New York Times, The Los Angeles Times, The Chicago Tribune, The Detroit Metro Times, National Public Radio, The Village Voice Jazz Critics Poll, and Down Beat's International Critics Poll, and was nominated for a 2010 Grammy for Best Instrumental Jazz Album (Iyer's first nomination and the first for an Indian-American in that category). The Vijay Iyer Trio (with Marcus Gilmore now in the drummer chair) won the 2010 Echo Award (Germany's Grammy equivalent) for Best International Ensemble, and the 2010 Down Beat Critics Poll for Best Small Ensemble. In 2010 he also released his first solo album (Solo) and was named 2010 Musician of the Year at the Jazz Journalists Association Jazz Awards. \r\nIyer kicked off 2011 with a new band called Tirtha, a trio with electric guitarist Prasanna and virtuoso tabla player Nitin Mitta. The group released a self-titled album on ACT early in the year and toured globally in support of it; the album appeared on many jazz critics' year-end lists. Iyer's piano trio with Gilmore and Crump returned to recording later in the year; they released Accelerando in March of 2012. In 2013, he collaborated with poet/spoken word artist Mike Ladd on Holding It Down: The Veterans' Dreams Project, and won a MacArthur Foundation Genius grant. Mutations, his debut for ECM, was released in March of 2014. Iyer had also been working with filmmaker Prashant Bhargava, composing and performing a score for a multimedia project focused on the eight-day Holi festival in Northern India. ECM released Radhe Radhe: Rites of Holi as a DVD in the fall. They reentered the studio in June and put a new album in the can. Break Stuff, the result of those sessions, was released in February of 2015. Iyer was named 2015-2016 Artist in Residence at New York City's Metropolitan Museum of Art and released A Cosmic Rhythm with Each Stroke, his third album for ECM, in duo with Wadada Leo Smith in March of 2016. The following year, he delivered the sextet date Far from Over, which featured cornetist Graham Haynes, saxophonist Steve Lehman, drummer Tyshawn Sorey, and others. In 2018, Iyer was again selected as Down Beat's Jazz Artist of the year. \r\nIyer and pianist Craig Taborn both played in Roscoe Mitchell's Note Factory for 2002's Song for My Sister on Pi Recordings, and worked with him separately afterwards. In 2018, they teamed for a live concert performance in Budapest at the Franz Liszt Recital Hall, improvising while paying tribute to influential figures who had passed away, including Cecil Taylor, Geri Allen, and Muhal Richard Abrams. The unedited concert was issued by ECM in March of 2019 as The Transitory Poems. 2019 also saw Iyer enter a New York recording studio with bassist Linda May Han Oh and drummer Tyshawn Sorey. Their collaborative sessions were released by ECM as Uneasy in 2021. Also that year, he joined trumpeter Wadada Leo Smith and drummer Jack DeJohnette for their trio album, Love Sonnet for Billie Holiday. \r\nIn 2023, Iyer, multi-instrumentalist Shahzad Ismaily, and vocalist Arooj Aftab teamed to record Love in Exile, a live-in-studio collection of songlike soundscapes created from couplets in Urdu poetry. Iyer returned to ECM for 2024's Compassion, leading the Han Oh and Sorey trio.",
+    "One of the most celebrated jazz musicians of his generation, Vijay Iyer is a composer, pianist, electronic musician, professor, and software developer. He has led combos including Spirit Complex, the Poisonous Prophets, and the Vijay Iyer Trio, who all appeared on Memorophilia (1995), his debut album. He's also recorded solo. Blood Sutra (2003) was hailed for its fusion of Indian Carnatic styles, post-bop, and modal jazz; Historicity (2009) was nominated for a Grammy for Best Instrumental Jazz Album. Iyer won a Doris Duke Performing Artist Fellowship and was named a MacArthur Fellow before his boundary-breaking trio outing Break Stuff (2015) earned international acclaim. The duo date Transitory Poems arrived in 2019, followed by the trio album Uneasy in 2021. He collaborated with vocalist Arooj Aftab and multi-instrumentalist Shahzad Ismaily on 2023's experimental Love in Exile, then returned with Compassion in 2024, accompanied by Linda May Han Oh and Tyshawn Sorey."
+  ]
+}

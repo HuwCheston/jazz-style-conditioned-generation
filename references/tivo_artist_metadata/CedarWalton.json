@@ -1,0 +1,82 @@
+{
+  "moods": [
+    {
+      "name": "Passionate",
+      "weight": 6
+    },
+    {
+      "name": "Exuberant",
+      "weight": 6
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 6
+    },
+    {
+      "name": "Complex",
+      "weight": 6
+    },
+    {
+      "name": "Cerebral",
+      "weight": 6
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Kenny Barron",
+      "weight": 8
+    },
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "Horace Parlan",
+      "weight": 9
+    },
+    {
+      "name": "Bobby Timmons",
+      "weight": 8
+    },
+    {
+      "name": "Wynton Kelly",
+      "weight": 9
+    },
+    {
+      "name": "Sonny Clark",
+      "weight": 8
+    },
+    {
+      "name": "Kenny Drew",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Cedar Walton",
+  "bio": [
+    "The celebrated pianist collaborated with bop's finest leaders, and also led several excellent ensembles of his own.",
+    "One of the most valued of all hard bop accompanists, Cedar Walton was a versatile pianist whose funky touch and cogent melodic sense graced the recordings of many of jazz's greatest players. He was also one of the music's more underrated composers; although he was always a first-rate interpreter of standards, Walton wrote a number of excellent tunes (\"Mosaic,\" \"Ugetsu,\" and \"Bolivia,\" to name a few) that found their way into Art Blakey's book during the pianist's early-'60s stint with the Jazz Messengers. In addition to his many quantifiable accomplishments, Walton is less well known as the first pianist to record, in April 1959 with John Coltrane, the tenorist's daunting \"Giant Steps\" -- unlike the unfortunate Tommy Flanagan a month later, Walton wasn't required to solo, though he does comp magnificently.\r\nWalton was first taught piano by his mother. After attending the University of Denver, he moved to New York in 1955, ostensibly to play music. Instead, he was drafted into the Army. Stationed in Germany, Walton played with American musicians Leo Wright, Don Ellis, and Eddie Harris. After his discharge, Walton moved back to New York, where he began his career in earnest. From 1958-1961, Walton played with Kenny Dorham, J.J. Johnson, and Art Farmer's Jazztet, among others. Walton joined Blakey in 1961, with whom he remained until 1964. This was perhaps Blakey's most influential group, with Freddie Hubbard and Wayne Shorter. Walton served time as Abbey Lincoln's accompanist from 1965-1966 and made records with Lee Morgan from 1966-1968; from 1967-1969, Walton served as a sideman on many Prestige albums as well. Walton played in a band with Hank Mobley in the early '70s and returned to Blakey for a 1973 tour of Japan. \r\nWalton's own band of the period was called Eastern Rebellion, and was comprised of a rotating cast that included saxophonists Clifford Jordan, George Coleman, and Bob Berg; bassist Sam Jones; and drummer Billy Higgins. From the '80s onward, Walton continued to lead his own fine bands, releasing numerous albums including The Maestro in 1980, Cedar Walton Plays in 1986, and Composer in 1996, followed a year later by Roots, featuring trumpeter Terence Blanchard and saxophonist Joshua Redman. In 2001 Walton released The Promise Land, his debut for Highnote, which was followed by Latin Tinge in 2002, Underground Memoirs in 2005, and Seasoned Wood with trumpeter Jeremy Pelt in 2008. Walton was joined by saxophonist Vincent Herring on Voices Deep Within in 2009. Herring was also featured along with trombonist Steve Turre on The Bouncer in 2011. Cedar Walton died at his home in Brooklyn on August 19, 2013; he was 79 years old.",
+    "Hard bop pianist Cedar Walton made a name for himself by playing with the cream of the jazz crop in the 1950s and '60s, and continued to distinguish himself as a bandleader in the '70s. While in the military in the mid-'50s, Walton met and played with several emerging jazz musicians, including Don Ellis, and on his return to New York he collaborated with important bop artists such as Kenny Dorham, J.J. Johnson, and Art Blakey. He proved an adept accompanist to singers as well as to instrumentalists, and in the late '60s, worked with artists such as Lee Morgan, Hank Mobley, and George Coleman. In the '70s he was active as co-leader of the groups Eastern Rebellion and Soundscapes. He continued to tour and record into the 2000s, releasing several fine albums. After a brief illness, he passed away in 2013."
+  ]
+}

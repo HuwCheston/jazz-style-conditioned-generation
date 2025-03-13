@@ -1,0 +1,250 @@
+{
+  "moods": [
+    {
+      "name": "Poignant",
+      "weight": 7
+    },
+    {
+      "name": "Indulgent",
+      "weight": 7
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Precious",
+      "weight": 7
+    },
+    {
+      "name": "Wry",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Earnest",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 9
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Ambitious",
+      "weight": 9
+    },
+    {
+      "name": "Ethereal",
+      "weight": 9
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Spacey",
+      "weight": 9
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 9
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Energetic",
+      "weight": 9
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 7
+    },
+    {
+      "name": "Bright",
+      "weight": 7
+    },
+    {
+      "name": "Playful",
+      "weight": 9
+    },
+    {
+      "name": "Uncompromising",
+      "weight": 9
+    },
+    {
+      "name": "Theatrical",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Reflective",
+      "weight": 9
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Lush",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Sprawling",
+      "weight": 7
+    },
+    {
+      "name": "Complex",
+      "weight": 9
+    },
+    {
+      "name": "Gentle",
+      "weight": 9
+    },
+    {
+      "name": "Intimate",
+      "weight": 8
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Global Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Avant-Garde Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Vocal Music",
+      "weight": 7
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Fusion",
+      "weight": 9
+    },
+    {
+      "name": "Classical",
+      "weight": 7
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Modern Creative",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Keith Jarrett",
+      "weight": 9
+    },
+    {
+      "name": "Michel Camilo",
+      "weight": 8
+    },
+    {
+      "name": "Herbie Hancock",
+      "weight": 9
+    },
+    {
+      "name": "John Hicks",
+      "weight": 8
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 7
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 7
+    },
+    {
+      "name": "Brad Mehldau",
+      "weight": 6
+    },
+    {
+      "name": "Michel Petrucciani",
+      "weight": 6
+    },
+    {
+      "name": "Oscar Peterson",
+      "weight": 6
+    },
+    {
+      "name": "Hiromi",
+      "weight": 5
+    },
+    {
+      "name": "Gonzalo Rubalcaba",
+      "weight": 5
+    },
+    {
+      "name": "Joe Sample",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Chick Corea",
+  "bio": [
+    "A highly lauded pianist with a wide palette of influences, whose work had a major influence on early fusion and jazz-rock.",
+    "A masterful and creatively wide-ranging jazz pianist, Chick Corea was a celebrated performer whose influential albums found him exploring harmonically adventurous post-bop, electric fusion, Latin traditions, and classical. Initially emerging in the 1960s, Corea gained early notice for albums including 1968's Now He Sings, Now He Sobs, as well as session work with Willie Bobo, Blue Mitchell, and Stan Getz. He joined Miles Davis' electric ensemble and appeared on 1969's Bitches Brew. As a leader, he built upon his experience with Davis, founding his own innovative fusion group Return to Forever and penning such beloved jazz standards as \"Spain,\" \"500 Miles High,\" \"La Fiesta,\" and \"Windows.\" A prolific musician, and the fourth most-nominated artist in Grammy history with 60-plus nominations and 20 wins, Corea continued to release a steady stream of acclaimed Top Ten jazz-charting albums throughout his career, including 1976's The Leprechaun, 1989's Chick Corea Akoustic Band, 2014's Trilogy, and 2019's Antidote. In September 2021, Resonance, a double-live duo outing with pianist Makoto Ozone, was released. A live duo performance with banjoist Béla Fleck was released as Remembrance in 2024.\r\nBorn Armando Anthony Corea in 1941 in Chelsea, Massachusetts, Corea was first introduced to the piano around age four by his father, a Dixieland-style trumpeter. By age eight, he was also playing drums. Immersed in jazz at home, he listened to an array of artists including pianists Horace Silver and Bud Powell, who were early influences. Another influence was pianist Salvatore Sullo, with whom Corea studied classical piano and composition. As a teenager, he was a member of the local St. Rose Scarlet Lancers drum and bugle corps, and started playing his own jazz gigs. After high school, he studied briefly at Columbia University and Juilliard before leaving school to pursue his jazz career.\r\nSome of Corea's most formative experiences came in the early '60s playing with Latin bandleaders Mongo Santamaria and Willie Bobo. He also worked in small jazz groups with Blue Mitchell, Herbie Mann, and Stan Getz. As a leader, Corea made his recording debut with 1966's Tones for Joan's Bones. However, it was his 1968 trio release, Now He Sings, Now He Sobs, with Miroslav Vitous and Roy Haynes, that marked his arrival as one of the most gifted improvisers of his generation. The album eventually earned status as a jazz classic and in 1999 the title track was inducted into the Grammy Hall of Fame.\r\nAfter a stint with Sarah Vaughan, Corea joined Miles Davis' group, coming on board as Herbie Hancock's eventual replacement. He would stay with Davis from 1968 to 1970, during the trumpeter's important transitional period from acoustic post-bop to electric fusion. Davis persuaded Corea to start playing electric piano and included him on such pivotal albums as Filles de Kilimanjaro, In a Silent Way, and the landmark Bitches Brew. \r\nFollowing his time with Davis, Corea founded the avant-garde acoustic jazz quartet Circle, which also included Anthony Braxton, Dave Holland, and Barry Altschul. He also formed a trio with Holland and Altschul, releasing 1971's Song of Singing on Blue Note. That same year, he made his ECM debut with the same group for A.R.C.. He also released two introspective solo piano sessions for the label, 1971's Piano Improvisations, Vol. 1 and 1972's Piano Improvisations, Vol. 2. \r\nBy the end of 1971, Corea had shifted his creative direction again, playing for a short time with Stan Getz before forming Return to Forever. The group initially started out as a Brazilian-influenced ensemble, featuring bassist Stanley Clarke, saxophonist Joe Farrell, percussionist Airto Moreira, and vocalist Flora Purim. They debuted in 1972 with the eponymous Return to Forever, hitting number eight on the Billboard Jazz chart. They returned the following year with Light as a Feather. Another Top Ten jazz album, it earned Corea his first two Grammy nominations, including Best Instrumental Arrangement for \"Spain,\" largely considered his best-known song. \r\nWithin a year, Corea had transformed Return to Forever into an even more cutting-edge fusion ensemble, with Clarke, guitarist Bill Connors, and drummer Lenny White joining. This version of the group appeared on 1973's Hymn of the Seventh Galaxy and found Corea further drawing upon his work with Miles Davis, weaving together more electric instruments. Return to Forever would see several line-up changes throughout its lifetime, including introducing a then-19-year-old guitarist Al DiMeola on 1974's Where Have I Known You Before. When RTF broke up in the late '70s, Corea retained the name for some large ensemble dates with Clarke. During the next few years, he returned to acoustic playing and appeared in a variety of contexts, including separate duet tours with Gary Burton and Herbie Hancock, a quartet with Michael Brecker, trios with Miroslav Vitous and Roy Haynes, tributes to Thelonious Monk, and some classical music.\r\nIn 1985, Corea formed another benchmark fusion group who debuted on the eponymous The Elektric Band and featured bassist John Patitucci and drummer Dave Weckl. The same group also recorded as the Akoustic Trio for 1989's Chick Corea Akoustic Band. When Patitucci went out on his own in the early '90s, the personnel changed, but Corea continued leading stimulating groups, including a quartet with Patitucci and Bob Berg. From 1996 to 1997, Corea toured with an all-star quintet featuring Kenny Garrett and Wallace Roney that played modern versions of Bud Powell and Thelonious Monk compositions as heard on Remembering Bud Powell. There were also notable sessions with vibraphonist Gary Burton, including 1997's Like Minds with Pat Metheny. Two years later, he issued his first studio album with his Origin ensemble, Change. \r\nCorea began the 21st century by releasing a pair of solo piano records, Solo Piano: Originals and Solo Piano: Standards, in 2000 followed by Past, Present & Futures in 2001. Rendezvous in New York appeared in 2003, followed by To the Stars in 2004. The Ultimate Adventure was released in 2006. That same year, Corea released Super Trio with drummer Steve Gadd and bassist Christian McBride. In the spring of 2007, Corea released the duet album with banjo master Béla Fleck entitled The Enchantment on Concord. It was followed by a Japan-only six-disc box set called Five Trios in 2008 that showcased the pianist in a handful of different trio settings. The same year, Corea and vibraphonist Gary Burton released their fourth collaboration together, The New Crystal Silence. \r\nAlso in 2008, Corea reunited with John McLaughlin for the first time since they'd played together with Miles Davis in the late '60s. They pulled together a band with saxophonist Kenny Garrett, drummer Vinnie Colaiuta, and bassist Christian McBride for the recording Five Peace Band: Live (with another former Miles collaborator, Herbie Hancock, guesting on \"In a Silent Way/It's About That Time\"). Concord re-released Return to Forever's four albums issued between 1973 and 1976 (with Corea, White, Clarke, and DiMeola) -- Hymn of the Seventh Galaxy, Where Have I Known You Before, No Mystery, and Romantic Warrior -- as a precursor for a reunion tour. This resulted in both a live album, Returns, and a concert DVD. In 2009, Corea teamed with Japanese piano sensation Hiromi for Duet, followed by a live trio album titled Forever with Clarke and White, culled from their \"RTF Unplugged\" tour. The two-disc set, issued by Concord in 2011, featured guest appearances by Chaka Khan, original RTF guitarist Connors, and violinist Jean-Luc Ponty. \r\nIn 2012, Corea was busy from get-go. He delivered a trio recording on Concord in January, Further Explorations, with sidemen Eddie Gomez and Paul Motian (both members of various Evans ensembles). Corea: The Continents Concerto for Jazz Quintet and Chamber Orchestra was issued by Deutsche Grammophone in February. In September, another duet recording with Burton, Hot House, was released by Concord. In the summer of 2013, Corea debuted his new electric band with The Vigil; its members included bassist Christian McBride, drummer Marcus Gilmore, Tim Garland on reeds and winds, and guitarist Charles Altura. The expansive three-disc Trilogy, recorded live at stops all over the world with bassist Christian McBride and drummer Brian Blade appeared in 2014. \r\nThe pianist then reunited with longtime friend Béla Fleck for the 2015 duet album, Two, compiled from over seven years of their live performances together. The following year, Corea celebrated his 75th birthday with a six-week stint of shows at the Blue Note in New York city. Joined by a bevy of guests including Herbie Hancock, Bobby McFerrin, Wynton Marsalis, John McLaughlin, Stanley Clarke, and others, the performances were released in 2017 as part of The Musician album and documentary. In addition, he joined longtime associate drummer Steve Gadd for Chinese Butterfly, which also featured Lionel Loueke, Steve Wilson, Carlitos Del Puerto, and Luisito Quintero. Trilogy 2, Corea's second collection of live recordings with bassist Christian McBride and drummer Brian Blade, arrived in 2018. \r\nFor 2019's Antidote, Corea assembled an updated version of his Latin-infused octet and explored newer songs alongside material off his classic Latin-infused albums like 1976's My Spanish Heart and 1982's Touchstone. Dubbed the Spanish Heart Band, it included Madrid's Jorge Pardo on saxophone and flute (he was an original member of flamenco master Paco de Lucia's band). Also from the last generation of that group, Corea recruited guitarist Niño Josele. Trumpeter Michael Rodriguez and trombonist Steve Davis rounded out the horn section while the rhythm section comprised Cuban bassist Carlitos Del Puerto, percussionist Luicito Quintero, and drummer Marcus Gilmore. Flamenco dancer Nino de los Reyes and singer Ruben Blades also appeared. The album won Corea his 23rd Grammy Award and first for Best Latin Jazz Album. The solo piano album Plays arrived in 2020 and featured interpretations of jazz standards, as well as classical pieces by Mozart, Scriabin, Chopin, and others. \r\nCorea was active until his death on February 9, 2021, shortly after being diagnosed with a \"rare cancer\" at age 79. In September, the posthumous live duo outing Resonance, with pianist Makoto Ozone, was released by Universal Japan. In May 2024, Béla Fleck Productions issued Remembrance, a duo offering from the banjoist and pianist recorded during their final tour in 2019.",
+    "A masterful, wide-ranging jazz pianist and composer, Chick Corea's albums explored harmonically adventurous post-bop, electric fusion, Latin traditions, and classical music. Corea gained notice for early albums including 1968's Now He Sings, Now He Sobs as well as his work with Willie Bobo, Blue Mitchell, and Stan Getz. He joined Miles Davis for the landmark 1969 album Bitches Brew. As a bandleader, he founded the innovative fusion group Return to Forever, and penned many beloved jazz standards including \"Spain\" and \"500 Miles High.\" A prolific recording artist, he won 20 Grammy awards with a diverse stream of jazz releases. They included 1978's My Spanish Heart, 1989's Chick Corea Akoustic Band, 2014's Trilogy, and 2019's Antidote. Resonance, a live double-album duo outing with pianist Makoto Ozone, was released months after his death in 2021. In 2024, it was followed by Remembrance, documenting his final tour with banjoist Béla Fleck in 2019."
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Swing",
+      "weight": 9
+    },
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Hal Galper",
+      "weight": 8
+    },
+    {
+      "name": "Oscar Peterson",
+      "weight": 8
+    },
+    {
+      "name": "Bud Powell",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "John Colianni",
+  "bio": [
+    "Piano. Steady mainstream player, noteworthy for excellent rhythmic skills. His tastes are even further in past than most neoboppers, reaching to swing and big band era for inspiration, as well as early days of bop."
+  ]
+}

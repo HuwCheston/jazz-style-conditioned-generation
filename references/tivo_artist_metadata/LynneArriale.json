@@ -1,0 +1,166 @@
+{
+  "moods": [
+    {
+      "name": "Intimate",
+      "weight": 3
+    },
+    {
+      "name": "Poignant",
+      "weight": 7
+    },
+    {
+      "name": "Soft/Quiet",
+      "weight": 8
+    },
+    {
+      "name": "Reflective",
+      "weight": 6
+    },
+    {
+      "name": "Elegant",
+      "weight": 7
+    },
+    {
+      "name": "Gentle",
+      "weight": 8
+    },
+    {
+      "name": "Sensual",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 9
+    },
+    {
+      "name": "Knotty",
+      "weight": 6
+    },
+    {
+      "name": "Nocturnal",
+      "weight": 6
+    },
+    {
+      "name": "Autumnal",
+      "weight": 7
+    },
+    {
+      "name": "Melancholy",
+      "weight": 8
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 8
+    },
+    {
+      "name": "Atmospheric",
+      "weight": 8
+    },
+    {
+      "name": "Searching",
+      "weight": 6
+    },
+    {
+      "name": "Cerebral",
+      "weight": 3
+    },
+    {
+      "name": "Calm/Peaceful",
+      "weight": 8
+    },
+    {
+      "name": "Bittersweet",
+      "weight": 7
+    },
+    {
+      "name": "Relaxed",
+      "weight": 5
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Wistful",
+      "weight": 7
+    },
+    {
+      "name": "Romantic",
+      "weight": 8
+    },
+    {
+      "name": "Soothing",
+      "weight": 7
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 7
+    },
+    {
+      "name": "Plaintive",
+      "weight": 8
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Crossover Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 6
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 4
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Geri Allen",
+      "weight": 8
+    },
+    {
+      "name": "Fred Hersch",
+      "weight": 7
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 7
+    },
+    {
+      "name": "Jessica Williams",
+      "weight": 7
+    },
+    {
+      "name": "Cyrus Chestnut",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Lynne Arriale",
+  "bio": [
+    "Acclaimed jazz pianist and composer who rose to fame winning the 1993 International Great American Piano Competition.",
+    "A gifted pianist and composer, Lynne Arriale is recognized for her sophisticated and elegant post-bop jazz. The winner of the 1993 International Great American Jazz Piano Competition, Arriale has released a string of highly regarded albums, including 1993's The Eyes Have it, 1997's The Long Road Home, and 2002's Inspiration. When not performing, she also teaches at the University of North Florida. Although trio work is her forte, she has collaborated with guests including trumpeter Randy Brecker on 2009's Nuance, saxophonist Bill McHenry on 2011's Convergence, and vocalist K.J. Denhert on 2020's Chimes of Freedom, the latter of which featured themes of social justice, and showcased her originals alongside delicately rendered covers by Bob Dylan and Paul Simon. More socially and politically conscious themes marked 2023's The Lights Are Always On, as evidenced by her song \"The Notorious RBG,\" a tribute to the late Supreme Court Justice Ruth Bader Ginsburg. \r\nBorn in 1957 in Milwaukee, Wisconsin, Arriale was adopted as an infant and started playing a toy piano at age three. Growing up, she initially taught herself to play by ear, building a repertoire of songs learned from the radio and from Broadway musicals. She began taking classical lessons and earned her undergraduate degree in music at UW-Madison, before finishing her master's degree at the Wisconsin Conservatory of Music. It was around age 25 that she began studying jazz, drawing inspiration from players like Keith Jarrett and Herbie Hancock. After college, she launched her performance career, leading her own trio and even touring Japan in 1991 with \"100 Golden Fingers,\" which found her performing alongside nine veteran pianists, including Tommy Flanagan, Hank Jones, Cedar Walton, and others.\r\nHowever, it was her winning run at the 1993 International Great American Jazz Piano Competition that brought her widespread acclaim. That same year, she performed at the Jacksonville Jazz Festival and signed to the DMP label, making her debut as leader with 1994's The Eyes Have It. That album introduced Arriale's trio, featuring bassist Jay Anderson and drummer Steve Davis, the latter of whom she would continue to work with closely for a decade. Two more albums followed for the label, including 1995's When You Listen and 1996's With Words Unspoken, both of which found bassist Drew Gress taking over for Anderson. After three outings for DMP, she jumped to TCB for 1997's The Long Road Home, which found her joined by bassist John Patitucci and drummer Davis. Melody arrived two years later with Davis and bassist Scott Colley. Following 2000's Live at the Montreux Jazz Festival, she rounded out her time on TCB with 2002's Inspiration, reuniting her original trio with Davis and bassist Jay Anderson. \r\nIn addition to her solo recordings, she has worked with a bevy of artists, including Benny Golson, Rufus Reid, Larry Coryell, and Marian McPartland, among many others. Along with performing, Arriale is a dedicated teacher, holding the positions of Professor of Jazz Studies and Director of Small Ensembles at The University of North Florida in Jacksonville. With 2003's Arise, Arriale embarked on a fruitful partnership with Motéma Music. That album found her working again with bassist Anderson and drummer Davis. The trio delivered concert album, Live, recorded at the Montreux Jazz Festival. They returned to the studio for 2004's Come Together. For 2009's Nuance, she broke from her longtime trio, and worked with veteran bassist George Mraz and drummer Anothony Pinciotti. The album also featured guest trumpeter Randy Brecker. Shifting gears again, she delivered 2011's Convergence with Pinciotti, bassist Omer Avital, and saxophonist Bill McHenry. Solo, her first ever solo piano album, appeared in 2012. \r\nArriale returned in 2018 with Give Us These Days, a trio album recorded with Dutch bassist and drummer team Jasper Somsen and Jasper Van Hulten. Her first album for Challenge Records, it also featured a special guest appearance by vocalist Kate McGarry. A second outing for the label, the politically and socially minded Chimes of Freedom, arrived two years later and found her joined by bassist Somsen and drummer E.J. Strickland. It featured several songs by Bob Dylan and Paul Simon sung by guest vocalist K.J. Denhert. The same trio delivered 2022's The Lights Are Always On, an equally socially conscious production that found Arriale paying tribute to the work of public figures like trail-blazing Supreme Court Justice Ruth Bader Ginsburg and Representative John Lewis.",
+    "A gifted pianist and composer, Lynne Arriale is recognized for her sophisticated and elegant post-bop jazz. The winner of the 1993 International Great American Jazz Piano Competition, Arriale has released a string of highly regarded albums, including 1993's The Eyes Have it, 1997's The Long Road Home, and 2002's Inspiration. Although trio work is her forte, she has collaborated with guests, including trumpeter Randy Brecker on 2009's Nuance, saxophonist Bill McHenry on 2011's Convergence, and vocalist K.J. Denhert on 2020's Chimes of Freedom, the latter of which featured themes of social justice and showcased her originals alongside delicately rendered covers of songs by Bob Dylan and Paul Simon. More socially and politically conscious themes marked 2023's The Lights Are Always On, as evidenced by her song \"The Notorious RBG,\" a tribute to the late Supreme Court Justice Ruth Bader Ginsburg."
+  ]
+}

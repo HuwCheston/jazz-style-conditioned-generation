@@ -1,0 +1,202 @@
+{
+  "moods": [
+    {
+      "name": "Relaxed",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Romantic",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Sweet",
+      "weight": 7
+    },
+    {
+      "name": "Earnest",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Precious",
+      "weight": 7
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Playful",
+      "weight": 9
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Poignant",
+      "weight": 7
+    },
+    {
+      "name": "Confident",
+      "weight": 9
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    },
+    {
+      "name": "Intimate",
+      "weight": 9
+    },
+    {
+      "name": "Exuberant",
+      "weight": 9
+    },
+    {
+      "name": "Reflective",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 9
+    },
+    {
+      "name": "Self-Conscious",
+      "weight": 7
+    },
+    {
+      "name": "Lively",
+      "weight": 9
+    },
+    {
+      "name": "Carefree",
+      "weight": 9
+    },
+    {
+      "name": "Stately",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 9
+    },
+    {
+      "name": "Reverent",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 8
+    },
+    {
+      "name": "Complex",
+      "weight": 8
+    },
+    {
+      "name": "Knotty",
+      "weight": 8
+    },
+    {
+      "name": "Rollicking",
+      "weight": 8
+    },
+    {
+      "name": "Light",
+      "weight": 9
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Wynton Kelly",
+      "weight": 9
+    },
+    {
+      "name": "Barry Harris",
+      "weight": 8
+    },
+    {
+      "name": "Sonny Clark",
+      "weight": 8
+    },
+    {
+      "name": "Kenny Drew",
+      "weight": 9
+    },
+    {
+      "name": "John Hicks",
+      "weight": 8
+    },
+    {
+      "name": "Eric Reed",
+      "weight": 5
+    },
+    {
+      "name": "Ahmad Jamal",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Tommy Flanagan",
+  "bio": [
+    "Revered session jazz pianist of the '50s & '60s who finally took the helm, to much acclaim, in the '70s.",
+    "Known for his flawless and tasteful playing, Tommy Flanagan received long overdue recognition for his talents in the 1980s. He played clarinet when he was six and switched to piano five years later. Flanagan was an important part of the fertile Detroit jazz scene (other than 1951-1953 when he was in the Army) until he moved to New York in 1956. He was used for many recordings after his arrival during that era; cut sessions as a leader for New Jazz, Prestige, Savoy, and Moodsville; and worked regularly with Oscar Pettiford, J.J. Johnson (1956-1958), Harry \"Sweets\" Edison (1959-1960), and Coleman Hawkins (1961). Flanagan was Ella Fitzgerald's regular accompanist during 1963-1965 and 1968-1978, which resulted in him being underrated as a soloist. However, starting in 1975, he began leading a series of superior record sessions and since leaving Fitzgerald, Flanagan has been in demand as the head of his own trio, consistently admired for his swinging and creative bop-based style. Among the many labels he has recorded for since 1975 are Pablo, Enja, Denon, Galaxy, Progressive, Uptown, Timeless, and several European and Japanese companies. For Blue Note, he cut Sunset and Mockingbird in 1998, followed a year later by Samba for Felix. Despite a heart condition, Flanagan continued performing until the end of his life, performing two-week stints at the Village Vanguard twice a year, recording and touring. He died on November 16, 2001, in Manhattan from an arterial aneurysm.",
+    "Tommy Flanagan began playing piano as a child, making his professional debut while still a teenager. In his mid-twenties he relocated to New York and before too long had a gig at the iconic Birdland. From the mid-'50s he continued his support role, working with Miles Davis, Sonny Rollins, Coleman Hawkins and Tony Bennett before teaming up with Ella Fitzgerald, for whom he was accompanist for the greater part of the '60s and '70s. In the late-'70s, Flanagan finally made the break from his back-up role and gained acclaim as both small group leader and soloist, fame which stayed with him through the '80s and into the '90s. Though his playing was often deeply introspective, Flanagan’s varied experience and stylistic grace helped make him a major player on the international stage."
+  ]
+}

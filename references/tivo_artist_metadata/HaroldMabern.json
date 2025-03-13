@@ -1,0 +1,105 @@
+{
+  "moods": [
+    {
+      "name": "Energetic",
+      "weight": 7
+    },
+    {
+      "name": "Organic",
+      "weight": 6
+    },
+    {
+      "name": "Passionate",
+      "weight": 6
+    },
+    {
+      "name": "Cerebral",
+      "weight": 6
+    },
+    {
+      "name": "Intimate",
+      "weight": 8
+    },
+    {
+      "name": "Earnest",
+      "weight": 6
+    },
+    {
+      "name": "Stylish",
+      "weight": 8
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 6
+    },
+    {
+      "name": "Refined",
+      "weight": 6
+    },
+    {
+      "name": "Playful",
+      "weight": 8
+    },
+    {
+      "name": "Gentle",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Soul Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "Bobby Timmons",
+      "weight": 9
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "Ray Bryant",
+      "weight": 8
+    },
+    {
+      "name": "Duke Jordan",
+      "weight": 8
+    },
+    {
+      "name": "Cedar Walton",
+      "weight": 6
+    },
+    {
+      "name": "Kenny Barron",
+      "weight": 6
+    }
+  ],
+  "tivo_artist_name": "Harold Mabern",
+  "bio": [
+    "Memphis-born powerful hard bop jazz pianist with an extensive list of sideman and solo credits.",
+    "An excellent hard bop pianist, Harold Mabern was a highly regarded performer who emerged from the Memphis jazz and R&B scene of the 1950s. Mabern developed a commanding style that combined harmonic and modal sophistication with an impressive technical virtuosity. \r\nBorn in Memphis in 1936, Mabern initially started out on the drums before switching to piano. By his teens he was playing locally, often sharing the stage with such fellow up-and-comers as George Coleman, Charles Lloyd, and Booker Little. Although largely self-taught, he moved to Chicago after high school, where he did receive some private training. From there, he moved to New York City, where he found work recording with saxophonist Jimmy Forrest as well as Walter Perkins' MJT + 3 alongside fellow Memphis native Frank Strozier. More high-profile dates followed, including sessions with Johnny Griffin, Freddie Hubbard, Lee Morgan, Jackie McLean, Hank Mobley, and Wes Montgomery, among others.\r\nIn 1968, Mabern signed with Prestige and made his recording debut as a leader with A Few Miles from Memphis, followed by the same year's Rakin' and Scrapin', 1969's Workin' and Wailin', and 1970's Greasy Kid Stuff! Aside from the somewhat obscure 1978 trio date Pisces Calling, Mabern's own recordings largely came to a halt during the 1970s. However, he remained a highly sought-after sideman, appearing on albums by George Benson, Archie Shepp, Billy Harper, and others. He finally returned to his work as a leader with 1985's Joy Spring, a live solo date recorded at Toronto's Café des Copains. The trio date Straight Street, featuring longtime associates Ron Carter and Jack DeJohnette, appeared in 1989. \r\nMabern's output picked up considerably over the next decade, beginning with 1993's Leading Man, which featured Carter and DeJohnette along with altoist Bill Easley, trumpeter Bill Mobley, guitarist Kevin Eubanks, and vocalist Pamela Baskin-Watson. More well-regarded efforts followed with 1993's Lookin' on the Bright Side, 1995's For Phineas, and 1998's Mabern's Grooveyard. The pianist hailed the start of the new millennium with a flurry of albums for Japan's Venus label, including 2002's Kiss of Fire, 2003's Falling in Love with Love, 2005's Fantasy, and 2007's Somewhere Over the Rainbow. In 2008, he delivered another date for the Japanese market, the solo piano session Misty. \r\nIn 2012, he signed with HighNote and delivered the quartet album Mr. Lucky: A Tribute to Sammy Davis Jr. with tenor saxophonist Eric Alexander, bassist John Webber, and drummer Joe Farnsworth. Alexander was also on board for 2017's live Smoke Sessions release To Love and Be Loved, which also featured trumpeter Freddie Hendrix, bassist Nat Reeves, drummer Jimmy Cobb, and percussionist Cyro Baptista. The concert album The Iron Man: Live at Smoke arrived in 2018 and again found the pianist leading his quartet with Webber, Farnsworth, and Alexander. Mabern died on September 17, 2019 after suffering a heart attack. He was 83 years old."
+  ]
+}

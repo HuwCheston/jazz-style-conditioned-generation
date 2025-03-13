@@ -1,0 +1,134 @@
+{
+  "moods": [
+    {
+      "name": "Sensual",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 7
+    },
+    {
+      "name": "Reflective",
+      "weight": 8
+    },
+    {
+      "name": "Elegant",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 8
+    },
+    {
+      "name": "Yearning",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 8
+    },
+    {
+      "name": "Romantic",
+      "weight": 8
+    },
+    {
+      "name": "Intimate",
+      "weight": 8
+    },
+    {
+      "name": "Bravado",
+      "weight": 5
+    },
+    {
+      "name": "Lyrical",
+      "weight": 9
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Standards",
+      "weight": 9
+    },
+    {
+      "name": "Vocal",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Cyrus Chestnut",
+      "weight": 8
+    },
+    {
+      "name": "Renee Rosnes",
+      "weight": 7
+    },
+    {
+      "name": "Eric Reed",
+      "weight": 7
+    },
+    {
+      "name": "Brad Mehldau",
+      "weight": 7
+    },
+    {
+      "name": "Jacky Terrasson",
+      "weight": 6
+    },
+    {
+      "name": "Makoto Ozone",
+      "weight": 5
+    },
+    {
+      "name": "Marcus Roberts",
+      "weight": 7
+    },
+    {
+      "name": "Geri Allen",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Bill Charlap",
+  "bio": [
+    "A Grammy-winning pianist whose lyrical approach to acoustic jazz and standards is the epitome of swinging sophistication.",
+    "A strikingly gifted jazz pianist, Bill Charlap is a swinging and lyrical post-bop improvisor and accompanist, as well as a celebrated interpreter of standards. He debuted in the '90s with Gerry Mulligan and has performed with other jazz icons like Benny Carter, Phil Woods, and Clark Terry. Following a string of well-received albums, he gained wider attention with 1998's All through the Night and 2000's Written in the Stars, both of which featured his long-running trio with bassist Peter Washington and drummer Kenny Washington. He has recorded albums with vocalists, including his mother, singer Sandy Stewart, and won a Grammy for his collaboration with singer Tony Bennett, 2015's Silver Lining: The Songs of Jerome Kern. Charlap has released a steady stream of trio albums, including 2017's Grammy-nominated Uptown, Downtown, 2021's Street of Dreams, and 2024's And Then Again.\r\nBorn in 1966, Charlap grew up in New York City in a musical household, the son of Broadway songwriter Moose Charlap and singer Sandy Stewart. Taking to the piano at a young age, he went on to study at New York's High School of Performing Arts. He then entered college, but rather than finishing, he opted to practice and play on his own. Pianist Bill Mays soon took up Charlap's cause, recommending the young man as his replacement in the Gerry Mulligan Quartet. During this time, Charlap also worked with Benny Carter, Clark Terry, and Frank Wess, and was a sought-after accompanist for singers such as Tony Bennett, Carol Sloane, and Sheila Jordan. In 1995, he secured one of the most coveted piano chairs in jazz with the Phil Woods Quintet. \r\nAll the while, Charlap showed steady development as a leader. His debut came in 1994 with Along with Me, followed by Souvenir in 1995 and Distant Star in 1996. His 1997 release, All Through the Night, was the first to feature his trio with the redoubtable (and unrelated) Washingtons, Peter and Kenny, on bass and drums, respectively. In 2000, this lineup had its major-label breakthrough with the highly acclaimed Blue Note album Written in the Stars. \r\nTwo albums appeared in 2001: 2Gether with Warren Vaché and Contrasts with Jon Gordon. 'S Wonderful hit the shelves in 2002, as did Stardust, which was the first of a series of albums that focused on a single composer. Stardust featured the music of Hoagy Carmichael, 2004's Somewhere was a Leonard Bernstein affair, and 2005's Plays George Gershwin featured ten songs by the man Charlap considers \"the American soul.\" Also in 2005, he released an album with his mother, vocalist Sandy Stewart, Love Is Here to Stay. The concert album Live at the Village Vanguard appeared in 2007. \r\nIn 2010, Charlap joined pianist Renee Rosnes for the duo effort Double Portrait. Two years later, he reunited with his mother, singer Stewart, for Something to Remember. In 2015, he collaborated with legendary vocalist Tony Bennett for Silver Lining: The Songs of Jerome Kern, winning a Grammy in the process for Best Traditional Pop Vocal Album. He then returned to his longtime trio with bassist Peter Washington and drummer Kenny Washington for 2017's Uptown, Downtown. More trio albums arrived with 2021's Street of Dreams and 2024's And Then Again, the latter of which captured the group during a live performance at the Village Vanguard.",
+    "A strikingly gifted jazz pianist, Bill Charlap is a swinging and lyrical post-bop improvisor and accompanist, as well as a celebrated interpreter of standards. He debuted in the 1990s with Gerry Mulligan and has performed with other jazz icons like Benny Carter, Phil Woods, and Clark Terry. Following a string of well-received albums, he gained wider attention with 1998's All Through the Night and 2000's Written in the Stars, both of which featured his long-running trio with bassist Peter Washington and drummer Kenny Washington. He has recorded albums with vocalists, including his mother, singer Sandy Stewart, and won a Grammy for his 2015 collaboration with singer Tony Bennett, Silver Lining: The Songs of Jerome Kern. Charlap has released a steady stream of trio albums, including 2017's Grammy-nominated Uptown, Downtown, 2021's Street of Dreams, and 2024's And Then Again."
+  ]
+}

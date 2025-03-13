@@ -1,0 +1,72 @@
+{
+  "moods": [
+    {
+      "name": "Whimsical",
+      "weight": 7
+    },
+    {
+      "name": "Smooth",
+      "weight": 7
+    },
+    {
+      "name": "Reflective",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 7
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "John Taylor",
+  "bio": [
+    "Contemporary British pianist with a fine touch and Keith Jarrett-like style.",
+    "Self-taught British pianist John Taylor has established himself as one of the most respected musicians of his generation. He learned his trade with a dance band up until 1964, when he moved to London and began working with other up-and-comers such as John Surman, Alan Skidmore, and future wife Norma Winstone, as well as established stars like Cleo Laine and John Dankworth. In the late '60s, he began to lead his own trio and a sextet with trumpeter Kenny Wheeler, among others. He has played in Surman’s outstanding but short-lived Morning Glory with Terje Rypdal, and has also worked with Lee Konitz and ECM star Jan Garbarek. He continued to collaborate with Surman, producing some of the most inventive, jazz-based music of subsequent decades."
+  ]
+}

@@ -1,0 +1,258 @@
+{
+  "moods": [
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 6
+    },
+    {
+      "name": "Intimate",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 8
+    },
+    {
+      "name": "Earnest",
+      "weight": 9
+    },
+    {
+      "name": "Sensual",
+      "weight": 8
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 8
+    },
+    {
+      "name": "Poignant",
+      "weight": 6
+    },
+    {
+      "name": "Relaxed",
+      "weight": 7
+    },
+    {
+      "name": "Stately",
+      "weight": 7
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 5
+    },
+    {
+      "name": "Soothing",
+      "weight": 6
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 8
+    },
+    {
+      "name": "Witty",
+      "weight": 6
+    },
+    {
+      "name": "Romantic",
+      "weight": 8
+    },
+    {
+      "name": "Searching",
+      "weight": 6
+    },
+    {
+      "name": "Bright",
+      "weight": 6
+    },
+    {
+      "name": "Optimistic",
+      "weight": 6
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Stylish",
+      "weight": 9
+    },
+    {
+      "name": "Organic",
+      "weight": 9
+    },
+    {
+      "name": "Precious",
+      "weight": 7
+    },
+    {
+      "name": "Melancholy",
+      "weight": 5
+    },
+    {
+      "name": "Sweet",
+      "weight": 8
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Literate",
+      "weight": 8
+    },
+    {
+      "name": "Reflective",
+      "weight": 7
+    },
+    {
+      "name": "Earthy",
+      "weight": 6
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Cool",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Chamber Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Soul Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 8
+    }
+  ],
+  "similars": [
+    {
+      "name": "Bill Evans",
+      "weight": 9
+    },
+    {
+      "name": "Hank Jones",
+      "weight": 9
+    },
+    {
+      "name": "Junior Mance",
+      "weight": 8
+    },
+    {
+      "name": "Ramsey Lewis",
+      "weight": 9
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 8
+    },
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 7
+    },
+    {
+      "name": "Wynton Kelly",
+      "weight": 8
+    },
+    {
+      "name": "Sonny Clark",
+      "weight": 7
+    },
+    {
+      "name": "Herbie Hancock",
+      "weight": 7
+    },
+    {
+      "name": "Oscar Peterson",
+      "weight": 8
+    },
+    {
+      "name": "Keith Jarrett",
+      "weight": 7
+    },
+    {
+      "name": "Roland Hanna",
+      "weight": 5
+    },
+    {
+      "name": "Erroll Garner",
+      "weight": 7
+    },
+    {
+      "name": "Thelonious Monk",
+      "weight": 7
+    },
+    {
+      "name": "Barry Harris",
+      "weight": 7
+    },
+    {
+      "name": "Paul Bley",
+      "weight": 5
+    },
+    {
+      "name": "Abdullah Ibrahim",
+      "weight": 5
+    },
+    {
+      "name": "Michel Petrucciani",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Ahmad Jamal",
+  "bio": [
+    "Innovative jazz pianist who parlayed a lean approach, featuring intelligent use of space and an expert sense of pacing plus simple embellishments.",
+    "One of the most individualistic pianists, composers, and arrangers of his generation, Ahmad Jamal's disciplined technique and minimalist style had a huge impact on trumpeter Miles Davis, and Jamal was often cited as contributing to the development of cool jazz throughout the 1950s. Though he was an excellent, technically proficient player well-versed in the gymnastic idioms of swing and bebop, he chose to play in a pared-down and nuanced style. Influenced by pianists Errol Garner, Art Tatum, and Nat King Cole, as well as big-band and orchestral music, Jamal developed his own boundary-pushing approach to modern jazz that incorporated an abundance of space, an adept use of tension and release, and unexpected rhythmic phrasing and dynamics. His highly melodic compositional style was evidenced beautifully on the best-selling 1958 offering At the Pershing: But Not for Me. His style and depth only increased in the ensuing decades, displaying themselves on standard-setting trio albums including 1965's Extensions, charting crossover sets like 1979's Intervals, and 1986's Rossiter Road. In the 21st century, Jamal continued carving his own path with a series of live and studio albums that juxtaposed standards with his own compositions including 2003's In Search of Momentum, Blue Moon: The New York Session/The Paris Concert in 2012, and the following year's Saturday Morning: La Buissone Studio Sessions. Even as he neared his nineties, his skills remained as sharp as ever, as evidenced on 2019's solo and duets set Ballades.\r\nBorn in Pittsburgh on July 2, 1930, Jamal was a child prodigy and began playing piano at age three, discovered by his uncle. By the time he was seven years old, Jamal was studying privately with Mary Cardwell Dawson, the founder of the National Negro Opera Company. An accomplished musician by his teens, Jamal performed regularly in the local jazz scene and in 1949 toured with George Hudson's Orchestra. After leaving Hudson, he joined swing violinist Joe Kennedy's group the Four Strings, with whom he stayed until Kennedy's departure around 1950.\r\nAfter leaving the Four Strings, Jamal relocated to Chicago, where he formed his own group, the Three Strings, with bassist Eddie Calhoun and guitarist Ray Crawford. The precursor to the later Ahmad Jamal Trio, the Three Strings would, at different times, include bassists Richard Davis and Israel Crosby. During a stint in New York City, the Three Strings caught the ear of legendary Columbia record exec and talent scout John Hammond, who signed the group to the Columbia subsidiary OKeh in 1951. During this time, Jamal released several influential albums including Ahmad Jamal Trio Plays (also known as Chamber Music of the New Jazz) on Parrot (1955), The Ahmad Jamal Trio on Epic (1955), and Count 'Em 88 on Argo (1956). Some of the landmark songs recorded during these sessions include \"Ahmad's Blues\" and \"Pavanne,\" both of which had a profound impact on Miles Davis, who later echoed the spare, bluesy quality of Jamal's playing on his own recordings.\r\nIn 1958, Jamal took up a residency in the lounge of the Pershing Hotel in Chicago. Working with bassist Crosby and drummer Vernell Fornier, Jamal recorded the seminal live album Ahmad Jamal at the Pershing: But Not for Me. Comprised primarily of jazz standards, including his definitive version of the buoyant Latin number \"Poinciana,\" the album showcased Jamal's minimalist phrasing and unique approach to small group jazz, emphasizing varied dynamics and nuanced shading as opposed to the high-energy freneticism commonly associated with jazz of the '40s and '50s. Though somewhat misunderstood by critics at the time who did not fully appreciate the inventive qualities of Jamal's playing, the record proved a commercial success and remained on the Billboard album charts for over two years -- a rarefied achievement for a jazz musician of any generation.\r\nThe smash success of the album raised the musician's profile and allowed him to open his own club and restaurant, The Alhambra, in Chicago in 1959. During this time, Jamal released several albums on the Argo label including Ahmad Jamal Trio, Vol. 4 (1958), Ahmad Jamal at the Penthouse (1960), Happy Moods (1960), Ahmad Jamal's Alhambra (1961), and All of You (1961). After the Alhambra closed in 1961, Jamal disbanded his trio, moved to New York City, and took a two-year hiatus from the music industry.\r\nIn 1964, he returned to performing and recording. Working with a new version of his trio that included bassist Jamil Nasser and drummer Frank Gant, with whom he would work until 1972, Jamal recorded several more albums for Argo (later renamed Cadet) including Naked City Theme (1964), The Roar of the Greasepaint (1965), Extensions (1965), Rhapsody (1966), Heat Wave (1966), Cry Young (1967), and The Bright, the Blue and the Beautiful (1968). Also in 1968, Jamal made his Impulse Records debut with the live album Ahmad Jamal at the Top: Poinciana Revisited. This was followed by several more Impulse releases including The Awakening (1970), Freeflight (1971), and Outertimeinnerspace (1972), both of which culled tracks from his appearance at the Montreux Jazz Festival in 1971. These albums found Jamal moving toward an expansive, funk-infused style, sometimes playing a Fender Rhodes electric keyboard. Also during the '70s, Jamal moved to the 20th Century label and continued to release a steady stream of albums that attracted both hardcore jazz and crossover audiences. Of his '70s albums, both Genetic Walk (1975) and Intervals (1979) made the R&B charts.\r\nThe '80s continued to be a productive time for Jamal, who kicked off the decade with such albums as Night Song on Motown (1980) and Live in Concert Featuring Gary Burton (1981). After signing with Atlantic, Jamal released several well-received albums that found him returning to his classic, acoustic small group sound including Digital Works (1985), Live at the Montreal Jazz Festival 1985 (1985), Rossiter Road (1986), Crystal (1987), and Pittsburgh (1989). \r\nThe '90s also saw a resurgence in interest and acclaim for Jamal, who was awarded the American Jazz Master Fellowship by the National Endowment for the Arts in 1994. Though he never stopped interpreting standards, Jamal utilized his own compositions more and more as the decades passed. During this period, he delivered such albums as Chicago Revisited: Live at Joel Segal's Jazz Showcase on Telarc (1992), Live in Paris '92 on Verve (1993), I Remember Duke, Hoagy & Strayhorn on Telarc (1994), as well as a handful of superb releases for Birdology including The Essence, Pt. 1 (1995), Big Byrd: The Essence, Pt. 2 (1995), and Nature: The Essence, Pt. 3 (1997).\r\nIn 2000, Jamal celebrated his 70th birthday with the concert album L'Olympia 2000 (released in October of the following year), which featured saxophonist George Coleman. He followed up with In Search of Momentum (2003), After Fajr (2005), It's Magic (2008), A Quiet Time (2010), and Blue Moon: The New York Session/The Paris Concert (2012). In 2013, Jamal released the album Saturday Morning: La Buissone Studio Sessions, featuring bassist Reginald Veal and drummer Herlin Riley. Jamal also opened Lincoln Center's concert season that year by performing live with the Lincoln Center Jazz Orchestra. A year later, he delivered the concert album Live at the Olympia, June 27, 2012: The Music and the Film of the Complete Concert, which featured Yusef Lateef. In 2017, Jamal delivered the small group session Marseille, which included contributions from French rapper Abd Al Malik and vocalist Mina Agossi. That same year he was honored with a Grammy Lifetime Achievement Award.\r\nIn 2019, Jamal released Ballades, a recording inspired by his life-long love of French music and culture. Comprised of three solo compositions -- including his first version of \"Poinciana\" -- and three duets with longtime bassist James Cammack, the album was issued by Harcourt in September. It would prove to be the last album of original material released during the pianist's lifetime. He passed away in April of 2023 at the age of 92.",
+    "One of the most individualistic pianists, composers, and arrangers of his generation, Ahmad Jamal's disciplined technique and minimalist style had a huge impact on trumpeter Miles Davis, and Jamal is often cited as contributing to the development of cool jazz throughout the 1950s. While he played with the skill of a virtuoso, it was often what he chose not to play that marked him as an innovator. Influenced by such pianists as Erroll Garner, Art Tatum, and Nat King Cole, Jamal developed his own boundary-pushing approach to modern jazz that incorporated an abundance of space, an adept use of tension and release, unexpected rhythmic phrasing and dynamics, and a highly melodic compositional style evidenced beautifully on the best-selling 1958 offering At the Pershing: But Not for Me. He has remained active well into the 21st century, carving his own path with a series of live and studio albums."
+  ]
+}

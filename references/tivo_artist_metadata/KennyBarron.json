@@ -1,0 +1,198 @@
+{
+  "moods": [
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 9
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Exuberant",
+      "weight": 8
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 6
+    },
+    {
+      "name": "Dramatic",
+      "weight": 8
+    },
+    {
+      "name": "Ambitious",
+      "weight": 9
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Bright",
+      "weight": 5
+    },
+    {
+      "name": "Complex",
+      "weight": 5
+    },
+    {
+      "name": "Improvisatory",
+      "weight": 9
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Animated",
+      "weight": 5
+    },
+    {
+      "name": "Introspective",
+      "weight": 5
+    },
+    {
+      "name": "Knotty",
+      "weight": 7
+    },
+    {
+      "name": "Exploratory",
+      "weight": 6
+    },
+    {
+      "name": "Lyrical",
+      "weight": 8
+    },
+    {
+      "name": "Reflective",
+      "weight": 8
+    },
+    {
+      "name": "Romantic",
+      "weight": 5
+    },
+    {
+      "name": "Rollicking",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Fusion",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 9
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 8
+    },
+    {
+      "name": "John Hicks",
+      "weight": 9
+    },
+    {
+      "name": "Cedar Walton",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "Wynton Kelly",
+      "weight": 7
+    },
+    {
+      "name": "Sonny Clark",
+      "weight": 7
+    },
+    {
+      "name": "Hal Galper",
+      "weight": 7
+    },
+    {
+      "name": "George Cables",
+      "weight": 8
+    },
+    {
+      "name": "Herbie Nichols",
+      "weight": 6
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 6
+    },
+    {
+      "name": "Herbie Hancock",
+      "weight": 6
+    },
+    {
+      "name": "James Williams",
+      "weight": 6
+    },
+    {
+      "name": "Kenny Drew",
+      "weight": 6
+    },
+    {
+      "name": "Abdullah Ibrahim",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Kenny Barron",
+  "bio": [
+    "Grammy-nominated contemporary jazz pianist, composer, and accompanist who is also an experienced teacher.",
+    "A highly respected, immensely influential jazz pianist, Kenny Barron is a sophisticated improviser, composer, bandleader, and educator. Emerging during the hard bop era, Barron established himself early on as an in-demand sideman, working alongside his brother, saxophonist Bill Barron, as well as with such titans as Dizzy Gillespie, James Moody, Freddie Hubbard, Booker Ervin, and many others. Blessed with fluid technique and a nuanced sense for chord voicings, he is the epitome of the modern jazz pianist, at home in both swinging straight-ahead dates and more forward-thinking settings. Since the '70s, he has also dedicated himself to passing along his knowledge, working as an instructor at the university level. Although often thought of as a journeyman with numerous session credits, Barron is a virtuoso performer with many well-regarded albums under his own name, including 1978's Innocence, 1995's Wanton Spirit, 2016's Grammy-nominated Book of Intuition, 2018's Concentric Circles, and 2023's The Source.\r\nBorn in Philadelphia on June 9, 1943, Barron took on the piano at the age of 12, with a little help from Ray Bryant's sister, known today as the mother of guitarist Kevin Eubanks. Three years later, on the recommendation of his own big brother, saxophonist Bill Barron (1927-1989), he joined Mel Melvin's R&GB band. The aspiring pianist gained more experience while working with drummer Philly Joe Jones and saxophonist Jimmy Heath, as well as multi-instrumentalist Yusef Lateef in Detroit. Lateef's album The Centaur and the Phoenix (1960) was Barron's first modern jazz recording project -- not as a performer (Joe Zawinul was the pianist on this date) but as composer and arranger.\r\nHis recording debut as an improvising artist, The Tenor Stylings of Bill Barron, took place shortly after he moved to New York in 1961, and was the first of many albums with his brother. A session in 1962 found Barron working with trumpeter Dave Burns, onetime member of sax and flute man James Moody's exciting bop orchestra. Moody himself played an important role in Barron's career, first hiring him to perform at the Village Vanguard, then bringing him into Dizzy Gillespie's band. Barron stuck with Diz and Moody until 1966, performing at clubs and festivals on both coasts and touring through France and England.\r\nBarron's first great year of independent recording activity was 1967. In addition to co-leading the session You Had Better Listen with trumpeter Jimmy Owens, the pianist made records with trumpeter Freddie Hubbard and saxophonists Joe Henderson, Stanley Turrentine, Tyrone Washington, Booker Ervin, and Eric Kloss. His ever-expanding discography continued to widen in the '70s, featuring dates with sax and flute men Moody and Lateef, bassists Ron Carter and Buster Williams, and artists like Earl and Carl Grubbs, Marion Brown, and Marvin \"Hannibal\" Peterson. \r\nBarron's artistic balance of freedom and discipline would continue to bear fruit in the '70s as he worked regularly with saxophonists Chico and Von Freeman, John Stubblefield, Nick Brignola, and Stan Getz (with whom he toured extensively during Getz's twilight years). The stylistic range continued to widen as Barron sat in with violinists Michal Urbaniak and John Blake, drummer Elvin Jones, and singing trombonist Ray Anderson. He also delivered several of his own albums, including 1973's Sunset to Dawn, 1975's Lucifer, and 1978's Together with fellow pianist Tommy Flanagan. Also beginning in the '70s, Barron joined the faculty at Rutgers University, teaching piano and keyboard harmony. \r\nDuring the '80s, Barron remained quite active, releasing his own albums such as 1985's Scratch, with bassist Dave Holland and drummer Daniel Humair. He also played on Bill Lee's score for Spike Lee's film Do the Right Thing, appeared on multi-performer tribute albums honoring composers Nino Rota and Thelonious Monk, and became a founding member (with Charlie Rouse, Buster Williams, and Ben Riley) of Sphere, the definitive Monk legacy band. The '90s were an equally fruitful period for Barron, and found him working steadily for Verve, releasing such albums as People Time, Other Places, Wanton Spirit, and Night and the City. \r\nBy the turn of the century, Barron had established himself as both a piano virtuoso and journeyman artist who issued solo, duo, and large-ensemble recordings. In 2000, he released the Grammy-nominated Spirit Song, followed quickly by the release of Freefall, featuring violinist Regina Carter, in 2001. Around this time, he left his position at Rutgers and joined the faculty at Juilliard. Barron then moved to a quintet setting for 2004's Images. Four years later, he collaborated with West African guitarist Lionel Loueke on Traveler. Vocalist Claire Martin was the next beneficiary of Barron's deft accompanist skills on her album Too Much in Love to Care in 2012.\r\nBarron next delivered several duo albums, pairing with bassist Holland for 2014's The Art of Conversation on Impulse! and vibraphonist Mark Sherman for 2015's Interplay on Chesky Records. In 2016, he returned to the trio format with the Grammy-nominated Book of Intuition featuring bassist Kiyoshi Kitagawa and drummer Johnathan Blake. He then expanded his trio to a quintet for his Blue Note debut, 2018's Concentric Circles, adding trumpeter Mike Rodriguez and saxophonist Dayna Stephens. The following year, Barron issued a three-disc live album titled The Art of Piano Duo, collecting three duo performances with late pianist Mulgrew Miller from 2005 and 2011. He then reunited with Dave Holland and Johnathan Blake for the 2020 trio date Without Deception. Barron also joined singer Patty Lomuscio for her 2022 sophomore album, Star-Crossed Lovers, then returned a year later with the solo piano release The Source, which earned Barron yet another Grammy nomination in the process.",
+    "A highly respected, immensely influential jazz pianist, Kenny Barron is a sophisticated improviser, composer, bandleader, and educator. Emerging during the hard bop era, Barron established himself early on as an in-demand sideman, working alongside his brother, saxophonist Bill Barron, as well as with such titans as Dizzy Gillespie, James Moody, Freddie Hubbard, Booker Ervin, and many others. Blessed with fluid technique and a nuanced sense for chord voicings, he is the epitome of the modern jazz pianist, at home in swinging straight-ahead dates and more forward-thinking settings. Since the '70s, he has also dedicated himself to passing along his knowledge, working as an instructor at the university level. Although often thought of as a journeyman with numerous session credits, Barron is a virtuoso performer with many well-regarded albums under his own name, including 1978's Innocence, 1995's Wanton Spirit, 2016's Grammy-nominated Book of Intuition, 2018's Concentric Circles, and 2023's The Source."
+  ]
+}

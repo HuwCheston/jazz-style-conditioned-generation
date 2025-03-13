@@ -1,0 +1,210 @@
+{
+  "moods": [
+    {
+      "name": "Rollicking",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 8
+    },
+    {
+      "name": "Poignant",
+      "weight": 4
+    },
+    {
+      "name": "Delicate",
+      "weight": 4
+    },
+    {
+      "name": "Intimate",
+      "weight": 7
+    },
+    {
+      "name": "Intense",
+      "weight": 4
+    },
+    {
+      "name": "Melancholy",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 7
+    },
+    {
+      "name": "Plaintive",
+      "weight": 4
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 4
+    },
+    {
+      "name": "Gentle",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 8
+    },
+    {
+      "name": "Bittersweet",
+      "weight": 4
+    },
+    {
+      "name": "Complex",
+      "weight": 4
+    },
+    {
+      "name": "Reflective",
+      "weight": 4
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 4
+    },
+    {
+      "name": "Reserved",
+      "weight": 7
+    },
+    {
+      "name": "Calm/Peaceful",
+      "weight": 4
+    },
+    {
+      "name": "Literate",
+      "weight": 4
+    },
+    {
+      "name": "Ethereal",
+      "weight": 7
+    },
+    {
+      "name": "Ambitious",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Atmospheric",
+      "weight": 7
+    },
+    {
+      "name": "Eccentric",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Enigmatic",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Paranoid",
+      "weight": 7
+    },
+    {
+      "name": "Sparkling",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Modern Creative",
+      "weight": 9
+    },
+    {
+      "name": "Classical",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Larry Goldings",
+      "weight": 7
+    },
+    {
+      "name": "Jason Moran",
+      "weight": 6
+    },
+    {
+      "name": "Jacky Terrasson",
+      "weight": 7
+    },
+    {
+      "name": "Hiromi",
+      "weight": 6
+    },
+    {
+      "name": "Bill Charlap",
+      "weight": 6
+    },
+    {
+      "name": "Marc Copland",
+      "weight": 7
+    },
+    {
+      "name": "Tigran Hamasyan",
+      "weight": 6
+    },
+    {
+      "name": "Fred Hersch",
+      "weight": 8
+    },
+    {
+      "name": "Geri Allen",
+      "weight": 8
+    },
+    {
+      "name": "Benny Green",
+      "weight": 8
+    },
+    {
+      "name": "Eric Reed",
+      "weight": 7
+    },
+    {
+      "name": "Adam Birnbaum",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Brad Mehldau",
+  "bio": [
+    "Improvisational jazz pianist who introduced a classical impressionist influence into modern jazz, often using pop music as source material.",
+    "One of the most acclaimed pianists of his generation, Brad Mehldau is a virtuoso performer with an ear for deeply nuanced, harmonically sophisticated acoustic jazz. While Mehldau is one of the more absorbing and thoughtful practitioners within that idiom, he is also receptive to the idea of using material from the rock era (Paul McCartney's \"Blackbird\" for example). Though Mehldau's training is primarily classical, his interest in jazz began early and he has subsequently utilized both forms throughout his career. This is evident on his first (of five) Art of the Trio volume, and on 2006's House on Hill and 2010's Day Is Done. Both originals and covers of popular music standards -- from Radiohead to Nick Drake to Paul Simon -- reflect that his playing and compositional style owe as much to the 20th century classical impressionism of Claude Debussy as they do Bill Evans. He delivers classically oriented recordings on his own and with singers Renée Fleming and Anne Sofie von Otter, but he has also issued cross-pollinated explorations of J.S. Bach's classical pieces on After Bach and worked with the Orpheus Chamber Orchestra on Variations on a Melancholy Theme. Mehldau continues to expand the depth and breadth of the jazz piano tradition, whether playing with his contemporaries Joshua Redman, Christian McBride, and Brian Blade on Round Again and LongGone, or releasing solo albums like the Grammy-winning Finding Gabriel, 2022's prog-rock-inspired Jacob's Ladder, and 2023's Your Mother Should Know: Brad Mehldau Plays the Beatles.\r\nBorn in 1970 in Jacksonville, Florida, Mehldau started playing piano at a young age. Around age ten, he moved to West Hartford, Connecticut where he began taking classical piano lessons. By his teens, he had discovered jazz, listening to artists like Oscar Peterson, John Coltrane, and Keith Jarrett. He played in the Hall High School jazz band in West Hartford, Connecticut, winning the Berklee College of Music's Best All-Around Musician Award while still in his junior year of high school. In college, he studied jazz at New York's New School for Social Research under Fred Hersch, Junior Mance, Kenny Werner, and Jimmy Cobb. Cobb soon hired him to play in his band, Cobb's Mob. Mehldau also played alongside bassist Christian McBride and drummer Brian Blade in saxophonist Joshua Redman's first acoustic quartet before forming his own trio in 1994 and recording his first Warner Bros. album, Introducing Brad Mehldau, in 1995. Art of the Trio, Vol. 1 followed in 1997, with the next two volumes in the series appearing in the following months. Two years later, Mehldau returned with Elegiac Cycle, as well as Art of the Trio, Vol. 4: Back at the Vanguard. Places followed in 2000, consisting of all-original compositions focusing on various cities, hence the title of the album. \r\nAnother Art of the Trio album came out in 2001, but the most significant release was Largo, which featured Mehldau performing with other groups outside of his usual trio format. This was a big change from his previous work and offered new challenges as he adapted to several interesting lineup situations. Mehldau followed the genre-bending album with the standards-based Anything Goes and Live in Tokyo in 2004, with Day Is Done arriving the following year. In 2006, he released House on Hill as well as Love Sublime, the latter with soprano vocalist Renée Fleming on Nonesuch Records. Mehldau chose to work with his trio plus Pat Metheny on Quartet in 2007; he followed it up with the double-disc Live in 2008, which was recorded with his trio at the Village Vanguard. \r\nIn 2010, Mehldau emerged with the ambitious Highway Rider, a double-disc of 15 new compositions produced by Jon Brion. He employed his trio as well as drummer Matt Chamberlain, saxophonist Joshua Redman, and a small chamber orchestra led by Dan Coleman. Mehldau arranged and orchestrated all the music. Also in 2010, Mehldau was honored by Carnegie Hall when he was named the first jazz artist to hold the Richard and Barbara Debs Composer's Chair for the 2010-2011 season. In 2011, Mehldau appeared on two live albums: His own Live in Marciac and the ECM date Live at Birdland (recorded in 2009) with saxophonist Lee Konitz, bassist Charlie Haden, and drummer Paul Motian. In September of that year, Nonesuch also released a studio album, Modern Music, a collaboration between Mehldau, pianist Kevin Hays, and composer/arranger Patrick Zimmerli. The music on this set comprised tunes by each of the principals, as well as compositions by Ornette Coleman, Steve Reich, and Philip Glass.  \r\nOn December 6, 2011, while Mehldau was at the beginning of a world tour, Nonesuch issued a box set entitled Art of the Trio Recordings: 1996–2001. The set includes the five Art of the Trio albums -- the last a double-disc -- that were originally issued on Warner Bros. The box also included a seventh disc of previously unreleased material from shows at the Village Vanguard in 1997, 1999, and 2001. A year later, the Brad Mehldau Trio released two studio albums: the all-original Ode and a companion collection of cover songs, Where Do You Start. The pianist then joined drummer/electronicist Mark Guiliana for the duo's collaborative 2014 effort, Mehliana: Taming the Dragon. \r\nThe box set 10 Years Solo Live appeared in 2015 and featured solo performances Mehldau had given in Europe in the preceding decade. He then returned to his tried-and-tested trio of Larry Grenadier and Jeff Ballard for 2016's Blues and Ballads, an album that featured their meticulous collective touch on compositions by Cole Porter, Charlie Parker, Lennon/McCartney, and others. Also in 2016, the pianist joined longtime associate saxophonist Joshua Redman for the Grammy-nominated duo album Nearness. The following year, he paired with progressive bluegrass star Chris Thile for the Nonesuch effort Chris Thile & Brad Mehldau, then explored composer J.S. Bach's Well-Tempered Clavier fugues with 2018's After Bach. A few short months later, he was back with another trio album, Seymour Reads the Constitution! His first trio date to include any original material since 2012's Ode, it featured three originals alongside his usual covers of pop songs, jazz tunes, and standards. The pianist continued to stretch himself, playing in guitarist Wolfgang Muthspiel's trio along with Ambrose Akinmusire on the ECM date Where the River Goes. He closed out the year with the archival duo offering Long Ago and Far Away with the late bassist Charlie Haden, recorded at the Enjoy Jazz Festival in Mannheim, Germany in 2007. \r\nMehldau followed with Finding Gabriel, a recording outside the confines of post-bop jazz that aligned more closely with his other slipstream albums such as Mehliana: Taming the Dragon, Largo, and The Highway Rider. The set included nine thematically related originals by Mehldau, who played piano, synthesizers, percussion, and Fender Rhodes, as well as delivering wordless vocals. The album sessions also offered contributions from guests such as Akinmusire, Giuliana, Sara Caswell, Kurt Elling, Joel Frahm, Gabriel Kahane, Becca Stevens, and others. Its inspiration was taken from a biblical prophecy as related through the ages by the angel Gabriel. Released in the spring of 2019, it took home the Grammy Award for Best Jazz Instrumental Album. The following year, he reunited with the other members of saxophonist Joshua Redman's '90s quartet, including Christian McBride and Brian Blade, for Round Again. \r\nIn July, Mehldau released the solo recital Suite: April 2020. Recorded in Amsterdam during the COVID-19 pandemic, the work included 12 original compositions and three favorite standards that, according to the pianist, \"... provide a musical snapshot of life in the last month in the world in which we’ve all found ourselves....\" Issued digitally and in a numbered, limited-edition run of 1,000 deluxe 180-gram vinyl LPs, all of the latter's proceeds were donated to the Jazz Foundation of America's COVID-19 Musician's Emergency Fund. (CDs and standard vinyl editions were released by Nonesuch in September, also with a significant portion of sales donated to benefit JFA's fund.) A collaboration with the Orpheus Chamber Orchestra, Variations on a Melancholy Theme, arrived in June 2021. Released in 2022, Jacob's Ladder found Mehldau drawing inspiration from scripture and his longtime love of prog rock. Featured on the album were guest appearances from Chris Thile, Cecile McLorin Salvant, Becca Stevens, and others. Also that year, he reunited with Redman, McBride, and Blade for the Grammy-nominated LongGone. A solo piano date, Your Mother Should Know: Brad Mehldau Plays the Beatles, appeared in February 2023 and found the pianist putting his distinctive and intimate jazz spin on the iconic band's work.",
+    "One of the most acclaimed pianists of his generation, Brad Mehldau is a virtuoso performer with an ear for deeply nuanced, harmonically sophisticated acoustic jazz. Though Mehldau's training is primarily classical, his interest in jazz began early and he has utilized both forms throughout his career. Both originals and covers of popular music standards -- from Radiohead to Nick Drake to Paul Simon -- reflect that his playing and compositional style owe as much to the 20th century classical impressionism of Claude Debussy as they do Bill Evans. Along with cross-pollinated explorations like 2018's After Bach, Mehldau continues to expand the depth and breadth of the jazz piano tradition, playing with his contemporaries Joshua Redman, Christian McBride, and Brian Blade on Round Again, and releasing solo albums like the Grammy-winning Finding Gabriel and 2022's prog rock-inspired Jacob's Ladder."
+  ]
+}

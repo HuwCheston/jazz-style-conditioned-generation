@@ -1,0 +1,98 @@
+{
+  "moods": [
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 7
+    },
+    {
+      "name": "Carefree",
+      "weight": 8
+    },
+    {
+      "name": "Rollicking",
+      "weight": 7
+    },
+    {
+      "name": "Earthy",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Rousing",
+      "weight": 8
+    },
+    {
+      "name": "Romantic",
+      "weight": 8
+    },
+    {
+      "name": "Intimate",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Soul Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Gene Harris",
+      "weight": 9
+    },
+    {
+      "name": "Bobby Timmons",
+      "weight": 9
+    },
+    {
+      "name": "Ray Bryant",
+      "weight": 9
+    },
+    {
+      "name": "Ahmad Jamal",
+      "weight": 8
+    },
+    {
+      "name": "Ramsey Lewis",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Junior Mance",
+  "bio": [
+    "Jazz pianist who backed Dizzy Gillespie, Dinah Washington, and Cannonball Adderley as well as leading his own combos.",
+    "Junior Mance was well-known for his soulful bluesy style, but was also expert at playing bop standards. He started playing professionally when he was ten. Mance worked with Gene Ammons in Chicago between 1947 and 1949, played with Lester Young (1950), and was with the Ammons-Sonny Stitt group until he was drafted. He was the house pianist at Chicago's Bee Hive (1953 to 1954), worked as Dinah Washington's accompanist (1954 and 1955), was in the first Cannonball Adderley Quintet (1956 to 1957), and then spent two years touring with Dizzy Gillespie (1958 to 1960). After a few months with the Eddie \"Lockjaw\" Davis/Johnny Griffin group, Mance formed his own trio and was primarily a leader. He led sessions for Verve, Jazzland, Riverside, Capitol, Atlantic, Milestone, and Polydor, among other labels. In the '80s, Mance joined the faculty at the New School in New York City, teaching as part of their Jazz program. He also continued to record, issuing his last album, For My Fans, It’s All About You, in 2015, one year before he retired from music. Junior Mance died on January 17, 2021 in his home in Manhattan after a struggle with Alzheimer’s disease; he was 92 years old.",
+    "His light, rippling piano backed all the jazz greats of the 1940s, but Chicago jazz musician Junior Mance really honed his chops playing with Dizzie Gillespie in the '50s. Taught piano by his father, also a respected jazz musician, Mance was playing professionally before he’d entered his teenage years, and spent the ensuing decades playing with artists like Gene Ammon, Cannonball Adderley, and Dinah Washington. In the '60s, Mance launched a career as leader, releasing a string of well-received albums. His profile was boosted in the '90s after some highly successful world tours with nine other piano players, a group dubbed the 100 Gold Fingers. Mance was inducted into the International Jazz Hall of Fame in '97 and has continued to play, record, and teach into the '00s."
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "moods": [
+    {
+      "name": "Refined",
+      "weight": 8
+    },
+    {
+      "name": "Confident",
+      "weight": 8
+    },
+    {
+      "name": "Soothing",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 4
+    },
+    {
+      "name": "Playful",
+      "weight": 8
+    },
+    {
+      "name": "Rollicking",
+      "weight": 8
+    },
+    {
+      "name": "Boisterous",
+      "weight": 4
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 7
+    },
+    {
+      "name": "Restrained",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 8
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Energetic",
+      "weight": 6
+    },
+    {
+      "name": "Earthy",
+      "weight": 6
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Romantic",
+      "weight": 4
+    },
+    {
+      "name": "Reserved",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Big Band",
+      "weight": 7
+    },
+    {
+      "name": "Swing",
+      "weight": 9
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 6
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Ralph Sutton",
+      "weight": 8
+    },
+    {
+      "name": "Red Garland",
+      "weight": 8
+    },
+    {
+      "name": "Oscar Peterson",
+      "weight": 8
+    },
+    {
+      "name": "Dick Hyman",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Teddy Wilson",
+  "bio": [
+    "Among the best and most original pianists of the swing era, celebrated for his work with Billie Holiday and Benny Goodman.",
+    "Teddy Wilson was the definitive swing pianist, a solid and impeccable soloist whose smooth and steady style was more accessible to the general public than players like Earl Hines or Art Tatum. He picked up early experience playing with Speed Webb in 1929 and appearing on some Louis Armstrong recordings in 1933. Discovered by John Hammond, Willie joined Benny Carter's band and recorded with the Chocolate Dandies later that year. In 1935, he began leading a series of classic small-group recordings with swing all-stars that on many occasions featured Billie Holiday. That was also the year that an informal jam session with Benny Goodman and Gene Krupa resulted in the formation of the Benny Goodman Trio (Lionel Hampton made the group a quartet the following year). Although he was a special added attraction rather than a regular member of the orchestra, Wilson's public appearances with Goodman broke important ground in the long struggle against segregation.\r\nBetween his own dates, many recordings with Benny Goodman's small groups and a series of piano solos, Teddy Wilson recorded a large number of gems during the second half of the 1930s. He left B.G. in 1939 to form his own big band but, despite some fine records, it folded in 1940. Wilson led a sextet at Cafe Society from 1940 to 1944, taught music at Juilliard during the summers of 1945 to 1952, appeared on radio shows, and recorded regularly with a trio, as a soloist, and with pick-up groups in addition to having occasional reunions with Goodman. During the '60s, he worked as music director for the Dick Cavett Show, and he was awarded an Honorary Doctorate of Music from Berklee College of Music in 1979. Teddy Wilson died of stomach cancer on July 31, 1986 at the age of 73.",
+    "A naturally restrained musician, Wilson’s fleet playing and the elegant poise of his striding solos combined to make him an influential figure in the development of jazz piano. Although influenced by Earl ‘Fatha’ Hines, Wilson was a highly distinctive performer in his own right. He made history in the 1930s, when he joined Benny Goodman's big band, making him the first African-American to join a white band; his performances with Goodman provided a brilliantly intuitive counterpoint to the famed bandleader's playing. He made a succession of outstanding recordings with Benny Carter in the early-30s, and his work with Billie Holiday produced a number of jazz masterpieces. The earlier sessions, when Holiday’s talent was still unpolished, are object lessons in their deceptive simplicity."
+  ]
+}

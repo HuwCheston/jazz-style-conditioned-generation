@@ -1,0 +1,90 @@
+{
+  "moods": [
+    {
+      "name": "Reflective",
+      "weight": 9
+    },
+    {
+      "name": "Melancholy",
+      "weight": 8
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Literate",
+      "weight": 8
+    },
+    {
+      "name": "Gentle",
+      "weight": 7
+    },
+    {
+      "name": "Intimate",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 7
+    },
+    {
+      "name": "Atmospheric",
+      "weight": 6
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Lennie Tristano",
+      "weight": 9
+    },
+    {
+      "name": "Don Friedman",
+      "weight": 8
+    },
+    {
+      "name": "Herbie Nichols",
+      "weight": 8
+    },
+    {
+      "name": "Paul Bley",
+      "weight": 8
+    },
+    {
+      "name": "Keith Jarrett",
+      "weight": 7
+    },
+    {
+      "name": "Chick Corea",
+      "weight": 6
+    }
+  ],
+  "tivo_artist_name": "Steve Kuhn",
+  "bio": [
+    "The quintessential post-bop jazz pianist, thoroughly modernist in approach.",
+    "A highly regarded jazz pianist and composer, Steve Kuhn is known for his sophisticated ear for harmony and lyrical, motivic approach to improvisation. Emerging from the Boston jazz scene of the late '50s, Kuhn gained early exposure playing with legends like Kenny Dorham, John Coltrane, and Art Farmer. He came to wider prominence in 1966 with his albums Three Waves, with bassist Steve Swallow and drummer Pete La Roca, and The October Suite, with vibraphonist Gary McFarland. Those recordings led to a series of highly regarded albums for ECM including 1974's Trance, with Swallow and drummer Jack DeJohnette. An adaptive, forward-thinking performer, Kuhn's subsequent albums like 1987's Life's Magic, 1995's Remembering Tomorrow, and 2012's Wisteria have found him moving across various genres, from swinging acoustic post-bop to classical-influenced chamber jazz and the avant-garde. \r\nBorn in Brooklyn, New York in 1938 to Hungarian immigrant parents, Kuhn first became interested in music at a young age while listening to his father's jazz record collection on 78s. Starting piano lessons at age five, he quickly displayed his gift for perfect pitch. After moving to Boston with his family, Kuhn began taking lessons with the legendary Boston-area pedagogue Margaret Chaloff, whom he credits with engendering his strong classical piano technique. Also during this time, he befriended Chaloff's son, saxophonist Serge Chaloff, who encouraged his interest in jazz.\r\nBy his teens, Kuhn had developed into an adept jazz pianist, influenced by the recordings of jazz luminaries like Duke Ellington, Bud Powell, Fats Waller, and Art Tatum. He formed his own trio with drummer Arnold Wise and bassist Chuck Israels and began playing local clubs. Even while attending Harvard, Kuhn held down a six-nights-a-week gig in Harvard Square and gained valuable experience working with the myriad jazz stars who came through the city, including Chet Baker, Coleman Hawkins, and Vic Dickenson, among others. After graduating Harvard, Kuhn continued his studies at the Lenox School of Music, where he rubbed shoulders with fellow students Ornette Coleman and Don Cherry and studied under esteemed jazz scholars like Gunther Schuller and George Russell. It was also while at Lenox that he met trumpeter Kenny Dorham, who hired the pianist for a year-long tour. \r\nParting ways with Dorham in 1960, Kuhn next joined legendary saxophonist John Coltrane's quartet for a stint at New York's Jazz Gallery. While brief (Kuhn was replaced by McCoy Tyner after eight weeks), the experience inspired Kuhn and would inform much of his later work. Also during the '60s, Kuhn began appearing on recording dates with artists like Stan Getz, Oliver Nelson, and Art Farmer; he also spent a year touring with Farmer and future collaborators bassist Steve Swallow and drummer Pete La Roca. \r\nAs a leader, Kuhn debuted alongside pianist Toshiko Akiyoshi on 1963's The Country and Western Sound of Jazz Pianos. He then followed up with 1966's Three Waves, featuring Swallow and La Roca. Also in 1966, he paired with fellow Lenox student Gary McFarland for the landmark chamber jazz album The October Suite. \r\nIn the late '60s, Kuhn relocated to Stockholm, Sweden, where he lived and performed until 1971. Ironically, it wasn't until returning to the States that Kuhn signed with Manfred Eicher's then-fledgling European jazz label ECM. Notably, Kuhn's work on The October Suite had been one of Eicher's early inspirations in founding the label. With ECM, Kuhn released several probing and atmospheric albums including Ecstasy (1974), Trance (1974), Motility (1977), Non-Fiction (1978), Playground, featuring vocalist Sheila Jordan (1979), and Last Year's Waltz (1981). \r\nIn the '80s, Kuhn continued to refine his sound, often playing in a trio with bassist Ron Carter and drummer Al Foster. Many of his albums from this period, including 1984's Mostly Ballads, 1987's Life's Magic, and 1988's Porgy, showcase a mix of well-curated standards along with his inventive original compositions. It was a template that Kuhn would stick with throughout the next decade as he found himself working in various trio settings with artists like David Finck, George Mraz, Buster Williams, Billy Drummond, Lewis Nash, Bill Stewart, Kenny Washington, and others. \r\nWhile the trio remained Kuhn's preferred format, his 1995 album Seasons of Romance found him working in an all-star quintet with tenor saxophonist Bob Mintzer and trumpeter Tom Harrell. Even more expansive was his 2004 return to ECM, Promises Kept, which found him backed by a small string orchestra. Kuhn also retained his exploratory edge, returning to his love of classical composers like Debussy and Ravel on 2006's Pavane for a Dead Princess. Jazz reworkings of classical compositions were featured on his 2008 trio album, Baubles, Bangles and Beads. \r\nIn 2009, Kuhn revisited his time as a member of John Coltrane's quartet with Mostly Coltrane, featuring saxophonist Joe Lovano, on ECM. Also for ECM, Kuhn paired in a trio with bassist Swallow and drummer Joey Baron for 2012's Wisteria. His trio with Swallow and Baron was also the focus of 2016's At This Time... and 2018's To and from the Heart.",
+    "After studying with Margaret Chaloff (mother of baritonist Serge Chaloff), the Brooklyn-born pianist  Kuhn starting playing professionally in local Boston jazz clubs while still a teenager. After attending the John Lewis-sponsored Lenox School of Music, Kuhn began an off-and-on association with the jazz avant-garde, playing with Ornette Coleman and Don Cherry, and even joining the newly formed John Coltrane for a short while in 1961. During the '60s, Kuhn mainly played in Europe but returned to the United States in the '70s, recording for the ECM label with a celebated quartet that included the singer Sheila Jordan. Steve Kuhn is a quintessential post-bop jazz pianist, thoroughly modernist in his approach but never leaving the jazz standard tradition too far behind."
+  ]
+}

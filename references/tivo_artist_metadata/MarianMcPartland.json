@@ -1,0 +1,210 @@
+{
+  "moods": [
+    {
+      "name": "Reflective",
+      "weight": 7
+    },
+    {
+      "name": "Precious",
+      "weight": 7
+    },
+    {
+      "name": "Plaintive",
+      "weight": 7
+    },
+    {
+      "name": "Cheerful",
+      "weight": 7
+    },
+    {
+      "name": "Intimate",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Nostalgic",
+      "weight": 7
+    },
+    {
+      "name": "Thoughtful",
+      "weight": 7
+    },
+    {
+      "name": "Earnest",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Relaxed",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Energetic",
+      "weight": 9
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 7
+    },
+    {
+      "name": "Carefree",
+      "weight": 7
+    },
+    {
+      "name": "Melancholy",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Sweet",
+      "weight": 9
+    },
+    {
+      "name": "Bright",
+      "weight": 7
+    },
+    {
+      "name": "Playful",
+      "weight": 9
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Stately",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 9
+    },
+    {
+      "name": "Earthy",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 9
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    },
+    {
+      "name": "Reverent",
+      "weight": 9
+    },
+    {
+      "name": "Rambunctious",
+      "weight": 7
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Poignant",
+      "weight": 9
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Standards",
+      "weight": 9
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Swing",
+      "weight": 9
+    },
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "Cool",
+      "weight": 9
+    },
+    {
+      "name": "Vocal",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "American Popular Song",
+      "weight": 9
+    }
+  ],
+  "similars": [
+    {
+      "name": "Jessica Williams",
+      "weight": 8
+    },
+    {
+      "name": "Mary Lou Williams",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Marian McPartland",
+  "bio": [
+    "Exceptional jazz musician for over 50 years, renowned for her capacity for intelligent improvising.",
+    "Marian McPartland became famous for hosting her Piano Jazz radio program beginning in 1978, but she was a well-respected pianist decades before. She played in a four-piano vaudeville act in England and performed on the European continent for the troops during World War II. In Belgium in 1944, she met cornetist Jimmy McPartland and they soon married. Marian moved with her husband to the United States in 1946, where she sometimes played with him even though her style was more modern than his Dixieland-oriented groups. McPartland eventually had her own trio at the Embers (1950) and the Hickory House (1952-1960), which until 1957 included drummer Joe Morello. She recorded regularly for Savoy and Capitol during the 1950s and also made sessions for Argo (1958), Time (1960 and 1963), Sesac, and Dot. Although eventually divorced from Jimmy, they remained close friends, sometimes played together, and even remarried just weeks before his death. She formed her own Halcyon label and recorded several fine albums between 1969-1977. McPartland also made three albums for Tony Bennett's Improv label during 1976-1977 before signing with Concord, where she remained after 1978. The Jazz Alliance label has made available over 30 CDs' worth of material from Marian McPartland's Piano Jazz show, some of which are quite fascinating and significant. McPartland died in August 2013 at her home in Port Washington, New York; she was 95 years old.",
+    "British jazz pianist Marian McPartland was a beloved musical institution whose performing roots dated back to the WWII years in Europe. She was also an important disseminator and educator, whose radio program PIANO JAZZ was the longest-running series on NPR. A highly sensitive pianist who never stopped appreciating and assimilating new ideas, McPartland had a highly diverse range of tastes and passions, not to mention a series of consistently beautiful albums spanning the last three decades of the 20th century and into the 21st."
+  ]
+}

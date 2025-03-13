@@ -1,0 +1,173 @@
+{
+  "moods": [
+    {
+      "name": "Precious",
+      "weight": 7
+    },
+    {
+      "name": "Sweet",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Uplifting",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Bright",
+      "weight": 7
+    },
+    {
+      "name": "Poignant",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Cheerful",
+      "weight": 7
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Reverent",
+      "weight": 9
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 7
+    },
+    {
+      "name": "Earnest",
+      "weight": 7
+    },
+    {
+      "name": "Earthy",
+      "weight": 7
+    },
+    {
+      "name": "Stately",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Kenny Barron",
+      "weight": 9
+    },
+    {
+      "name": "Benny Green",
+      "weight": 8
+    },
+    {
+      "name": "James Williams",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "Donald Brown",
+      "weight": 8
+    },
+    {
+      "name": "Kenny Drew",
+      "weight": 8
+    },
+    {
+      "name": "George Cables",
+      "weight": 9
+    },
+    {
+      "name": "Geoffrey Keezer",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "John Hicks",
+  "bio": [
+    "Jazz pianist whose personal style harmoniously blended a melodious romanticism with buoyant, inventive, dramatic flair.",
+    "A longtime fixture of the New York City jazz landscape, pianist John Hicks was an artist of uncommon versatility, moving effortlessly from pop standards to the avant-garde while retaining the dense physicality and intense energy that were the hallmarks of his approach. Born December 12, 1941, in Atlanta, Hicks was still an infant when his preacher father relocated the family to Los Angeles. He spent the better part of his teen years in St. Louis, and counted among his classmates there the young Lester Bowie. Hicks' mother was his first piano teacher, and after a stint at Lincoln University in Missouri he attended the Berklee School of Music and the Juilliard School; he later cited influences spanning from Fats Waller to Thelonious Monk to Methodist church hymns, and his catholic listening tastes were instrumental in shaping his far-ranging skills as a player. After touring in support of bluesman Albert King and hard bop tenor saxophonist Johnny Griffin, Hicks backed singer Della Reese during a 1963 New York club residency, and the city remained his home for the rest of his life. In the wake of stints with Kenny Dorham and Joe Henderson, Hicks joined Art Blakey's Jazz Messengers in 1964, collaborating alongside the likes of trumpeters Lee Morgan and Freddie Hubbard. Two years later, he signed on with singer Betty Carter, like Blakey a keen judge of emerging talent. Upon exiting Carter's band in 1968, Hicks spent the remainder of the decade with Woody Herman and entered the decade to follow as a first-call sideman. He also moonlighted as an educator, and during the early '70s taught jazz and improvisation at Southern Illinois University. \r\nAfter backing Carter on her 1976 date Now It's My Turn, Hicks returned to her backing group full-time. The exposure vaulted him to new renown, and in 1979 he finally led his own studio effort, After the Morning. With 1981's Some Other Time, cut with bassist Walter Booker and drummer Idris Muhammad, Hicks also emerged as a gifted composer, writing his best-known effort, \"Naima's Love Song,\" in honor of his young daughter. He recorded prolifically in the years to follow, concentrating on solo and small ensemble work including stints as member of the Power Trio and the Keystone Trio. He also served as the regular pianist with the Mingus Dynasty Band and for a time led his own big band. Hicks enjoyed his greatest commercial success with a series of tribute LPs celebrating the music of his mentors and influences, highlighted by 1998's Something to Live For (a collection of Billy Strayhorn compositions), 2000's Impressions of Mary Lou (Williams, of course), and 2003's Fatha's Day (honoring Earl Hines). Hicks' longest and most rewarding collaboration was his partnership with flutist Elise Wood, which launched in 1983 and after several studio sessions and tours culminated in marriage in 2001, around the time of the release of their duo recording Beautiful Friendship. Hicks died suddenly on May 10, 2006. Just three days earlier, he delivered his final performance at Harlem's St. Mark's United Methodist Church, where his father served as a minister prior to his own death. Hicks was 64 years old."
+  ]
+}

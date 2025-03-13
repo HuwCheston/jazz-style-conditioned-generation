@@ -1,0 +1,322 @@
+{
+  "moods": [
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Atmospheric",
+      "weight": 7
+    },
+    {
+      "name": "Brooding",
+      "weight": 9
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Bittersweet",
+      "weight": 7
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 9
+    },
+    {
+      "name": "Literate",
+      "weight": 9
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Uplifting",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Uncompromising",
+      "weight": 7
+    },
+    {
+      "name": "Gentle",
+      "weight": 9
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Bravado",
+      "weight": 7
+    },
+    {
+      "name": "Wistful",
+      "weight": 7
+    },
+    {
+      "name": "Indulgent",
+      "weight": 7
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Calm/Peaceful",
+      "weight": 9
+    },
+    {
+      "name": "Self-Conscious",
+      "weight": 7
+    },
+    {
+      "name": "Earthy",
+      "weight": 7
+    },
+    {
+      "name": "Poignant",
+      "weight": 7
+    },
+    {
+      "name": "Melancholy",
+      "weight": 7
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    },
+    {
+      "name": "Ambitious",
+      "weight": 7
+    },
+    {
+      "name": "Meandering",
+      "weight": 9
+    },
+    {
+      "name": "Earnest",
+      "weight": 7
+    },
+    {
+      "name": "Stately",
+      "weight": 7
+    },
+    {
+      "name": "Detached",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Wry",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Precious",
+      "weight": 7
+    },
+    {
+      "name": "Complex",
+      "weight": 9
+    },
+    {
+      "name": "Insular",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Provocative",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Reflective",
+      "weight": 9
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Intimate",
+      "weight": 9
+    },
+    {
+      "name": "Fiery",
+      "weight": 8
+    },
+    {
+      "name": "Reserved",
+      "weight": 8
+    },
+    {
+      "name": "Rousing",
+      "weight": 9
+    },
+    {
+      "name": "Enigmatic",
+      "weight": 9
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Orchestral",
+      "weight": 2
+    },
+    {
+      "name": "Chamber Music",
+      "weight": 1
+    },
+    {
+      "name": "Progressive Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Keyboard",
+      "weight": 1
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Standards",
+      "weight": 6
+    },
+    {
+      "name": "Concerto",
+      "weight": 2
+    },
+    {
+      "name": "Fusion",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Modern Creative",
+      "weight": 9
+    },
+    {
+      "name": "Vocal",
+      "weight": 5
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Classical",
+      "weight": 2
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Chick Corea",
+      "weight": 9
+    },
+    {
+      "name": "Geri Allen",
+      "weight": 8
+    },
+    {
+      "name": "Lennie Tristano",
+      "weight": 7
+    },
+    {
+      "name": "John Hicks",
+      "weight": 8
+    },
+    {
+      "name": "Herbie Hancock",
+      "weight": 7
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 8
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 7
+    },
+    {
+      "name": "Brad Mehldau",
+      "weight": 7
+    },
+    {
+      "name": "Paul Bley",
+      "weight": 7
+    },
+    {
+      "name": "Ahmad Jamal",
+      "weight": 7
+    },
+    {
+      "name": "Michel Petrucciani",
+      "weight": 7
+    },
+    {
+      "name": "Oscar Peterson",
+      "weight": 7
+    },
+    {
+      "name": "Fred Hersch",
+      "weight": 6
+    },
+    {
+      "name": "Abdullah Ibrahim",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Keith Jarrett",
+  "bio": [
+    "Prolific jazz and classical pianist, and bandleader. His 1975 improvised solo outing The Koln Concert is one of the best-selling albums in jazz history.",
+    "Pianist, composer, and bandleader Keith Jarrett is one of the most prolific, innovative, and iconoclastic musicians to emerge from the late 20th century. As a pianist (though that is by no means the only instrument he plays), he literally changed the improvisation conversation by introducing a new aesthetic in solo concerts -- complete spontaneous creation from beginning to end. He has recorded over 100 albums as a leader in jazz and classical music. His 1967 leader debut, Life Between the Exit Signs, led to playing with Miles Davis for a time. Jarrett issued a host of albums for Atlantic, Columbia, and Impulse including The Mourning of a Star, Expectations, and Bop-Be. He signed to ECM for 1972's solo piano studio offering Facing You. 1975's improvised The Köln Concert is one of the best-selling jazz piano albums ever. Jarrett's dozens of albums for ECM offer variety: International trios and quartets, duos and orchestral offerings, and solo concerts. In 1981 he debuted the \"standards trio\" with Gary Peacock and Jack DeJohnette, and the three worked together for more than 30 years. He released several albums of classical piano recitals including works by Bach and Shostakovich. He returned to improvised solo recitals with 1997's La Scala. During the 21st century, Jarrett continued performing solo and releasing archival material, including 2011's Rio, 2015's Creation, and 2016's A Multitude of Angels (a box recorded in 1996). Though a pair of strokes in 2018 left him unable to play, Jarrett continued to release archival concerts such as 2022's The Bordeaux Concert, a set recorded during 2016's European tour and 2023's Carl Philipp Emanuel Bach, a 1994 recording of the Württemberg Sonatas.\r\nJarrett was born May 8, 1945, in Allentown, Pennsylvania. At the age of three he began playing piano. He undertook the study of classical music at age eight, and at 15 he studied formal composition before moving to Boston to study briefly at the Berklee College of Music. Still in his teens, Jarrett intended to further his academic work in Paris before deciding to move to New York in 1964 and become a jazz musician. \r\nHe entered the city's vibrant scene by sitting in with veteran and aspiring players at clubs, including the Village Vanguard. His first touring gig was with Art Blakey's New Jazz Messengers, where he remained until 1966. His lone recording with that band -- which also featured trumpeter Chuck Mangione -- was Buttercorn Lady, recorded live at the Lighthouse in Hermosa Beach. Jarrett joined Charles Lloyd's famed quartet in 1966. That band, which reflected the variety of changes taking place in jazz and popular music in general, achieved global success as both a recording and touring entity.\r\nHe left the group in 1968 and issued his first solo recording, Restoration Ruin, on the Vortex label. He played everything on the album including soprano saxophone, harmonica, drums, and guitar in addition to piano; he even sang. The effort is mainly considered a curiosity in his catalog because it wasn't a jazz album, but a folk-rock recording. Regardless of how Jarrett regards it today, it stands as a brave undertaking from a young musician and paints an interesting view of his early thoughts in lieu of what he would accomplish later. Appearing the same year, he recorded Life Between the Exit Signs for Atlantic, where he led a trio whose rhythm section consisted of bassist Charlie Haden and drummer Paul Motian. This group -- later a quartet with the addition of saxophonist Dewey Redman -- would record together for 11 years and attain the status of jazz legends for their dynamic, groundbreaking interplay and improvisation.\r\nJarrett played organ and electric piano with Miles Davis between 1970 and 1971, which resulted in Live at the Fillmore and Live/Evil. His work with Davis would also surface on the trumpeter's 1974 album Get Up with It and was beautifully documented on the box set Miles Davis: The Cellar Door Session 1970, which was issued in 2005. Jarrett also appeared on other artists' albums during this period, including Airto's Free, psychedelic pop duo Barbara & Ernie's Prelude To..., and soul singer Donal Leace's self-titled offering from 1972. Jarrett and Gary Burton issued their self-titled recording on Atlantic in 1971, the same year his trio released The Mourning of a Star. \r\nThe pianist briefly signed to Columbia, releasing one enduring album for the label, Expectations, in 1972; it featured his trio with guitarist Sam Brown and drummer/percussionist Airto. The year also proved fruitful for two other reasons. The first was Facing You, Jarrett's first solo piano recording for Manfred Eicher's young ECM label, an association that would become symbiotic by the end of the decade. Redman joined Jarrett's group in late 1971, and the first offering by the larger band was Birth, issued by Atlantic in 1972. The band also recorded for Impulse! during this time, issuing the highly regarded Fort Yawuh (1973), Treasure Island (1974), Death and the Flower and Backhand (1975), Mysteries (1976), ByaBlue (1977), and Bop-Be (1978). El Juicio (The Judgement) also appeared on Atlantic in 1975. \r\nJarrett's horizons were broadening considerably in the early '70s, and his association with ECM was deepening. While 1972 saw the release of Ruta and Daitya, a duet album with Jack DeJohnette, 1973 offered evidence of what would become iconic in the decades to come: the improvised Solo Concerts: Bremen & Lausanne. In 1975, Jarrett's double-live solo piano album The Köln Concert was released; its warmth, accessibility, and immense and enduring popularity have made it one of the best-selling solo piano recordings in jazz history. His other solo piano works for ECM include Staircase, the ten-album Sun Bear Concerts, Moth and the Flame, Concerts, Paris Concert, Dark Intervals, Vienna Concert, La Scala, Carnegie Hall Concert, and Rio.\r\nJarrett began recording with a European group in the '70s, the second of his three groups that would become legendary. His European quartet included saxophonist Jan Garbarek, bassist Palle Danielsson, and drummer Jon Christensen; their debut, Belonging, appeared in 1974. Simultaneously, Jarrett remained busy with his American quartet and with recording experimentation. In the Light, which was released in 1974, was a double album that showcased his interest in composing modern classical music. His compositions were wide-ranging; among them were a string quartet, a brass quintet, and \"Crystal Moment (Piece for Four Celli and Two Trombones).\" He also recorded a pair of albums co-led with Garbarek, Luminescence (1975), where the pair was aided by an orchestral string section, and the popular Arbour Zena, which included Haden on bass as well as chamber strings. In 1976, the provocative Hymns/Spheres, a double album of improvisations played on an enormous 18th century organ in the Benedictine Abbey Ottobeuren, appeared on ECM. \r\nThe pianist's European quartet issued My Song in 1978, an album that brought more conservative jazz fans back to Jarrett's table, especially as it was surrounded by the releases of Bop-Be and The Survivor's Suite, the first of two releases by his American quartet to appear on ECM. That band's final album together, the live double album Eyes of the Heart, was released in 1979.\r\nJarrett kicked off the '80s with Celestial Hawk: For Orchestra, Percussion and Piano, recorded at Carnegie Hall. This work wed his instinctual improvisational discipline on the piano to his formal compositional abilities in both vanguard classical music and jazz. That year, his European quartet also released the live Nude Ants -- recorded at the Village Vanguard -- and Sacred Hymns, a solo piano album of compositions by metaphysical philosopher/musician Georges Ivanovitch Gurdjieff. \r\nIn 1983, Jarrett began working in a trio with bassist Gary Peacock and drummer Jack DeJohnette. It was the beginning of an association that has lasted ever since. Their initial session produced three albums: Standards, Vol. 1 and Vol. 2, and Changes (the last a set of free improvisations). Throughout the decade they alternated between recording standards and freely improvised sets, among them 1986's Standards Live and 1989's Changeless.\r\nJarrett also cut two deeply personal albums in the '80s. In 1986, Spirits, a double album, featured him playing piano, flute, recorder, soprano saxophone, guitar, and percussion. Another double, Book of Ways from 1987, was completely performed on the clavichord.\r\nIn 1988, Jarrett began recording canonical classical music. His first release was Bach's Das Wohltemperierte Klavier Buch I, followed by his Goldberg Variations the following year. But he hadn't abandoned jazz. Jarrett closed the decade with records by his European quartet in Personal Mountains, and by his American trio with Changeless, in 1989. \r\nWhile his first album of the '90s was the solo Paris Concert, the trio was also busy touring. They stopped briefly to record Bye Bye Blackbird in 1991 as a memorial to Miles Davis. That said, Jarrett spent most of the decade's first half recording classical music. These albums included collections of Handel and Bach sonatas -- both with Michala Petri playing recorder: his award-winning Shostakovich: 24 Preludes and Fugues Op. 87 in 1992, Bach's French Suites in 1993, and the composer's Bach: 3 Sonaten für Viola da Gamba und Cembalo with violist Kim Kashkashian in 1994. He also recorded W.A. Mozart Piano Concertos K. 467, 488, 595 Masonic Funeral Music K. 477 & Symphony in G Minor K. 550 with conductor Dennis Russell Davies and the Stuttgart Symphony, which remained unreleased until 2004.\r\nAt the Deer Head Inn with Peacock and DeJohnette also appeared in 1994. A six-CD box set entitled Keith Jarrett at the Blue Note: The Complete Recordings, was released in 1995, documenting a three-night stand by the trio in June of 1994. \r\nWhile on tour with the trio in Europe during 1996, Jarrett became ill with what was diagnosed as chronic fatigue syndrome. He battled the disease -- caused by an infection from parasitic bacteria -- for three years. While he recovered, ECM issued the 1995 solo concert La Scala in 1997, as well as the trio document Tokyo '96 in 1998. During his illness in 1997, Jarrett gathered his strength and recorded the intimate Melody at Night, With You, in his home studio. It is a solo piano offering of short, straightforward interpretations of standards, ballads, folk songs, and a lone original; it is the most intimate recording in his oeuvre, and unlike anything else in his catalog. The album was released in 1999, the year he had recovered enough to begin touring again with his trio. Jarrett's first release of the 21st century, in fact, was Whisper Not, a collection of standards recorded on that tour.\r\nOver the next four years, the trio toured and recorded shows. ECM issued several albums of them, including standards recordings such as Up for It and The Out of Towners, as well as Inside Out and Always Let Me Go -- the latter two shows consist of freely improvised music. In 2007, My Foolish Heart: Live at Montreux appeared, commemorating the trio's 25th anniversary. The stellar solo piano effort The Carnegie Hall Concert, wherein the pianist created new rules for himself as a live improviser, also appeared that year. In 2008, The Cure was released. It was a prime live standards gig by the trio from 1990 that had been sitting in the vault. \r\nIn 2009, the Paris/London solo concerts appeared, followed in 2010 by a duet recording between the pianist and Haden entitled Jasmine. In 2011, Rio was released shortly after the concert took place -- an anomaly in Jarrett's career. In 2012, ECM once more dug into its vaults and released Sleeper: Tokyo, April 16th, 1979, a previously unissued date by Jarrett's European quartet. His trio recorded at the Luzern Concert Hall in July of 2009; the concert was released as Somewhere in May of 2013. In November of that year, ECM released No End, an archival home studio recording from 1986, on which he played all instruments, including piano, electric guitars, bass, tablas, recorder, and drums; it was followed in December with the complete reissue Concerts: Bregenz München, a three-disc set comprising two solo piano concerts from 1981. In June of 2014, more standards from the 2007 duet sessions with Haden that yielded Jasmine were released as Last Dance.\r\nFor the occasion of the pianist's 70th birthday in May of 2015, ECM released two albums simultaneously: one was an orchestral classical recording of the pianist performing Barber's Piano Concerto and Bartók's Piano Concerto No. 3 with different orchestras. The second was a solo piano effort titled Creation. Departing from his usual practice of issuing complete concert recordings, this set offered handpicked and carefully sequenced selections from Jarrett's performances in Tokyo, Toronto, Rome, and Paris. He followed this release in the fall of 2016 with the four-disc box A Multitude of Angels. This set documented his final four solo performances in 1996 in the cities of Modena, Ferrara, Torino, and Genova, before he was forced into hiatus to recover from chronic fatigue syndrome. The year 2018 saw the release of La Fenice, a double album documenting his solo piano concert at the Gran Teatro la Fenice in Venice, Italy, from July 2006. The album found the pianist channeling his inspirational flow into a suite of eight spontaneously created pieces that referenced everything from blues to vanguard dissonance. In addition, it offered readings of the traditional \"My Wild Irish Rose,\" the standard \"Stella by Starlight,\" and a tender new reading of the pianist's own \"Blossom\" for encores. The release of La Fenice coincided with Jarrett making history as the first jazz musician to receive the coveted Golden Lion for Lifetime Achievement at the International Festival of Contemporary Music of the Biennale di Venezia. The award was previously presented to such contemporary composers as Luciano Berio, Pierre Boulez, György Kurtág, Sofia Gubaidulina, and Steve Reich. \r\nJarrett played at Carnegie Hall in February of 2017. It went so well he thanked the audience for \"bringing me to tears,\" and rescheduled for the following March, but abruptly canceled the performance and subsequent tour, citing \"health issues.\" In September of 2020, during an interview to promote the October release of the archival Budapest Concert from 2016, he told the New York Times' Nate Chinen that he canceled his tour because he'd suffered two strokes, one in February of 2018 and another in May. They left him walking with the aid of a cane, and completely unable to use his left hand, making it impossible to perform. \r\nDuring his recuperation, Jarrett teamed up with ECM to explore reissuing his many archived shows. In 2022, the label released The Bordeaux Concert, which was recorded during his 2016 tour of Europe. Another archival recording, Carl Philipp Emanuel Bach, arrived the following year. Recorded at Jarrett's Cavelight Studio in 1994, it featured his takes on Carl Philipp Emanuel Bach's Württemberg Sonatas.",
+    "Pianist/composer Keith Jarrett single-handedly changed the jazz conversation with his 1972 solo studio debut, Facing You, for ECM, followed by dozens of charting, spontaneously improvised solo concerts -- 1975's The Köln Concert is one of the best-selling piano titles of all time. His playing style embraces the jazz and classical canons, and is captured on over 100 albums. He recorded for Atlantic, Columbia, and Impulse before ECM. His vast catalog offers trios, quartets, and orchestral and solo outings of staggering variety. Due to health issues, Jarrett was forced to stop touring in 2017. He has continued releasing archival material, including 2016's box set A Multitude of Angels (recorded live in 1996). Both 2018's Budapest Concert and 2022's Bordeaux Concert were recorded during his final European tour. Carl Philipp Emanuel Bach, a 1994 recording of the Württemberg Sonatas, arrived in 2023."
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "Buddy Montgomery",
+  "bio": [
+    "Jazz vibraphone master, part of vibrant family, strong sideman of the '40s & '50s, busy solo artist later in life.",
+    "The youngest of the three Montgomery brothers, Buddy Montgomery was a reliable, if underrated, vibraphonist and pianist. He became a professional in 1948 and the following year toured with Big Joe Turner. He played piano with Slide Hampton in his native Indianapolis, IN, served in the Army, and then was a member (on vibes) of the popular Mastersounds with his bassist brother Monk. Buddy had a brief stint with Miles Davis (playing vibes) in 1960 and frequently played with brothers Wes and Monk (under the leadership of guitarist Wes) in the 1960s. He moved to Milwaukee, WI in 1969, becoming a local fixture and an educator. In the early '80s, Montgomery moved to Oakland, CA, where he recorded for producer Orrin Keepnews on Landmark and with the Riverside Reunion Band. Montgomery's earliest dates as a leader were for World Pacific (1957), Fantasy, Riverside, Milestone, and Impulse! (1969). His recordings during the ‘90s and 2000s included Live at Maybeck Recital Hall, Vol. 15 (1991, Concord Jazz),  Icebreaker (2001, Staalplaat), A Love Affair in Paris (2002, Space Time), and the Japanese release Remembering Wes (2006, Pony Canyon). Buddy Montgomery outlived both his brothers; he died on May 14, 2009 at the age of 79."
+  ]
+}

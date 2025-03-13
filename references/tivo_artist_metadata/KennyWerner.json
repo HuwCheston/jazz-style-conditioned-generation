@@ -1,0 +1,62 @@
+{
+  "moods": [
+    {
+      "name": "Intimate",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 8
+    },
+    {
+      "name": "Complex",
+      "weight": 8
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Chick Corea",
+      "weight": 8
+    },
+    {
+      "name": "Keith Jarrett",
+      "weight": 8
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Kenny Werner",
+  "bio": [
+    "Kenny Werner has had a diverse, protean career since the 1970’s as a truly modern pianist.",
+    "Born November 19, 1951 in Brooklyn, New York, Kenny Werner got an early start as a pianist. At the age of 11 he recorded a single with a 15-piece orchestra and appeared on television playing stride piano. He attended the Manhattan School of Music while still in high school, then became a concert piano major upon graduation. He felt the pull of jazz and decided to leave the Manhattan School for the Berklee School of Music in Boston, coming under the influence of two teachers, Madame Chaloff and Juão Assis Brasil, both strong pianists who helped him integrate spiritual aspects with strong performances.\r\nHis first jazz recording was in 1977, when he released an LP that featured piano solos of the music of Bix Beiderbecke, Duke Ellington, James P. Johnson, and George Gershwin. Soon after that, Werner got a plum job when he was invited to record with Charles Mingus on Something Like a Bird. In 1981 he released his first album of original work, Beyond the Forest of Mirkwood. 298 Bridge Street, which was inspired by the sounds surrounding his Brooklyn studio, followed a year later. The early '80s brought extensive touring, including a tour with Archie Shepp and the Mel Lewis Orchestra. He also performed in duos with Rufus Reid, Ray Drummond, and Jaki Byard. His accomplishments were honored by the National Endowment for the Arts, which awarded him two grants in the '80s -- in 1985 and 1987 -- allowing him to present his own music in a concert hall setting at Symphony Space in New York. He also played with Ratzo Harris and Tom Rainey throughout the '80s, but the trio wouldn't make its first album until 1988's Introducing the Trio. The band recorded only one more album after that, but stayed together until 1995. Another long-term relationship was established when Werner joined the faculty of the New School in 1987. \r\nThroughout the '80s and '90s Werner played with a variety of famed jazz artists, from John Abercrombie and Joe Henderson to Tom Harrell and Chico Freeman. One of his strongest alliances, however, was with Joe Lovano, with whom he recorded several albums. He also served as pianist, arranger, and musical director for famed Broadway star Betty Buckley. The '90s also brought more recognition from the NEA, which awarded him grants in 1993 and 1995 to produce tribute concerts to Mel Lewis and Duke Ellington.\r\nWerner produced a series of acclaimed records in the '90s, including three albums for the Concord Jazz label: Maybeck Recital Hall Series, Vol. 34, Concord Duo Series, Vol. 10, and Live at Visiones. The albums were all award-winning and helped further Werner's commercial success. Two new albums arrived in 1998: A Delicate Balance, which featured Dave Holland and Jack DeJohnette; and Unprotected Music for the Double-Time label, which was played by a trio with Marc Johnson and Joey Baron. Both albums showed Werner's diverse style, as well as his ability to work as part of a musical team with strong players like Baron. In 2000 he released Beauty Secrets for RCA, a gentle yet innovative album that showed the delicacy that Werner was capable of. Werner continued to be active as the new century went on, releasing No Beginning No End, which featured old cohort Joe Lovano as well as Judi Silvano, on Half Note Records in 2010. In 2011 Werner delivered the live album Balloons: Live at the Blue Note, which featured trumpeter Randy Brecker, saxophonist David Sanchez, bassist John Patitucci, and drummer Antonio Sanchéz. Me, Myself & I, a solo piano album, was recorded live at Upstairs Jazz Bar & Grill as part of the Montreal Jazz Festival. It was released in the spring of 2012.",
+    "Born in Brooklyn and educated in Boston, Kenny Werner studied jazz piano history that ranged from James P. Johnson to the free and fusion players. Coming to New York, he performed with the Mel Lewis Orchestra, John Abercrombie, Lee Konitz, and Joe Lovano. He was also accompanist and musical director for Broadway star Betty Buckley. Werner led several piano trios in mainstream and post-bop styles, but in 2007 Blue Note released the brilliant LAWN CHAIR SOCIETY, wherein he included the influences of fusion, funk, and electronic music alongside his characteristic lush lyricism."
+  ]
+}

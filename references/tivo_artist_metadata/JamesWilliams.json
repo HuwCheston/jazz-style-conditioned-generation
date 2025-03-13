@@ -1,0 +1,97 @@
+{
+  "moods": [
+    {
+      "name": "Restrained",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Melancholy",
+      "weight": 6
+    },
+    {
+      "name": "Reserved",
+      "weight": 6
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 6
+    },
+    {
+      "name": "Refined",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 7
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 9
+    },
+    {
+      "name": "Sonny Clark",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 9
+    },
+    {
+      "name": "Marcus Roberts",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "James Williams",
+  "bio": [
+    "Contemporary American jazz pianist who has realesed several independent albums.",
+    "Pianist James Williams channeled the gospel and R&B influences of his youth to forge a soulful, deeply expressive approach to contemporary jazz. A gifted soloist and accompanist, he was also a respected producer and educator. Born in Memphis on March 8, 1951, Williams began piano lessons at age 13. A fan of Ray Charles, Stevie Wonder, and Ramsey Lewis, he spent six years as the organist with Memphis' Eastern Star Baptist Church before studying music education at Memphis State University. After befriending fellow pianists Mulgrew Miller and Donald Brown, Williams turned his focus to jazz, drawing influence from Hank Jones, Ahmad Jamal, and local legend Phineas Newborn. At just 22 Williams joined the faculty of Boston's Berklee School of Music, additionally backing touring jazz dignitaries like Milt Jackson, Art Farmer, and Sonny Stitt in groups led by colleague Alan Dawson. During his five years at Berklee, the pianist also developed his compositional skills, and in 1977 issued his first LP as a leader, the Zim label release Flying Colors. Williams joined Art Blakey's Jazz Messengers the following year, completing a lineup that included a young Wynton Marsalis. This iteration of Blakey's long-running group cut no fewer than ten LPs over the next four years. Upon exiting the Jazz Messengers Williams settled in New York City, where he collaborated with Dizzy Gillespie, Freddie Hubbard, and Kenny Burrell in addition to leading his own projects, among them his vocal/instrumental combo Intensive Care Unit, a group featuring saxophonist Bill Pierce, bassist Christian McBride, and drummer Tony Reedus. In 1987 Williams reunited with Blakey and bassist Ray Brown in the Magical Trio. Later incarnations included drummers Elvin Jones and Jeff \"Tain\" Watts. He also founded his own production firm, Finas Sound, and with Miller and Brown launched the Contemporary Piano Ensemble, a group dedicated to preserving and promoting the music of Phineas Newborn. In 1999 William Paterson University named Williams its director of jazz studies; he remained with the school until he was diagnosed with the liver cancer that claimed his life on July 20, 2004."
+  ]
+}

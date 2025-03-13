@@ -1,0 +1,125 @@
+{
+  "moods": [
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Intimate",
+      "weight": 6
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 7
+    },
+    {
+      "name": "Energetic",
+      "weight": 9
+    },
+    {
+      "name": "Rousing",
+      "weight": 7
+    },
+    {
+      "name": "Atmospheric",
+      "weight": 9
+    },
+    {
+      "name": "Reflective",
+      "weight": 8
+    },
+    {
+      "name": "Bittersweet",
+      "weight": 6
+    },
+    {
+      "name": "Earthy",
+      "weight": 9
+    },
+    {
+      "name": "Knotty",
+      "weight": 8
+    },
+    {
+      "name": "Relaxed",
+      "weight": 9
+    },
+    {
+      "name": "Elegant",
+      "weight": 8
+    },
+    {
+      "name": "Earnest",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Reserved",
+      "weight": 7
+    },
+    {
+      "name": "Playful",
+      "weight": 8
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 6
+    }
+  ],
+  "genres": [
+    {
+      "name": "Guitar Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 6
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Fusion",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Soul Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Chick Corea",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Andy LaVerne",
+  "bio": [
+    "A highly gifted jazz pianist, bandleader and composer whose thoughtful playing is deeply rooted in bop.",
+    "A fine keyboardist who has ranged in styles from Bill Evans to Chick Corea and fusion, Andy LaVerne has managed to avoid predictability throughout his career. He began studying as a classical piano student at Juilliard when he was eight. After discovering jazz, LaVerne had some important lessons from Bill Evans. He toured with Woody Herman's big band (1973-1975), played with John Abercrombie, and Miroslav Vitous, and was with Stan Getz's group during 1977-1980, often playing electric piano. In the 1980s, he performed with the Brubeck-LaVerne Trio (which also featured Chris and Dan Brubeck), recorded a tribute to Chick Corea for DMP, and became a busy jazz educator. In the 1990s, LaVerne has concentrated on acoustic piano, recording a solo concert at Maybeck Recital Hall. Through the years, Andy LaVerne has recorded as a leader for Storyville (1977), Jazzline, SteepleChase, DMP, Triloka, Concord, and some smaller labels."
+  ]
+}

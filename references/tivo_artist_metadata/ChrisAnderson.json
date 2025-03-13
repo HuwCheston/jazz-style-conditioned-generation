@@ -1,0 +1,26 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Modern Creative",
+      "weight": 3
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "Chris Anderson",
+  "bio": [
+    "There are two things that distinguish pianist Chris Anderson's career. The first is that he was a teacher and influence/mentor to Herbie Hancock; the second is that he made some fine recordings in the early '60s that were more dynamic and musically diverse and interesting than many similiar trio and quartet sans brass or reeds dates. Anderson's phrasing and solo technique can really be heard in early Hancock releases like My Point of View or Fat Albert Rotunda. A 1960 Vee-Jay album with bassist Bill Lee and drummer Art Taylor is his finest; Jazz Heritage issued on compact disc the 1987 release Love Locked Out which recognizes Anderson's impact on Hancock, though it loses points for rather mundane vocal effects."
+  ]
+}

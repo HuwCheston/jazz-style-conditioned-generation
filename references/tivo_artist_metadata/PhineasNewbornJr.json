@@ -1,0 +1,129 @@
+{
+  "moods": [
+    {
+      "name": "Cerebral",
+      "weight": 5
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 4
+    },
+    {
+      "name": "Elegant",
+      "weight": 5
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 5
+    },
+    {
+      "name": "Complex",
+      "weight": 5
+    },
+    {
+      "name": "Refined",
+      "weight": 5
+    },
+    {
+      "name": "Stylish",
+      "weight": 5
+    },
+    {
+      "name": "Bright",
+      "weight": 9
+    },
+    {
+      "name": "Relaxed",
+      "weight": 9
+    },
+    {
+      "name": "Light",
+      "weight": 8
+    },
+    {
+      "name": "Intimate",
+      "weight": 9
+    },
+    {
+      "name": "Innocent",
+      "weight": 9
+    },
+    {
+      "name": "Warm",
+      "weight": 9
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 8
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Hampton Hawes",
+      "weight": 8
+    },
+    {
+      "name": "James Williams",
+      "weight": 8
+    },
+    {
+      "name": "Ellis Marsalis",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "Donald Brown",
+      "weight": 8
+    },
+    {
+      "name": "Bud Powell",
+      "weight": 8
+    },
+    {
+      "name": "George Cables",
+      "weight": 8
+    },
+    {
+      "name": "Art Tatum",
+      "weight": 8
+    },
+    {
+      "name": "Barry Harris",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Phineas Newborn, Jr.",
+  "bio": [
+    "Jazz pianist with astounding speed, phrasing, and harmonic knowledge, plus an unmatched ability to integrate blues and gospel elements.",
+    "One of the most technically skilled and brilliant pianists in jazz during his prime, Phineas Newborn remains a bit of a mystery. Plagued by mental and physical problems of unknown origin, Newborn faded from the scene in the mid-'60s, only to re-emerge at irregular intervals throughout his life. Newborn could be compared to Oscar Peterson in that his bop-based style was largely unclassifiable, his technique was phenomenal, and he was very capable of enthralling an audience playing a full song with just his left hand. \r\nHe started out working in Memphis R&B bands with his brother, guitarist Calvin Newborn, and recorded with local players including B.B. King in the early '50s. Brief stints with Lionel Hampton and Willis Jackson preceded a period in the military (1952-1954). After moving to New York in 1956, Newborn astounded fans and critics alike. Although he worked briefly with Charles Mingus (1958) and Roy Haynes, Newborn usually performed at the head of a trio or quartet. His early recordings for Atlantic (1956), Victor, Roulette, and Contemporary are quite outstanding. Unfortunately, after the mid-'60s, Newborn's profile dropped sharply, and although there were further recordings for Contemporary (1969), Atlantic (1969), Pablo (1976) and the Japanese Philips (1977) label, and although he still sounded strong when appearing in public, the pianist was in danger of being forgotten by most of the jazz world during his last decade. Spending most of his time in Memphis, he was an inspiration to many younger pianists including James Williams, Harold Mabern, Mulgrew Miller, Donald Brown, and Geoff Keezer, who after Newborn's death would dedicate their work as the Contemporary Piano Ensemble to him. Fortunately, the episode of Jazz Scene USA that features Phineas Newborn in 1962 has been made available on a video by \"Shanachie.\""
+  ]
+}

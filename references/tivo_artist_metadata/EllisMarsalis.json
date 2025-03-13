@@ -1,0 +1,113 @@
+{
+  "moods": [
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 5
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 5
+    },
+    {
+      "name": "Elegant",
+      "weight": 5
+    },
+    {
+      "name": "Rollicking",
+      "weight": 5
+    },
+    {
+      "name": "Intimate",
+      "weight": 4
+    },
+    {
+      "name": "Playful",
+      "weight": 4
+    },
+    {
+      "name": "Refined",
+      "weight": 5
+    },
+    {
+      "name": "Gentle",
+      "weight": 7
+    },
+    {
+      "name": "Bittersweet",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Trumpet Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Keyboard",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Classical",
+      "weight": 1
+    },
+    {
+      "name": "New Orleans Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Bop",
+      "weight": 7
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "Roland Hanna",
+      "weight": 8
+    },
+    {
+      "name": "Hank Jones",
+      "weight": 8
+    },
+    {
+      "name": "Marcus Roberts",
+      "weight": 8
+    },
+    {
+      "name": "Ahmad Jamal",
+      "weight": 5
+    },
+    {
+      "name": "Toshiko Akiyoshi",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Ellis Marsalis",
+  "bio": [
+    "A custodian of jazz tradition, his influence as an inspirational figure, educator and spokesman is unrivalled.",
+    "It is a bit ironic that Ellis Marsalis had to wait for sons Wynton and Branford to get famous before he was able to record on a regular basis, but Ellis finally received his long-overdue recognition. The father of six sons (including Wynton, Branford, Delfeayo, and Jason), Ellis Marsalis' main importance to jazz may very well have been as a jazz educator; his former pupils (in addition to his sons) included Terence Blanchard, Donald Harrison, Harry Connick, Jr., Nicholas Payton, and Kent and Marlon Jordan, among others. \r\nBorn in New Orleans in 1934, he started out as a tenor saxophonist, switching to piano while in high school. Marsalis was one of the few New Orleans musicians of the era who did not specialize in Dixieland or rhythm & blues. He played with fellow modernists (including Ed Blackwell) in the late '50s with AFO, recorded with Cannonball and Nat Adderley in the '60s, played with Al Hirt (1967-1970), and was busy as a teacher. Marsalis freelanced in New Orleans during the '70s and taught at the New Orleans Center for Creative Arts. He recorded with Wynton and Branford on Father and Sons in 1982, an album that they shared with Chico and Von Freeman. After that, Marsalis recorded for ELM, Spindletop (a duet session with Eddie Harris), Rounder, Blue Note, and Columbia, issuing Twelve's It on the latter in 1998. Duke in Blue followed a year later. \r\nMarsalis released 2000's Afternoon Session, 2005's Ruminations in New York, and 2008's An Open Letter to Thelonious. In 2011, he offered his second holiday-themed effort, New Orleans Christmas Carol. He then joined son Branford and pianist Makoto Ozone for 2012's Pure Pleasure for the Piano. The following year, he offered the urbane solo piano recording On the First Occasion. In 2014, he guested on son Delfeayo's The Last Southern Gentlemen and joined trumpeter Scotty Barnhart and the legacy Count Basie Orchestra for 2015's A Very Swingin' Basie Christmas. An active performer, Marsalis toured often and was a frequent guest at the New Orleans Jazz & Heritage Festival. Ellis Marsalis died in New Orleans on April 1, 2020; he was 85 years old."
+  ]
+}

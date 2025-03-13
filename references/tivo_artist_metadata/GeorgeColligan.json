@@ -1,0 +1,96 @@
+{
+  "moods": [
+    {
+      "name": "Cerebral",
+      "weight": 7
+    },
+    {
+      "name": "Complex",
+      "weight": 3
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 7
+    },
+    {
+      "name": "Reflective",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 8
+    },
+    {
+      "name": "Rollicking",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Intense",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Keith Jarrett",
+      "weight": 6
+    },
+    {
+      "name": "Herbie Hancock",
+      "weight": 5
+    },
+    {
+      "name": "Larry Goldings",
+      "weight": 5
+    },
+    {
+      "name": "Chick Corea",
+      "weight": 5
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 5
+    },
+    {
+      "name": "Stanley Cowell",
+      "weight": 4
+    }
+  ],
+  "tivo_artist_name": "George Colligan",
+  "bio": [
+    "George Colligan is an advanced jazz pianist and composer who has done high-ranking work as a sideman and a leader. His most high-profile association, with vocalist Cassandra Wilson, began in 2000 and continues at the time of this writing. He has also played with Ravi Coltrane, Robin Eubanks, David Gilmore, Myron Walden, Steve Wilson, and many other stellar musicians, young and old. His own bands have boasted talents as formidable as Mark Turner and Kurt Rosenwinkel. Born in New Jersey and raised mostly in Maryland, Colligan began his musical life on the trumpet, an instrument on which he still occasionally performs and records. (Colligan is also a viable jazz drummer.) He attended the Peabody Conservatory as a classical trumpet major but became increasingly drawn to jazz piano. In 1990 he attended the Banff Summer Jazz Workshop in Canada. After several years as a freelancer in the Maryland area, Colligan relocated to New York, where his success has continued to mount. Colligan released his first two albums, 1996's Activism and 1997's Newcomer, on the Steeplechase label. Switching to the Fresh Sound New Talent label, he followed up in 1999 with Unresolved and in 2000 with Desire. Agent 99 appeared in summer 2001."
+  ]
+}

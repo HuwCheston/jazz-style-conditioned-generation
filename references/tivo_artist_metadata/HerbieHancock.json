@@ -1,0 +1,210 @@
+{
+  "moods": [
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 9
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Stylish",
+      "weight": 9
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Wry",
+      "weight": 7
+    },
+    {
+      "name": "Lively",
+      "weight": 6
+    },
+    {
+      "name": "Complex",
+      "weight": 9
+    },
+    {
+      "name": "Slick",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 9
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Rousing",
+      "weight": 9
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Spacey",
+      "weight": 9
+    },
+    {
+      "name": "Earnest",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 9
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Poignant",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Sprawling",
+      "weight": 9
+    },
+    {
+      "name": "Quirky",
+      "weight": 7
+    },
+    {
+      "name": "Insular",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Energetic",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Fusion",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Electro",
+      "weight": 2
+    },
+    {
+      "name": "Funk",
+      "weight": 4
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Modal Music",
+      "weight": 9
+    },
+    {
+      "name": "Jazz-Funk",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 3
+    }
+  ],
+  "similars": [
+    {
+      "name": "Keith Jarrett",
+      "weight": 8
+    },
+    {
+      "name": "Chick Corea",
+      "weight": 9
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 9
+    },
+    {
+      "name": "Oscar Peterson",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "George Cables",
+      "weight": 9
+    },
+    {
+      "name": "Ramsey Lewis",
+      "weight": 9
+    },
+    {
+      "name": "Ahmad Jamal",
+      "weight": 5
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 7
+    },
+    {
+      "name": "Abdullah Ibrahim",
+      "weight": 8
+    },
+    {
+      "name": "Michel Petrucciani",
+      "weight": 7
+    },
+    {
+      "name": "Stanley Cowell",
+      "weight": 7
+    }
+  ],
+  "tivo_artist_name": "Herbie Hancock",
+  "bio": [
+    "Inventive and intelligent jazz pianist/keyboardist whose distinguished career has covered hard bop, fusion, hip-hop, and dance.",
+    "Herbie Hancock will always be one of the most revered and controversial figures in jazz, just as his employer/mentor Miles Davis was when he was alive. Unlike Miles, who pressed ahead relentlessly and never looked back until near the very end, Hancock has cut a zigzagging forward path, shuttling between almost every development in electronic and acoustic jazz and R&B over the last third of the 20th century and into the 21st. Though grounded in Bill Evans and able to absorb blues, funk, gospel, and even modern classical influences, Hancock's piano and keyboard voices are entirely his own, with their own urbane harmonic and complex, earthy rhythmic signatures -- and young pianists cop his licks constantly. Having studied engineering and professing to love gadgets and buttons, Hancock was perfectly suited for the electronic age; he was one of the earliest champions of the Rhodes electric piano and Hohner clavinet, and would field an ever-growing collection of synthesizers and computers on his electric dates. Yet his love for the grand piano never waned, and despite his peripatetic activities all over the musical map, his piano style continued to evolve into tougher, ever more complex forms. He is as much at home trading riffs with a smoking funk band as he is communing with a world-class post-bop rhythm section -- and that drives purists on both sides of the fence up the wall.\r\nHaving taken up the piano at age seven, Hancock quickly became known as a prodigy, soloing in the first movement of a Mozart piano concerto with the Chicago Symphony at the age of 11. After studies at Grinnell College, Hancock was invited by Donald Byrd in 1961 to join his group in New York City, and before long, Blue Note offered him a solo contract. His debut album, Takin' Off, took off after Mongo Santamaria covered one of the album's songs, \"Watermelon Man.\" In May 1963, Miles Davis asked him to join his band in time for the Seven Steps to Heaven sessions, and he remained with him for five years, greatly influencing Davis' evolving direction, loosening up his own style, and, upon Davis' suggestion, converting to the Rhodes electric piano. During that time, Hancock's solo career blossomed on Blue Note, as he poured forth increasingly sophisticated compositions like \"Maiden Voyage,\" \"Cantaloupe Island,\" \"Goodbye to Childhood,\" and the exquisite \"Speak Like a Child.\" He also played on many East Coast recording sessions for producer Creed Taylor and provided a groundbreaking score to Michelangelo Antonioni's film Blow-Up, which gradually led to further movie assignments. \r\nHaving left the Davis band in 1968, Hancock recorded an elegant funk album, Fat Albert Rotunda, and in 1969 formed a sextet that evolved into one of the most exciting, forward-looking jazz-rock groups of the era. By then deeply immersed in electronics, Hancock added Patrick Gleeson's synthesizer to his Echoplexed, fuzz-wah-pedaled electric piano and clavinet, and the recordings became spacier and more complex rhythmically and structurally, creating their own corner of the avant-garde. By 1970, all of the musicians used both English and African names (Herbie's was Mwandishi). Alas, Hancock had to break up the band in 1973 when it ran out of money, and having studied Buddhism, he concluded that his ultimate goal should be to make his audiences happy. \r\nThe next step, then, was a terrific funk group whose first album, Head Hunters, with its Sly Stone-influenced hit single, \"Chameleon,\" became the biggest-selling jazz LP up to that time. Handling all of the synthesizers himself, Hancock's heavily rhythmic comping often became part of the rhythm section, leavened by interludes of the old urbane harmonies. Hancock recorded several electric albums of mostly superior quality in the '70s, followed by a turn into disco around the decade's end. In the meantime, Hancock refused to abandon acoustic jazz. After a one-shot reunion of the 1965 Miles Davis Quintet (Hancock, Ron Carter, Tony Williams, Wayne Shorter, and Freddie Hubbard sitting in for Miles) at New York's 1976 Newport Jazz Festival, they went on tour the following year as V.S.O.P. The near-universal acclaim of the reunions proved that Hancock was still a whale of a pianist; that Miles' loose mid-'60s post-bop direction was far from spent; and that the time for a neo-traditional revival was near, finally bearing fruit in the '80s with Wynton Marsalis and his ilk. V.S.O.P. continued to hold sporadic reunions through 1992, though the death of the indispensable Williams in 1997 cast much doubt as to whether these gatherings would continue.\r\nHancock continued his chameleonic ways in the '80s: scoring an MTV hit in 1983 with the scratch-driven, electro-influenced single \"Rockit\" (accompanied by a striking video); launching an exciting partnership with Gambian kora virtuoso Foday Musa Suso that culminated in the swinging 1986 live album Jazz Africa; doing film scores, and playing festivals and tours with the Marsalis brothers, George Benson, Michael Brecker, and many others. After his 1988 techno-pop album, Perfect Machine, Hancock left Columbia (his label since 1973), signed a contract with Qwest that came to virtually nothing (save for A Tribute to Miles in 1992), and finally made a deal with Polygram in 1994 to record jazz for Verve and release pop albums on Mercury. \r\nWell into a youthful middle age, Hancock's curiosity, versatility, and capacity for growth showed no signs of fading, and in 1998 he issued Gershwin's World. His curiosity with the fusion of electronic music and jazz continued with 2001's Future 2 Future, but he also continued to explore the future of straight-ahead contemporary jazz with 2005's Possibilities. An intriguing album of jazz treatments of Joni Mitchell compositions called River: The Joni Letters was released in 2007 and won a Grammy for Album of the Year in 2008. Two years later, Hancock released his The Imagine Project album, recorded in seven countries with a host of collaborators including Dave Matthews, Juanes, and Wayne Shorter. He was also named Creative Chair for the New Los Angeles Philharmonic. In 2013, he was the recipient of a Kennedy Center Honors award, acknowledged for his contribution to American performing arts. An expanded tenth anniversary edition of River: The Joni Letters was released in 2017, and he continues to perform regularly.",
+    "Herbie Hancock is among the most influential, forward-thinking figures in popular music. The pianist has topped charts in jazz, pop and R&B in six consecutive decades. In the 1960s, he recorded for Blue Note as a leader, joined the Miles Davis Quintet, and contributed to the trumpeter's early electric jazz experiments. Hancock's early embrace of synths and electronic keyboards led to 1973's classic Head Hunters, the clarion call for jazz-funk. He controversially embraced disco only a few years later. In the 1980s and '90s he experimented with hip-hop, sampling, and global music. Through it all he continued to play jazz, solo and in groups. During the 21st century, his acoustic jazz readings of pop tunes helped to create a new American standards book."
+  ]
+}

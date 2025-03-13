@@ -1,0 +1,222 @@
+{
+  "moods": [
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Wry",
+      "weight": 7
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Reverent",
+      "weight": 7
+    },
+    {
+      "name": "Stately",
+      "weight": 7
+    },
+    {
+      "name": "Earnest",
+      "weight": 7
+    },
+    {
+      "name": "Thoughtful",
+      "weight": 7
+    },
+    {
+      "name": "Poignant",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 7
+    },
+    {
+      "name": "Reflective",
+      "weight": 7
+    },
+    {
+      "name": "Earthy",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 7
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Provocative",
+      "weight": 7
+    },
+    {
+      "name": "Organic",
+      "weight": 7
+    },
+    {
+      "name": "Uplifting",
+      "weight": 7
+    },
+    {
+      "name": "Bright",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Energetic",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Sprawling",
+      "weight": 7
+    },
+    {
+      "name": "Joyous",
+      "weight": 7
+    },
+    {
+      "name": "Rousing",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Modern Creative",
+      "weight": 5
+    },
+    {
+      "name": "Global Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Progressive Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "African Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Highlife",
+      "weight": 3
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "African Traditions",
+      "weight": 3
+    },
+    {
+      "name": "International",
+      "weight": 3
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "Kenny Drew",
+      "weight": 8
+    },
+    {
+      "name": "Ahmad Jamal",
+      "weight": 8
+    },
+    {
+      "name": "Abdullah Ibrahim",
+      "weight": 8
+    },
+    {
+      "name": "Hank Jones",
+      "weight": 7
+    },
+    {
+      "name": "Wynton Kelly",
+      "weight": 7
+    }
+  ],
+  "tivo_artist_name": "Randy Weston",
+  "bio": [
+    "A Thelonious Monk disciple who ranked among the most visionary pianists in jazz, incorporating elements of African and Indian music into his work.",
+    "Placing acclaimed pianist Randy Weston into narrow, bop-derived categories only tells part of the story of this restless musician. Starting with the gospel of bop according to Thelonious Monk, Weston emerged in the early '50s with a series of albums on the Riverside label and dates playing alongside such luminaries as Kenny Dorham and Cecil Payne. A virtuosic player, he also made his mark as a composer, writing songs like \"Saucer Eyes,\" \"Pam's Waltz,\" \"Little Niles,\" and his most recognizable composition, \"Hi-Fly.\" From the '60s onward, he spent much of his time in Africa, living in Morocco and traveling throughout the continent. He gradually absorbed the letter and spirit of African and Caribbean rhythms and tunes, welding everything together into a searching, energizing, often celebratory blend. Over the years, his wide-ranging artistry garnered numerous accolades, including two Grammy Award nominations, an NEA Jazz Masters Fellowship, and a 2014 Doris Duke Award. \r\nGrowing up in Brooklyn, Weston was surrounded by a rich musical community: he knew Max Roach, Cecil Payne, and Duke Jordan; Eddie Heywood lived across the street; Wynton Kelly was a cousin. Most influential of all was Monk, who tutored Weston upon visits to his apartment. Weston began working professionally in R&B bands in the late '40s before playing in the bebop outfits of Payne and Kenny Dorham. After signing with Riverside in 1954, Weston led his own trios and quartets and attained a prominent reputation as a composer, contributing jazz standards like \"Hi-Fly\" and \"Little Niles\" to the repertoire and releasing albums like Jazz á la Bohemia, The Modern Art of Jazz, and New Faces at Newport. He also met arranger Melba Liston, who collaborated with Weston off and on from the late '50s into the 1990s. \r\nWeston's interest in his roots was stimulated by extended stays in Africa; he visited Nigeria in 1961 and 1963, during which time he issued albums like Highlife: Music from the New African Nations, Randy!, and African Cookbook. He lived in Morocco from 1968 to 1973 following a tour, and subsequently remained fascinated with the music and spiritual values of the continent. In the '70s, Weston made recordings for Arista-Freedom, Polydor, and CTI while maintaining a peripatetic touring existence, mostly in Europe. His albums like Blue Moses, Tanjah (which earned him his first Grammy nomination in 1973), and Perspective found him continuing to incorporate African influences along with funk and soul-jazz, while moving between large-ensemble and small-group sets.\r\nHowever, starting in the late '80s, after a period when his recording had slowed, Weston's visibility in the U.S. skyrocketed with an extraordinarily productive period in the studios for Antilles and Verve. His highly eclectic recording projects included a trilogy of \"Portrait\" albums depicting Ellington, Monk, and himself; The Spirits of Our Ancestors, an ambitious two-CD work rooted in African music; a blues album; and a Grammy-nominated collaboration with the Gnawa Musicians of Morocco. Weston's fascination with the music of Africa continued on such works as 2003's Spirit! The Power of Music, 2004's Nuit Africaine, and 2006's Zep Tepi by Weston and his African Rhythms Trio. \r\nIn 2010, Weston released the live album The Storyteller, which featured the then 84-year-old pianist in concert at Dizzy's Club Coca-Cola as part of Jazz at Lincoln Center. Three years later, he paired with Billy Harper for The Roots of the Blues. The African Nubian Suite, an ambitious project conceptualized around Africa's heritage as the birthplace of humanity and civilization, followed in 2016. Weston issued the solo piano album Sound in 2018. On September 1 of that year, he died at his home in Brooklyn at the age of 92.",
+    "The style of jazz pianist Randy Weston sprang from two tributaries -- Thelonious Monk and Duke Ellington. Like them, Weston was economical, slyly melodious, and somewhat percussive. Weston was also one of the first jazz musicians to overtly incorporate aspects of African music into a hard bop-oriented approach. His piano shone in a range of contexts, from solo to small group to orchestral, as well as with African musicians."
+  ]
+}

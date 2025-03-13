@@ -1,0 +1,134 @@
+{
+  "moods": [
+    {
+      "name": "Joyous",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Rollicking",
+      "weight": 7
+    },
+    {
+      "name": "Energetic",
+      "weight": 9
+    },
+    {
+      "name": "Elegant",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Cheerful",
+      "weight": 8
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Reserved",
+      "weight": 8
+    },
+    {
+      "name": "Sweet",
+      "weight": 8
+    },
+    {
+      "name": "Complex",
+      "weight": 9
+    },
+    {
+      "name": "Stylish",
+      "weight": 8
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Boogie-Woogie",
+      "weight": 3
+    },
+    {
+      "name": "Stride",
+      "weight": 4
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Swing",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Roland Hanna",
+      "weight": 8
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 8
+    },
+    {
+      "name": "Barry Harris",
+      "weight": 8
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 8
+    },
+    {
+      "name": "Oscar Peterson",
+      "weight": 8
+    },
+    {
+      "name": "Tete Montoliu",
+      "weight": 8
+    },
+    {
+      "name": "Bud Powell",
+      "weight": 9
+    },
+    {
+      "name": "Earl Hines",
+      "weight": 9
+    },
+    {
+      "name": "Thelonious Monk",
+      "weight": 7
+    },
+    {
+      "name": "Erroll Garner",
+      "weight": 7
+    },
+    {
+      "name": "Teddy Wilson",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Art Tatum",
+  "bio": [
+    "Jazz pianist widely regarded as a musical genius, who influenced countless musicians with his harmonic complexities and unusual chord sequences.",
+    "Art Tatum was among the most extraordinary of all jazz musicians, a pianist with wondrous technique who could not only play ridiculously rapid lines with both hands (his 1933 solo version of \"Tiger Rag\" sounds as if there were three pianists jamming together) but was harmonically 30 years ahead of his time; all pianists have to deal to a certain extent with Tatum's innovations in order to be taken seriously. Able to play stride, swing, and boogie-woogie with speed and complexity that could only previously be imagined, Tatum's quick reflexes and boundless imagination kept his improvisations filled with fresh (and sometimes futuristic) ideas that put him way ahead of his contemporaries.\r\nBorn nearly blind, Tatum gained some formal piano training at the Toledo School of Music but was largely self-taught. Although influenced a bit by Fats Waller and the semi-classical pianists of the 1920s, there is really no explanation for where Tatum gained his inspiration and ideas from. He first played professionally in Toledo in the mid-'20s and had a radio show during 1929-1930. In 1932 Tatum traveled with singer Adelaide Hall to New York and made his recording debut accompanying Hall (as one of two pianists). But for those who had never heard him in person, it was his solos of 1933 (including \"Tiger Rag\") that announced the arrival of a truly major talent. In the 1930s, Tatum spent periods working in Cleveland, Chicago, New York, Los Angeles, and (in 1938) England. Although he led a popular trio with guitarist Tiny Grimes (later Everett Barksdale) and bassist Slam Stewart in the mid-'40s, Tatum spent most of his life as a solo pianist who could always scare the competition. Some observers criticized him for having too much technique (is such a thing possible?), working out and then keeping the same arrangements for particular songs, and for using too many notes, but those minor reservations pale when compared to Tatum's reworkings of such tunes as \"Yesterdays,\" \"Begin the Beguine,\" and even \"Humoresque.\" Although he was not a composer, Tatum's rearrangements of standards made even warhorses sound like new compositions.\r\nArt Tatum, who recorded for Decca throughout the 1930s and Capitol in the late '40s, starred at the Esquire Metropolitan Opera House concert of 1944 and appeared briefly in his only film in 1947, The Fabulous Dorseys (leading a jam session on a heated blues). He recorded extensively for Norman Granz near the end of his life in the 1950s, both solo and with all-star groups; all of the music has been reissued by Pablo on a six-CD box set. His premature death from uremia has not resulted in any loss of fame, for Art Tatum's recordings still have the ability to scare modern pianists.",
+    "The legacy of pianist Art Tatum looms large over jazz. Nearly blind, he possessed a technical prowess that awed even the classical virtuoso Vladimir Horowitz, and his style was completely his own. Tatum's genius was in dissecting, reconstructing, and elaborating the repertoire of the American popular song, an approach that informed and inspired Charlie Parker and the bop generation. Tatum may be best appreciated in his solo work, where he was able to stretch out without overwhelming his sidemen. Recording intermittently from the 1930s until his death in 1956, Tatum made a profound impact on the art of the jazz piano."
+  ]
+}

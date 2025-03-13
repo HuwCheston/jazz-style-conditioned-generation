@@ -1,0 +1,68 @@
+{
+  "moods": [
+    {
+      "name": "Organic",
+      "weight": 6
+    },
+    {
+      "name": "Elegant",
+      "weight": 6
+    },
+    {
+      "name": "Cerebral",
+      "weight": 6
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 6
+    }
+  ],
+  "genres": [
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Classical",
+      "weight": 5
+    },
+    {
+      "name": "Concerto",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Kenny Barron",
+      "weight": 7
+    },
+    {
+      "name": "Hal Galper",
+      "weight": 7
+    },
+    {
+      "name": "Hank Jones",
+      "weight": 7
+    },
+    {
+      "name": "Jim McNeely",
+      "weight": 7
+    },
+    {
+      "name": "Fred Hersch",
+      "weight": 7
+    }
+  ],
+  "tivo_artist_name": "Kenny Drew, Jr.",
+  "bio": [
+    "Despite sharing his father's name, Kenny Drew, Jr. was raised by his aunt and grandparents and did not consider Kenny Drew, Sr. to be an influence. He was taught classical music by his mother and grandmother and gigged in clubs as a teenager. He made his recording debut with Charnett Moffett; worked with Stanley Jordan and OTB; and recorded with Eddie Gomez, Sadao Watanabe, and the Mingus Big Band. In 1990, Drew won the Great American Jazz Piano competition at the Jacksonville Jazz Festival. He first led sessions for the Japanese label Jazz City and then had record dates for Antilles, Concord (a solo Maybeck Recital Hall concert), and Claves. Kenny Drew, Jr. died at his home in St. Petersburg, Florida in August 2014; he was 56 years old."
+  ]
+}

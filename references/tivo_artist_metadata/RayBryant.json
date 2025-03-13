@@ -1,0 +1,126 @@
+{
+  "moods": [
+    {
+      "name": "Earnest",
+      "weight": 9
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 9
+    },
+    {
+      "name": "Street-Smart",
+      "weight": 7
+    },
+    {
+      "name": "Gritty",
+      "weight": 9
+    },
+    {
+      "name": "Wry",
+      "weight": 7
+    },
+    {
+      "name": "Earthy",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Energetic",
+      "weight": 9
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 9
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Organic",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Soul Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Blues",
+      "weight": 5
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Gene Harris",
+      "weight": 9
+    },
+    {
+      "name": "Bobby Timmons",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Ray Bryant",
+  "bio": [
+    "Blues and gospel driven jazz pianist whose soulful compositions found fame from the 1960s on.",
+    "Although he could always play bop, Ray Bryant's playing combined together older elements (including blues, boogie-woogie, gospel, and even stride) into a distinctive, soulful, and swinging style; no one played \"After Hours\" quite like him. The younger brother of bassist Tommy Bryant and the uncle of Kevin and Robin Eubanks (his sister is their mother), Bryant started his career playing with Tiny Grimes in the late '40s. He became the house pianist at The Blue Note in Philadelphia in 1953, where he backed classic jazz greats (including Charlie Parker, Miles Davis, and Lester Young) and made important contacts. He accompanied Carmen McRae (1956-1957), recorded with Coleman Hawkins and Roy Eldridge at the 1957 Newport Jazz Festival (taking a brilliant solo on an exciting version of \"I Can't Believe That You're in Love with Me\"), and played with Jo Jones' trio (1958). Bryant settled in New York in 1959; played with Sonny Rollins, Charlie Shavers, and Curtis Fuller; and soon had his own trio. He had a few funky commercial hits (including \"Little Susie\" and \"Cubano Chant\") that kept him working for decades. Bryant recorded often throughout his career (most notably for Epic, Prestige, Columbia, Sue, Cadet, Atlantic, Pablo, and Emarcy), and even his dates on electric piano in the '70s are generally rewarding. However, Bryant was heard at his best when playing the blues on unaccompanied acoustic piano. After a lengthy illness, Ray Bryant died in Queens, New York on June 2, 2011; he was 79 years old.",
+    "Initially inspired by the style of Teddy Wilson, Bryant’s gospel inflections give his playing a modern, rootsy edge. Raised in a musical family - his mother played piano, his sister sang in a gospel choir - Bryant started out on bass, but his true calling was piano. With his brother Tom, he formed the Bryant Brothers who became the house band for Philadelphia's Blue Note Club, playing with Charlie Parker and Miles Davis. By 1960, he had moved to New York and was a regular at the Village Vanguard. His 1960 debut album gave birth to the suprise hit, the sly, infectious \"Little Susie.\" Bryant continued to create spry, soulful compositions to worldwide acclaim into the '90s."
+  ]
+}

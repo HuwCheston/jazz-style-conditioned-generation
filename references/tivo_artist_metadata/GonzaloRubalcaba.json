@@ -1,0 +1,137 @@
+{
+  "moods": [
+    {
+      "name": "Playful",
+      "weight": 8
+    },
+    {
+      "name": "Complex",
+      "weight": 8
+    },
+    {
+      "name": "Aggressive",
+      "weight": 8
+    },
+    {
+      "name": "Manic",
+      "weight": 8
+    },
+    {
+      "name": "Elegant",
+      "weight": 8
+    },
+    {
+      "name": "Cerebral",
+      "weight": 8
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 8
+    },
+    {
+      "name": "Intense",
+      "weight": 5
+    },
+    {
+      "name": "Gentle",
+      "weight": 5
+    },
+    {
+      "name": "Melancholy",
+      "weight": 8
+    },
+    {
+      "name": "Intimate",
+      "weight": 6
+    },
+    {
+      "name": "Atmospheric",
+      "weight": 9
+    },
+    {
+      "name": "Organic",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 6
+    },
+    {
+      "name": "Restrained",
+      "weight": 5
+    },
+    {
+      "name": "Stylish",
+      "weight": 8
+    },
+    {
+      "name": "Relaxed",
+      "weight": 5
+    },
+    {
+      "name": "Sparse",
+      "weight": 6
+    },
+    {
+      "name": "Self-Conscious",
+      "weight": 5
+    },
+    {
+      "name": "Reflective",
+      "weight": 9
+    },
+    {
+      "name": "Refined",
+      "weight": 8
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Latin Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Cuban Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Afro-Cuban Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Global Jazz",
+      "weight": 9
+    }
+  ],
+  "similars": [
+    {
+      "name": "Michel Camilo",
+      "weight": 9
+    },
+    {
+      "name": "Tete Montoliu",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Gonzalo Rubalcaba",
+  "bio": [
+    "A gifted Cuban jazz pianist with amazing technique who filters various influences through the lense of his heritage.",
+    "One of the most important figures to emerge from Afro-Cuban jazz in the '90s, Gonzalo Rubalcaba is an extraordinarily versatile pianist able to blend disparate strands of Cuban and American jazz tradition into a fresh, modern whole. Born into a musical family in Havana on May 27, 1963, Rubalcaba began studying classical piano at age eight, honing his technique in that area for the next 12 years while playing around Havana by night. In 1983, he toured France and Africa with Cuba's longstanding Orquesta Aragon, and formed his own band, Grupo Proyecto, in 1985, the same year he was discovered by Dizzy Gillespie. In 1986, Rubalcaba played the Havana Jazz Festival with the American rhythm section of Charlie Haden and Paul Motian, and with Haden's support soon appeared at major international festivals like Montreal and Montreux. \r\nRubalcaba's early dates for Blue Note -- 1990's Discovery: Live at Montreux and the following year's The Blessing -- were instant classics, breaking him among American jazz audiences and showcasing his virtuosic technique and dense improvisations. Rubalcaba was finally able to play for American audiences beginning in 1993, including a star-making appearance at Lincoln Center, and soon emigrated from Cuba (though not to the U.S. right away; he eventually settled in South Florida in 1996). Rubalcaba recorded for several labels, including Blue Note, which was home to much of his best later work, including 1999's introspective Inner Voyage, 2001's Grammy-winning Supernova, 2004's Paseo, which offered new interpretations of old songs, and 2005's aptly named Solo. In 2002 Rubalcaba shared the title of Artist in Residence at the Montreal Jazz Festival with fellow pianist Chucho Valdés, and in 2003, as part of the Bele Bele Jazz Club series, issued Straight Ahead, re-releases of three separate recording sessions between 1986 and 1987."
+  ]
+}

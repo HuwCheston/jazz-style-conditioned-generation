@@ -1,0 +1,109 @@
+{
+  "moods": [
+    {
+      "name": "Sensual",
+      "weight": 5
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Ambitious",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 6
+    },
+    {
+      "name": "Ebullient",
+      "weight": 7
+    },
+    {
+      "name": "Lyrical",
+      "weight": 6
+    },
+    {
+      "name": "Relaxed",
+      "weight": 6
+    },
+    {
+      "name": "Playful",
+      "weight": 5
+    },
+    {
+      "name": "Earthy",
+      "weight": 6
+    },
+    {
+      "name": "Swinging",
+      "weight": 6
+    }
+  ],
+  "genres": [
+    {
+      "name": "Saxophone Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "Bobby Timmons",
+      "weight": 8
+    },
+    {
+      "name": "Wynton Kelly",
+      "weight": 8
+    },
+    {
+      "name": "James Williams",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "Donald Brown",
+      "weight": 8
+    },
+    {
+      "name": "George Cables",
+      "weight": 9
+    },
+    {
+      "name": "John Hicks",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Kirk Lightsey",
+  "bio": [
+    "Detroit-born jazz pianist with a sophisticated post-bop style.",
+    "Pianist and flutist Kirk Lightsey is a sophisticated improvisor with a lithe touch and a bent toward expansive, post-bop, modal jazz and warmly rendered standards. Born in Detroit, Michigan in 1935, Lightsey first began playing piano at age five and grew up listening to swing and big-band music via radio and his mother's record collection. Later, he studied privately with legendary teacher Gladys Wade Dillard, who also tutored similar Detroit luminaries as Barry Harris and Tommy Flanagan. It was while attending Cass Technical High School alongside classmates Paul Chambers, Ron Carter, and Hugh Lawson that the pianist became interested in jazz. At school, he played clarinet in the orchestra, but afternoons were spent playing piano at Barry Harris' house, where he learned to improvise. Although he was talented enough on clarinet to earn a scholarship to Wayne State University in 1954, he instead chose to pursue a career as a jazz pianist. \r\nGigs followed, including hits with Joe Henderson, Yusef Lateef, Melba Liston, and others. He also found commercial work touring with Arthur Bragg's Rhythm and Blues Show, where he backed performers like T-Bone Walker, Della Reese, and the Four Tops. After a tour in the Army, during with time he played clarinet in the Fort Knox Army Band, he moved back to Detroit where he played regularly with Cecil McBee, and worked as a studio musician for Motown Records. He also continued to hone his skills studying with classical pianist Boris Maximovich. During the '60s, he made his recorded debut as a sideman on a handful of albums with trumpeter Chet Baker, beginning with 1966's Groovin' with the Chet Baker Quintet. He also recorded with Sonny Stitt for 1967's Pow, and began expanding his scope, working with singer Damita Jo and managing the production group In Stage. He also reconnected with his wind instrument roots, and began playing the flute on occasion. During the '70s, a job as pianist and music director for singer O.C. Smith brought him to Los Angeles, where he also found work with luminaries like Bobby Hutcherson, Pharoah Sanders, Harold Land, and many more. In 1974, he paired with saxophonist Rudolph Johnson for Habiba on the Gallo label, after which he joined Dexter Gordon's group, touring with the saxophonist for five years. \r\nLightsey's own work increased in the '80s after he signed with the then-new French Sunnyside label and released his debut solo album, 1982's Lightsey 1. He followed up with the trio date Isotope, featuring bassist Jesper Lundgaard and drummer Eddie Gladden, on Criss Cross. More well-regarded albums followed for Sunnyside, including 1984's Lightsey 2, 1985's Lightsey Live, and 1986's Everything Is Changed. He closed out the decade by pairing with trumpeter Marcus Belgrave for the 1987 quintet session Kirk n' Marcus. Poignantly, he had also reunited with Chet Baker for a European tour in 1988, when the trumpeter died tragically after a fall from a hotel window in Amsterdam. There were also albums with Woody Shaw, Jim Pepper, David \"Fathead\" Newman, and more. Around this time, the pianist also joined the supergroup the Leaders, recording several albums alongside trumpeter Lester Bowie, saxophonist Arthur Blythe, saxophonist Chico Freeman, bassist Cecil McBee, and drummer Famoudou Don Moye. \r\nOver the next decade, Lightsey remained in-demand, recording with fellow Detroiters Wendell Harrison, and Marcus Belgrave, David Murray, and Bill Pierce, among others. He also released several albums, including 1990's Nat King Cole tribute From Kirk to Nat, and 1994's Goodbye Mr. Evans. Since the mid-'90s, Lightsey has lived in France, where he continues to tour and record. In 2004, he issued the live album The Nights of Bradley's, and rejoined the Leaders for 2007's Spirits Alike. A year later, he paired with vocalist Louise Gibbs for Everybody's Song But Our Own. The live Solo Piano en Argentina (recorded at the Festival Internacional de Jazz de Buenos Aires) appeared in 2013. He then joined bassist Tibor Elekes and drummer Famoudou Don Moye for the 2015 trio album Le Corbu. Two years later, he collaborated with vocalist Marilena Paradisi on Some Place Called Where."
+  ]
+}

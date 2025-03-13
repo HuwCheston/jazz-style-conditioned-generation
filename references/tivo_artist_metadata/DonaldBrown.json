@@ -1,0 +1,39 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Benny Green",
+      "weight": 9
+    },
+    {
+      "name": "James Williams",
+      "weight": 9
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Donald Brown",
+  "bio": [
+    "A fine pianist and educator, Donald Brown has also been a prolific composer. He grew up in Memphis and actually started out on drums and trumpet. By the time he attended Memphis State University (1972-1975), he was playing jazz piano. After years of local work, Brown replaced James Williams with the Jazz Messengers (1981-1982).  He went on to teach at Berklee (1983-1985) and the University of Tennessee (starting in 1988), recorded albums as a leader for Sunnyside and Muse, and had his compositions performed and recorded by a wide variety of top modern jazz players."
+  ]
+}

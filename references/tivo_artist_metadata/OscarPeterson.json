@@ -1,0 +1,222 @@
+{
+  "moods": [
+    {
+      "name": "Springlike",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Cheerful",
+      "weight": 8
+    },
+    {
+      "name": "Romantic",
+      "weight": 7
+    },
+    {
+      "name": "Celebratory",
+      "weight": 7
+    },
+    {
+      "name": "Rollicking",
+      "weight": 8
+    },
+    {
+      "name": "Complex",
+      "weight": 7
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Energetic",
+      "weight": 7
+    },
+    {
+      "name": "Carefree",
+      "weight": 7
+    },
+    {
+      "name": "Reverent",
+      "weight": 7
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 8
+    },
+    {
+      "name": "Exuberant",
+      "weight": 8
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Delicate",
+      "weight": 7
+    },
+    {
+      "name": "Fun",
+      "weight": 7
+    },
+    {
+      "name": "Intimate",
+      "weight": 8
+    },
+    {
+      "name": "Warm",
+      "weight": 9
+    },
+    {
+      "name": "Stylish",
+      "weight": 8
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    },
+    {
+      "name": "Joyous",
+      "weight": 9
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 8
+    },
+    {
+      "name": "Reflective",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Swing",
+      "weight": 9
+    },
+    {
+      "name": "Bop",
+      "weight": 6
+    },
+    {
+      "name": "Keyboard",
+      "weight": 2
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Concerto",
+      "weight": 2
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Classical",
+      "weight": 2
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 9
+    },
+    {
+      "name": "Roland Hanna",
+      "weight": 8
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 8
+    },
+    {
+      "name": "Barry Harris",
+      "weight": 9
+    },
+    {
+      "name": "Sonny Clark",
+      "weight": 8
+    },
+    {
+      "name": "Bud Powell",
+      "weight": 9
+    },
+    {
+      "name": "Duke Jordan",
+      "weight": 8
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 7
+    },
+    {
+      "name": "Art Tatum",
+      "weight": 7
+    },
+    {
+      "name": "Hank Jones",
+      "weight": 7
+    },
+    {
+      "name": "Hampton Hawes",
+      "weight": 7
+    },
+    {
+      "name": "Kenny Barron",
+      "weight": 7
+    },
+    {
+      "name": "Bill Charlap",
+      "weight": 7
+    },
+    {
+      "name": "Red Garland",
+      "weight": 7
+    },
+    {
+      "name": "Ahmad Jamal",
+      "weight": 7
+    },
+    {
+      "name": "Erroll Garner",
+      "weight": 7
+    },
+    {
+      "name": "George Shearing",
+      "weight": 7
+    }
+  ],
+  "tivo_artist_name": "Oscar Peterson",
+  "bio": [
+    "A jazz pianist who possessed dazzling, fluid technique and always delivered the musical goods in a powerfully swinging style.",
+    "Oscar Peterson was one of the greatest piano players of all time. A pianist with phenomenal technique on the level of his idol, Art Tatum, Peterson's speed, dexterity, and ability to swing at any tempo were amazing. Very effective in small groups, jam sessions, and in accompanying singers, O.P. was at his absolute best when performing unaccompanied solos. His original style did not fall into any specific idiom. Like Erroll Garner and George Shearing, Peterson's distinctive playing formed during the mid- to late '40s and fell somewhere between swing and bop. Peterson was criticized through the years because he used so many notes, didn't evolve much since the 1950s, and recorded a remarkable number of albums. Perhaps it is because critics ran out of favorable adjectives to use early in his career; certainly it can be said that Peterson played 100 notes when other pianists might have used ten, but all 100 usually fit, and there is nothing wrong with showing off technique when it serves the music. As with Johnny Hodges and Thelonious Monk, to name two, Peterson spent his career growing within his style rather than making any major changes once his approach was set, certainly an acceptable way to handle one's career. Because he was Norman Granz's favorite pianist (along with Tatum) and the producer tended to record some of his artists excessively, Peterson made an incredible number of albums. Not all are essential, and a few are routine, but the great majority are quite excellent, and there are dozens of classics.  \r\nPeterson started classical piano lessons when he was six and developed quickly. After winning a talent show at 14, he began starring on a weekly radio show in Montreal. Peterson picked up early experience as a teenager playing with Johnny Holmes' Orchestra. From 1945-1949, he recorded 32 selections for Victor in Montreal. Those trio performances find Peterson displaying a love for boogie-woogie, which he would soon discard, and the swing style of Teddy Wilson and Nat King Cole. His technique was quite brilliant even at that early stage, and although he had not yet been touched by the influence of bop, he was already a very impressive player. Granz discovered Peterson in 1949 and soon presented him as a surprise guest at a Jazz at the Philharmonic concert. Peterson was recorded in 1950 on a series of duets with either Ray Brown or Major Holley on bass; his version of \"Tenderly\" became a hit. Peterson's talents were quite obvious, and he became a household name in 1952 when he formed a trio with guitarist Barney Kessel and Brown. Kessel tired of the road and was replaced by Herb Ellis the following year. The Peterson-Ellis-Brown trio, which often toured with JATP, was one of jazz's great combos from 1953-1958. Their complex yet swinging arrangements were competitive -- Ellis and Brown were always trying to outwit and push the pianist -- and consistently exciting. In 1958, when Ellis left the band, it was decided that no other guitarist could fill in so well, and he was replaced (after a brief stint by Gene Gammage) by drummer Ed Thigpen. In contrast to the earlier group, the Peterson-Brown-Thigpen trio (which lasted until 1965) found the pianist easily the dominant soloist. Later versions of the group featured drummers Louis Hayes (1965-1966), Bobby Durham (1967-1970), Ray Price (1970), and bassists Sam Jones (1966-1970) and George Mraz (1970).  \r\nIn 1960, Peterson established the Advanced School of Contemporary Music in Toronto, which lasted for three years. He made his first recorded set of unaccompanied piano solos in 1968 (strange that Granz had not thought of it) during his highly rated series of MPS recordings. With the formation of the Pablo label by Granz in 1972, Peterson was often teamed with guitarist Joe Pass and bassist Niels Pedersen. He appeared on dozens of all-star records, made five duet albums with top trumpeters (Dizzy Gillespie, Roy Eldridge, Harry \"Sweets\" Edison, Clark Terry, and Jon Faddis), and teamed up with Count Basie on several two-piano dates. An underrated composer, Peterson wrote and recorded the impressive \"Canadiana Suite\" in 1964 and has occasionally performed originals in the years since. Although always thought of as a masterful acoustic pianist, Peterson has also recorded on electric piano (particularly some of his own works), organ on rare occasions, and even clavichord for an odd duet date with Joe Pass. One of his rare vocal sessions in 1965, With Respect to Nat, reveals that Peterson's singing voice was nearly identical to Nat King Cole's. A two-day reunion with Herb Ellis and Ray Brown in 1990 (which also included Bobby Durham) resulted in four CDs. Peterson was felled by a serious stroke in 1993 that knocked him out of action for two years. He gradually returned to the scene, however, although with a weakened left hand. Even when he wasn't 100 percent, Peterson was a classic improviser, one of the finest musicians that jazz has ever produced. The pianist appeared on an enormous number of records through the years. As a leader, he has recorded for Victor, Granz's Clef and Verve labels (1950-1964), MPS, Mercury, Limelight, Pablo, and Telarc.",
+    "Oscar Peterson was one of the greatest piano players of all time. A pianist with phenomenal technique on the level of his idol, Art Tatum, Peterson's speed, dexterity, and ability to swing at any tempo were amazing. Very effective in small groups and jam sessions, and in accompanying singers, O.P. was at his absolute best when performing unaccompanied solos. His original style did not fall into any specific idiom. Peterson's distinctive playing formed during the mid- to late '40s and fell somewhere between swing and bop. Peterson was a classic improviser, one of the finest musicians that jazz has ever produced."
+  ]
+}

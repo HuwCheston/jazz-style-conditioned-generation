@@ -1,0 +1,250 @@
+{
+  "moods": [
+    {
+      "name": "Intimate",
+      "weight": 5
+    },
+    {
+      "name": "Reserved",
+      "weight": 5
+    },
+    {
+      "name": "Refined",
+      "weight": 7
+    },
+    {
+      "name": "Summery",
+      "weight": 6
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 6
+    },
+    {
+      "name": "Playful",
+      "weight": 6
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Soothing",
+      "weight": 4
+    },
+    {
+      "name": "Passionate",
+      "weight": 6
+    },
+    {
+      "name": "Restrained",
+      "weight": 5
+    },
+    {
+      "name": "Elegant",
+      "weight": 8
+    },
+    {
+      "name": "Stylish",
+      "weight": 5
+    },
+    {
+      "name": "Organic",
+      "weight": 7
+    },
+    {
+      "name": "Atmospheric",
+      "weight": 6
+    },
+    {
+      "name": "Bright",
+      "weight": 8
+    },
+    {
+      "name": "Fun",
+      "weight": 6
+    },
+    {
+      "name": "Circular",
+      "weight": 7
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 9
+    },
+    {
+      "name": "Gentle",
+      "weight": 6
+    },
+    {
+      "name": "Lyrical",
+      "weight": 9
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Sparkling",
+      "weight": 5
+    },
+    {
+      "name": "Sunny",
+      "weight": 5
+    },
+    {
+      "name": "Romantic",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Calypso",
+      "weight": 4
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Standards",
+      "weight": 5
+    },
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "International",
+      "weight": 4
+    },
+    {
+      "name": "Vocal",
+      "weight": 5
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Caribbean Traditions",
+      "weight": 4
+    }
+  ],
+  "similars": [
+    {
+      "name": "Wynton Kelly",
+      "weight": 7
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 7
+    },
+    {
+      "name": "Michel Camilo",
+      "weight": 8
+    },
+    {
+      "name": "Hampton Hawes",
+      "weight": 7
+    },
+    {
+      "name": "Teddy Wilson",
+      "weight": 8
+    },
+    {
+      "name": "Tommy Flanagan",
+      "weight": 6
+    },
+    {
+      "name": "Jacky Terrasson",
+      "weight": 6
+    },
+    {
+      "name": "Gene Harris",
+      "weight": 6
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 6
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 6
+    },
+    {
+      "name": "Sonny Clark",
+      "weight": 5
+    },
+    {
+      "name": "George Cables",
+      "weight": 5
+    },
+    {
+      "name": "Barry Harris",
+      "weight": 5
+    },
+    {
+      "name": "Kenny Drew",
+      "weight": 6
+    },
+    {
+      "name": "Hank Jones",
+      "weight": 6
+    },
+    {
+      "name": "Roland Hanna",
+      "weight": 6
+    },
+    {
+      "name": "John Hicks",
+      "weight": 5
+    },
+    {
+      "name": "Herbie Hancock",
+      "weight": 6
+    },
+    {
+      "name": "Ahmad Jamal",
+      "weight": 6
+    },
+    {
+      "name": "Ramsey Lewis",
+      "weight": 5
+    },
+    {
+      "name": "Joe Sample",
+      "weight": 7
+    }
+  ],
+  "tivo_artist_name": "Monty Alexander",
+  "bio": [
+    "A dynamic, technically brilliant, Jamaican-born jazz pianist in the mold of Oscar Peterson who often explores his Caribbean roots.",
+    "Jamaica-born pianist Monty Alexander is a sophisticated, prolific performer with an urbane swinging style informed by the bop tradition as well as the reggae and Caribbean folk he grew up with. Influenced by pianist Oscar Peterson, Alexander initially garnered attention performing in night clubs in the late '50s. Following a move to Miami, he gained wider renown with 1965's Alexander the Great and 1976's Live! Montreux Alexander. Over the years he continued to explore a vibrant, cross-pollinated sound, moving from straight-ahead acoustic jazz to Jamaican sounds on albums like 1980's Trio, 1994's Jamboree: Monty Alexander's Ivory and Steel, and 2011's Grammy-nominated Harlem-Kingston Express. He brought all these influences to bear on 2019's Thelonious Monk-inspired Wareika Hill Rastamonk Vibrations and 2022's Love Notes. In 2024, he released D-Day in honor of the 80th anniversay of the landings at Normandy during WWII. \r\nBorn in Kingston, Jamaica, in 1944, Alexander first started playing piano around age four and took classical lessons from age six. By his teens, however, he had discovered jazz and was already performing in nightclubs. His early career found him covering pop and rock hits of the day, as well as working with various ska, reggae, and calypso groups, including Clue J & His Blues Blasters. However, it was his love of jazz-oriented artists like Oscar Peterson, Duke Ellington, Frank Sinatra, and Nat King Cole that brought him the most inspiration. In 1961, he moved with his family to Miami, Florida to better pursue his musical ambitions. It was there that Alexander met restaurateur and Frank Sinatra associate Jilly Rizzo, who eventually hired him as the house pianist at his New York nightclub Jilly's. For the next several years, Alexander lived in New York and worked at Jilly's, where he had the opportunity to befriend and perform with a bevy of stars including Sinatra, Ray Brown, Milt Jackson, and others. Buoyed by this success, he traveled to Los Angeles in 1964, where he recorded several well-received albums for the Pacific Jazz label, including Alexander the Great and Spunky. A handful of additional efforts followed, including 1967's Zing! on RCA and 1969's This Is Monty Alexander on Verve. In 1969 he also appeared on vibraphonist Milt Jackson's That's the Way It Is. \r\nIn the '70s, Alexander built a long-lasting relationship with Germany's MPS (Musik Produktion Schwarzwald) label and released a steady stream of albums including 1971's Here Comes the Sun, 1974's Perception!, and 1977's Cobilimbo with longtime friend and collaborator Ernest Ranglin. These albums found Alexander pushing his sound in new directions and often combining jazz with elements of the Caribbean musical traditions of his youth. During this period he formed working relationships with bassist John Clayton and drummer Jeff Hamilton. As a trio, they debuted to much acclaim on 1976's Live! Montreux Alexander, and would continue to work together in various configurations over the next several decades. The pianist also continued to record with Milt Jackson, and made appearances on albums by Quincy Jones, Dizzy Gillespie, Phyllis Hyman, and others. \r\nThe '80s were also a fruitful period for Alexander, who continued to combine his love of straight-ahead jazz and Caribbean music with the release of such albums as 1983's The Duke Ellington Songbook, 1985's The River, and 1986's Li'l Darlin'. He also reunited with Clayton and Hamilton on 1983's Reunion in Europe and paired with bassist Ray Brown for several dates, including 1985's Full Steam Ahead and 1987's The Red Hot Ray Brown Trio. More albums followed, including 1994's Live at Maybeck and 1995's reggae-inflected Yard Movement. He rounded out the decade with 1997's Frank Sinatra-inspired Echoes of Jilly's and 1999's Stir It Up: The Music of Bob Marley. \r\nIn 2000, Alexander's artistic achievements were recognized by the Jamaican government with his designation as a worldwide music ambassador and as Commander in the Order of Distinction for outstanding services to Jamaica. That same year, he collaborated with reggae giants Sly Dunbar and Robbie Shakespeare on Monty Meets Sly & Robbie, followed in 2001 by Caribbean Duet with pianist Michel Sardaby. He then joined Ray Brown and guitarist Herb Ellis again for 2002's Triple Scoop and 2003's Straight Ahead. Two tribute sessions followed with 2008's The Good Life: Monty Alexander Plays the Songs of Tony Bennett and 2009's Calypso Blues: The Songs of Nat King Cole. \r\nAlexander then highlighted his fusion of reggae, ska, R&B, and jazz on 2011's Grammy-nominated Harlem-Kingston Express and 2014's Harlem-Kingston Express, Vol. 2: River Rolls On, both recorded at Dizzy's Club Coca-Cola at Lincoln Center. In 2019, he celebrated his longstanding love of Thelonious Monk on Wareika Hill Rastamonk Vibrations, reworking many of the pianist's songs with Caribbean flourishes. Featured on the album were guest spots by saxophonists Wayne Escoffery, Ron Blake, and Joe Lovano. More notable guests marked 2022's Love Notes, including trumpeters Roy Hargrove and Arturo Sandoval. In 2024 , he marked the 80th anniversary of the Normandy Landings of WWII, as well as his own 80th birthday, with D-Day. Recorded in Paris, if featured his trio with bassist Luke Sellick and drummer Jason Brown.",
+    "Jamaica-born pianist Monty Alexander is a sophisticated, prolific performer with an urbane swinging style informed by the bop tradition as well as the reggae and Caribbean folk he grew up with. Influenced by pianist Oscar Peterson, Alexander initially garnered attention performing in night clubs in the late '50s. Following a move to Miami, he gained wider renown with 1965's Alexander the Great and 1976's Live! Montreux Alexander. Over the years, he has continued to explore a vibrant, cross-pollinated sound, moving from straight-ahead acoustic jazz to Jamaican sounds on albums like 1980's Trio, 1994's Jamboree: Monty Alexander's Ivory and Steel, and 2011's Grammy-nominated Harlem-Kingston Express. He brought all these influences to bear on 2019's Thelonious Monk-inspired Wareika Hill Rastamonk Vibrations and 2022's Love Notes. In 2024, he released D-Day in honor of the 80th anniversary of the landings at Normandy during WWII."
+  ]
+}

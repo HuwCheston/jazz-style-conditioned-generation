@@ -1,0 +1,117 @@
+{
+  "moods": [
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Ambitious",
+      "weight": 8
+    },
+    {
+      "name": "Brash",
+      "weight": 7
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 8
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Brittle",
+      "weight": 7
+    },
+    {
+      "name": "Bright",
+      "weight": 8
+    },
+    {
+      "name": "Elaborate",
+      "weight": 8
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Street-Smart",
+      "weight": 7
+    },
+    {
+      "name": "Uncompromising",
+      "weight": 7
+    },
+    {
+      "name": "Rousing",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 9
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Intense",
+      "weight": 7
+    },
+    {
+      "name": "Nocturnal",
+      "weight": 9
+    },
+    {
+      "name": "Complex",
+      "weight": 9
+    }
+  ],
+  "genres": [
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Fusion",
+      "weight": 7
+    },
+    {
+      "name": "Crossover Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    }
+  ],
+  "similars": [
+    {
+      "name": "Fred Hersch",
+      "weight": 6
+    },
+    {
+      "name": "Kenny Werner",
+      "weight": 7
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 6
+    }
+  ],
+  "tivo_artist_name": "Alan Pasqua",
+  "bio": [
+    "Journeyman jazz-rock fusion and pop session keyboardist who has played with Tony Williams, Santana, and Bob Dylan.",
+    "Keyboardist Alan Pasqua is an adept performer and educator, with a bent toward sophisticated post-bop jazz. Along with his own jazz trio recordings, Pasqua's gritty organ riffs and synth textures can be heard on hits by Eddie Money and Giant. He's also done sides with Bob Dylan, Carlos Santana, Rick Springfield, Pat Benatar, and Sammy Hagar, among others. \r\nPasqua's musical roots run throughout his family tree. Growing up in New Jersey, Pasqua took classical piano lessons as a child. During his teens, he began playing in rock and jazz bands. When he graduated from high school, he attended Indiana University. During the early '70s, he continued his music studies with pianist Jaki Byard at Boston's New England Conservatory of Music. Pasqua's roommate, drummer Peter Erskine, offered him a chance to stand in for an ailing Stan Kenton on a short tour. This was followed by a stint with another jazz legend, Joe Williams, who mentored the young musician. Pasqua's instructor, George Russell, recommended him for a recording date for jazz drummer great Tony Williams. After a New York performance at Carnegie Hall, Williams asked Pasqua to join his band Tony Williams' Lifetime, whose lineup included guitarist Alan Holdsworth and bassist Tony Newton. Pasqua's recording debut was on the quartet's Believe It LP. \r\nOpting for the more lucrative genre of rock & roll, Pasqua moved to Los Angeles, where he was reunited with Tony Williams' producer Bruce Botnick, whose other credits included the Doors. Botnick, a staff producer at CBS Records, called Pasqua to do a session with a new artist named Eddie Money. Money had hits with \"Two Tickets to Paradise\" and \"Baby Hold on to Me.\" Pasqua worked with the singer in the studio and on the road. Becoming an in-demand session musician, Pasqua can be heard on the movie soundtracks The Color Purple, Fatal Attraction, and An Officer and a Gentleman. \r\nAs a leader, Pasqua debuted in 1994 with Milagro alongside bassist Dave Holland, drummer Jack DeJohnette, and saxophonist Michael Brecker. A year later, he delivered Dedications, which once again featured Holland, as well as legendary drummer Paul Motian. He returned in 2000 with Russian Peasant. The Music of Eric Von Essen, Vol. 1, which featured Alan Broadbent, Alex Cline, Nels Cline, and Peter Erskine, appeared that same year. A flurry of solo outings followed, including 2004's Body and Soul, 2005's New Old Friend, and 2007's Anti Social Club. \r\nIn 2008, Pasqua joined the faculty of USC Thorton School of Music as a Professor of Jazz Studies. Three years later, he returned to his solo work with Twin Bill: Two Piano Music of Bill Evans, followed by the live album The Interlochen Concert, which showcased the pianist at the famed Michigan arts academy, alongside drummer Erskine, and bassist Darek Oles. In 2017, he delivered the studio effort Northern Lights, with bassist Oles, drummer Conor Malloy, and percussionist Aaron Serfaty."
+  ]
+}

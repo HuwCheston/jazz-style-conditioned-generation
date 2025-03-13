@@ -1,0 +1,134 @@
+{
+  "moods": [
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 8
+    },
+    {
+      "name": "Intimate",
+      "weight": 8
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 8
+    },
+    {
+      "name": "Earnest",
+      "weight": 8
+    },
+    {
+      "name": "Rollicking",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 9
+    },
+    {
+      "name": "Earthy",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Innocent",
+      "weight": 7
+    },
+    {
+      "name": "Whimsical",
+      "weight": 9
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Smooth",
+      "weight": 7
+    },
+    {
+      "name": "Reserved",
+      "weight": 6
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 9
+    }
+  ],
+  "similars": [
+    {
+      "name": "Kirk Lightsey",
+      "weight": 8
+    },
+    {
+      "name": "Tommy Flanagan",
+      "weight": 9
+    },
+    {
+      "name": "Bobby Timmons",
+      "weight": 9
+    },
+    {
+      "name": "Red Garland",
+      "weight": 8
+    },
+    {
+      "name": "Hampton Hawes",
+      "weight": 9
+    },
+    {
+      "name": "Sonny Clark",
+      "weight": 5
+    },
+    {
+      "name": "Hank Jones",
+      "weight": 8
+    },
+    {
+      "name": "Kenny Drew",
+      "weight": 9
+    },
+    {
+      "name": "George Cables",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Wynton Kelly",
+  "bio": [
+    "A wonderfully delicate and inventive jazz pianist who led his own trio and had a famous stint with the Miles Davis Sextet in the late '50s and early '60s.",
+    "A superb accompanist loved by Miles Davis and Cannonball Adderley, Wynton Kelly was also a distinctive soloist who decades later would be a strong influence on Benny Green. He grew up in Brooklyn and early on played in R&B bands led by Eddie \"Cleanhead\" Vinson, Hal Singer, and Eddie \"Lockjaw\" Davis. Kelly, who recorded 14 titles for Blue Note in a trio (1951), worked with Dinah Washington, Dizzy Gillespie, and Lester Young during 1951-1952. After serving in the military, he made a strong impression with Washington (1955-1957), Charles Mingus (1956-1957), and the Dizzy Gillespie big band (1957), but he would be most famous for his stint with Miles Davis (1959-1963), recording such albums with Miles as Kind of Blue, At the Blackhawk, and Someday My Prince Will Come. When he left Davis, Kelly took the rest of the rhythm section (bassist Paul Chambers and drummer Jimmy Cobb) with him to form his trio. The group actually sounded at its best backing Wes Montgomery. Before his early death, Kelly recorded as a leader for Blue Note, Riverside, Vee-Jay, Verve, and Milestone.",
+    "Jazz pianist Wynton Kelly's most high-profile engagement came as a member of the Miles Davis Sextet of the late '50s and early '60s. During this time he appeared briefly on the legendary KIND OF BLUE sessions with Davis. He later left the group, taking bassist Paul Chambers and drummer Jimmy Cobb to the Wynton Kelly Trio, which produced many fine recordings and also backed artists such as Wes Montgomery and George Coleman."
+  ]
+}

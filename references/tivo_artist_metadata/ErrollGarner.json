@@ -1,0 +1,154 @@
+{
+  "moods": [
+    {
+      "name": "Carefree",
+      "weight": 8
+    },
+    {
+      "name": "Smooth",
+      "weight": 4
+    },
+    {
+      "name": "Dramatic",
+      "weight": 8
+    },
+    {
+      "name": "Gentle",
+      "weight": 9
+    },
+    {
+      "name": "Reflective",
+      "weight": 7
+    },
+    {
+      "name": "Romantic",
+      "weight": 7
+    },
+    {
+      "name": "Rollicking",
+      "weight": 7
+    },
+    {
+      "name": "Fun",
+      "weight": 7
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Intimate",
+      "weight": 7
+    },
+    {
+      "name": "Whimsical",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 9
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 8
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Playful",
+      "weight": 8
+    },
+    {
+      "name": "Delicate",
+      "weight": 4
+    },
+    {
+      "name": "Refined",
+      "weight": 8
+    },
+    {
+      "name": "Soft/Quiet",
+      "weight": 4
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Cheerful",
+      "weight": 8
+    },
+    {
+      "name": "Restrained",
+      "weight": 9
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 7
+    },
+    {
+      "name": "Uplifting",
+      "weight": 7
+    },
+    {
+      "name": "Indulgent",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "Swing",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 6
+    }
+  ],
+  "similars": [
+    {
+      "name": "Ralph Sutton",
+      "weight": 9
+    },
+    {
+      "name": "Oscar Peterson",
+      "weight": 8
+    },
+    {
+      "name": "Dick Hyman",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Erroll Garner",
+  "bio": [
+    "Jazz pianist whose tumbling, percussive, and humorous style gave rise to a remarkable breadth of expression, inspiring countless musicians.",
+    "One of the most distinctive of all pianists, Erroll Garner proved that it was possible to be a sophisticated player without knowing how to read music, that a creative jazz musician can be very popular without watering down his music, and that it is possible to remain an enthusiastic player without changing one's style once it is formed. A brilliant virtuoso who sounded unlike anyone else, on medium tempo pieces, Erroll Garner often stated the beat with his left hand like a rhythm guitar while his right played chords slightly behind the beat, creating a memorable effect. His playful free-form introductions (which forced his sidemen to really listen), his ability to play stunning runs without once glancing at the keyboard, his grunting, and the pure joy that he displayed while performing were also part of the Erroll Garner magic.\r\nGarner, whose older brother Linton was also a fine pianist, appeared on the radio with the Kan-D-Kids at the age of ten. After working locally in Pittsburgh, he moved to New York in 1944 and worked with Slam Stewart's trio during 1944-1945 before going out on his own. By 1946, Garner had his sound together, and when he backed Charlie Parker on his famous Cool Blues session of 1947, the pianist was already an obvious giant. His unclassifiable style had an orchestral approach straight from the swing era but was open to the innovations of bop. From the early '50s on,  Garner's accessible style became very popular and he never seemed to have an off day up until his forced retirement (due to illness) in early 1975. His composition \"Misty\" became a standard. Garner, who had the ability to sit at the piano without prior planning and record three albums in one day (all colorful first takes), made many records throughout his career for such companies as Savoy, Mercury, RCA, Dial, Columbia, EmArcy, ABC-Paramount, MGM, Reprise, and his own Octave label.",
+    "Though he never learned to read music, Erroll Garner had a natural pianistic gift that gave rise to a remarkable breadth of expression, inspiring countless musicians. By turns mightily swinging, orchestral, swooningly romantic, and mercilessly outré, Garner's tumbling, percussive, and humorous style was entirely his own. Recording throughout the 1950s, '60s, and '70s almost exclusively in a trio or solo context, he regularly reinterpreted jazz standards and his own tunes, \"Misty\" being the best-known."
+  ]
+}

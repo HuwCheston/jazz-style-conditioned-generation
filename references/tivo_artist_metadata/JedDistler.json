@@ -1,0 +1,20 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Keyboard",
+      "weight": 4
+    },
+    {
+      "name": "Classical",
+      "weight": 4
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "Jed Distler",
+  "bio": []
+}

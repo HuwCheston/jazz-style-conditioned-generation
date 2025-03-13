@@ -1,0 +1,105 @@
+{
+  "moods": [
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 6
+    },
+    {
+      "name": "Gentle",
+      "weight": 6
+    },
+    {
+      "name": "Refined",
+      "weight": 8
+    },
+    {
+      "name": "Relaxed",
+      "weight": 9
+    },
+    {
+      "name": "Slick",
+      "weight": 6
+    },
+    {
+      "name": "Reserved",
+      "weight": 8
+    },
+    {
+      "name": "Soothing",
+      "weight": 7
+    },
+    {
+      "name": "Light",
+      "weight": 8
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Reflective",
+      "weight": 6
+    },
+    {
+      "name": "Soft/Quiet",
+      "weight": 8
+    },
+    {
+      "name": "Intimate",
+      "weight": 8
+    },
+    {
+      "name": "Stylish",
+      "weight": 6
+    },
+    {
+      "name": "Sensual",
+      "weight": 7
+    },
+    {
+      "name": "Smooth",
+      "weight": 9
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 6
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Vibraphone/Marimba Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Smooth Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 4
+    },
+    {
+      "name": "Crossover Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "Don Grusin",
+  "bio": [
+    "Grammy Award-winning American composer, arranger, producer, pianist, and educator, and younger brother of pianist Dave Grusin.",
+    "American composer, arranger, producer, pianist, and educator Don Grusin is an accomplished Grammy Award-winning musician with a bent toward crossover styles of music from jazz to pop with a specific interest in the music of Brazil and Latin America. The younger brother of pianist Dave Grusin, Grusin grew up in Colorado. By age 6, he was taking piano lessons and gaining exposure to an eclectic mix of music; whether it be classical via his violinist father, jazz via his older brother, country & western via the local music scene, or R&B via radio. \r\nAlthough music was his focus, Grusin eventually earned a Bachelor's degree in Sociology and a Masters Degree in Economics from the University of Colorado. Subsequently, although he continued to play music, he spent the first half of the '70s teaching as a Fulbright Professor of Economics at the Autonomous University in Guadalajara, Mexico. By the mid-'70s, Grusin was teaching Economics at Foothills College near San Francisco and continuing to play music. During this time, he traveled to Bogota, Colombia with percussionist Pete Escovedo's Latin fusion ensemble Azteca (then featuring Escovedo's daughter Sheila E.) and became increasingly interested in the music of Latin America -- a passion that would color his music from then on. \r\nIn 1975, an offer to join Quincy Jones' band for a tour of Japan and the U.S. led Grusin to pursue music full-time, and by the late '70s he was an in-demand freelance and studio musician having already appeared on a bevy of recordings by such artists as Randy Crawford, the Pointer Sisters, Joe Pass, and Billy Eckstine. In 1979, Grusin released an album on Elektra with his jazz fusion outfit Friendship featuring saxophonist Ernie Watts, guitarist Lee Ritenour and percussionist Alex Acuña. He then debuted as a solo artist on JVC with 10k-LA in 1981 and followed-up with a self-titled release in 1983. In 1988, he collaborated with his brother Dave for the JVC album Sticks and Stones. \r\nSince the '80s, Grusin has continued to perform with and/or produce albums for a wide array of artists including saxophonist Watts (on the 1985 Grammy-winning Musican), Brazilian singer/songwriter Milton Nascimento, pianist David Benoit, and Patti Austin, Sergio Mendes, Oscar Castro-Neves, Zoot Sims, Dori Caymmi, Sadao Watanabe, Frank Quintero, Brenda Russell, Gerald Albright, Nelson Rangell, Jim Hall, Gilberto Gil, Flora Purim, Airto, Larry Carlton, Leon Ware, and many others. On his own, Grusin has recorded for several labels, most notably GRP, releasing such albums as 1990's Raven, 1991's Zephyr, 1992's No Borders, 1993's Native Land, and 1994's Banana Fish. In 2000, he released the trio album Traveling Fancy and received a Grammy nomination for his 2004 live album The Hang. Subsequent Grammy awards were garnered for his work on two Paul Winter albums, 2008's Crestone and 2010's Miho: Journey to the Mountain. Grusin, who received an honorary Doctorate of Music from Five Towns College in Huntington, New York, continues to perform, record, and produce music, and even brings together his experience in economics, music, film, ethnography, journalism, and art for a multidisciplinary course he teaches at the ATLAS Institute at the University of Colorado. In 2011, Grusin once again appeared with his brother Dave on the live album One Night Only, and his collaboration with Shakatak keyboardist Bill Sharpe, Trans Atlantica, is set for release in 2012.",
+    "American composer, arranger, producer, pianist, and educator Don Grusin is an accomplished Grammy Award-winning musician with a bent toward crossover styles of music from jazz to pop with a specific interest in the music of Brazil and Latin America. The younger brother of pianist Dave Grusin, Grusin originally avoided music (not wanting to be in his brother's shadow), becoming an economics professor. An offer to join Quincy Jones' band for a tour of Japan and the U.S. led Grusin to pursue music full-time, and by the late '70s he was an in-demand freelance and studio musician. Grusin continues to perform, record, and produce, and even brings together his experience in economics, music, film, ethnography, journalism, and art for a course he teaches at the University of Colorado."
+  ]
+}

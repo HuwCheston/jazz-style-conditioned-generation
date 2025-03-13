@@ -1,0 +1,113 @@
+{
+  "moods": [
+    {
+      "name": "Earnest",
+      "weight": 7
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Complex",
+      "weight": 9
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 9
+    },
+    {
+      "name": "Uplifting",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Provocative",
+      "weight": 7
+    },
+    {
+      "name": "Rousing",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Wry",
+      "weight": 7
+    },
+    {
+      "name": "Ambitious",
+      "weight": 7
+    },
+    {
+      "name": "Carefree",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Big Band",
+      "weight": 9
+    },
+    {
+      "name": "Progressive Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Modern Big Band",
+      "weight": 9
+    }
+  ],
+  "similars": [
+    {
+      "name": "George Shearing",
+      "weight": 7
+    }
+  ],
+  "tivo_artist_name": "Toshiko Akiyoshi",
+  "bio": [
+    "Talented jazz pianist, but best known for her wizardry as a composer/arranger of big band music since the 1950s.",
+    "As an arranger, Toshiko Akiyoshi (influenced originally by Gil Evans and Thad Jones) has been particularly notable for incorporating elements of traditional Japanese music into her otherwise bop-ish charts. A strong (and underrated) pianist in the Bud Powell tradition, Akiyoshi was born in China but moved to Japan in 1946. She played locally (Sadao Watanabe was among her sidemen) and, after being noticed and encouraged by Oscar Peterson, studied at Berklee during 1956-1959. Married for a time to altoist Charlie Mariano, she co-led the Toshiko Mariano Quartet in the early '60s. After working with Charles Mingus in 1962 (including participating in his ill-fated Town Hall Concert), Toshiko returned to Japan for three years. Back in New York by 1965, she did a radio series and formed a quartet with her second husband, Lew Tabackin, in 1970. After moving to Los Angeles in 1972, Toshiko Akiyoshi put together her very impressive big band which featured such fine soloists as Bobby Shew, Gary Foster, and Tabackin. They recorded several notable albums before Akiyoshi decided, in 1981, to move to New York. Since their relocation, Akiyoshi and Tabackin have both been quite active although her re-formed big band has actually received less publicity than it did in L.A. She ranks as one of the top jazz arrangers of the past several decades."
+  ]
+}

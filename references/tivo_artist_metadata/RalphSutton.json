@@ -1,0 +1,117 @@
+{
+  "moods": [
+    {
+      "name": "Reserved",
+      "weight": 8
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 8
+    },
+    {
+      "name": "Elegant",
+      "weight": 8
+    },
+    {
+      "name": "Rollicking",
+      "weight": 8
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 8
+    },
+    {
+      "name": "Stylish",
+      "weight": 8
+    },
+    {
+      "name": "Refined",
+      "weight": 8
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Intimate",
+      "weight": 7
+    },
+    {
+      "name": "Organic",
+      "weight": 9
+    },
+    {
+      "name": "Bright",
+      "weight": 7
+    },
+    {
+      "name": "Smooth",
+      "weight": 8
+    },
+    {
+      "name": "Innocent",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 8
+    },
+    {
+      "name": "Light",
+      "weight": 9
+    },
+    {
+      "name": "Whimsical",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Stride",
+      "weight": 9
+    },
+    {
+      "name": "Standards",
+      "weight": 6
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Vocal",
+      "weight": 6
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Swing",
+      "weight": 8
+    }
+  ],
+  "similars": [
+    {
+      "name": "Earl Hines",
+      "weight": 9
+    },
+    {
+      "name": "Dick Hyman",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Ralph Sutton",
+  "bio": [
+    "One of the last of the classic New York stride pianists, who combined exuberance and control in equal measures.",
+    "Ralph Sutton was the greatest stride pianist to emerge since World War II, with his only close competitors being the late Dick Wellstood and the very versatile Dick Hyman. Nearly alone in his generation, Sutton kept alive the piano styles of Fats Waller and James P. Johnson, not as mere museum pieces but as devices for exciting improvisations. Although sticking within the boundaries of his predecessors, Sutton infused the music with his own personality; few could match his powerful left hand. Ralph Sutton played with Jack Teagarden's big band briefly in 1942 before serving in the Army. After World War II he appeared regularly on Rudi Blesh's This Is Jazz radio show and spent eight years as the intermission pianist at Eddie Condon's club, recording frequently. He spent time playing in San Francisco, worked for Bob Scobey, moved to Aspen in the mid-'60s, and became an original member of the World's Greatest Jazz Band with Yank Lawson, Bob Haggart, and Bud Freeman. In the 1970s, he recorded many exciting albums for the Chaz label and then cut albums for quite a few labels. Despite suffering a stroke in the early '90s, Sutton kept a busy schedule through the mid-'90s, playing at jazz parties and festivals. He died suddenly on December 29, 2001, in his car outside a restaurant in Evergreen, CO. Although he would have received much greater fame if he had been born 20 years earlier and come to maturity during the 1930s rather than the 1950s, at the time of his death it was obvious that Ralph Sutton had earned his place among the top classic jazz pianists of all time."
+  ]
+}

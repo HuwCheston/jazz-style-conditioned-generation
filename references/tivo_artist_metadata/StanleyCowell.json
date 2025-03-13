@@ -1,0 +1,125 @@
+{
+  "moods": [
+    {
+      "name": "Refined",
+      "weight": 5
+    },
+    {
+      "name": "Nocturnal",
+      "weight": 6
+    },
+    {
+      "name": "Stylish",
+      "weight": 4
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Intense",
+      "weight": 5
+    },
+    {
+      "name": "Intimate",
+      "weight": 6
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 6
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Reflective",
+      "weight": 6
+    },
+    {
+      "name": "Complex",
+      "weight": 6
+    },
+    {
+      "name": "Elegant",
+      "weight": 7
+    },
+    {
+      "name": "Smooth",
+      "weight": 4
+    },
+    {
+      "name": "Dramatic",
+      "weight": 5
+    },
+    {
+      "name": "Cerebral",
+      "weight": 9
+    },
+    {
+      "name": "Ambitious",
+      "weight": 8
+    },
+    {
+      "name": "Searching",
+      "weight": 9
+    }
+  ],
+  "genres": [
+    {
+      "name": "Guitar Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 6
+    },
+    {
+      "name": "Free Jazz",
+      "weight": 4
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Geri Allen",
+      "weight": 8
+    },
+    {
+      "name": "James Williams",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "George Cables",
+      "weight": 8
+    },
+    {
+      "name": "John Hicks",
+      "weight": 9
+    },
+    {
+      "name": "Herbie Hancock",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Stanley Cowell",
+  "bio": [
+    "A highly respected jazz pianist and educator who co-founded the Strata East label with Charles Tolliver in the 1970s.",
+    "A superb modern jazz pianist, Stanley Cowell is a highly regarded artist whose work often pushes the boundaries of forward-thinking hard bop without ever falling into completely avant-garde territory. Born in Toledo, Ohio in 1941, Cowell began studying piano around age four and first became interested in jazz after gaining exposure to the music of pianist Art Tatum, a family friend. After high school, he attended both the Oberlin College Conservatory and the University of Michigan, during which time he also gained valuable experience playing with Rahsaan Roland Kirk. In the mid-'60s he moved to New York City, where he played regularly with such luminaries as Marion Brown (1966 and 1967), Max Roach (1967 to 1970), and the Bobby Hutcherson-Harold Land Quintet (1968 to 1971). \r\nAs a leader, Cowell debuted on the Arista-Freedom label with 1969's Blues for the Viet Cong, followed that same year by Brilliant Circles. He then moved to ECM for 1973's Illusion Suite. Also in the early '70s, he worked regularly with trumpeter Charles Tolliver, with whom he co-founded the Strata East label. Consequently, he delivered several highly regarded albums for the label, including 1974's solo piano date Musa: Ancestral Streams and 1975's Regeneration. Also during this period, he played regularly with the Heath Brothers and continued recording, releasing a handful of solo piano albums for Galaxy Records, including 1977's Waiting for the Moment and 1978's Equipoise. \r\nBeginning in 1981, Cowell started balancing his time between performing and working as an educator, first at CUNY's Lehman College, and then spending several decades at Rutgers University in New Jersey. During these years, however, he remained active in the studio and developed a fruitful relationship with SteepleChase Records, which issued such well-received albums as 1989's Sienna, 1993's Angel Eyes, and 1997's Hear Me One. \r\nMore albums followed for the label, including 2010's Prayer for Peace, which featured the pianist's daughter Sunny Cowell on vocals. Two years later, he was joined by former Rutgers students bassist Tom Dicarlo and drummer Chris Brown on It's Time, followed by 2013's Welcome to This New World with the Empathlectrik Quartet and 2014's Are You Real? In 2017 he delivered his 15th album for SteepleChase, No Illusions, featuring saxophonist/flutist Bruce Williams, bassist Jay Anderson, and drummer Billy Drummond. Stanley Cowell died on December 17, 2020 in Dover, Delaware at the age of 79."
+  ]
+}

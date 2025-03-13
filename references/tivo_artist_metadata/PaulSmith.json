@@ -1,0 +1,63 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Swing",
+      "weight": 9
+    },
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "Cool",
+      "weight": 9
+    },
+    {
+      "name": "Traditional Pop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Vocal",
+      "weight": 9
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "Hal Galper",
+      "weight": 8
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 8
+    },
+    {
+      "name": "Hank Jones",
+      "weight": 8
+    },
+    {
+      "name": "George Shearing",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Paul Smith",
+  "bio": [
+    "Paul Smith was a brilliant pianist with technique on the level of an Oscar Peterson, but a musician who never really dedicated himself to jazz. After playing early on with Johnny Richards in 1941 and spending a couple years in the military, he worked with Les Paul (1946-1947) and Tommy Dorsey (1947-1949) before moving to Los Angeles and becoming a studio musician. Smith recorded frequently both with his trios and as a soloist. In addition to recording with Dizzy Gillespie, Anita O'Day, Buddy DeFranco, Louie Bellson, Steve Allen, Louie Bellson, and Stan Kenton (among others), he toured with Ella Fitzgerald off and on during 1956-1978. Smith died in Torrance, California on June 29, 2013 at the age of 91."
+  ]
+}

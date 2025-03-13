@@ -1,0 +1,124 @@
+{
+  "moods": [
+    {
+      "name": "Sophisticated",
+      "weight": 7
+    },
+    {
+      "name": "Atmospheric",
+      "weight": 9
+    },
+    {
+      "name": "Intimate",
+      "weight": 6
+    },
+    {
+      "name": "Cerebral",
+      "weight": 8
+    },
+    {
+      "name": "Whimsical",
+      "weight": 6
+    },
+    {
+      "name": "Literate",
+      "weight": 5
+    },
+    {
+      "name": "Complex",
+      "weight": 5
+    },
+    {
+      "name": "Searching",
+      "weight": 8
+    },
+    {
+      "name": "Poignant",
+      "weight": 5
+    },
+    {
+      "name": "Ambitious",
+      "weight": 6
+    },
+    {
+      "name": "Reflective",
+      "weight": 9
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 8
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Post-Bop",
+      "weight": 6
+    },
+    {
+      "name": "Jazz",
+      "weight": 9
+    },
+    {
+      "name": "International",
+      "weight": 5
+    },
+    {
+      "name": "Modern Creative",
+      "weight": 8
+    },
+    {
+      "name": "Chamber Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Venezuelan",
+      "weight": 6
+    },
+    {
+      "name": "South American Traditions",
+      "weight": 6
+    },
+    {
+      "name": "Piano Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Latin Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Global Jazz",
+      "weight": 5
+    },
+    {
+      "name": "M-Base",
+      "weight": 4
+    },
+    {
+      "name": "Stage & Screen",
+      "weight": 4
+    },
+    {
+      "name": "Soundtracks",
+      "weight": 4
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "Edward Simon",
+  "bio": [
+    "Creative jazz pianist often heard in post-bop piano trio settings; also melds jazz with folk traditions of his native Venezuela.",
+    "Creative jazz pianist, composer, and bandleader Edward Simon was born in Punta, Cardón, Venezuela in 1969, first traveling to the United States in 1981 at 12 years of age and attending the Performing Arts School in Philadelphia, Pennsylvania. After graduating at age 15, he studied classical piano and music performance under a scholarship at Philadelphia’s University of the Arts, then moved on to the Manhattan School of Music, where he studied jazz piano and music performance. By 1988 he was performing and recording professionally; Simon made his first recorded appearance on the 1988 Greg Osby album Mind Games, and the following year he joined saxophonist Bobby Watson's Horizon ensemble, remaining with the band until 1994 and appearing on such Watson albums as The Inventor (1990), Present Tense (1992), and Midwest Shuffle (1994). Upon departing Watson's group, Simon became a member of trumpeter Terence Blanchard's band between 1994 and 2002; the pianist can be heard on a number of Blanchard albums, including Romantic Defiance and the score to the Spike Lee-directed movie Clockers (both 1995), The Heart Speaks (1996), the score to the Kasi Lemmons film Eve's Bayou (1997), and Let's Get Lost (2001). During these years, Simon also appeared on recordings by the likes of guitarist Kevin Eubanks, alto saxophonist Dave Binney, flutist Herbie Mann, and tenor saxophonist Mark Turner.\r\nSimon's debut as a leader arrived in 1994 with Beauty Within on the Audioquest label; the album also introduced listeners to the Edward Simon Group, a trio featuring the pianist accompanied by electric bassist Anthony Jackson and drummer Horacio \"El Negro\" Hernández. The following year found Simon recording and releasing an eponymous sophomore album with a new trio featuring bassist Larry Grenadier and drummer Adam Cruz, along with occasional support from Turner on tenor saxophone and Milton Cardona on percussion. Simon expanded his ensemble beyond the post-bop piano trio format for 1998's La Bikina, including both Turner and Binney on saxophones and Diego Urcola on trumpet in addition to drummer/percussionist Cruz, bassist Ben Street, percussionist Pernel Saturnino, and Cardona contributing vocals. However, the ensuing years would see Simon continue to explore the possibilities of the piano-bass-drums trio with a series of recordings including 2003's The Process (with bassist John Patitucci and drummer Eric Harland); 2004's Simplicitas (with bassist Avishai Cohen and drummer Adam Cruz); and 2006's Unicity, 2009's Poesía, and 2013's Trio Live in New York at Jazz Standard (all with Patitucci and drummer Brian Blade).\r\nMeanwhile, Simon and Binney co-founded the collaborative creative jazz quartet Afinidad in 2000; the band (with bassist Scott Colley and drummer Brian Blade) released an eponymous debut in 2001 and Océanos in 2007. In 2003 Simon founded Ensemble Venezuela, an ambitious project melding creative jazz with the traditional musics of his home country, and in 2005 he received a Chamber Music America commission to compose Venezuelan Suite for the ensemble. Simon assembled ten musicians (including saxophonist Turner and drummer Cruz) from the United States, Venezuela, and Colombia to record the suite at Brooklyn's Systems Two studio in 2012; the album Venezuelan Suite was released by the Sunnyside label in January 2014. Simon is also a member of the SF Jazz Collective."
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "moods": [
+    {
+      "name": "Fiery",
+      "weight": 5
+    },
+    {
+      "name": "Lively",
+      "weight": 5
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Soothing",
+      "weight": 5
+    },
+    {
+      "name": "Relaxed",
+      "weight": 4
+    },
+    {
+      "name": "Knotty",
+      "weight": 6
+    },
+    {
+      "name": "Complex",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Whimsical",
+      "weight": 9
+    },
+    {
+      "name": "Intimate",
+      "weight": 9
+    },
+    {
+      "name": "Literate",
+      "weight": 4
+    },
+    {
+      "name": "Reflective",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 6
+    },
+    {
+      "name": "Detached",
+      "weight": 8
+    },
+    {
+      "name": "Smooth",
+      "weight": 9
+    },
+    {
+      "name": "Cerebral",
+      "weight": 7
+    },
+    {
+      "name": "Sentimental",
+      "weight": 6
+    },
+    {
+      "name": "Dramatic",
+      "weight": 5
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 8
+    },
+    {
+      "name": "Ambitious",
+      "weight": 5
+    },
+    {
+      "name": "Elaborate",
+      "weight": 8
+    },
+    {
+      "name": "Reserved",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Modal Music",
+      "weight": 7
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Afro-Cuban Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 4
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Global Jazz",
+      "weight": 7
+    }
+  ],
+  "similars": [
+    {
+      "name": "Horace Parlan",
+      "weight": 8
+    },
+    {
+      "name": "Benny Green",
+      "weight": 8
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 9
+    },
+    {
+      "name": "Adam Makowicz",
+      "weight": 9
+    },
+    {
+      "name": "James Williams",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "Kenny Drew",
+      "weight": 8
+    },
+    {
+      "name": "Art Tatum",
+      "weight": 8
+    },
+    {
+      "name": "Geoffrey Keezer",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Tete Montoliu",
+  "bio": [
+    "Blind Spanish jazz pianist who established an international reputation as a gifted soloist with great skill.",
+    "An outstanding veteran pianist from Spain, Tete Montoliu was born blind. He learned to read music in Braille when he was seven and developed impressive technique on piano. He recorded with Lionel Hampton in 1956, had his first session as a leader in 1958, and played with the touring Roland Kirk in 1963. Through the years, he also worked with such visiting Americans as Kenny Dorham, Dexter Gordon, Ben Webster, Lucky Thompson, and even Anthony Braxton. Tete Montoliu's visits to the U.S. were very infrequent, but his SteepleChase albums (starting in 1971) are generally available; he also cut one date for Contemporary (1979) and recorded for Enja and Soul Note.",
+    "Blind from birth, pianist Tete Montoliu studied classical music as a child, but in his early-teens started listening to the American jazz records issued by the La Vos de su Amo label, in particular artists such as Art Tatum, Earl Hines and Bud Powell. He began playing with the American tenor Don Byas, a family houseguest, when he was 13. By the mid-1950s he was sitting in with visiting American artists, notably Lionel Hampton. In the late-'60s he played in New York, establishing an international reputation as a gifted soloist, and would continue to work with such jazz luminaries as Ben Webster, Anthony Braxton, Rahsaan Roland Kirk, and Dexter Gordon. He led a series of talented trios from the mid-'70s onwards, and remained active until his death in 1997."
+  ]
+}

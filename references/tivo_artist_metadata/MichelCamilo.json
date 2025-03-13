@@ -1,0 +1,81 @@
+{
+  "moods": [
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 6
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 8
+    },
+    {
+      "name": "Summery",
+      "weight": 8
+    },
+    {
+      "name": "Joyous",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Keyboard",
+      "weight": 2
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 4
+    },
+    {
+      "name": "Latin Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Global Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Chick Corea",
+      "weight": 9
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 8
+    },
+    {
+      "name": "Gonzalo Rubalcaba",
+      "weight": 7
+    },
+    {
+      "name": "Tete Montoliu",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Michel Camilo",
+  "bio": [
+    "Technically brilliant Dominican Republican pianist and composer who blends Caribbean styles with American jazz.",
+    "An exciting and high-powered virtuoso pianist, Michel Camilo is a Grammy Award-winning performer known for his cross-pollinated mix of Latin, jazz, and classical styles. Born in 1954 in Santo Domingo, Dominican Republic, Camilo came from a very musical family (all nine of his uncles were musicians). Originally playing accordion, he switched to piano around age nine when he also began his formal music studies. By the time he was 16 years old, Camilo was playing with the National Symphony Orchestra of the Dominican Republic. After moving to New York in 1979, his song \"Why Not?\" became a hit for the Manhattan Transfer and caught on as a standard, and \"Caribe\" entered the repertoire of Dizzy Gillespie. \r\nCamilo, who worked with Paquito d'Rivera's band for three years (cutting an album with \"Why Not?\" as the title cut), recorded for Electric Bird (sessions reissued by Evidence) and Columbia, and worked as a leader beginning with his self-titled album in 1988; the album remained at the top of the jazz charts for ten weeks straight. Camilo had the attention of both critics and Latin jazz fans alike. Another standout in his catalog was 1993's Rendezvous, with bassist Anthony Jackson and drummer Dave Weckl. Camilo also added film composer to his résumé with two scores: Amo Tu Cama Rica in 1991 and Two Much in 1996. In 1997, he was percussionist Giovanni Hidalgo's collaborator on the stellar Hands of Rhythm.\r\nIn 2000, he was one of the featured artists in director Fernando Trueba's documentary Calle 54. That same year he and flamenco guitarist Tomatito won Best Latin Jazz Album at the first Latin Grammy Awards for their collaborative album Spain. (They issued a sequel entitled Spain Again in 2006.) In 2002, the pianist received acclaim for Triangulo, with Jackson on bass and Horatio \"El Negro\" Hernandez in the drummer's chair. Also in 2002, Camilo collaborated with Leonard Slatkin and the BBC Symphony Orchestra on his Piano Concerto; Suite for Piano, Strings & Harp; Caribe. In 2006, he and Tomatito got together again for Spain Again, and a year later he released his final date for the Telarc label, the lauded Spirit of the Moment. In 2009, Caribe: Michel Camilo Big Band, an audio-video concert document, was released in Japan. \r\nIn 2011, Camilo released the trio album Mano a Mano with Hidalgo and bassist Charles Flores for Emarcy before undertaking another world tour that included many festivals. He returned to the recording studio with What's Up?, a solo piano offering, on the revived OKeh label in 2013. Three years later, Camilo re-teamed with Tomatito to issue their third collaboration, Spain Forever, covering music by a wide variety of composers including Ennio Morricone, Astor Piazzolla, Egberto Gismonti, Charlie Haden, Luis Bonfa, Django Reinhardt, Chick Corea, and Erik Satie. The concert album Live in London, featuring Camilo in a solo setting at London's Queen Elizabeth Hall, appeared in 2017. The full-band Latin jazz outing, Essence, appeared in June of 2019."
+  ]
+}

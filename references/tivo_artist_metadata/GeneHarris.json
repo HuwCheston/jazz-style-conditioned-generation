@@ -1,0 +1,190 @@
+{
+  "moods": [
+    {
+      "name": "Earnest",
+      "weight": 9
+    },
+    {
+      "name": "Bright",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Greasy",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Playful",
+      "weight": 9
+    },
+    {
+      "name": "Organic",
+      "weight": 9
+    },
+    {
+      "name": "Precious",
+      "weight": 7
+    },
+    {
+      "name": "Cheerful",
+      "weight": 7
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 9
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Reflective",
+      "weight": 7
+    },
+    {
+      "name": "Provocative",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Earthy",
+      "weight": 9
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Street-Smart",
+      "weight": 7
+    },
+    {
+      "name": "Relaxed",
+      "weight": 7
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Stately",
+      "weight": 7
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 9
+    },
+    {
+      "name": "Gritty",
+      "weight": 7
+    },
+    {
+      "name": "Rollicking",
+      "weight": 7
+    },
+    {
+      "name": "Celebratory",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Soul Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Blues",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Ray Bryant",
+      "weight": 9
+    },
+    {
+      "name": "Junior Mance",
+      "weight": 9
+    },
+    {
+      "name": "Ahmad Jamal",
+      "weight": 9
+    },
+    {
+      "name": "Ramsey Lewis",
+      "weight": 9
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 8
+    },
+    {
+      "name": "Monty Alexander",
+      "weight": 6
+    }
+  ],
+  "tivo_artist_name": "Gene Harris",
+  "bio": [
+    "Founder of the Three Sounds as well as a leader on his own, with a warm, bluesy approach to jazz piano that fit well with the soul-jazz scene.",
+    "One of the most accessible of all jazz pianists, Gene Harris' soulful style (influenced by Oscar Peterson and containing the blues-iness of a Junior Mance) was immediately likable and predictably excellent. After playing in an Army band (1951-1954), he formed a trio with bassist Andy Simpkins and drummer Bill Dowdy which was, by 1956, known as the Three Sounds. The group was quite popular, and recorded regularly during 1956-1970 for Blue Note and Verve. Although the personnel changed and the music became more R&B-oriented in the early '70s, Harris retained the Three Sounds name for his later Blue Note sets. He retired to Boise, ID, in 1977, and was largely forgotten when Ray Brown persuaded him to return to the spotlight in the early '80s. Harris worked for a time with the Ray Brown Trio and led his own quartets in the years to follow, recording regularly for Concord and heading the Phillip Morris Superband on a few tours; 1998's Tribute to Count Basie even earned a Grammy nomination. While awaiting a kidney transplant, he died on January 16, 2000, at the age of 66.",
+    "Pianist Gene Harris had a warm, earthy, bluesy approach to jazz piano that fit right in with the soul jazz scene and was popular beyond it. Based in the style of Oscar Peterson but favoring the bluesy fervor of Junior Mance and Bobby Timmons, Harris led the highly successful trio the Three Sounds up until the beginning of the ‘70s. He then retired from music until the bassist Ray Brown convinced him to join  his own trio in the early ‘80s. Though he died in 2000, Harris possessed a genial yet substantial style that continues to transcend eras and trends."
+  ]
+}

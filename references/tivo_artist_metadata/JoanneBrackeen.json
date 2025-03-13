@@ -1,0 +1,120 @@
+{
+  "moods": [
+    {
+      "name": "Dramatic",
+      "weight": 9
+    },
+    {
+      "name": "Playful",
+      "weight": 9
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Ambitious",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Complex",
+      "weight": 9
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 9
+    },
+    {
+      "name": "Earnest",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Intimate",
+      "weight": 5
+    },
+    {
+      "name": "Refined",
+      "weight": 5
+    },
+    {
+      "name": "Reserved",
+      "weight": 5
+    },
+    {
+      "name": "Elegant",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Progressive Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Kenny Barron",
+      "weight": 9
+    },
+    {
+      "name": "Jessica Williams",
+      "weight": 8
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 8
+    },
+    {
+      "name": "Eric Reed",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Joanne Brackeen",
+  "bio": [
+    "Joanne Brackeen is a gifted pianist and composer whose harmonically advanced, creatively complex, and rhythmically adventuresome music greatly enhanced the development of jazz during the closing decades of the 20th century. Born Joanne Grogan in Ventura, CA on July 26, 1938, she was mostly self-taught but did study at the Los Angeles Conservatory of Music. Although her earliest inspiration was pop pianist Frankie Carle, her life was permanently altered by the music of Charlie Parker and she rapidly developed into an aspiring jazz pianist. By the late '50s, in fact, she was gigging with saxophonists Teddy Edwards, Dexter Gordon, Harold Land, Charles Lloyd, and Charles Brackeen, a friend of trumpeter Don Cherry and drummer Ed Blackwell. After getting married, the two relocated to New York City in 1965 and were eventually divorced, after which she raised their four children even as her artistry blossomed under the influence of McCoy Tyner, Ornette Coleman, and Chick Corea.\r\nBetween 1965 and 1968, Joanne Brackeen appeared on five different albums released under the name of soul-jazz vibraphonist Freddie McCoy. After working with trumpeter Woody Shaw and saxophonist David Liebman she became the first woman ever to gig and record as a member of Art Blakey's Jazz Messengers (1969-1972), and can be heard on Blakey's album Catalyst along with trumpeter Bill Hardman and saxophonist Carlos Garnett. From 1972-1974 she worked with saxophonists Joe Henderson, Joe Farrell, and Sonny Red, as well as mouth organist Toots Thielemans. She began releasing albums under her own name in 1975 while collaborating with saxophonists Sonny Stitt and Stan Getz, with whom she was recorded in live performance at Copenhagen's Cafe Montmartre in 1977. In 1982 she assumed greater control over her career by becoming her own manager.\r\nFor decades Brackeen's trios helped to define the steadily evolving tradition of modern jazz as she sought out musicians whose creative integrity and improvisational facility matched her own, such as bassists Niels-Henning Ørsted Pedersen, Rufus Reid, Cecil McBee, Clint Houston, and Eddie Gomez, an ex-member of the Bill Evans Trio who became one of her preferred collaborators. Brackeen's choice of musical company has always been unwaveringly excellent, and has included drummers Jack DeJohnette, Al Foster, Idris Muhammad, Roy Haynes, and Billy Hart (like Gomez a trusted ally whose involvement with Brackeen's ensembles spans decades). Brackeen's guitarists have included Ryo Kawasaki, John Abercrombie, Earl Klugh, and Joshua Breakstone; she has made great music with trumpeters Freddie Hubbard, Terence Blanchard, and John McNeil; with flugelhornist Ed Sarath, and with saxophonists Gary Bartz, Tom Scott, Michael Brecker, Bob Berg, Glen Hall, Lew Tabackin, Branford Marsalis, Donald Harrison, and Chris Potter, as well as vocalist Kurt Elling.\r\nIn her maturity Brackeen achieved greater recognition as a composer and as a solo performer, even while continuing to record with some of the most exciting and creative musicians on the scene. During the '90s her fascination with Brazilian music resulted in Breath of Brazil (released in 1991), Brasil from the Inside, an album released in 1992 with guitarist Romero Lubambo, bassist Nilson Matta, and drummer Duduka da Fonseca (a team that became internationally known as the Trio da Paz), and Take a Chance, a quartet offering that appeared in 1993. In 1994 she joined saxophonist Ivo Perelman on his imaginatively stoked tribute to composer Heitor Villa-Lobos, Man of the Forest. Other Brazilian composers whose works have inspired Brackeen are Antonio Carlos Jobim, Milton Nascimento, Egberto Gismonti, and Gilberto Gil. In 2001 Brackeen recorded Eyes of the Elders with saxophonist Talib Qadir Kibwe, an Abdullah Ibrahim alumnus now operating under the name T.K. Blue, and with veteran multi-instrumentalist Makanda Ken McIntyre on what was unfortunately to be his very last album, New Beginning. A survivor of many years in an economically challenging and at times unhealthy working environment, Joanne Brackeen is an internationally acclaimed improvising artist and a respected educator at the Berklee College of Music."
+  ]
+}

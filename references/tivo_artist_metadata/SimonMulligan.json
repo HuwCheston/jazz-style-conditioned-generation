@@ -1,0 +1,24 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Chamber Music",
+      "weight": 7
+    },
+    {
+      "name": "Classical",
+      "weight": 9
+    },
+    {
+      "name": "Keyboard",
+      "weight": 9
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "Simon Mulligan",
+  "bio": []
+}

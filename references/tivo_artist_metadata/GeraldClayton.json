@@ -1,0 +1,146 @@
+{
+  "moods": [
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Detached",
+      "weight": 6
+    },
+    {
+      "name": "Innocent",
+      "weight": 3
+    },
+    {
+      "name": "Gentle",
+      "weight": 4
+    },
+    {
+      "name": "Light",
+      "weight": 6
+    },
+    {
+      "name": "Bright",
+      "weight": 8
+    },
+    {
+      "name": "Intimate",
+      "weight": 5
+    },
+    {
+      "name": "Elegant",
+      "weight": 7
+    },
+    {
+      "name": "Dreamy",
+      "weight": 5
+    },
+    {
+      "name": "Delicate",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 4
+    },
+    {
+      "name": "Relaxed",
+      "weight": 5
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Smooth",
+      "weight": 6
+    },
+    {
+      "name": "Stylish",
+      "weight": 6
+    },
+    {
+      "name": "Playful",
+      "weight": 6
+    },
+    {
+      "name": "Restrained",
+      "weight": 3
+    },
+    {
+      "name": "Sparkling",
+      "weight": 8
+    },
+    {
+      "name": "Reserved",
+      "weight": 4
+    },
+    {
+      "name": "Atmospheric",
+      "weight": 8
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 6
+    },
+    {
+      "name": "Modern Creative",
+      "weight": 7
+    }
+  ],
+  "similars": [
+    {
+      "name": "Benny Green",
+      "weight": 7
+    },
+    {
+      "name": "Brad Mehldau",
+      "weight": 7
+    },
+    {
+      "name": "Jason Moran",
+      "weight": 6
+    },
+    {
+      "name": "Joey Alexander",
+      "weight": 8
+    },
+    {
+      "name": "Cyrus Chestnut",
+      "weight": 5
+    },
+    {
+      "name": "Adam Birnbaum",
+      "weight": 7
+    },
+    {
+      "name": "Ethan Iverson",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Gerald Clayton",
+  "bio": [
+    "Lauded post-bop-leaning jazz pianist and composer who is also the son of bassist John Clayton.",
+    "Jazz pianist Gerald Clayton is an adept improviser and composer with a bent toward post-bop and straight-ahead jazz. In addition to Clayton's own recordings and those with his father, bassist John Clayton, he has helped to shape a number of high-profile jazz projects including albums by Roberta Gambarini, Diana Krall, Roy Hargrove, and Ambrose Akinmusire. His own trio dates, including 2009's Two Shade and 2011's Bond: The Paris Sessions (with bassist Joe Sanders and drummer Justin Brown), established his reputation as both a composer and arranger of great skill. The latter album earned a Grammy nomination, as did 2013's Life Forum, which found him expanding his group with saxophonists Logan Richardson and Dayna Stephens, Akinmusire on trumpet, and vocalists Gretchen Parlato and Sachal Vasandani. A larger group also helmed 2017's charting Tributary Tales, featuring saxophonist Ben Wendel, percussionist Henry Cole, and Carl Hancock Rux joining Vasandani on overtone singing. More Grammy nominations arrived with 2019's Happening: Live at the Village Vanguard. His debut for Blue Note Records, the live album paved the way for his first studio date for the storied label, 2022's Bells on Sand, which featured appearances by his father, John Clayton, saxophonist Charles Lloyd, and others.\r\nThe son of bassist/bandleader John Clayton, Gerald was born in the Netherlands but grew up in Los Angeles, California. Interested in music from a young age, he began studying piano at age seven and eventually graduated from the Los Angeles County High School for the Arts, after which he earned a music degree from the USC Thornton School of Music. In 2006, Clayton took second place in the prestigious Thelonious Monk Institute of Jazz Piano Competition. Based out of New York City, Clayton has performed with a bevy of name musicians including trumpeter Roy Hargrove and pianist/vocalist Diana Krall, as well as his father's Clayton-Hamilton Jazz Orchestra and the Clayton Brothers trio. He has received several Grammy nods, including a nomination for Best Instrumental Composition for the song \"Battle Circle\" on the Clayton Brothers' album New Song and Dance. \r\nClayton released his debut solo album, Two-Shade, in 2009, which garnered a Grammy nomination for Best Improvised Jazz Solo for his take on Cole Porter's \"All of You.\" In 2011 he delivered his sophomore album, Bond: The Paris Sessions, which hit number 12 on the traditional jazz chart and picked up a Grammy nomination for Best Jazz Instrumental Album. That same year, he appeared on trumpeter Ambrose Akinmusire's critically lauded sophomore album, When the Heart Emerges Glistening. Akinmusire then returned the favor, appearing on Clayton's third solo album and first for Concord Records, Life Forum. An ambitious all-star recording, the album cracked the Top Ten of the jazz chart and earned Clayton yet another Grammy Award nomination for Best Jazz Instrumental Album. \r\nIn 2017 he made the move to Motéma Music for Tributary Tales, which featured contributions from saxophonists Logan Richardson, Ben Wendel, and Dayna Stephens, as well as vocalist Sachal Vasandani and poets Carl Hancock Rux and Aja Monet. Away from his solo work, the pianist has stayed busy making appearances on albums by Terri Lyne Carrington, Peter Bernstein, Avishai Cohen, and others. \r\nIn the spring of 2019, Clayton signed to Blue Note Records and celebrated by playing six nights at the storied Village Vanguard with a quintet that included his longtime collaborators Sanders, Brown, and Richardson, with Walter Smith III on tenor saxophone. Those performances were compiled for Happening: Live at the Village Vanguard. Released during the summer of 2020 it picked up two Grammy nominations, including Best Improvised Jazz Solo for \"Celia.\" The pianist's second Blue Note album and first studio date for the label, Bells on Sand, arrived in April 2022 and featured contributions from his father John Clayton, as well as saxophonist Charles Lloyd, Portuguese vocalist MARO, and drummer Justin Brown.",
+    "Jazz pianist Gerald Clayton is an adept improviser and composer with a bent toward post-bop and straight-ahead jazz. The son of bassist John Clayton, he has helped to shape a number of high-profile jazz projects including albums by Diana Krall, Roy Hargrove, and Ambrose Akinmusire. His trio dates, including 2009's Two Shade and 2011's Bond: The Paris Sessions, established his reputation as a skilled composer and arranger. The latter album earned Clayton a Grammy nomination, as did 2013's Life Forum, which found him expanding his group with trumpeter Akinmusire, saxophonists Logan Richardson, and vocalist Gretchen Parlato. A larger group also performed 2017's charting Tributary Tales. More Grammy nominations arrived with 2019's Happening: Live at the Village Vanguard. Clayton's debut for Blue Note Records, the live album paved the way for his first studio date for the storied label, 2022's Bells on Sand, which featured appearances by saxophonist Charles Lloyd and others."
+  ]
+}

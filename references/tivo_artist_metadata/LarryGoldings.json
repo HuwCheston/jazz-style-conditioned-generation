@@ -1,0 +1,190 @@
+{
+  "moods": [
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Calm/Peaceful",
+      "weight": 7
+    },
+    {
+      "name": "Smooth",
+      "weight": 6
+    },
+    {
+      "name": "Sensual",
+      "weight": 6
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 6
+    },
+    {
+      "name": "Intimate",
+      "weight": 7
+    },
+    {
+      "name": "Bright",
+      "weight": 7
+    },
+    {
+      "name": "Earthy",
+      "weight": 8
+    },
+    {
+      "name": "Fun",
+      "weight": 7
+    },
+    {
+      "name": "Poignant",
+      "weight": 7
+    },
+    {
+      "name": "Thoughtful",
+      "weight": 6
+    },
+    {
+      "name": "Wry",
+      "weight": 5
+    },
+    {
+      "name": "Confident",
+      "weight": 9
+    },
+    {
+      "name": "Elegant",
+      "weight": 5
+    },
+    {
+      "name": "Lively",
+      "weight": 8
+    },
+    {
+      "name": "Reflective",
+      "weight": 8
+    },
+    {
+      "name": "Warm",
+      "weight": 8
+    },
+    {
+      "name": "Brassy",
+      "weight": 5
+    },
+    {
+      "name": "Earnest",
+      "weight": 8
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Playful",
+      "weight": 8
+    },
+    {
+      "name": "Searching",
+      "weight": 8
+    },
+    {
+      "name": "Witty",
+      "weight": 6
+    },
+    {
+      "name": "Cerebral",
+      "weight": 5
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 6
+    },
+    {
+      "name": "Refined",
+      "weight": 5
+    },
+    {
+      "name": "Uplifting",
+      "weight": 7
+    },
+    {
+      "name": "Boisterous",
+      "weight": 5
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Energetic",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Rousing",
+      "weight": 8
+    },
+    {
+      "name": "Wistful",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Contemporary Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Standards",
+      "weight": 5
+    },
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Brad Mehldau",
+      "weight": 7
+    }
+  ],
+  "tivo_artist_name": "Larry Goldings",
+  "bio": [
+    "A lauded post-bop pianist and organist known for his soulful trio work and versatility outside the jazz genre.",
+    "A versatile and highly regarded pianist, Larry Goldings is known for his balance of hard-swinging, harmonically nuanced post-bop and funky organ jazz. Emerging in the early '90s, Goldings established himself as a premier soloist on the New York scene, often playing in his trio with guitarist Peter Bernstein and drummer Bill Stewart. He has issued a stream of highly regarded albums, including 1995's Whatever It Takes, 2002's Sweet Science, and 2007's Grammy-nominated Saudades with drummer Jack DeJohnette and guitarist John Scofield. He is a longtime touring member of James Taylor's band, and has been sought out by a wide array of performers, including Norah Jones, Madeleine Peyroux, Maceo Parker, Sia, Charlie Haden, and others. Along with hardcore jazz dates, like 2022's Perpetual Pendulum, he has expanded his approach, incorporating his love of classical and electronic sounds on 2021's Earthshine and his 2024 collaboration with tap dancer Melinda Sullivan, Big Foot.\r\nBorn in Boston, Massachusetts in 1968, Goldings took classical piano lessons until age 12, encouraged by his father, a classical aficionado. It was while in high school at Concord Academy that he became interested in jazz. Around this time, a friend of his father's introduced him to pianist Dave McKenna, whose music had a profound influence on Goldings. From there, he embarked on a deeper study of jazz, listening to artists like Erroll Garner, Oscar Peterson, Red Garland, and Bill Evans. He also sought out private lessons with pianists Ran Blake and Keith Jarrett. \r\nAfter high school, he enrolled in the jazz program at New York's The New School, where he further honed his skills studying with Jaki Byard and Fred Hersch. It was during this period that he accompanied pianist Roland Hanna to Copenhagen for a three-day series of private concerts, where he performed with Sarah Vaughan, Kenny Burrell, Tommy Flanagan, Hank Jones, Harry \"Sweets\" Edison, and Al Cohn. Also prior to graduating, Goldings toured with singer Jon Hendricks, an association that led to work with guitarist Jim Hall. \r\nGraduating in 1990, he began leading his own trio with guitarist Peter Bernstein and drummer Bill Stewart, playing regularly at Augie's Jazz Bar (later named Smoke). In 1991, he made his debut as a leader with Intimacy of the Blues, which featured his trio along with guest saxophonist David \"Fathead\" Newman. A second trio effort, Light Blue, appeared a year later, followed by the bossa nova-tinged organ session Caminhos Cruzados, which included several tracks with saxophonist Joshua Redman.\r\nIn 1995, Goldings signed with Warner Bros. and released two highly regarded organ-centric albums, starting with Whatever It Takes. A funky, hard-bop-leaning date, it featured his trio with Bernstein and Stewart along with guest spots from saxophonists Maceo Parker, David Sanborn, and Redman, as well as trombonist Fred Wesley. Released in 1996, Big Stuff showcased a similar sound, and found the pianist joined by Bernstein, veteran drummer Idris Muhammad, and guitarist Kurt Rosenwinkel. For his final Warner Bros. album, 1997's Awareness, Goldings shifted back to piano, working with longtime Keith Jarrett associates bassist Larry Grenadier and drummer Paul Motian. \r\nGoldings then moved to Palmetto, issuing the trio album As One with Bernstein and Stewart. Several more albums followed for the indie label, including the Hammond organ-soaked Sweet Science and 2006's aptly named Quartet with trumpeter/cornetist John Sneider, bassist Ben Allison, and drummer Matt Wilson. \r\nAlso during this period, he joined drummer Jack DeJohnette and guitarist John Scofield for a live 2004 concert at London's Queen Elizabeth's Hall. Released as Saudades in 2006, it earned Goldings a Grammy nomination for Best Instrumental Jazz Album of the Year. In 2010, he joined the Dutch Metropole Orkest for two albums, When Larry Met Harry with saxophonist Harry Allen and Scenes from a Dream with Peter Erskine and Chris Minh Doky. \r\nThe solo piano album In My Room followed in 2011. That same year, he rejoined Bernstein and Stewart for the concert album Live at Smalls. The trio were also together for 2014's Ramshackle Serenade. He then guested with Ron Carter, Gerry Gibbs, and Kenny Barron on We're Back. In 2017, he joined John Mayer on the singer/songwriter's The Search for Everything tour, and returned a year later with his own trio album, Toy Tunes, with Bernstein and Stewart. \r\nMore stylistically wide-ranging projects followed, including two collaborations with Pomplamoose singer/songwriter Jack Conte's Scary Pockets group, Scary Goldings and The Ego Trap. He also joined forces with singer/guitarist Kathleen Grace for 2020's Tie Me To You. In 2022, he once again returned to his longtime organ trio with guitarist Peter Bernstein and drummer Bill Stewart for their Smoke Sessions album Perpetual Pendulum. Also that year, he showcased his love of classical and electronic production on Earthshine. A similary sonically ambitious synth-infused sound marked 2024's Big Foot, his collaboration with tap dancer Melinda Sullivan.",
+    "A versatile and highly regarded pianist, Larry Goldings is known for his balance of hard-swinging, harmonically nuanced post-bop and funky organ jazz. Emerging in the early '90s, he established himself as a premier soloist on the New York scene, often playing in his trio with guitarist Peter Bernstein and drummer Bill Stewart. Goldings has issued a stream of highly regarded albums, including 1995's Whatever It Takes, 2002's Sweet Science, and 2007's Grammy-nominated Saudades with drummer Jack DeJohnette and guitarist John Scofield. He is a longtime touring member of James Taylor's band, and has been sought out by a wide array of performers, including Norah Jones, Madeleine Peyroux, Maceo Parker, Sia, and Charlie Haden. Along with hardcore jazz dates, like 2022's Perpetual Pendulum, Goldings has expanded his approach, incorporating his love of classical and electronic sounds on 2021's Earthshine and his 2024 collaboration with tap dancer Melinda Sullivan, Big Foot."
+  ]
+}

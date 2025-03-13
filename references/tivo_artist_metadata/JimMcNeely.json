@@ -1,0 +1,76 @@
+{
+  "moods": [
+    {
+      "name": "Playful",
+      "weight": 5
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 5
+    },
+    {
+      "name": "Passionate",
+      "weight": 5
+    },
+    {
+      "name": "Exuberant",
+      "weight": 5
+    },
+    {
+      "name": "Gritty",
+      "weight": 5
+    },
+    {
+      "name": "Rollicking",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Hal Galper",
+      "weight": 8
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 9
+    },
+    {
+      "name": "Kenny Werner",
+      "weight": 9
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 9
+    },
+    {
+      "name": "Marcus Roberts",
+      "weight": 8
+    },
+    {
+      "name": "George Cables",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Jim McNeely",
+  "bio": [
+    "A harmonically advanced pianist and a developing arranger, Jim McNeely has had a few notable musical associations in his career. After graduating from the University of Illinois, McNeely had a stint with Ted Curson (1976-1978) and was an important member of the Mel Lewis Orchestra (1978-1984), Stan Getz's Quartet (1981-1985), and, during much of the 1990s, the Phil Woods Quintet. McNeely, who has also played with Bobby Watson, Art Farmer, Joe Henderson, and his own trios, in addition to writing for the Carnegie Hall Jazz Band, has led recording sessions for SteepleChase (1976), Gatemouth, Owl, and Concord."
+  ]
+}

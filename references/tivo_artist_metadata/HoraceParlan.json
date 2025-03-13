@@ -1,0 +1,130 @@
+{
+  "moods": [
+    {
+      "name": "Joyous",
+      "weight": 5
+    },
+    {
+      "name": "Elegant",
+      "weight": 3
+    },
+    {
+      "name": "Organic",
+      "weight": 6
+    },
+    {
+      "name": "Playful",
+      "weight": 5
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 6
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 5
+    },
+    {
+      "name": "Passionate",
+      "weight": 5
+    },
+    {
+      "name": "Rollicking",
+      "weight": 5
+    },
+    {
+      "name": "Confident",
+      "weight": 9
+    },
+    {
+      "name": "Earnest",
+      "weight": 8
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 6
+    },
+    {
+      "name": "Intimate",
+      "weight": 5
+    },
+    {
+      "name": "Smooth",
+      "weight": 9
+    },
+    {
+      "name": "Reflective",
+      "weight": 8
+    },
+    {
+      "name": "Sentimental",
+      "weight": 5
+    },
+    {
+      "name": "Warm",
+      "weight": 5
+    },
+    {
+      "name": "Light",
+      "weight": 9
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 4
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 9
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "Sonny Clark",
+      "weight": 8
+    },
+    {
+      "name": "James Williams",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "Kenny Drew",
+      "weight": 8
+    },
+    {
+      "name": "Mary Lou Williams",
+      "weight": 6
+    }
+  ],
+  "tivo_artist_name": "Horace Parlan",
+  "bio": [
+    "Pittsburgh pianist Horace Parlan triumphed over a physical disability to become internationally renowned hard bop stylist.",
+    "Horace Parlan overcame physical disability and thrived as a pianist despite it. His right hand was partially disabled by polio in his childhood, but Parlan made frenetic, highly rhythmic right-hand phrases part of his characteristic style, contrasting them with striking left-hand chords. He also infused blues and R&B influences into his style, playing in a stark, sometimes somber fashion. Parlan always cited Ahmad Jamal and Bud Powell as prime influences. He began playing in R&B bands during the '50s, joining Charles Mingus' group from 1957 to 1959 following a move from Pittsburgh to New York. Mingus aided his career enormously, both through his recordings and his influence. Parlan played with Booker Ervin in 1960 and 1961, then in the Eddie \"Lockjaw\" Davis-Johnny Griffin quintet in 1962. Parlan played with Rahsaan Roland Kirk from 1963 to 1966, and had a strong series of Blue Note recordings in the '60s. He left America for Copenhagen in 1973, and gained international recognition for some stunning albums on SteepleChase, including a pair of superb duet sessions with Archie Shepp. He also recorded with Dexter Gordon, Red Mitchell, Frank Foster, and Michal Urbaniak, and recorded extensively for Enja and Timeless. He died in Denmark in February 2017 at the age of 86.",
+    "Despite a childhood bout with polio that partially paralyzed his right hand, Pittsburgh pianist Horace Parlan became a prominent hard bop (yet forward-looking) stylist. He started his career in the 1950s with Charles Mingus, then partnered with some of the best saxophonists of the '60s: Johnny Griffin, Eddie \"Lockjaw\" Davis, and Rahsaan Roland Kirk. In the '70s, Parlan relocated to Denmark, dividing his time between leading his own groups and accompanying fellow expatriates such as Dexter Gordon along with European players like Michal Urbaniak. He died in Denmark in 2017 at the age of 86."
+  ]
+}

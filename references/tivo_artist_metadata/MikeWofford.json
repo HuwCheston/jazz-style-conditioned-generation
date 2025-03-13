@@ -1,0 +1,30 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Modern Creative",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "Mike Wofford",
+  "bio": [
+    "Despite leading a number of recording dates under his own name, pianist, composer, and arranger Mike Wofford was better known as a consummate accompanist, lending his skills to the music of such giants as Ella Fitzgerald, Sarah Vaughan, and Benny Carter. A native of San Antonio, TX, Wofford was raised in San Diego, CA, and gained his earliest professional experience at the famed Lighthouse club in nearby Hermosa Beach. There he played with the likes of James Moody, and later enlisted with the bands of Shelly Manne and Shorty Rogers; over the decades to come, he also worked in the company of Zoot Sims, Joe Pass, Kenny Burrell, Barney Kessel, Harry \"Sweets\" Edison, Eddie \"Cleanhead\" Vinson, Bud Shank, and countless others. While already a respected figure in jazz circles on the strength of such solo dates as 1966's Strawberry Wine and the following year's Summer Night, Wofford's visibility was raised considerably in 1979 when he, longtime friend and drummer Roy McCurdy, and bassist Andy Simpkins were tapped to back Sarah Vaughan. Wofford remained with the legendary singer for about a year, at which time he exited to pursue other projects, among them several recordings of Jerome Kern standards. By 1988, he was regularly performing with Benny Carter, and a year later appeared on All That Jazz, the final studio recording from Ella Fitzgerald. After touring with Fitzgerald until her 1994 retirement, Wofford signed on with Kenny Rankin; on occasion, he also continued leading his own sessions."
+  ]
+}

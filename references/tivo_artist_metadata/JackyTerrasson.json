@@ -1,0 +1,146 @@
+{
+  "moods": [
+    {
+      "name": "Complex",
+      "weight": 8
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 8
+    },
+    {
+      "name": "Reserved",
+      "weight": 6
+    },
+    {
+      "name": "Passionate",
+      "weight": 8
+    },
+    {
+      "name": "Quirky",
+      "weight": 6
+    },
+    {
+      "name": "Reflective",
+      "weight": 6
+    },
+    {
+      "name": "Elegant",
+      "weight": 6
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 6
+    },
+    {
+      "name": "Autumnal",
+      "weight": 7
+    },
+    {
+      "name": "Bittersweet",
+      "weight": 8
+    },
+    {
+      "name": "Wistful",
+      "weight": 7
+    },
+    {
+      "name": "Cathartic",
+      "weight": 7
+    },
+    {
+      "name": "Brooding",
+      "weight": 7
+    },
+    {
+      "name": "Dreamy",
+      "weight": 7
+    },
+    {
+      "name": "Calm/Peaceful",
+      "weight": 7
+    },
+    {
+      "name": "Earnest",
+      "weight": 7
+    },
+    {
+      "name": "Intimate",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Cosmopolitan",
+      "weight": 9
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Brad Mehldau",
+      "weight": 9
+    },
+    {
+      "name": "Jason Moran",
+      "weight": 8
+    },
+    {
+      "name": "Monty Alexander",
+      "weight": 9
+    },
+    {
+      "name": "Bill Charlap",
+      "weight": 8
+    },
+    {
+      "name": "Renee Rosnes",
+      "weight": 7
+    },
+    {
+      "name": "Marc Copland",
+      "weight": 6
+    },
+    {
+      "name": "Ethan Iverson",
+      "weight": 6
+    },
+    {
+      "name": "Geoffrey Keezer",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Jacky Terrasson",
+  "bio": [
+    "A straight-ahead jazz star since his debut in the early ‘90s.",
+    "Originally hailed as one of the bright young lions on the straight-ahead jazz scene of the 1990s, virtuoso pianist Jacky Terrasson developed into a sophisticated performer with eclectic stylistic taste. His feathery keyboard touch is coupled with a lot of power and passion, and a complete understanding of the blues and improvisation. Terrasson is also a gifted arranger, putting his own personal stamp on well-known tunes. He initially captured the public's attention winning the Thelonious Monk International Jazz Competition in 1993 and drew high praise from all corners of the jazz world for his debut, Jacky Terrasson, issued on Blue Note in 1995. Although he favors a trio, he has worked on more expansive projects, including 1997's Rendezvous with Cassandra Wilson, 2001's homage to his hometown A Paris..., and 2015's Take This with vocalist Sly Johnson.\r\nBorn in 1965 in Berlin to a French mother and an American father, Terrasson's distinctive piano style reflects his old and new influences. In his youth, he spent years studying and listening to recordings by Bud Powell, Bill Evans, and Thelonious Monk. He began playing piano at age five, and his parents were always playing classical music on the stereo. At age 11, he began listening intently to the Billie Holiday and Miles Davis records that belonged to his mother, and at that point he was hooked on playing jazz piano. He studied jazz at the Berklee College of Music in Boston with many other new traditionalists as classmates, including people like Danilo Perez. After graduation, he spent a year jamming at clubs in Chicago and New York before hitting the road, touring with ensembles led by his mentors, including Arthur Taylor and Betty Carter. \r\nIn 1993, he rose to acclaim winning the prestigious Thelonious Monk International Jazz Piano Competition. On the heels of his success, he made his Blue Note debut with 1995's Jacky Terrasson, a trio album featuring bassist Ugonna Okegwo and drummer Leon Parker. Among many other sessions, Terrasson performed and arranged on Jimmy Scott's 1996 release, Heaven, for Warner Bros. Terrasson continued to perform around the world as leader of his own trio, and made several European and Japanese tours. On his 1996 sophomore effort, Reach, he was again joined by bassist Okegwo and drummer Parker. He then paired with vocalist Cassandra Wilson for 1997's Rendezvous and returned the following year with a third trio date, Alive. \r\nReleased in 1999, What It Is was a boundary-pushing album emphasizing Terrasson's compositional skills as well as his technique. It also featured contribution by tenor saxophonist Michael Brecker, flutist Jay Collins, percussionist Mino Cinelu, and guitarist Adam Rodgers. A Paris, an homage to Terrasson's hometown, followed two years later. In 2002 he delivered Smile, a companion piece of sorts to A Paris. He then moved away from ensemble work with his 2007 solo piano album Mirror. Terrasson released the lively trio album Push in 2010, and he returned in 2012 with the eclectic album Gouache, featuring a handful of guest artists including clarinetist Michel Portal, trumpeter/flügelhornist Stephane Belmondo, vocalist Cecile McLorin Salvant (winner of the 2010 Thelonious Monk International Jazz Competition), and others. \r\nIn 2015, Terrasson made his Impulse! Records debut with Take This, which featured a collaboration with vocalist/beatboxer Sly Johnson, among others. The following year, Terrasson paired with trumpeter/flügelhornist Belmondo for the duo album Mother. Dedicated to the pianist's mother, who passed away just after he finished recording, the album featured a set of ballads and ruminative compositions including covers of songs by Charlie Haden, Dave Brubeck, Stevie Wonder, and others. The intimate trio album, 53, arrived in 2019 and found Terrasson returning to Blue Note.",
+    "Originally hailed as one of the bright young lions on the straight-ahead jazz scene of the 1990s, virtuoso pianist Jacky Terrasson developed into a sophisticated performer with eclectic stylistic taste. His feathery keyboard touch is coupled with a lot of power and passion, and a complete understanding of the blues and improvisation. Terrasson is also a gifted arranger, putting his own personal stamp on well-known tunes. He initially captured the public's attention winning the Thelonious Monk International Jazz Competition in 1993 and drew high praise from all corners of the jazz world for his debut, Jacky Terrasson, issued on Blue Note in 1995. Although he favors a trio, he has worked on more expansive projects, including 1997's Rendezvous with Cassandra Wilson, 2001's homage to his hometown A Paris..., and 2015's Take This with vocalist Sly Johnson. The intimate trio album 53 arrived in 2019."
+  ]
+}

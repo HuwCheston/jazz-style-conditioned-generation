@@ -1,0 +1,110 @@
+{
+  "moods": [
+    {
+      "name": "Celebratory",
+      "weight": 6
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Ambitious",
+      "weight": 7
+    },
+    {
+      "name": "Swinging",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 8
+    },
+    {
+      "name": "Sweet",
+      "weight": 6
+    },
+    {
+      "name": "Technical",
+      "weight": 8
+    },
+    {
+      "name": "Rollicking",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 8
+    },
+    {
+      "name": "Bravado",
+      "weight": 6
+    },
+    {
+      "name": "Uplifting",
+      "weight": 6
+    },
+    {
+      "name": "Reverent",
+      "weight": 6
+    }
+  ],
+  "genres": [
+    {
+      "name": "Jazz Instrument",
+      "weight": 6
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 8
+    },
+    {
+      "name": "Jazz",
+      "weight": 8
+    },
+    {
+      "name": "Piano Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 6
+    },
+    {
+      "name": "Soul Jazz",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Justin Kauflin",
+      "weight": 7
+    },
+    {
+      "name": "Gerald Clayton",
+      "weight": 7
+    },
+    {
+      "name": "Benny Green",
+      "weight": 7
+    },
+    {
+      "name": "Vijay Iyer",
+      "weight": 7
+    },
+    {
+      "name": "Adam Birnbaum",
+      "weight": 7
+    }
+  ],
+  "tivo_artist_name": "Joey Alexander",
+  "bio": [
+    "Acclaimed Indonesian-born jazz piano prodigy who made his recorded debut at age 11.",
+    "Indonesian-born pianist Joey Alexander is an extremely gifted jazz musician who first came to the public's attention as a ten-year-old prodigy. Championed by veterans, including his idol Herbie Hancock and Wynton Marsalis, Alexander emerged to wide acclaim in 2014, earning several Grammy nominations 2015's My Favorite Things and 2016's Countdown (among others), both of which also hit number one on the Billboard Jazz Albums chart. Alexander has continued to mature as an improviser and composer, leading his trio with veteran bassist Larry Grenadier and drummer Kendrick Scott. He has also regularly landed in the jazz Top 20 as on 2018's Eclipse, 2020's Warna, and 2022's Origin. On 2023's Continuance, Alexander was joined by trumpeter Theo Croker and further pushed his sound, playing Fender Rhodes and Mellotron.\r\nBorn Josiah Alexander Sila in Denpasar, Bali, Indonesia in 2003, Alexander was introduced to music by his father, an amateur musician and jazz aficionado. By age six, he had taught himself how to play piano by listening to albums by Louis Armstrong, Thelonious Monk, Bill Evans, and others. Without formal training, and initially only playing on a small keyboard his father had given him, Alexander achieved a high degree of proficiency. By age eight, he was jamming with local professionals, and in 2012 he had the opportunity to play for Herbie Hancock, who was visiting Jakarta, Indonesia as a UNESCO Goodwill Ambassador. The following year, Alexander won first place in the Master Jam-Fest in Odessa, Ukraine. \r\nIn 2014, he relocated with his family to New York City, where Wynton Marsalis invited him to perform at a Jazz at Lincoln Center gala. Several more high-profile shows followed, including appearances at the Apollo Theater, Juilliard, and the Copenhagen Jazz Festival. Many of these performances were widely covered, with viral videos of the proficient Alexander popping up online. On the heels of this recognition, he released his debut album, 2015's Jason Olaine-produced My Favorite Things, on the Motema Music label. Recorded when Alexander was only 11, the album featured the pianist backed by bassists Larry Grenadier and Russell Hall, drummers Sammy Miller and Ulysses Owens, Jr., and trumpeter Alphonso Horne. Featuring eight standards and one Alexander original, the album topped the jazz albums chart at number 59 on the Billboard 200. It also garnered Grammy nominations for Best Instrumental Jazz Album and Best Improvised Jazz Solo. \r\nA year later, he again topped the Billboard Jazz Albums chart with his sophomore recording, Countdown. Produced by Jason Olaine, the album featured contributions from bassist Grenadier, drummer Owens, and saxophonist Chris Potter. For his rendition of the John Coltrane-penned title track, Alexander earned a 2017 Grammy nomination for Best Improvised Jazz Solo. Also in 2017, he issued the concert album Joey.Monk.Live!, marking Thelonious Monk's centennial. \r\nAlexander's third studio album, Eclipse, arrived in 2018 and hit number three on the jazz chart. Recorded over a three-day period that began on the day of the 2017 solar eclipse, the album featured the pianist backed by his rhythm section of bassist Reuben Rogers and drummer Eric Harland. Also featured was a guest appearance by saxophonist Joshua Redman. Later that year he released the holiday EP A Joey Alexander Christmas. \r\nIn 2020, he made his major-label debut for Verve with Warna. The album showcased his trio, this time featuring veteran bassist Larry Grenadier and drummer Kendrick Scott. He also augmented several tracks with Venezuelan-born percussionist Luisito Quintero and flutist Anne Drummond. It became his fifth album to reach the Top 20 of the Billboard jazz chart. With 2022's Origin, Alexander moved to the Mack Avenue label, expanding his Warna trio with acclaimed saxophonist Chris Potter and guitarist Gilad Hekselman. More sonic experimentation marked 2023's Continuance, which found Alexander playing the Fender Rhodes and Mellotron, as well as piano. It also featured contributions by trumpeter Theo Croker.",
+    "Indonesian-born pianist Joey Alexander is an extremely gifted jazz musician who first came to the public's attention as a ten-year-old prodigy. Championed by veterans including his idol Herbie Hancock and Wynton Marsalis, Alexander emerged to wide acclaim in 2014, earning several Grammy nominations, including for 2015's My Favorite Things and 2016's Countdown, both of which also hit number one on the Billboard Jazz Albums chart. Alexander has continued to mature as an improviser and composer, leading his trio with veteran bassist Larry Grenadier and drummer Kendrick Scott. He has also regularly landed in the jazz Top 20 with albums such as 2018's Eclipse, 2020's Warna, and 2022's Origin. On 2023's Continuance, Alexander was joined by trumpeter Theo Croker and further pushed his sound, playing Fender Rhodes and Mellotron."
+  ]
+}

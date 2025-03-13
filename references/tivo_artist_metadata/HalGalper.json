@@ -1,0 +1,110 @@
+{
+  "moods": [
+    {
+      "name": "Elegant",
+      "weight": 5
+    },
+    {
+      "name": "Atmospheric",
+      "weight": 6
+    },
+    {
+      "name": "Refined",
+      "weight": 6
+    },
+    {
+      "name": "Organic",
+      "weight": 8
+    },
+    {
+      "name": "Complex",
+      "weight": 9
+    },
+    {
+      "name": "Intimate",
+      "weight": 6
+    },
+    {
+      "name": "Smooth",
+      "weight": 7
+    },
+    {
+      "name": "Relaxed",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 8
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Neo-Bop",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Kenny Barron",
+      "weight": 9
+    },
+    {
+      "name": "James Williams",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "Stanley Cowell",
+      "weight": 9
+    },
+    {
+      "name": "George Cables",
+      "weight": 8
+    },
+    {
+      "name": "John Hicks",
+      "weight": 9
+    },
+    {
+      "name": "Cedar Walton",
+      "weight": 7
+    },
+    {
+      "name": "Bobby Timmons",
+      "weight": 6
+    },
+    {
+      "name": "Ted Rosenthal",
+      "weight": 6
+    }
+  ],
+  "tivo_artist_name": "Hal Galper",
+  "bio": [
+    "Fine bebop-rooted pianist with fluid and invigorating playing, and solos distinguished by adventurousness and sophistication.",
+    "Jazz pianist, composer, and educator Hal Galper is among the finest post-bop performers, known for his fluid solo performances and work with icons like Chet Baker, Phil Woods, and the Brecker Brothers. An East Coast native, Galper first came to the public's attention playing with Baker's quartet in the mid-'60s before launching his own career with albums like 1972's The Guerilla Band. From there, he played with a string of marquee artists like Lee Konitz, Tom Harrell, and Woods, while also releasing his own largely acoustic piano albums, including 1992's Tippin', 2009's Art-Work, and 2018's Cubist. In addition, he has contributed to the world of academia, teaching at the New School of Jazz and Contemporary Music and Purchase Conservatory. Galper remains an active performer, balancing his time between teaching and playing with his trio as on 2019's The Zone: Live at the Yardbird Suite.\r\nBorn in Salem, Massachusetts in 1938, Galper first began taking piano lessons at age six. A gifted performer, he entered Berklee School of Music in Boston in 1955, honing his skills by studying with noted pianist and teacher Madame Chaloff. During college, he hit the jazz clubs, playing with such luminaries as Sam Rivers, Herb Pomeroy, and Jaki Byard. He also garnered his own gigs, working as the house pianist at such Boston venues as The Stables, Connelly's, and Lennie's on the Turnpike. After graduating, he launched his professional career, touring and recording for three years with iconic trumpeter/vocalist Chet Baker. From there, he also played with such luminaries as Joe Henderson, Cannonball Adderley, and others. \r\nBy the '70s, Galper had begun to embrace an expansive soul-jazz and fusion sound, a style he showcased on two 1971 recordings for Mainstream Records -- The Guerilla Band and Wild Bird -- both of which featured trumpeter Randy Brecker and his brother, saxophonist Michael Brecker. A third Mainstream session, the trio date Inner Journey, followed in 1972 and found Galper returning to a more acoustic sound. He then joined saxophonist Lee Konitz for the straight-ahead duo session Windows. Galper's follow-up as leader, 1976's Reach Out, reunited him with the Brecker Brothers for a fiery and searching post-bop set. Along with several more sessions with the Breckers, he rounded out the '70s with dates on several Enja albums, including Now Hear This with trumpeter Terumasa Hino and Ivory Forest with guitarist John Scofield. \r\nThe '80s were also a busy time for Galper, who recorded again with Baker. He worked steadily with Phil Woods for much of the decade, appearing on 14 of the saxophonist's albums. Consequently, his own output slowed somewhat, though he did deliver several highly regarded efforts like 1982's Naturally with bassist Rufus Reid and drummer Victor Lewis, 1986's Dreamsville, and 1987's Time to Remember. After releasing his 1989 trio album Portrait, he decided to return to more regular solo work. Over the next decade, Galper's output increased steadily and he recorded for such labels as Concord, Enja, and Philology with albums like 1992's Tippin', 1995's Rebop, and 1999's Let's Call This That.\r\nAlong with performing, Galper has worked as an educator -- he helped found New York's New School of Jazz and Contemporary Music, and taught at Purchase University until 2014. He also authored a highly regarded theory textbook, Forward Motion. During these years, he remained active, recording a handful of trio albums including 2007's Agents of Change with bassist Tony Marino and drummer Billy Mintz, 2009's Art-Work with former John Coltrane bandmates bassist Reggie Workman and drummer Rashid Ali, and 2012's Airegin Revisited with bassist Jeff Johnson and drummer John Bishop. In 2018, Galper delivered Cubist, a quartet date featuring saxophonist Jerry Bergonzi. A concert album, The Zone: Live at the Yardbird Suite, appeared the following year and found the pianist leading his trio.",
+    "Jazz pianist, composer, and educator Hal Galper is among the finest post-bop performers, known for his fluid solo performances and work with icons like Chet Baker, Phil Woods, and the Brecker Brothers. An East Coast native, Galper first came to the public's attention playing with Baker's quartet in the mid-'60s before launching his own career with albums like 1972's The Guerilla Band. From there, he played with a string of marquee artists like Lee Konitz, Tom Harrell, and Woods, while also releasing his own largely acoustic piano albums, including 1992's Tippin', 2009's Art-Work, and 2018's Cubist. In addition, he has contributed to the world of academia, teaching at the New School of Jazz and Contemporary Music and Purchase Conservatory. Galper remains an active performer, balancing his time between teaching and playing with his trio, as on 2019's The Zone: Live at the Yardbird Suite."
+  ]
+}

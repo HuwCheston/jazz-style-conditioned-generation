@@ -1,0 +1,118 @@
+{
+  "moods": [
+    {
+      "name": "Wistful",
+      "weight": 7
+    },
+    {
+      "name": "Melancholy",
+      "weight": 6
+    },
+    {
+      "name": "Complex",
+      "weight": 7
+    },
+    {
+      "name": "Reflective",
+      "weight": 8
+    },
+    {
+      "name": "Dramatic",
+      "weight": 6
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Gentle",
+      "weight": 8
+    },
+    {
+      "name": "Dreamy",
+      "weight": 5
+    },
+    {
+      "name": "Smooth",
+      "weight": 5
+    },
+    {
+      "name": "Somber",
+      "weight": 8
+    },
+    {
+      "name": "Intimate",
+      "weight": 7
+    },
+    {
+      "name": "Soft/Quiet",
+      "weight": 9
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 5
+    },
+    {
+      "name": "Sentimental",
+      "weight": 6
+    },
+    {
+      "name": "Cerebral",
+      "weight": 8
+    },
+    {
+      "name": "Warm",
+      "weight": 5
+    },
+    {
+      "name": "Ambitious",
+      "weight": 9
+    }
+  ],
+  "genres": [
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "International",
+      "weight": 5
+    },
+    {
+      "name": "European Folk",
+      "weight": 5
+    },
+    {
+      "name": "Central/West Asian Traditions",
+      "weight": 5
+    },
+    {
+      "name": "New Age",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Vijay Iyer",
+      "weight": 5
+    },
+    {
+      "name": "Brad Mehldau",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Tigran Hamasyan",
+  "bio": [
+    "Armenian pianist and composer whose work in classical, jazz, and indie pop made him a major figure on the global music scene.",
+    "Tigran Hamasyan is a pianist, composer, and keyboardist from Armenia. His compositions are deeply influenced by the scales and modes used in the Armenian folk tradition. Hamasyan is also influenced by jazz and progressive rock. 2011's A Fable, on Verve, strongly reflects Armenian folk music. 2013's Shadow Theater melds jazz and progressive pop with folk. 2015's Mockroot offered new compositions in a similar musical setting. He also released Luys i Luso on ECM that year -- comprising recontextualized sacred music from five centuries in modern piano/voices setting -- to commemorate the centenary of the Armenian genocide. Two years later, An Ancient Observer folded Armenian folk and sacred sources into jazz, prog rock, and electronica. He scored the 2019 film They Say Nothing Stays the Same. 2020's The Call Within drew inspiration from contemporary and historical maps, poetry, Armenian culture, and geometry. He released the loud, angular standards album StandArt in 2022, while 2024's The Bird of a Thousand Voices marked the musical realization of an early 20th century story by Gayane Grigor Gaboyan. \r\nHamasyan was born in what is now Gyumri Armenia in 1987. He began playing his family's piano at age three, and was enrolled in a music academy at six. At around ten, Hamasyan's family emigrated to Los Angeles. There he was taught by Vahag Hayrapetyan, a former student of jazz pianist Barry Harris, who exposed him to jazz; in particular, the music of Thelonious Monk, Charlie Parker, Art Tatum, and Miles Davis. He blended this with the folk and sacred music of his Armenian upbringing in a unique compositional approach. Hamasyan won the Montreux Jazz Festival's piano competition in 2003 at age 16; three years later, he won the Thelonious Monk International Jazz Piano Competition. His other awards include the 2005 Concours de Solistes de Jazz de Monaco and the 2013 Vilcek Prize for Creative Promise in Contemporary Music.\r\nWith his band Aratta Rebirth, he released the album Red Hail in 2009. Two years later, he released the solo piano and vocal outing A Fable (credited simply to Tigran), his debut on Verve. In 2013, Hamasyan issued the widely acclaimed Shadow Theater, backed by a band, strings, voices, and Jan Bang's electronics. That year, he won the Vilcek Prize for Creative Promise in Contemporary Music. \r\nMockroot, his 2015 Nonesuch debut, offered original electro-acoustic-based compositions as well as a traditional Armenian song. Hamasyan made his ECM debut that year with Luys i Luso. Cut a year earlier in the company of the Yerevan State Chamber Choir and conducted by Harutyun Topikyan, it showcased Armenian sacred music from the fifth to the 20th century in arrangements for solo piano and chorus. It was released to commemorate the 100th anniversary of the Armenian Genocide. \r\nWhile his homeland's traditional music remained a continuing source for investigation and creative inspiration, he returned to jazz with 2016's double-length Atmospheres on ECM, an electro-acoustic collaboration with Europeans Arve Henriksen, Jan Bang, and Eivind Aarset. Hamasyan returned to Armenia to live in 2016. He issued his second album on Nonesuch, An Ancient Observer, in March 2017. Recorded and mixed primarily in France by Antoine Gaillet for FLAM Music, it featured compositions written over the prior four years -- two based on traditional Armenian melodies. Some pieces were through-composed, while others offered less-formal frameworks, leaving space for improvisation. As is his trademark, musical influences proved myriad, ranging from classical Baroque dance and Armenian folk music to J-Dilla-esque hip-hop grooves adapted for piano to tracks with pedals connected to a synthesizer. Five additional tracks from those sessions appeared in 2018 as the EP For Gyumri; titled for his hometown, it was prefaced by the video single \"Rays of Light.\" \r\nHamasyan composed and recorded the original score and soundtrack for the film They Say Nothing Stays the Same directed by Joe Odagiri. He recorded and released The Call Within in various American studios in late 2019 and early 2020. Comprising ten original compositions, his primary accompanists on the latter included electric bassist Evan Marien and Arthur Hnatek on drums. It also featured several key guests including vocalist and longtime collaborator Areni Agbabian, cellist Artyom Manukyan, guitarist Tosin Abasi, and the Varduhi Art School Children's Choir. Produced by Hamasyan, the album's aesthetic goal was to offer a journey into the pianist's dreamlike inner world, taking inspiration from his interest in historical maps, poetry, Armenian folk stories, ancient Armenian design, astrology, geometry, rock carvings, and cinematography. It was released by Nonesuch in August 2020.\r\nTwo years later, Hamasyan issued the most unusual album in his catalog to date. Titled StandArt, it offered eight jazz standards and a lone original. Hamasyan sought to push these jazz evergreens to the breaking point with dramatic harmonic expansions. With a rhythm section composed of bassist Matt Brewer and drummer Justin Brown, he also recruited saxophonists Joshua Redman and Mark Turner, and trumpeter Ambrose Akinmusire in guest roles.\r\n2024's The Bird of a Thousand Voices, issued on Naïve, reimagines a traditional Armenian tale (\"Hazaran Blbul\"). Its single, \"The Kingdom,\" blends music, narrative, and visual art into an immersive online experience for desktop and mobile devices. This ambitious project breathes new life into the ancient firebird tale, which has been passed down through the centuries. The story is a  metaphor of our times: a world in search of connection and harmony, faced with ecological, psychological, and spiritual crises.",
+    "Tigran Hamasyan is a pianist, composer, and keyboardist from Armenia. His compositions are deeply influenced by the scales and modes used in the Armenian folk tradition. Hamasyan is also influenced by jazz and progressive rock. 2011's A Fable for Verve, strongly reflects Armenian folk music. 2013's Shadow Theater melds jazz and progressive pop with folk. 2015's Mockroot offered new compositions in a similar musical setting. That year he also released Luys i Luso, commemorating the centenary of the Armenian genocide. Two years later, An Ancient Observer folded Armenian folk and sacred sources into jazz, prog rock, and electronica. He scored the 2019 film They Say Nothing Stays the Same. 2020's The Call Within drew inspiration from contemporary and historical maps, poetry, Armenian culture, and geometry. He released the loud, angular standards album StandArt in 2022, while 2024's The Bird of a Thousand Voices marked the musical realization of an early 20th century story by Gayane Grigor Gaboyan."
+  ]
+}

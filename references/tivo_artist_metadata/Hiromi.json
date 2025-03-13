@@ -1,0 +1,102 @@
+{
+  "moods": [
+    {
+      "name": "Freewheeling",
+      "weight": 9
+    },
+    {
+      "name": "Energetic",
+      "weight": 4
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 8
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Fiery",
+      "weight": 4
+    },
+    {
+      "name": "Playful",
+      "weight": 6
+    },
+    {
+      "name": "Complex",
+      "weight": 7
+    },
+    {
+      "name": "Intense",
+      "weight": 5
+    },
+    {
+      "name": "Ebullient",
+      "weight": 5
+    },
+    {
+      "name": "Circular",
+      "weight": 5
+    },
+    {
+      "name": "Eccentric",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Fusion",
+      "weight": 7
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 4
+    },
+    {
+      "name": "Avant-Garde Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Michel Petrucciani",
+      "weight": 7
+    },
+    {
+      "name": "Brad Mehldau",
+      "weight": 7
+    },
+    {
+      "name": "Makoto Ozone",
+      "weight": 8
+    },
+    {
+      "name": "Ethan Iverson",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Hiromi",
+  "bio": [
+    "A classically trained jazz pianist and composer who regularly employs electronic elements into a diverse but signature sound.",
+    "Whether playing solo, with a trio, a full-on electric band, or an orchestra, adventurous jazz pianist and composer Hiromi Uehara is as likely to meld post-bop and funk as she is pop and classical -- sometimes in the same composition. Beginning with her 2003 debut Another Mind, she challenged genre classifications with her technical command of the instrument, her dynamic sense of harmony, and a complex rhythmic sensibility. Spiral, recorded live in 2005, was cut direct-to-disc with a studio trio. In 2008, she and Chick Corea recorded a series of piano duets at Tokyo's Blue Note. After a two-album stint with bassist Stanley Clarke, she formed the longstanding Trio Project with contra-bassist Anthony Jackson and drummer Simon Phillips. Their 2011 debut Voice wed progressive, vanguard, and post-bop jazz to fiery improvisation and bluesy readings of Beethoven. The same year she released Get Together: Live in Tokyo, the first of two live albums with pianist/vocalist Akiko Yano. In 2017 Hiromi released Live in Montreal with composer and harpist Edmar Castaneda. Two years later, she issued her solo piano debut Spectrum, and in 2021 she released Silver Lining Suite with a chamber-string quintet. Another project, Sonicwonder, made its debut in 2023.\r\nHiromi was born in Shizuoka, Japan in 1979. At the age of six she started playing piano. Within a year, she was a student at the Yamaha School of Music, whose progressive approach to musical training allowed the young student to shape her technical, writing, and performing skills. After relocating to the United States in 1999, she continued her studies at the Berklee School of Music in Boston, where she received a full scholarship. It was there that Hiromi developed her varied musical taste, encompassing everyone from J.S. Bach to Sly & the Family Stone. While at Berklee, she also had the opportunity to play with jazz piano legends Oscar Peterson, Chick Corea, and her mentor, Ahmad Jamal. In 2003, Hiromi recorded her first disc, Another Mind, on the Telarc label, produced by Jamal. Brain was released a year later, followed by the pianist's third trio album for Telarc, Spiral, in 2006. For her next album, Hiromi augmented her trio with avant-fusion guitarist Dave Fiuczynski, releasing Time Control in early 2007. Beyond Standard, a thematic continuation of Time Control, was also recorded with her Sonicbloom trio and released a year later. The solo piano set Place to Be followed in 2010. \r\nFor 2011's electro-acoustic Voice, Hiromi formed the Trio Project with bassist Anthony Jackson and Simon Phillips. 2012 saw the issue of the Live at Marciac DVD. After a break and festival appearances, Hiromi & the Trio Project returned to the studio and delivered Move in 2013; it was followed by the all-acoustic Alive in the summer of 2014, and a world tour. The Trio Project returned to recording in 2015, emerging from the studio with The Spark in April 2016. In 2017, she and harpist Edmar Castaneda released Live in Montreal, followed by a second offering with Akiko Yano, Move: Live in Tokyo. Hiromi recorded solo for only the second time on 2019's Spectrum. \r\nSidelined during the COVID-19 pandemic in August and September of 2020, Hiromi live-streamed 32 solo piano concerts in 16 days from Tokyo's Blue Note. With a second series scheduled for December and January, she didn't want to play alone again. She'd befriended virtuoso violinist and concertmaster Tatsuo Nishie after performing with his New Japan Philharmonic, and the idea of forming a piano quintet began to take shape. Nishie recruited other string players who could articulate Hiromi's classically inspired compositions and steer them toward jazz. He enlisted violinist Sohei Birmann, violist Meguna Naka, and cellist Wataru Mukai. The piano quintet recorded Silver Lining Suite in Tokyo; it was issued by Concord in October 2021. That year Hiromi also performed at the opening ceremonies of the Tokyo Olympics. Two years later, Hiromi launched another new group, Sonicwonder. Featuring bassist Hadrien Feraud, drummer Gene Coye, and trumpeter Adam O’Farrill, the group released its debut, Sonicwonderland, on the Telarc label in August 2023.",
+    "Few jazz pianists are as relentlessly inventive and stylistically mercurial as Hiromi Uehara. Whether playing solo, with a trio, or an electric band, she often melds post-bop, funk, pop, and classical, sometimes in the same composition. Beginning with 2003's Another Mind, she challenged genre classifications with her technical command of the instrument, dynamic feel for harmony, and a complex rhythmic sensibility. Her longstanding Trio Project made its debut on Voice in 2011, fusing progressive, vanguard, and post-bop jazz with improvisation. The trio became Hiromi's primary vehicle, though she also found time to release Live in Montreal, a duet offering with composer/harpist Edmar Castañeda, in 2017. The solo recording Spectrum appeared in 2019. She issued Silver Lining Suite, a work of crossover classical and jazz for piano and string quartet, in 2021. Another project, Sonicwonder, made its debut in 2023."
+  ]
+}

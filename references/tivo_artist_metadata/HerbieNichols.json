@@ -1,0 +1,122 @@
+{
+  "moods": [
+    {
+      "name": "Complex",
+      "weight": 8
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Elegant",
+      "weight": 9
+    },
+    {
+      "name": "Enigmatic",
+      "weight": 8
+    },
+    {
+      "name": "Quirky",
+      "weight": 8
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Uncompromising",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 7
+    },
+    {
+      "name": "Bright",
+      "weight": 9
+    },
+    {
+      "name": "Happy",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Lively",
+      "weight": 9
+    },
+    {
+      "name": "Literate",
+      "weight": 9
+    },
+    {
+      "name": "Sparkling",
+      "weight": 9
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Bop",
+      "weight": 7
+    },
+    {
+      "name": "New Orleans Jazz Revival",
+      "weight": 6
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Swing",
+      "weight": 7
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Horace Parlan",
+      "weight": 8
+    },
+    {
+      "name": "Geri Allen",
+      "weight": 8
+    },
+    {
+      "name": "Lennie Tristano",
+      "weight": 8
+    },
+    {
+      "name": "Hampton Hawes",
+      "weight": 9
+    },
+    {
+      "name": "Sonny Clark",
+      "weight": 9
+    },
+    {
+      "name": "Randy Weston",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Herbie Nichols",
+  "bio": [
+    "Talented yet overlooked jazz pianist who played everything from Dixieland to bop to free jazz.",
+    "One of jazz's most tragically overlooked geniuses, Herbie Nichols was a highly original piano stylist and a composer of tremendous imagination and eclecticism. He wasn't known widely enough to exert much influence in either department, but his music eventually attracted a rabid cult following, though not quite the wide exposure it deserved. \r\nNichols was born January 3, 1919, in New York and began playing piano at age nine, later studying at C.C.N.Y. After serving in World War II, Nichols played with a number of different groups and was in on the ground floor of the bebop scene. However, to pay the bills he later focused on Dixieland ensembles; his own music -- a blend of Dixieland, swing, West Indian folk, Monk-like angularity, European classical harmonies via Satie and Bartók, and unorthodox structures -- was simply too unclassifiable and complex to make much sense to jazz audiences of the time. Mary Lou Williams was the first to record a Nichols composition -- \"Stennell,\" retitled \"Opus Z,\" in 1951; yet aside from the song he wrote for Billie Holiday, \"Lady Sings the Blues,\" none of Nichols' work got enough attention to really catch on. \r\nHe signed with Blue Note and recorded three brilliant piano trio albums from 1955-1956, adding another one for Bethlehem in late 1957. Nichols languished in obscurity after those sessions, though; sadly, just when he was beginning to find a following among several of the new thing's adventurous, up-and-coming stars, he was stricken with leukemia and died on April 12, 1963. In the years that followed, Nichols became a favorite composer in avant-garde circles, with tributes to his sorely neglected legacy coming from artists like Misha Mengelberg and Roswell Rudd. He also inspired a repertory group, called the Herbie Nichols Project, and most of his recordings were reissued on CD.",
+    "In the late 1930s and early '40s, Herbie Nichols played piano in the bands of Herman Autrey, Illinois Jacquet, Lucky Thompson, and Arnett Cobb; mastering styles that ranged from small-group swing to Dixieland to early R&B. Nichols preference, however, was for bop, particularly the sounds of its more idiosyncratic practitioners. Sadly, though, for much of his career the only gigs he could secure were playing in more trad modes. In the early 1960s, he scored work with modern musicians closer to his sensibilities, among them Roswell Rudd and Archie Shepp, but by then he was terminally ill with leukemia. His recorded legacy, though small, is of outstanding quality: particularly two Blue Note trio sessions reissued as the double album THE THIRD WORLD."
+  ]
+}

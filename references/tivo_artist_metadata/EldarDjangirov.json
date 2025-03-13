@@ -1,0 +1,85 @@
+{
+  "moods": [
+    {
+      "name": "Reflective",
+      "weight": 9
+    },
+    {
+      "name": "Lively",
+      "weight": 6
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 6
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Intimate",
+      "weight": 6
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 8
+    },
+    {
+      "name": "Meandering",
+      "weight": 8
+    },
+    {
+      "name": "Smooth",
+      "weight": 8
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    }
+  ],
+  "genres": [
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Keyboard",
+      "weight": 5
+    },
+    {
+      "name": "Classical",
+      "weight": 5
+    },
+    {
+      "name": "Easy Listening",
+      "weight": 5
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 3
+    },
+    {
+      "name": "Piano/Easy Listening",
+      "weight": 5
+    },
+    {
+      "name": "Classical Crossover",
+      "weight": 8
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "Eldar Djangirov",
+  "bio": []
+}

@@ -1,0 +1,124 @@
+{
+  "moods": [
+    {
+      "name": "Stylish",
+      "weight": 5
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 6
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Elegant",
+      "weight": 8
+    },
+    {
+      "name": "Energetic",
+      "weight": 6
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 5
+    },
+    {
+      "name": "Light",
+      "weight": 4
+    },
+    {
+      "name": "Gentle",
+      "weight": 6
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Bright",
+      "weight": 8
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Soothing",
+      "weight": 9
+    },
+    {
+      "name": "Summery",
+      "weight": 8
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    },
+    {
+      "name": "Reserved",
+      "weight": 8
+    },
+    {
+      "name": "Relaxed",
+      "weight": 9
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 6
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Keyboard",
+      "weight": 2
+    },
+    {
+      "name": "Film Score",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Classical",
+      "weight": 3
+    }
+  ],
+  "similars": [
+    {
+      "name": "Chick Corea",
+      "weight": 9
+    },
+    {
+      "name": "Hal Galper",
+      "weight": 8
+    },
+    {
+      "name": "Hampton Hawes",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Bill Mays",
+  "bio": [
+    "A fine pianist, Bill Mays has often worked behind the scenes, leading to him being a somewhat overlooked jazz improviser. Mays worked in Los Angeles as a studio musician from the late '60s on, accompanying Sarah Vaughan (1972-1973) and Al Jarreau (1975), but mostly doing session work. In the early '80s, he began to record jazz as a sideman with Howard Roberts, Bud Shank, Bobby Shew, Road Work Ahead, and Mark Murphy. He recorded a duet date with Red Mitchell for ITI (1982) and led a quintet album for Trend (1983). In 1984, Mays moved to New York and since then he has worked with Murphy, Gerry Mulligan, Ron Carter, James Moody, Sonny Stitt, Art Pepper, and the Mel Lewis Orchestra, among others. In the late 80's Mays recorded for DMP (duet records with Ray Drummond) and in 1992 released several discs on Concord. These dates found Mays in a variety of settings, beginning with the unaccompanied Live at Maybeck Recital Hall, Vol. 26 (Bill Mays at Maybeck), followed by a trio date An Ellington Affair, a duet with guitarist Ed Bickett Concord Duo, Vol. 7: Bill Mays and Ed Bickert and finallly backed by a full band on Mays in Manhattan. In 2001 the pianist recorded his 11th album as a leader and his first for the Palmetto label, Summer Sketches, followed two years later by Going Home."
+  ]
+}

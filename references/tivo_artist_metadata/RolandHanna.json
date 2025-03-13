@@ -1,0 +1,194 @@
+{
+  "moods": [
+    {
+      "name": "Calm/Peaceful",
+      "weight": 7
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 7
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Gentle",
+      "weight": 7
+    },
+    {
+      "name": "Reflective",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Earthy",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Precious",
+      "weight": 7
+    },
+    {
+      "name": "Melancholy",
+      "weight": 7
+    },
+    {
+      "name": "Stately",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Sweet",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Romantic",
+      "weight": 7
+    },
+    {
+      "name": "Relaxed",
+      "weight": 7
+    },
+    {
+      "name": "Wistful",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 7
+    },
+    {
+      "name": "Innocent",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Earnest",
+      "weight": 7
+    },
+    {
+      "name": "Poignant",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Standards",
+      "weight": 5
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Keyboard",
+      "weight": 2
+    },
+    {
+      "name": "Film Score",
+      "weight": 2
+    },
+    {
+      "name": "Cool",
+      "weight": 5
+    },
+    {
+      "name": "Vocal",
+      "weight": 5
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Modern Jazz",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "Barry Harris",
+      "weight": 8
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "Fred Hersch",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Roland Hanna",
+  "bio": [
+    "A marvellously inventive American pianist whose work reflected his thorough understanding of the roots of jazz.",
+    "A talented pianist with a style diverse enough to fit into swing, bop, and more adventurous settings, Roland Hanna was one of the last in an impressive line of great pianists who emerged in Detroit after World War II (including Hank Jones, Barry Harris, and Tommy Flanagan). After serving in the Army and studying music at Eastman and Juilliard, Hanna made a strong impression playing with Benny Goodman (1958). He worked with Charles Mingus for a period in 1959, and went on to generally lead his own trios. Hanna was an integral part of the Thad Jones/Mel Lewis orchestra (1967-1974), and in 1974 helped found the New York Jazz Quartet (with Frank Wess). He was given knighthood (thus the \"Sir\") from the President of Liberia in 1970 in recognition for a series of concerts held to benefit Liberian children. Hanna recorded many solo dates and often with a trio, but also composed many works for groups of varying sizes - both for jazz groups and classical ensembles. His piece \"Oasis\" for piano and orchestra was performed by the Detroit Symphony Orchestra in 1993. In addition to his busy performing schedule, Hanna was also an active educator and tenured professor at Queens College in New York. After almost half a century of performing and recording, Sir Roland Hanna passed away at the age of 70 on November 13, 2002 after suffering a heart attack.",
+    "Sir Roland Hanna studied at Eastman College and the Juilliard School, and in the 1950s worked with Benny Goodman, Charles Mingus, and Sarah Vaughan. In 1967, he joined the Thad Jones-Mel Lewis Orchestra, remaining a regular until 1974. During the '70s, Hanna was also a member of the co-operative New York Jazz Sextet and Quartet, an acoustic jazz outfit formed in protest of the growing commercial ascendancy of fusion. A marvellously inventive pianist, Hanna’s work reflected his thorough understanding of the roots of jazz. He was a masterly accompanist and an excellent big band player, while his solo work was based around clear, logical ideas delivered with considerable vitality. His title denotes an honorary knighthood bestowed upon him by the Republic of Liberia."
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "moods": [
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 6
+    },
+    {
+      "name": "Playful",
+      "weight": 6
+    },
+    {
+      "name": "Sentimental",
+      "weight": 6
+    },
+    {
+      "name": "Sparkling",
+      "weight": 5
+    },
+    {
+      "name": "Swinging",
+      "weight": 5
+    },
+    {
+      "name": "Happy",
+      "weight": 5
+    },
+    {
+      "name": "Romantic",
+      "weight": 5
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 5
+    },
+    {
+      "name": "Dreamy",
+      "weight": 5
+    },
+    {
+      "name": "Cheerful",
+      "weight": 5
+    },
+    {
+      "name": "Cosmopolitan",
+      "weight": 5
+    },
+    {
+      "name": "Delicate",
+      "weight": 5
+    },
+    {
+      "name": "Brittle",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Standards",
+      "weight": 8
+    },
+    {
+      "name": "Vocal",
+      "weight": 8
+    },
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Cyrus Chestnut",
+      "weight": 9
+    },
+    {
+      "name": "Kenny Drew",
+      "weight": 6
+    },
+    {
+      "name": "Brad Mehldau",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Beegie Adair",
+  "bio": [
+    "American pianist and arranger known for her interpretations of jazz and popular standards and show tunes.",
+    "Beegie Adair was a prolific, award-winning jazz pianist and arranger known for her interpretations of jazz and popular standards and show tunes. She sold over two million recordings globally. Her melodic, fleet-fingered style reflected the sounds of her major influences, including George Shearing, Bill Evans, Oscar Peterson, and Erroll Garner.\r\nAdair grew up in Cave City, Kentucky, where she began taking piano lessons at age five. She continued to study piano throughout college, earning a B.S. in music education at Western Kentucky University in Bowling Green. During and after college, she played in jazz bands, and spent three years teaching music to children before moving to Nashville, where she became a session musician, working at WSM-TV and on The Johnny Cash Show (1969-1971). She and her husband also started a jingle company to write music for commercials. \r\nIn 1982, Adair and saxophonist Denis Solee formed the Adair-Solee Quartet, which evolved into the Be-Bop Co-Op, a jazz sextet. In 1998, she released Escape to New York, her first trio-led date with a rhythm section consisting of Bob Cranshaw and Gregory Hutchinson. She signed to the fledgling Hillsboro label for 2001's Dream Dancing: The Songs of Cole Porter; bassist Roger Spencer and drummer Chris Brown joined her. Dream Dancing was the first of dozens of themed albums devoted to songwriters and singers. In 2002, she was named a Steinway Artist.\r\nMost of Adair's recordings have been issued by the independent jazz label Green Hill Productions. They include 2008's Yesterday: A Solo Piano Tribute to the Music of the Beatles, 2010's Swingin' with Sinatra, and 2012's The Real Thing (which spent 20 weeks on the jazz charts and was chosen one of the year's best 100 jazz albums). In 2015, her trio collaborated with saxophonist Don Aliquo on Too Marvelous for Words.\r\nFrom 2011 onward, Adair and her trio regularly played Birdland in New York. While visiting, they often collaborated with vocalist Monica Ramey. In the spring of 2016, that partnership bore fruit on the album Some Enchanted Evening. The following year saw Adair issue the compilation By Request, which featured her most requested and personal favorites. Beegie Adair died at her home in Franklin, Tennessee, on January 23, 2022; she was 84 years old."
+  ]
+}

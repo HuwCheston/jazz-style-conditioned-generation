@@ -1,0 +1,134 @@
+{
+  "moods": [
+    {
+      "name": "Elegant",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 8
+    },
+    {
+      "name": "Uncompromising",
+      "weight": 7
+    },
+    {
+      "name": "Intimate",
+      "weight": 8
+    },
+    {
+      "name": "Literate",
+      "weight": 6
+    },
+    {
+      "name": "Clinical",
+      "weight": 4
+    },
+    {
+      "name": "Reflective",
+      "weight": 9
+    },
+    {
+      "name": "Intense",
+      "weight": 6
+    },
+    {
+      "name": "Light",
+      "weight": 5
+    },
+    {
+      "name": "Knotty",
+      "weight": 7
+    },
+    {
+      "name": "Complex",
+      "weight": 8
+    },
+    {
+      "name": "Wistful",
+      "weight": 9
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Elaborate",
+      "weight": 9
+    },
+    {
+      "name": "Refined",
+      "weight": 4
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 5
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 6
+    },
+    {
+      "name": "Ambitious",
+      "weight": 9
+    },
+    {
+      "name": "Cerebral",
+      "weight": 5
+    },
+    {
+      "name": "Detached",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Bop",
+      "weight": 6
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Cool",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 4
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Horace Parlan",
+      "weight": 8
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 9
+    },
+    {
+      "name": "Hampton Hawes",
+      "weight": 8
+    },
+    {
+      "name": "Herbie Nichols",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Lennie Tristano",
+  "bio": [
+    "Advanced jazz pianist was an early experimenter in the be-bop era and mentored Lee Konitz and Warne Marsh.",
+    "The history of jazz is written as a recounting of the lives of its most famous (and presumably, most influential) artists. Reality is not so simple, however. Certainly the most important of the music's innovators are those whose names are known by all -- Armstrong, Parker, Young, Coltrane. Unfortunately, the jazz critic's tendency to inflate the major figures' status often comes at the expense of other musicians' reputations -- men and women who have made significant, even essential, contributions of their own, who are, for whatever reason, overlooked in the mad rush to canonize a select few. Lennie Tristano is one of those who have not yet received their critical due. In the mid-'40s, the Chicago-born pianist arrived on the scene with a concept that genuinely expanded the prevailing bop aesthetic. Tristano brought to the music of Charlie Parker and Bud Powell a harmonic language that adapted the practices of contemporary classical music; his use of polytonal effects in tunes like \"Out on a Limb\" was almost Stravinsky-esque, and his extensive use of counterpoint was (whether or not he was conscious of it at the time) in keeping with the trends being set in mid-century art music. Until relatively recently, it had seldom been acknowledged that Tristano had been the first to perform and record a type of music that came to be called \"free jazz.\" In 1949 -- almost a decade before the making of Ornette Coleman's first records -- Tristano's group (which included Lee Konitz, Warne Marsh, and Billy Bauer) cut the first recorded example of freely improvised music in the history of jazz. The two cuts, \"Intuition\" and \"Digression,\" were created spontaneously, without any pre-ordained reference to time, tonality, or melody. The resultant work was an outgrowth of Tristano's preoccupation with feeling and spontaneity in the creation of music. It influenced, among others, Charles Mingus, whose earliest records sound eerily similar to those of Tristano in terms of style and compositional technique. Mingus came by the influence honestly; he studied with the pianist for a period in the early '50s, as did many other well-known jazz musicians, such as Sal Mosca, Phil Woods, and the aforementioned Konitz and Marsh. \r\nTristano was stricken permanently blind as an infant. He first studied music with his mother, an avocational pianist and opera singer. From 1928-1938, he attended a school for the blind in Chicago, where he learned music theory and developed proficiency on several wind instruments. Later, he attended Chicago's American Conservatory of Music, from which he received a bachelor's degree in 1943. During his early years as a professional performer and teacher, Tristano worked in and around Chicago, achieving his first measure of critical attention and attracting his first important students, Konitz and composer/arranger Bill Russo. \r\nIn 1946, Tristano moved to New York, where he made something of a big splash, performing with many of the leading musicians of the day, including Dizzy Gillespie and Charlie Parker. The influential critic Barry Ulanov took an extreme liking to Tristano's music and championed his work in the pages of Metronome magazine; Tristano was named the publication's Musician of the Year for 1947. Tenor saxophonist Warne Marsh began studies with Tristano in 1948, and when Bauer and Konitz came back aboard, he had the core of his great sextet. In 1949 -- with the addition of bassist Arnold Fishkin and alternating drummers Harold Granowsky and Denzil Best -- Tristano, Bauer, Konitz, and Marsh recorded what was to become the basis of the band's collective legacy, the Capitol album Crosscurrents. The Capitol sessions spawned many of Tristano's best-known works, including the title track, and of course, the freely improvised cuts \"Digression\" and \"Intuition\" (these latter recorded without a drummer). The recordings synthesized the Tristano approach: long, rhythmically and harmonically elaborate melodies were played over a smooth, almost uninflected swing time maintained by the bassist and drummer. Counterpoint, which had been mostly abandoned by post-New Orleans/Chicago players, made a comeback in Tristano's music. Tristano's written lines were a great deal more involved than the already complex melodies typical of bebop; he subdivided and multiplied the beat in odd groupings, and his harmonies did not always behave in a manner consistent with functional tonality. The complexity of his constructs demanded that his rhythm section provide little more than a solid foundation. Tristano's bassists and drummers were not expected to interact in the manner of a bop rhythm section, but to support the music's melodic and harmonic substance. Such restraint lent Tristano's music an emotionally detached air, which to this day has been used by unsympathetic critics as a sledgehammer to pound him. \r\nIn 1951, Tristano founded a school of jazz in New York, the first of its kind. Its faculty consisted of many of his most prominent students, including Konitz, Bauer, Marsh, and pianist Sal Mosca. His public performances became fewer and farther between; for the rest of his life, Tristano was to concentrate on teaching, mostly to the exclusion of everything else. He shut down his school in 1956, and began teaching out of his home on Long Island. Thereafter he would play occasionally at the Half Note in New York City. Recordings became scarce. He made two albums for Atlantic, Lennie Tristano and The New Tristano. A compilation of odds and ends entitled Descent into the Maelstrom was released on Inner City; its title track documents Tristano's experiments in multi-track recording of the piano. He toured Europe in 1965; his last public performance in the U.S. was in 1968. \r\nUntil his death in 1978, Tristano continued to teach. A later generation of his adherents continues to work and thrive in New York to this day. Musicians like pianist Connie Crothers, saxophonists Lenny Popkin and Richard Tabnik, and drummer Carol Tristano -- the pianist's daughter -- carry on his work into the next century.",
+    "Blind from the age of 11, pianist Lennie Tristano became incredibly focused on the purity of sound. He sought, taught, and achieved perfection of tonal expression both in himself and his accompanists (most importantly Lee Konitz and Warne Marsh). He stressed virtuosity devoid of emotional coloration; as such, he remains a controversial figure. His point was to master one's instrument so as to be free from technical constraints, and thereby ably express pure feeling. He had a deep influence on the 1950s cool-jazz school, and his excursions into proto-free jazz left a legacy that has yet to be fully appreciated."
+  ]
+}

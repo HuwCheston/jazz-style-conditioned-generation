@@ -1,0 +1,206 @@
+{
+  "moods": [
+    {
+      "name": "Melancholy",
+      "weight": 8
+    },
+    {
+      "name": "Calm/Peaceful",
+      "weight": 8
+    },
+    {
+      "name": "Soothing",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 7
+    },
+    {
+      "name": "Reserved",
+      "weight": 9
+    },
+    {
+      "name": "Enigmatic",
+      "weight": 7
+    },
+    {
+      "name": "Somber",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 8
+    },
+    {
+      "name": "Cerebral",
+      "weight": 7
+    },
+    {
+      "name": "Bittersweet",
+      "weight": 7
+    },
+    {
+      "name": "Romantic",
+      "weight": 8
+    },
+    {
+      "name": "Wistful",
+      "weight": 7
+    },
+    {
+      "name": "Intimate",
+      "weight": 9
+    },
+    {
+      "name": "Gentle",
+      "weight": 8
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 8
+    },
+    {
+      "name": "Elegant",
+      "weight": 8
+    },
+    {
+      "name": "Literate",
+      "weight": 8
+    },
+    {
+      "name": "Reflective",
+      "weight": 9
+    },
+    {
+      "name": "Complex",
+      "weight": 8
+    },
+    {
+      "name": "Restrained",
+      "weight": 7
+    },
+    {
+      "name": "Sentimental",
+      "weight": 8
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Modal Music",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Cool",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 9
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "Hal Galper",
+      "weight": 8
+    },
+    {
+      "name": "Roland Hanna",
+      "weight": 9
+    },
+    {
+      "name": "Denny Zeitlin",
+      "weight": 7
+    },
+    {
+      "name": "George Shearing",
+      "weight": 9
+    },
+    {
+      "name": "Paul Bley",
+      "weight": 7
+    },
+    {
+      "name": "Keith Jarrett",
+      "weight": 8
+    },
+    {
+      "name": "Bud Powell",
+      "weight": 7
+    },
+    {
+      "name": "Sonny Clark",
+      "weight": 7
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 8
+    },
+    {
+      "name": "Herbie Hancock",
+      "weight": 7
+    },
+    {
+      "name": "Chick Corea",
+      "weight": 8
+    },
+    {
+      "name": "Ahmad Jamal",
+      "weight": 8
+    },
+    {
+      "name": "Red Garland",
+      "weight": 8
+    },
+    {
+      "name": "Wynton Kelly",
+      "weight": 6
+    },
+    {
+      "name": "Oscar Peterson",
+      "weight": 6
+    },
+    {
+      "name": "Kenny Barron",
+      "weight": 6
+    },
+    {
+      "name": "Brad Mehldau",
+      "weight": 6
+    },
+    {
+      "name": "Erroll Garner",
+      "weight": 6
+    },
+    {
+      "name": "Art Tatum",
+      "weight": 6
+    },
+    {
+      "name": "Hank Jones",
+      "weight": 7
+    }
+  ],
+  "tivo_artist_name": "Bill Evans",
+  "bio": [
+    "Virtual king of the modern jazz pianists who forged a gentle style of his own from the 1950s on.",
+    "Borrowing heavily from the impressionism of Debussy and Ravel, pianist Bill Evans brought an introverted, relaxed, and lyrical classical sensibility into jazz. Along with his keen technical ability and nuanced sense of harmony, Evans worked to democratize the role of the bassist and drummer in his succession of piano trios, encouraging greater contrapuntal interplay. After gaining widespread attention as a member of Miles Davis' late-'50s group, Evans garnered further acclaim for his own work, leading a celebrated trio with bassist Scott LaFaro and drummer Paul Motian and recording classic albums like 1960's Portrait in Jazz, 1961's At the Village Vanguard, and 1962's Waltz for Debby, the latter of which borrowed its title from the pianist's best-known composition. Following LaFaro's tragic death in 1961, Evans eventually forged a lasting creative partnership with bassist Eddie Gomez and continued to perform, working with drummers Jack DeJohnette and Marty Morell. He earned accolades including Grammy Awards for 1968's At the Montreux Jazz Festival, 1970's Alone, 1971's The Bill Evans Album, and 1979's We Will Meet Again. With the passage of time, Evans has become an entire school unto himself for pianists and a singular mood for listeners, leaving his mark on such noted players as Herbie Hancock, Keith Jarrett, Chick Corea, and Brad Mehldau.\r\nBorn and raised in New Jersey, Evans was recruited for Southeastern Louisiana University on a flute scholarship, where he received a thorough background in theory, played in the marching band, and also led his football team to a league championship as a quarterback. Graduating as a piano major in 1950, he started to tour with the Herbie Fields band, but the draft soon beckoned, and Evans was placed in the Fifth Army Band near Chicago. After three years in the service, he arrived in New York in 1954, playing in Tony Scott's quartet and undertaking postgraduate studies at Mannes College, where he encountered composer George Russell and his modal jazz theories. By 1956, he had already recorded his first album as a leader for Riverside, New Jazz Conceptions, still enthralled by the bop style of Bud Powell but also unveiling what was to become his best-known composition, \"Waltz for Debby,\" which he wrote while still in the Army.\r\nIn spring 1958, Evans began an eight-month gig with the Miles Davis Sextet, where he exerted a powerful influence upon the willful yet ever-searching leader. Though Evans left the band that autumn, exhausted by pressured expectations and anxious to form his own group, he was deeply involved in the planning and execution of Davis' epochal Kind of Blue album in 1959, contributing ideas about mood, structure, and modal improvisation, and collaborating on several of the compositions. Although the original release gave composition credit of \"Blue in Green\" to Davis, Evans claimed he wrote it entirely, based on two chords suggested by Davis (nowadays, they receive co-credit). \r\nEvans returned to the scene as a leader in December 1958 with the album Everybody Digs Bill Evans, which included the famous \"Peace Piece,\" a haunting vamp for solo piano that sounds like a long-lost Satie Gymnopédie. Evans' first working trio turned out to be his most celebrated, combining forces with the astounding young bassist Scott LaFaro and drummer Paul Motian in three-way telepathic trialogues. With this group, Evans became a star -- and there was even talk about a recording with Davis involving the entire trio. Sadly, only ten days after a landmark live session at the Village Vanguard in June 1961, LaFaro was killed in an auto accident -- and the shattered Evans went into seclusion for almost a year. He re-emerged the following spring with Chuck Israels as his bassist, and he would go on to record duets with guitarist Jim Hall and a swinging quintet session, Interplay, with Hall and trumpeter Freddie Hubbard. \r\nUpon signing with Verve in 1962, Evans was encouraged by producer Creed Taylor to continue to record in more varied formats: with Gary McFarland's big band, the full-orchestra arrangements of Claus Ogerman, co-star Stan Getz, and a reunion with Hall. The most remarkable of these experiments was Conversations with Myself, a session where Evans overdubbed second and third piano parts onto the first; this eventually led to two sequels in that fashion. \r\nBy 1966, Evans had paired with Puerto Rican bassist Eddie Gomez and formed a trio with drummer Jack DeJohnette. Though short-lived, the group garnered attention, picking up a Grammy Award for the 1968 concert album Bill Evans at the Montreux Jazz Festival. That same year, DeJohnette left to be replaced by Marty Morell. This version of Evans' trio continued to work for a decade, releasing albums like 1969's What's New and 1971's Grammy-winning The Bill Evans Album. Evans also picked up a Grammy in 1970 for his solo piano date Alone. \r\nIn his only concession to the emerging jazz-rock scene, Evans dabbled with the Rhodes electric piano in the 1970s but eventually tired of it, even though inventor Harold Rhodes had tailored the instrument to Evans' specifications. He recorded further trio sessions with Gomez and drummer Eliot Zigmund before launching a final trio in the late '70s with bassist Marc Johnson and drummer Joe La Barbera. Often considered one of the pianist's best configurations since the LaFaro-Motian team, their brief time together was documented on 1979's Grammy-winning We Will Meet Again, also featuring trumpeter Tom Harrell and saxophonist Larry Schneider.\r\nBy the late '70s, Evans' health was rapidly deteriorating, aggravated by long periods of heroin and cocaine addiction. He died on September 15, 1980, at Mount Sinai Hospital in New York City. He was 51 years old. Along with a 1994 Grammy Lifetime Achievement Award, a flood of unreleased recordings from commercial and private sources helped to further elevate interest in Evans' work. Turn Out the Stars: The Final Village Vanguard Recordings arrived in 1996, followed by 2000's The Last Waltz, recorded at Keystone Korner in 1980. Resonance Records also released three archival albums featuring Evans' late-'60s trio: 2016's Some Other Time: The Lost Session from the Black Forest, 2018's Another Time: The Hilversum Concert, and 2020's Live at Ronnie Scott's.",
+    "One of the most original and influential pianists in jazz, Bill Evans possessed an intensely personal and lyrical approach. The release of his first records under his own name, as well as his appearance on Miles Davis' 1959 classic Kind of Blue, pushed Evans rapidly to the forefront of jazz piano. For much of his career, he worked exclusively with his own trios, which brought collective interplay to new heights and extended the vocabulary of post-bop jazz piano. With the passage of time, Evans has become an entire school unto himself for pianists and a singular mood for listeners, leaving his mark on such noted players as Herbie Hancock, Keith Jarrett, Chick Corea, and Brad Mehldau."
+  ]
+}

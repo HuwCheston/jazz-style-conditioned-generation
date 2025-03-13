@@ -1,0 +1,22 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Fusion",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "Mitchel Forman",
+  "bio": [
+    "Mitchel Forman has had a continually surprising career. After graduating from the Manhattan School of Music (1978), he recorded three solo acoustic piano albums for the Japanese New Wave and Soul Note labels and worked with Stan Getz, Gerry Mulligan, Carla Bley, and Mel Tormé. However, he made his strongest impression on electric keyboards, playing with the re-formed Mahavishnu Orchestra, Wayne Shorter, and recording for Magenta (1985) and Novus (1991). Forman surprised many by performing a very effective Bill Evans tribute for Novus (1992) with an acoustic trio, but then went back to playing modern fusion on Lipstick (1993). He also played on Richard Elliot's 1997 album Jumpin' Off before releasing Hand Made in 1998 and Patience with his trio two years later. Mr. Clean appeared in spring 2001. Talented on both acoustic and electric keyboards, Mitchel Forman's progress should be well worth watching."
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Neo-Bop",
+      "weight": 3
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Chick Corea",
+      "weight": 8
+    },
+    {
+      "name": "Keith Jarrett",
+      "weight": 8
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 9
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 9
+    },
+    {
+      "name": "George Cables",
+      "weight": 8
+    },
+    {
+      "name": "John Hicks",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Allen Farnham",
+  "bio": [
+    "Allen Farnham has become quite important to jazz, not just as a pianist/arranger but also behind the scenes as a producer at the Concord label, where he has worked on more than 50 releases. Farnham first played piano when he was 12 and in 1983 he graduated from the Oberlin Conservatory of Music in Ohio, where he also gigged with Ernie Krivda. After moving to New York City in 1984, he freelanced and two years later signed with Concord. Farnham subsequently worked with such vocalists as Susannah McCorkle, Leon Thomas, Mel Tormé, Mark Murphy, and Eden Atwood. His diverse work experience also involved playing with Roland Vazquez, Special EFX, Arthur Blythe, Junior Cook, Tom Harrell, and Joe Lovano, among many others. In addition to the many Concord sessions Farnham has produced, he has led several of his own."
+  ]
+}

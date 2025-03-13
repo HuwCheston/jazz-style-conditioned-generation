@@ -1,0 +1,152 @@
+{
+  "moods": [
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Carefree",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Rousing",
+      "weight": 7
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Energetic",
+      "weight": 7
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Bright",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Wry",
+      "weight": 7
+    },
+    {
+      "name": "Stately",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Earnest",
+      "weight": 7
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Rambunctious",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 7
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Trumpet Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Bop",
+      "weight": 5
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 9
+    },
+    {
+      "name": "Barry Harris",
+      "weight": 9
+    },
+    {
+      "name": "Oscar Peterson",
+      "weight": 8
+    },
+    {
+      "name": "Bud Powell",
+      "weight": 9
+    },
+    {
+      "name": "Herbie Nichols",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Don Friedman",
+  "bio": [
+    "An excellent if underrated pianist, Don Friedman started off playing on the West Coast in 1956 with Dexter Gordon, Shorty Rogers, Buddy Collette, Buddy DeFranco (1956-1957), Chet Baker, and even the then-unknown altoist Ornette Coleman. After moving to New York in 1958, Friedman played in many settings, including with his own trio, Pepper Adams, Booker Little (recording with him in 1961), the Jimmy Giuffre Three (1964), a quartet with Attila Zoller, Chuck Wayne's trio (1966-1967), and, by the end of the decade, Clark Terry's big band. He continued working in New York as both a jazz educator and a pianist with wide musical interests, and was featured on Concord's Maybeck Recital Hall series (1993). Friedman also recorded for Riverside, Prestige, Progressive, Owl, Empathy, and several Japanese labels, and continued doing sessions in New York throughout the '90s and 2000s. Friedman died on June 30, 2016. He was 81 years old."
+  ]
+}

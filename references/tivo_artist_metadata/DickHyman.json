@@ -1,0 +1,130 @@
+{
+  "moods": [
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 8
+    },
+    {
+      "name": "Refined",
+      "weight": 8
+    },
+    {
+      "name": "Joyous",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Theatrical",
+      "weight": 7
+    },
+    {
+      "name": "Irreverent",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 8
+    },
+    {
+      "name": "Fun",
+      "weight": 8
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Swing",
+      "weight": 9
+    },
+    {
+      "name": "Lounge",
+      "weight": 9
+    },
+    {
+      "name": "Standards",
+      "weight": 4
+    },
+    {
+      "name": "Stride",
+      "weight": 9
+    },
+    {
+      "name": "Early Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Keyboard",
+      "weight": 1
+    },
+    {
+      "name": "Spy Music",
+      "weight": 9
+    },
+    {
+      "name": "Classical",
+      "weight": 1
+    },
+    {
+      "name": "Easy Listening",
+      "weight": 9
+    },
+    {
+      "name": "Stage & Screen",
+      "weight": 9
+    },
+    {
+      "name": "Vocal",
+      "weight": 4
+    },
+    {
+      "name": "Soundtracks",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Ralph Sutton",
+      "weight": 9
+    },
+    {
+      "name": "Jaki Byard",
+      "weight": 6
+    },
+    {
+      "name": "Earl Hines",
+      "weight": 9
+    }
+  ],
+  "tivo_artist_name": "Dick Hyman",
+  "bio": [
+    "A virtuoso of jazz piano with a versatile career that has seen him recreate styles from classic jazz to stride to pre-bop swing and beyond.",
+    "Among the most versatile musicians of modern times, keyboardist Dick Hyman performed in styles ranging from classic jazz to stride to pre-bop swing and beyond, even releasing several albums of electronic keyboard music. He once recorded an album, Themes and Variations on \"A Child Is Born,\" on which he rendered that tune in 11 different styles. Hyman began his career as a sideman in major swing bands, and for the latter part of his career, he returned to that style and to stride piano, which he recorded prolifically. Hyman was also a composer and became well known in that capacity as the creator of soundtracks for many films by actor-director Woody Allen. Hyman remained active into great old age, recording the album Counterpoint in 2019 with clarinetist Ken Peplowski.\r\nHyman was born on March 8, 1927, in New York. His mother's brother was the classical pianist Anton Rovinsky, and his first lessons were in the classical field. He also became interested in jazz through an older brother who had a jazz record collection. Hyman enlisted in the U.S. Army during World War II, but when his musical talent became clear, he was transferred to the Navy band department. He has credited his time there for rigorous training with players who were superior to himself. After the war, Hyman attended Columbia University, where he won a contest that brought a dozen lessons with pianist Teddy Wilson as the prize. Setting on a career in jazz, Hyman began to record solo and trio material around 1950, issuing several solo albums and several with a trio, including the 1955 LP The Unforgettable Sound of the Dick Hyman Trio.\r\nHyman worked with xylophonist/vibraphonist Red Norvo (1949-1950) and clarinetist Benny Goodman (1950) and then spent much of the '50s and '60s as a studio musician. He appeared on the one known sound film of Charlie Parker (Hot House from 1952); recorded honky tonk under pseudonyms; played organ and early synthesizers in addition to piano; was Arthur Godfrey's music director (1959-1962); collaborated with writer Leonard Feather on some \"History of Jazz\" concerts (doubling on clarinet); and performed rock, pop, rhythm-and-blues, free jazz, and even country music (with vocalist Marvin Rainwater); his credits include appearances on albums by Tony Bennett, Perry Como, Ivory Joe Hunter, and many more. On the Command label, he released albums on which he played the Lowrey organ, including Electrodynamics, Fabulous, Keyboard Kaleidoscope, and The Man from O.R.G.A.N. He also recorded using the Moog synthesizer, including Moog: The Electric Eclectics of Dick Hyman and The Age of Electronicus. These electronic releases had some pop success.\r\nFor much of the later part of his career, Hyman was a prime force in the revival of classic jazz styles. In the '70s, Hyman played with the New York Jazz Repertory Company, formed the Perfect Jazz Repertory Quintet (1976), and started writing soundtracks for Woody Allen films, which often included classic jazz elements along with orchestral sounds. Hyman's scores include those for 11 Allen films and several by other directors, including Moonstruck (1987). He has written several dozen classical compositions, including solo piano works, chamber pieces, two piano concertos (one, \"Concerto Electro,\" was for electric piano), and vocal and choral works. Hyman has recorded frequently during the past several decades (sometimes in duets with Ruby Braff) for Concord, Music Masters, and Reference, among other labels, and ranks at the top of the classic jazz field. He has remained active into his nineties. In 2013, Hyman teamed with vocalist Heather Masse for a set of standards on the Red House label called Lock My Heart. In 2019, he and Peplowski issued Counterpoint, an album of music by Lerner & Loewe, on the Arbors Records label, which also issued the collection A Century of Jazz Piano.",
+    "Among the most versatile musicians of modern times, keyboardist Dick Hyman performed in styles ranging from classic jazz to stride to pre-bop swing and beyond, even releasing several albums of electronic keyboard music. He once recorded an album, Themes and Variations on \"A Child Is Born,\" on which he rendered that tune in 11 different styles. Hyman began his career as a sideman in major swing bands, and for the latter part of his career, he returned to that style and to stride piano, which he recorded prolifically. Hyman was also a composer and became well known in that capacity as the creator of soundtracks for many films by actor-director Woody Allen. Hyman remained active into great old age, recording the album Counterpoint in 2019 with clarinetist Ken Peplowski."
+  ]
+}

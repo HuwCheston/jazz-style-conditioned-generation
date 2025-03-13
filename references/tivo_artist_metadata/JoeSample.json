@@ -1,0 +1,162 @@
+{
+  "moods": [
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Sparkling",
+      "weight": 6
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 6
+    },
+    {
+      "name": "Sensual",
+      "weight": 7
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 6
+    },
+    {
+      "name": "Energetic",
+      "weight": 7
+    },
+    {
+      "name": "Soft/Quiet",
+      "weight": 7
+    },
+    {
+      "name": "Light",
+      "weight": 9
+    },
+    {
+      "name": "Intimate",
+      "weight": 7
+    },
+    {
+      "name": "Relaxed",
+      "weight": 7
+    },
+    {
+      "name": "Sparse",
+      "weight": 5
+    },
+    {
+      "name": "Romantic",
+      "weight": 6
+    },
+    {
+      "name": "Organic",
+      "weight": 5
+    },
+    {
+      "name": "Reserved",
+      "weight": 6
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Gentle",
+      "weight": 8
+    },
+    {
+      "name": "Smooth",
+      "weight": 8
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Soothing",
+      "weight": 6
+    },
+    {
+      "name": "Rollicking",
+      "weight": 5
+    },
+    {
+      "name": "Earthy",
+      "weight": 5
+    },
+    {
+      "name": "Playful",
+      "weight": 5
+    },
+    {
+      "name": "Refined",
+      "weight": 8
+    }
+  ],
+  "genres": [
+    {
+      "name": "Crossover Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz-Pop",
+      "weight": 5
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Smooth Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Cool",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Fusion",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 5
+    },
+    {
+      "name": "Soul Jazz",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Ahmad Jamal",
+      "weight": 8
+    },
+    {
+      "name": "Herbie Hancock",
+      "weight": 8
+    },
+    {
+      "name": "Ramsey Lewis",
+      "weight": 9
+    },
+    {
+      "name": "Monty Alexander",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Joe Sample",
+  "bio": [
+    "Pioneer soul-jazz artist and Crusaders founder who collaborated with Joni Mitchell and wrote songs for B.B. King.",
+    "One of the many jazzmen who started out playing hard bop but went electric during the fusion era, Joe Sample was, in the late '50s, a founding member of the Jazz Crusaders along with trombonist Wayne Henderson, tenor saxman Wilton Felder, and drummer Stix Hooper. The Crusaders' debt to Art Blakey's Jazz Messengers wasn't hard to miss -- except that the L.A.-based unit had no trumpeter, and became known for its unique tenor/trombone front line. Sample, a hard-swinging player who could handle chordal and modal/scalar improvisation equally well, stuck to the acoustic piano during the Crusaders' early years -- but would place greater emphasis on electric keyboards when the band turned to jazz-funk in the early '70s and dropped \"Jazz\" from its name. Though he'd recorded as a trio pianist on 1969's obscure Fancy Dance, 1978's Rainbow Seeker was often described as his first album as a leader. In contrast to the gritty music the Crusaders became known for, Sample's own albums on MCA and, later, Warner Bros. and PRA generally favored a very lyrical and introspective jazz-pop approach. Sample died of mesothelioma in September 2014 in Houston, Texas at the age of 75. In 2015, Sample's holiday-themed collaboration with vocalist India.Arie, Christmas with Friends, was posthumously released.",
+    "A keyboardist and composer of great finesse, Joe Sample had the opportunity to excel in several musical arenas. As a founding member of the influential Jazz Crusaders (later just the Crusaders) in the 1960s, he helped to create the soul-jazz fusion associated with the era. He was also a sought-after session player, gracing many important recordings by Motown artists and other jazz, rock, and R&B stars. As a member of Tom Scott's L.A. Express he backed Joni Mitchell on her seminal '70s albums, and he wrote songs covered by soul singer Randy Crawford and blues guitarist B.B. King. Additionally, he released acclaimed solo albums at a steady clip, featuring his own sophisticated jazz compositions."
+  ]
+}

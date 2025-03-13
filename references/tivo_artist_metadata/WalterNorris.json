@@ -1,0 +1,39 @@
+{
+  "moods": [],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "McCoy Tyner",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "Donald Brown",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Walter Norris",
+  "bio": [
+    "Walter Norris was a brilliant pianist, a virtuoso whose improvisations could be both very complex harmonically yet often remain melodic. He would have been better known in the U.S. if he had not spent so much time in Germany. Norris worked with Howard Williams in Arkansas (1944-1950) as a teenager, was in Houston with Jimmy Ford (1952-1953), led his own trio in Las Vegas (1953-1954), and then settled in Los Angeles. He was on quite a few sessions during the latter half of the 1950s, most notably with Jack Sheldon, Frank Rosolino, and Herb Geller, in addition to Ornette Coleman's first record (1958); he did his best to fit into the latter setting, but (other than Paul Bley at the Hillcrest Club) it was the last time for decades that Coleman would use a pianist. The music director of the Playboy Club during 1963-1970, Norris was with the Thad Jones/Mel Lewis Orchestra during 1974-1976. After a stay in Scandinavia and a brief stint with Charles Mingus, Norris moved to Berlin in 1977, where he taught and performed for the remainder of his life in music. In the 1990s, Walter Norris visited the U.S. several times, recording dates for Concord and displaying his impressive musical growth of the previous 20 years. But he always returned to his home in Berlin, where he died on October 29, 2011, two months prior to what would have been his 80th birthday."
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "moods": [
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 5
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 8
+    },
+    {
+      "name": "Whimsical",
+      "weight": 5
+    },
+    {
+      "name": "Witty",
+      "weight": 5
+    },
+    {
+      "name": "Exuberant",
+      "weight": 5
+    },
+    {
+      "name": "Earthy",
+      "weight": 9
+    },
+    {
+      "name": "Enigmatic",
+      "weight": 6
+    },
+    {
+      "name": "Street-Smart",
+      "weight": 6
+    },
+    {
+      "name": "Searching",
+      "weight": 6
+    },
+    {
+      "name": "Passionate",
+      "weight": 8
+    },
+    {
+      "name": "Complex",
+      "weight": 8
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Playful",
+      "weight": 5
+    },
+    {
+      "name": "Cerebral",
+      "weight": 4
+    },
+    {
+      "name": "Quirky",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Modal Music",
+      "weight": 6
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Hal Galper",
+      "weight": 8
+    },
+    {
+      "name": "Ahmad Jamal",
+      "weight": 8
+    },
+    {
+      "name": "Joe Sample",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Ted Rosenthal",
+  "bio": [
+    "A fine modern mainstream pianist, Ted Rosenthal first gained fame when he won the second annual Thelonious Monk International Piano Competition in 1988. In 1990 he recorded his debut set as a leader for Ken and has since recorded as a leader for CTI, the Jazz Alliance, Concord (including an entry in the legendary Maybeck Recital Hall series), Playscape, Planet Arts, and Venus Records. Rosenthal worked as part of the last Gerry Mulligan Quartet during 1992-1995, making three CDs with the baritonist. He has also worked with Art Farmer, Jon Faddis, Benny Golson, James Moody, Jim Hall, Phil Woods, Mel Lewis, Lee Konitz, and Michael Brecker, among many others, and with David Sanborn on the NBC series Night Music. His recordings during the 2000s have included 2004's One Night in Vermont (a Planet Arts live date in duet with trombonist Bob Brookmeyer), 2006's The King and I (a Venus Records release with Rosenthal in a trio with bassist George Mraz and drummer Lewis Nash, interpreting songs from the Rodgers & Hammerstein musical), and 2008's My Funny Valentine (also on Venus Records and also a trio date, with Mraz returning on bass and with Al Foster on drums, interpreting jazz standards from the repertoire of Helen Merrill). Released in 2010, the Playscape label recording Impromptu featured Rosenthal interpreting the works of classical composers (Brahms, Chopin, Mozart, Puccini, Schubert, Schumann, and Tchaikovsky) with bassist Noriko Ueda and drummer Quincy Davis. Ted Rosenthal graduated from the Manhattan School of Music and serves as a faculty member there; he is also on the faculties of the Juilliard School and the New School/Mannes College of Music."
+  ]
+}

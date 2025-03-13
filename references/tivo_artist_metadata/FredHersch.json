@@ -1,0 +1,262 @@
+{
+  "moods": [
+    {
+      "name": "Provocative",
+      "weight": 7
+    },
+    {
+      "name": "Reflective",
+      "weight": 9
+    },
+    {
+      "name": "Earthy",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 8
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    },
+    {
+      "name": "Refined",
+      "weight": 9
+    },
+    {
+      "name": "Confident",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Earnest",
+      "weight": 8
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Stately",
+      "weight": 7
+    },
+    {
+      "name": "Laid-Back/Mellow",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 7
+    },
+    {
+      "name": "Melancholy",
+      "weight": 7
+    },
+    {
+      "name": "Optimistic",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Precious",
+      "weight": 7
+    },
+    {
+      "name": "Wistful",
+      "weight": 7
+    },
+    {
+      "name": "Poignant",
+      "weight": 7
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Cerebral",
+      "weight": 9
+    },
+    {
+      "name": "Ambitious",
+      "weight": 7
+    },
+    {
+      "name": "Intimate",
+      "weight": 8
+    },
+    {
+      "name": "Passionate",
+      "weight": 7
+    },
+    {
+      "name": "Sensual",
+      "weight": 5
+    },
+    {
+      "name": "Restrained",
+      "weight": 4
+    },
+    {
+      "name": "Gentle",
+      "weight": 7
+    },
+    {
+      "name": "Intense",
+      "weight": 5
+    },
+    {
+      "name": "Romantic",
+      "weight": 5
+    },
+    {
+      "name": "Yearning",
+      "weight": 7
+    },
+    {
+      "name": "Joyous",
+      "weight": 6
+    },
+    {
+      "name": "Enigmatic",
+      "weight": 6
+    },
+    {
+      "name": "Complex",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Film Score",
+      "weight": 2
+    },
+    {
+      "name": "Standards",
+      "weight": 7
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 8
+    },
+    {
+      "name": "Classical",
+      "weight": 2
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Modern Creative",
+      "weight": 6
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 7
+    }
+  ],
+  "similars": [
+    {
+      "name": "Tommy Flanagan",
+      "weight": 8
+    },
+    {
+      "name": "Roland Hanna",
+      "weight": 9
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "George Cables",
+      "weight": 8
+    },
+    {
+      "name": "Makoto Ozone",
+      "weight": 5
+    },
+    {
+      "name": "Keith Jarrett",
+      "weight": 7
+    },
+    {
+      "name": "Brad Mehldau",
+      "weight": 7
+    },
+    {
+      "name": "Michel Petrucciani",
+      "weight": 7
+    },
+    {
+      "name": "Jessica Williams",
+      "weight": 8
+    },
+    {
+      "name": "Geri Allen",
+      "weight": 7
+    },
+    {
+      "name": "Cyrus Chestnut",
+      "weight": 7
+    },
+    {
+      "name": "Lynne Arriale",
+      "weight": 7
+    },
+    {
+      "name": "Adam Birnbaum",
+      "weight": 8
+    },
+    {
+      "name": "Marc Copland",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Fred Hersch",
+  "bio": [
+    "Highly acclaimed pianist, composer, and activist whose lyrical, sophisticated style extends to his interpretive recordings as well as his own pieces.",
+    "An acclaimed jazz pianist, composer, and educator, Fred Hersch is a supremely gifted soloist with a sophisticated, yet unselfconscious approach to playing standards and his own original compositions. As a teacher, he counts both Brad Mehldau and the Bad Plus' Ethan Iverson as former students. As a player, his nuanced style, influenced by such giants as Ahmad Jamal, Bill Evans, and Oscar Peterson, is considered a benchmark for modern jazz, garnering him multiple Grammy nominations, including for 1992's Dancing in the Dark, 2014's Floating, and 2017's Open Book. Among other accolades, Hersch was awarded a 2003 Guggenheim Memorial Fellowship for composition, with which he created Leaves of Grass, an octet exploration of Walt Whitman's poetry. He also received a 2016 Doris Duke Performing Artist Award. While he often performs solo, he has released duo albums, collaborating with artists like Ralph Alessi, Julian Lage, and Esperanza Spalding, the latter of whom joined him for 2020's Live at the Village Vanguard. In 2022, he collaborated with the Crosby Street String Quartet for Breath by Breath and paired with Enrico Rava on The Song Is You on ECM. He then joined Esperanza Spalding for 2023's Grammy-nominated Alive at the Village Vanguard and returned to ECM for the solo piano session Silent, Listening. Openly gay and diagnosed HIV-positive at age 30, Hersch is a vocal proponent for gay rights and AIDS research and education.\r\nBorn in Cincinnati, Ohio, in 1955, Hersch began playing classical piano at age four and was dabbling in composing before the age of ten. However, it was while attending Grinnell College in Iowa that he first became interested in jazz. He dropped out of college and spent some time gigging around Cincinnati before enrolling at the New England Conservatory, where he studied with pianist and composer Jaki Byard. After graduating with honors in 1977, Hersch moved to New York City, where he began playing nightly, paying his dues as a sideman. He also made his recording debut during this period, appearing on such albums as Art Farmer's Yama and Billy Harper's Awakening, both in 1979.\r\nFrom 1980 to 1986, Hersch taught at the New England Conservatory. He began leading his own trio and working as a sideman with such luminaries as Chris Connor, Joe Henderson, Stan Getz, Toots Thielemans, Eddie Daniels, and others. He made his debut as leader in 1984 with the trio album Horizons, featuring bassist Marc Johnson and drummer Joey Baron. That same year, he joined clarinetist Jane Ira Bloom for As One, the first of many collaborations between the duo. The '80s remained a busy period for the pianist, who recorded extensively with others and released his own albums including 1986's Sarabande, 1988's E.T.C., and 1989's Heartsongs.\r\nIn 1993, Hersch came out as gay in his hometown during a benefit performance for AIDS Volunteers of Cincinnati. At the same time, he revealed that he had been receiving treatment for AIDS since his diagnosis with the disease in 1984. From the '90s onward, Hersch has remained a tireless proponent for both gay rights and AIDS research and education. He has produced benefit recordings, performed in numerous charity concerts, and given keynote addresses at international medical conferences. \r\nThe '90s were also the start of a more prolific creative period for Hersch, who earned praise for such releases as 1990's Evanessence: Tribute to Bill Evans, 1992's Dancing in the Dark, and 1994's I Never Told You: Fred Hersch Plays Johnny Mandel. Beginning with 1995's Plays Billy Strayhorn, Hersch built a sturdy set of albums on Nonesuch Records, many of them paying tribute to his influences, including 1996's Plays Rodgers & Hammerstein and 1997's Thelonious Monk-themed Thelonious. Similarly, 1998's Songs We Know found him investigating many of his favorite compositions alongside guitarist Bill Frisell.\r\nIn the 2000s, Hersch remained quite active, releasing several highly ambitious works including the three-disc Songs Without Words in 2001. Following his acceptance of a 2003 Guggenheim Memorial Fellowship for composition, he issued the Walt Whitman-inspired octet project Leaves of Grass, which featured contributions from vocalists Kurt Elling and Kate McGarry in 2005. For 2007's Night & the Music, Hersch returned to a more intimate, less conceptual trio setting. \r\nIn 2008, Hersch developed HIV-induced dementia, which left him in a coma for two months. Upon awaking, he underwent extensive rehabilitation to help him regain his ability to play piano. Following his recovery, he released the bossa nova-themed solo piano effort Fred Hersch Plays Jobim in 2009. The trio recording Whirl appeared on Palmetto in 2010. Also in 2010, Hersch was the subject of a major article in The New York Times Sunday Magazine entitled Giant Steps: The Survival of a Great Jazz Pianist by David Hadju. \r\nHersch then delivered two companion live albums with the 2011 solo piano date Alone at the Vanguard, followed a year later by the Grammy-nominated trio album Alive at the Vanguard. 2013 also proved to be a fruitful year as he appeared on no less than three albums: Fun House with pianist Benoit Delbecq, Only Many with trumpeter Ralph Alessi, and Free Flying, a collaboration with guitarist Julian Lage.\r\nIn 2014, Hersch received yet another Grammy nomination, this time for his trio album Floating. That same year he released the DVD My Coma Dreams, a 2011 performance of his multimedia stage show based on his coma experience. The live album Solo, recorded at the Windham Civic Center Concert Hall in Windham, New York, followed in 2015. In 2016, Hersch was the subject of directors Charlotte Lagarde and Carrie Lozano's documentary film The Ballad of Fred Hersch. The following year, he published his autobiographical memoir, Good Things Happen Slowly. Also that year, he delivered Open Book, which featured a series of solo performances recorded at the JCC Art Center Concert Hall in Seoul, South Korea. \r\nThe Grammy-nominated Begin Again arrived in 2019 and found Hersch collaborating with Vince Mendoza and Germany's WDR Big Band. 2022's Breath by Breath found the pianist drawing upon his longtime practice of meditation. Featuring an extended suite, the album's contributors included Drew Gress, Jochen Rueckert, Rogerio Boccato, and the Crosby Street String Quartet. Also that year, he paired with Italian trumpet icon Enrico Rava for the intimate duo session The Song Is You on ECM. Hersch kicked off 2023 with Alive at the Village Vanguard, a duo album with vocalist/bassist Esperanza Spalding. It picked up two Grammy nominations for Jazz Album of the Year and Best Jazz Performance for \"But Not for Me.\" He returned to ECM the following year with the introspective solo piano date Silent, Listening.",
+    "An acclaimed jazz pianist, Fred Hersch is a supremely gifted soloist with a sophisticated yet unselfconscious approach to playing standards and his own original compositions. His nuanced style, influenced by such giants as Ahmad Jamal, Bill Evans, and Oscar Peterson, is considered a benchmark for modern jazz, garnering him multiple Grammy nominations (1992's Dancing in the Dark, 2014's Floating, and 2017's Open Book). Among other accolades, Hersch was awarded a 2003 Guggenheim Memorial Fellowship for composition, with which he created Leaves of Grass, an octet exploration of Walt Whitman's poetry. While he often performs solo, he has collaborated with artists like the Crosby Street String Quartet (2022's Breath by Breath), Enrico Rava (2022's The Song Is You), and Esperanza Spalding (2023's Grammy-nominated Alive at the Village Vanguard). Openly gay and diagnosed HIV-positive at age 30, Hersch is a vocal proponent for gay rights and AIDS research and education."
+  ]
+}

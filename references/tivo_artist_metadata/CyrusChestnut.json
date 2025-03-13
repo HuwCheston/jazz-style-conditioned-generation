@@ -1,0 +1,226 @@
+{
+  "moods": [
+    {
+      "name": "Knotty",
+      "weight": 6
+    },
+    {
+      "name": "Reserved",
+      "weight": 5
+    },
+    {
+      "name": "Effervescent",
+      "weight": 7
+    },
+    {
+      "name": "Gritty",
+      "weight": 3
+    },
+    {
+      "name": "Bright",
+      "weight": 7
+    },
+    {
+      "name": "Ambitious",
+      "weight": 7
+    },
+    {
+      "name": "Exuberant",
+      "weight": 6
+    },
+    {
+      "name": "Passionate",
+      "weight": 6
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 9
+    },
+    {
+      "name": "Playful",
+      "weight": 6
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 6
+    },
+    {
+      "name": "Complex",
+      "weight": 6
+    },
+    {
+      "name": "Spiritual",
+      "weight": 9
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Elegant",
+      "weight": 6
+    },
+    {
+      "name": "Cerebral",
+      "weight": 6
+    },
+    {
+      "name": "Sparkling",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 5
+    },
+    {
+      "name": "Sensual",
+      "weight": 5
+    },
+    {
+      "name": "Earnest",
+      "weight": 5
+    },
+    {
+      "name": "Earthy",
+      "weight": 5
+    },
+    {
+      "name": "Reflective",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 9
+    },
+    {
+      "name": "Gleeful",
+      "weight": 5
+    },
+    {
+      "name": "Sentimental",
+      "weight": 7
+    },
+    {
+      "name": "Rousing",
+      "weight": 7
+    },
+    {
+      "name": "Rollicking",
+      "weight": 5
+    },
+    {
+      "name": "Intimate",
+      "weight": 6
+    },
+    {
+      "name": "Relaxed",
+      "weight": 6
+    },
+    {
+      "name": "Joyous",
+      "weight": 7
+    },
+    {
+      "name": "Warm",
+      "weight": 6
+    },
+    {
+      "name": "Boisterous",
+      "weight": 5
+    },
+    {
+      "name": "Reverent",
+      "weight": 8
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Straight-Ahead Jazz",
+      "weight": 7
+    },
+    {
+      "name": "Christmas",
+      "weight": 8
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 6
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Holidays",
+      "weight": 6
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Holiday",
+      "weight": 8
+    }
+  ],
+  "similars": [
+    {
+      "name": "Beegie Adair",
+      "weight": 5
+    },
+    {
+      "name": "Eric Reed",
+      "weight": 8
+    },
+    {
+      "name": "Bill Charlap",
+      "weight": 7
+    },
+    {
+      "name": "Marcus Roberts",
+      "weight": 8
+    },
+    {
+      "name": "Brad Mehldau",
+      "weight": 6
+    },
+    {
+      "name": "Geri Allen",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 6
+    },
+    {
+      "name": "Gerald Clayton",
+      "weight": 5
+    },
+    {
+      "name": "Fred Hersch",
+      "weight": 7
+    },
+    {
+      "name": "Lynne Arriale",
+      "weight": 5
+    }
+  ],
+  "tivo_artist_name": "Cyrus Chestnut",
+  "bio": [
+    "Highly regarded, Baltimore-born jazz pianist who embraces a range of influences from hard bop and modalism to gospel.",
+    "A masterful jazz pianist, Cyrus Chestnut balances his lithe technical skill with a robust, soulful style that speaks to his deep gospel roots and love of swinging hard bop. Raised in the church, he learned how to infuse his swinging, classically trained style with a warm gospel sound, a style that first marked his work as a sideman, backing legendary vocalists Jon Hendricks and Betty Carter, as well as with instrumentalists like Donald Harrison and Wynton Marsalis. He further perfected his approach as a leader, recording a bevy of small group albums for Atlantic, like 1998's Cyrus Chestnut, and as a member of the Manhattan Trinity with bassist George Mraz and drummer Lewis Nash. Most often, Chestnut leads his trio, as on 2016's Natural Essence with veterans Buster Williams and Lenny White, 2018's Kaleidoscope with Eric Wheeler and Chris Beck, and 2022's My Father's Hands with Peter Washington and drummer Lewis Nash, the latter of which found him paying tribute to his late father, who first taught him how to play.\r\nBorn in Baltimore, Maryland, in 1963, Chestnut was introduced to the piano at age three by his father, a self-taught pianist and church organist. Soon after, he was performing at the Mount Calvary Baptist Church, which he attended with his parents. By age nine, he was studying classical piano in the prep program at the Peabody Institute. All the while, he continued to develop his gospel and jazz skills, and in 1981 enrolled at Boston's Berklee College of Music, where he earned his degree in jazz composition and arranging. While there, he was awarded the Eubie Blake Fellowship, the Quincy Jones Scholarship, and the Oscar Peterson Scholarship. After graduating, he found himself an in-demand sideman, working throughout the late '80s and early '90s with a string of well-known performers including Jon Hendricks, Wynton Marsalis, Terence Blanchard, Donald Harrison, and others. However, it was his early association with vocalist Betty Carter, with whom he toured and recorded, appearing on 1992's It's Not About the Melody, that had a lasting influence on the pianist. Purportedly, Carter encouraged Chestnut to push himself to be more individualistic by taking chances and trying to surprise her.\r\nAs a leader, Chestnut took his time to develop, and he made his solo debut in 1992 with The Nutman Speaks and Nut. Recorded for Japan's Alfa Jazz label, the albums showcased the pianist's trio with bassist Christian McBride and drummer Carl Allen. A third trio effort with McBride and Allen, Another Direction, followed on Evidence in 1993. Chestnut then signed with Atlantic and issued 1994's Revelation with bassist Christopher J. Tomas and drummer Clarence Penn. Several more highly regarded Atlantic releases followed, including 1995's Earth Stories and 1998's Cyrus Chestnut, which featured guest spots from Joe Lovano, James Carter, and Anita Baker. \r\nIn 1995, Chestnut made his acting debut, performing as a character based on Count Basie in director Robert Altman's film Kansas City. Also during this period, he co-led the Manhattan Trinity with bassist George Mraz and drummer Lewis Nash. Together, they released a handful of highly regarded trio and small-group albums, including 1998's Love Story with saxophonist Eric Alexander. The pianist also appeared on vocalist Madeleine Peyroux's Dreamland, and collaborated on projects with other artists including Tim Warfield, Kathleen Battle, James Carter, Dee Dee Bridgewater, and Rodney Whitaker. \r\nIn 2000, Chestnut delivered his first holiday-themed album, Charlie Brown Christmas, which hit number three on the Billboard Jazz Albums chart. He rounded out his Atlantic contract with 2001's all-original Soul Food, a exuberant set featuring appearances by Marcus Printup, James Carter, Gary Bartz, and others. He then moved to Warner Bros. for 2003's trio effort You Are My Sunshine, with bassist Michael Hawkins and drummer Neal Smith. Chestnut expanded the same group to a quartet, adding guitarist Russell Malone on 2006's Genuine Chestnut. A year later, he applied his urbane jazz chops to the music of Elvis Presley on Cyrus Plays Elvis, followed by 2008's modal jazz-leaning Black Nile on Japan's M&I label. In 2013, he delivered the hard bop-infused Soul Brother Cool, which featured trumpeter Freddie Hendrix. He showcased his trio on the 2014 concert album Midnight Melodies, recorded live at Smoke in New York City. Also in 2014, he joined Jimmy Greene on the saxophonist's poignant, Grammy-nominated album Beautiful Life.\r\nChestnut then moved to HighNote, debuting for the label with the 2015 trio effort A Million Colors in Your Mind with bassist David Williams and drummer Victor Lewis. For his second HighNote effort, 2016's Natural Essence, the pianist was joined by the veteran rhythm section of bassist Buster Williams and drummer Lenny White. Williams and White were also on board for 2017's There's a Sweet Sweet Spirit, which featured vibraphonist Steve Nelson. In addition, he paired with Charnett Moffett on the bassist's Music from Our Soul. In 2018, Chestnut returned with Kaleidoscope, a classical-influenced trio album featuring bassist Eric Wheeler and drummer Chris Beck. Included on the record were jazz reworkings of compositions by Wolfgang Amadeus Mozart, Claude Debussy, Erik Satie, and more. With 2022's My Father's Hands, Chestnut paid tribute to his father, who died in 2021 at age 85. Along with solo performances, the album included trio recordings with the pianist's longtime associates Peter Washington on bass and Lewis Nash on drums.",
+    "A masterful jazz pianist, Cyrus Chestnut balances his lithe technical skill with a robust, soulful style that speaks to his deep gospel roots and love of swinging hard bop. Raised in the church, Chestnut learned how to infuse his swinging, classically trained style with a warm gospel sound, a style that first marked his work as a sideman, backing artists like Jon Hendricks, Betty Carter, Donald Harrison, and Wynton Marsalis. He further perfected his approach as a leader, recording a bevy of small-group albums for Atlantic, like 1998's Cyrus Chestnut, and as a member of the Manhattan Trinity with bassist George Mraz and drummer Lewis Nash. Most often, Chestnut leads his trio, as on 2016's Natural Essence with veterans Buster Williams and Lenny White, 2018's Kaleidoscope with Eric Wheeler and Chris Beck, and 2022's My Father's Hands, a tribute to his late father, who first taught him how to play."
+  ]
+}

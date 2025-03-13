@@ -1,0 +1,93 @@
+{
+  "moods": [
+    {
+      "name": "Confident",
+      "weight": 6
+    },
+    {
+      "name": "Complex",
+      "weight": 8
+    },
+    {
+      "name": "Energetic",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 4
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 6
+    },
+    {
+      "name": "Intense",
+      "weight": 3
+    },
+    {
+      "name": "Cerebral",
+      "weight": 9
+    },
+    {
+      "name": "Bright",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 6
+    },
+    {
+      "name": "Elaborate",
+      "weight": 5
+    },
+    {
+      "name": "Rousing",
+      "weight": 8
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Lively",
+      "weight": 4
+    },
+    {
+      "name": "Ambitious",
+      "weight": 7
+    },
+    {
+      "name": "Organic",
+      "weight": 5
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    },
+    {
+      "name": "Contemporary Jazz",
+      "weight": 5
+    }
+  ],
+  "similars": [],
+  "tivo_artist_name": "David Berkman",
+  "bio": [
+    "Inventive pianist and composer whose music is full of subtle surprises and adventure yet in the jazz tradition",
+    "David Berkman is an inventive pianist and composer whose music is full of subtle surprises and adventure yet well grounded in the jazz tradition. His father was an amateur pianist and Berkman, after a short stint on the bass, also switched to piano. Although he gigged locally, he did not become serious about music until he attended college including a period at Berklee. After graduation, Berkman returned to Cleveland, often playing with drummer Greg Bandy and bassist Junie Booth and accompanying visiting all-stars. He moved to New York in 1985 and since then he has performed in many situations including with trumpeter Scott Wendholt, tenor-saxophonist Rich Perry, drummer Eliot Zigmund (with whom the pianist recorded a trio album), the Woody Herman Orchestra (touring in 1989), drummer Matt Wilson, Joe Lovano, Billy Hart and bassist Ray Drummond; he also arranged songs for singers Eden Atwood and Lisa Michel. Berkman's most important and extensive musical associations have been with bassist Cecil McBee (with whom he recorded Unspoken), the Vanguard Orchestra and Tom Harrell. In 1998 Harrell and altoist Steve Wilson were part of David Berkman's quintet album for Palmetto, Handmade. He released Communication Theory in 2000.",
+    "David Berkman is an inventive pianist and composer whose music is full of subtle surprises and adventure yet grounded in the jazz tradition. His father was an amateur pianist and Berkman, after a short stint on the bass, also switched to piano. Although he gigged locally, he did not become serious about music until he attended college including a period at Berklee. Berkman moved to New York in 1985 and since then he has performed in many situations including with drummer Eliot Zigmund (with whom the pianist recorded a trio album), the Woody Herman Orchestra (touring in 1989), drummer Matt Wilson, and saxophonist Joe Lovano; he has also arranged songs for singers Eden Atwood and Lisa Michel. In 2009, Berkman released the well-regarded LIVE AT SMOKE, recorded at the legendary Upper West Side club, with the up-and-coming tenorist Jimmy Greene."
+  ]
+}

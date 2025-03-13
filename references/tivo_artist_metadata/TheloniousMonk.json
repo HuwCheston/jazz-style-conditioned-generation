@@ -1,0 +1,222 @@
+{
+  "moods": [
+    {
+      "name": "Exuberant",
+      "weight": 6
+    },
+    {
+      "name": "Passionate",
+      "weight": 6
+    },
+    {
+      "name": "Searching",
+      "weight": 7
+    },
+    {
+      "name": "Literate",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 7
+    },
+    {
+      "name": "Earnest",
+      "weight": 8
+    },
+    {
+      "name": "Effervescent",
+      "weight": 6
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 7
+    },
+    {
+      "name": "Ambitious",
+      "weight": 7
+    },
+    {
+      "name": "Rousing",
+      "weight": 6
+    },
+    {
+      "name": "Confident",
+      "weight": 9
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Quirky",
+      "weight": 7
+    },
+    {
+      "name": "Humorous",
+      "weight": 8
+    },
+    {
+      "name": "Playful",
+      "weight": 7
+    },
+    {
+      "name": "Thoughtful",
+      "weight": 6
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Sprawling",
+      "weight": 6
+    },
+    {
+      "name": "Wry",
+      "weight": 7
+    },
+    {
+      "name": "Stylish",
+      "weight": 6
+    },
+    {
+      "name": "Earthy",
+      "weight": 8
+    },
+    {
+      "name": "Reflective",
+      "weight": 5
+    },
+    {
+      "name": "Brash",
+      "weight": 6
+    },
+    {
+      "name": "Enigmatic",
+      "weight": 9
+    },
+    {
+      "name": "Irreverent",
+      "weight": 8
+    },
+    {
+      "name": "Amiable/Good-Natured",
+      "weight": 6
+    },
+    {
+      "name": "Uplifting",
+      "weight": 7
+    },
+    {
+      "name": "Complex",
+      "weight": 9
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Hard Bop",
+      "weight": 9
+    },
+    {
+      "name": "Post-Bop",
+      "weight": 9
+    },
+    {
+      "name": "Mainstream Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Modal Music",
+      "weight": 9
+    },
+    {
+      "name": "Modern Big Band",
+      "weight": 5
+    },
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Progressive Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "Geri Allen",
+      "weight": 8
+    },
+    {
+      "name": "Benny Green",
+      "weight": 8
+    },
+    {
+      "name": "McCoy Tyner",
+      "weight": 9
+    },
+    {
+      "name": "Barry Harris",
+      "weight": 9
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "Bud Powell",
+      "weight": 9
+    },
+    {
+      "name": "Herbie Nichols",
+      "weight": 8
+    },
+    {
+      "name": "John Hicks",
+      "weight": 8
+    },
+    {
+      "name": "Herbie Hancock",
+      "weight": 8
+    },
+    {
+      "name": "Erroll Garner",
+      "weight": 9
+    },
+    {
+      "name": "Art Tatum",
+      "weight": 7
+    },
+    {
+      "name": "Bill Evans",
+      "weight": 8
+    },
+    {
+      "name": "Keith Jarrett",
+      "weight": 6
+    }
+  ],
+  "tivo_artist_name": "Thelonious Monk",
+  "bio": [
+    "A brilliant composer and criminally underrated pianist whose sense of rhythm, space, and harmony made him one of the founders of modern jazz.",
+    "Recognized as one of the most original musicians in American history, Thelonious Sphere Monk fashioned a startlingly unique, inimitable playing and composing style that influenced virtually every succeeding jazz generation. His playing technique offered a percussive approach to the piano, identified by sparse, complex, sometimes dissonant harmonies, developed from unusual intervals and rhythms, and imbued with warmth and playfulness. (His motto was \"There are no wrong notes on the piano.\") Monk's name is synonymous with the creation of modern jazz; many of his compositions are jazz standards including, \"Round Midnight,\" \"Well You Needn’t,\" \"Straight, No Chaser,\" and \"Epistrophy.\" His bold musical conceptions sought to bind harmony and rhythm seamlessly to melody. A classically trained pianist, he was deeply influenced by Harlem's stride piano tradition. Monk's Blue Note recording sessions between 1947 and 1948, and 1951 and 1952, netted two volumes, numerically titled Genius of Modern Music. He cut outstanding albums for Riverside and Prestige in the '50s (Brilliant Corners), and Columbia in the '60s (Monk's Dream). On-stage, he was in constant motion: he'd leave his piano to dance during another player's solo, wiggle on his piano bench to emphasize a rhythm, and even bash elbows and forearms onto the keys in search of different tones. Monk released the charting Criss-Cross and Monk's Dream in 1963 and landed on the cover of Time a year later. After leaving Columbia in 1971, he recorded and played live only sporadically. From 1976 until his death in 1982, Monk lived at the home of longtime friend Pannonica de Koenigswarter. In 1978, he was honored by President Jimmy Carter during a White House jazz party. \r\nMonk was born in Rocky Mount, North Carolina in October of 1917. His family moved to New York City when he was five. He started playing piano a year later and received formal classical tutoring from age 11. He also received rigorous gospel training accompanying his church choir (in which his mother sang), and attended Stuyvesant High School, where he excelled at physics and math. Near his home were several jazz clubs, as well as the residence of Harlem stride pianist James P. Johnson, from whom Monk learned a great deal. By age 13 he was playing in a local bar and grill with a trio. A year later he was playing rent parties. Monk gained distinction while performing at the Apollo Theater's weekly amateur contests: He won so often, he was ultimately banned from the competition. Subsequently, he accompanied a faith healer and preacher for a year-long tour that revealed to him the subtleties and intricacies of rhythm & blues accompaniment. During the late '30s he toured as a pianist with a gospel group, then began playing stride and swing in clubs where drummer Kenny Clarke heard and hired him for the house band at Minton's Playhouse in 1941. Minton's was home to the late-night jam sessions frequented by young lions Dizzy Gillespie, Charlie Parker, Max Roach, and Bud Powell; the club served as an incubator for the emergent bebop. Monk was hired by Lucky Millinder's orchestra in 1942 and he also worked with the Coleman Hawkins Sextet between 1943 and 1945, making his recording debut on the 78 \"Flyin' Hawk.\" Monk was a member of Dizzy Gillespie's big band in 1946, and started leading his own groups in 1947. \r\nThe period between 1945 and 1954 was difficult for Monk. Because his rhythmic solos reflected an uncommon use of space, and a somewhat percussive technique, some musicians and critics erroneously thought him an inferior pianist. His compositions were so harmonically and rhythmically advanced -- even when employing a 12-bar blues or 32-bar ballad architecture -- they confused lesser and/or lazier players. Add to this the systemic racism of the era, his unusual name, his large physical stature, and iconic fashion sense: He wore a stylish goatee, and had a constantly changing array of colorful hats, bamboo sunglasses, and sharp cut suits. His personality that rendered him an occasionally uncommunicative introvert but also the ultimate hipster who spoke in the jazz vernacular. All served to brand him an outsider. A trumped-up charge for drug possession (he took the rap for Powell) didn't help, either, as it deprived Monk of his New York cabaret license in 1951, forcing him to seek work in Brooklyn and elsewhere for six years. He was also forced to rely on the freely offered financial assistance of his patron, Baroness Pannonica de Koenigswarter. \r\nBlue Note's Alfred Lion paid no mind to critics. He believed in Monk and recorded him extensively between 1947 and 1948 and again in 1951 and 1952. His singles were eventually compiled onto two 10\" vinyl LPs released as Genius of Modern Music, Vols. 1 & 2. The initial release, issued when Monk was 35, offered eight originals including \"Epistrophy\" \"'Round Midnight,\" \"Well You Needn't,\" Ruby My Dear,\" and \"Off Minor\"; the second featured \"Criss-Cross,\" \"Four in One,\" and \"Straight, No Chaser.\" Each of these titles reflected Monk’s trademark playing style, which incorporated silence and dissonance as forms of self-expression. Soon after that first recording session, Monk married Nellie Smith, who gave birth to his two children Barbara and T.S. Monk II. \r\nDuring his time with Blue Note, Monk recorded a host of titles for Prestige including Thelonious Monk Plays and Sonny Rollins and Thelonious Monk. In 1955, Prestige sold his contract to Riverside where he released Plays the Music of Duke Ellington to appease the label. By 1956, Monk had come into his own with Brilliant Corners, considered to be his first masterpiece (due in part to its complex title track). It proved so technically demanding and harmonically complex that the album version had to be edited together from separate takes. In 1957, he recorded Mulligan Meets Monk with Gerry Mulligan; the release helped expose him to a wider audience. With the Riverside release of the solo Thelonious Himself and Thelonious Monk with John Coltrane, the artist received belated but well-deserved acclaim. In 1957 and 1958, he won the Down Beat Critics Poll as Best Jazz Pianist. Monk also worked with classical composer Hall Overton to present his music orchestrally for 1959's At Town Hall. \r\nThe pianist signed to Columbia in late 1961 and toured Europe for the first time with a quartet that included saxophonist Charlie Rouse, drummer Frankie Dunlop, and bassist John Ore. (Later rhythm sections would include bassists Butch Warren or Larry Gales, and drummer Ben Riley). He issued two long-players in 1962, Monk's Dream and Criss-Cross, both compiled from EP and single sessions. They both charted and were received enthusiastically by critics. In 1964, Monk, at the peak of his popularity, appeared on the cover of Time Magazine: He is one of only five jazz musicians to have done so. (The others were Louis Armstrong, Dave Brubeck, Duke Ellington, and much later, Wynton Marsalis.)\r\nColumbia issued two charting titles by him that year, including Big Band and Quartet in Concert and It's Monk's Time. 1965 saw the release of Monk, comprised of a pair of striking originals (Teo\" and \"Pannonica\") and standards. It's one of the artist's most unjustly underrated offerings, and it's still a radical album. Critics complained that he wasn't writing new music, but Monk re-recorded tunes to reinvigorate them using fresh harmonic and rhythmic approaches. His approach to standards here was to strip them to basic harmonies and rhythms then rebuild them in his own musical image. In 1965, the release of Solo Monk appeased them. A standout in his catalog, most of its sides were cut during breaks on a 1964 West Coast quartet tour in October and November. The jaunt netted two masterful live quartet releases as well: Live at the It Club and Live at the Jazz Workshop (unreleased until the '80s). \r\nBy 1965, Columbia had become enthralled with rock and R&B artists on its roster thanks to administrative vice-president and general manager Clive Davis, who took the helm in 1966. Jazz was losing its place of import. Still, Monk continued to record and tour for the label. The seminal Straight, No Chaser was released in 1967. Underground, Monk's last Columbia record to receive acclaim during his lifetime was released in 1968 at the pinnacle of the counterculture, its iconic Norman Griner cover shot featured Monk in a makeshift bunker (actually an upscale New York photo studio) with a rifle strapped to his back and assorted grenades and handguns on a table, a cow, a tied-up Nazi, and a broken piano that he played for 90 minutes. Monk spoke only to the cow during the entire shoot. \r\n1969's Monk's Blues was his last outing for the label. Recorded by Monk's quartet with a big band in Los Angeles, it was deemed a commercial failure. Columbia's disinterest, combined with Monk's deteriorating mental and physical health, kept him out of the studio. In January of 1970, Rouse left the band, and less than two years later, the label quietly dropped Monk from its roster.\r\nIn 1971, Japan's Express signed him and issued Monk in Tokyo with a pick-up quartet comprised of saxophonist Paul Jeffrey, bassist Larry Ridley, and drummer Lenny McBrowne on one side, and with Toshiyuki Miyama & His New Herd Orchestra on the flip. He recruited saxophonist Pat Patrick and son Thelonious, Jr. for his quartet. Monk toured widely in 1972 with the \"Giants of Jazz,\" a bop supergroup consisting of Dizzy Gillespie, Kai Winding, Sonny Stitt, Al McKibbon, and Art Blakey, resulting in the Atlantic-issued live set Giants of Jazz. That said, he accepted ever fewer live engagements. Monk cut two outings for Black Lion in London, comprised of solo and trio recordings with Blakey and McKibbon. Commercially they appeared as Something in Blue in 1972 and The Man I Love in 1973. (A final recording from these sessions appeared as Blue Sphere in 1977.) This material, all but ignored during his lifetime, was collected for a box set by Mosaic after his death and acclaimed for the inspiration and quality in his playing. After appearances at both Carnegie Hall and Lincoln Center in 1974 and 1975, and the Newport Jazz Festivals in 1975 and 1976, Monk quit performing altogether. With the full approval of his wife Nellie, he retired to a single room in Baroness Pannonica's New Jersey mansion. The room contained a piano, but he seldom touched it. He spoke even less. Monk, seriously ailing, would rise, shower, put on a fresh suit, and return to bed where he spent the day watching television. In 1979, Columbia issued the two-fer Always Know, a compilation of unreleased material from his tenure with the label. \r\nMonk died from a stroke in 1982. Having lived in the same ground floor apartment on West 63rd St. for years, New York City named it \"Thelonius Monk Circle\" (sic). The spelling wasn't corrected until 2013. The year of his death, Columbia issued two stellar double-length live offerings from its vaults: Live at the It Club and Live at the Jazz Workshop. Two years later, producer Hal Willner's seminal tribute to the musician, That's the Way I Feel Now, was issued by A&M. Its track list included performances by jazz musicians such as the Carla Bley Big Band with Johnny Griffin; Steve Lacy with Elvin Jones or Gil Evans, and many others, but it also included rock and funk musicians like Was (Not Was), Joe Jackson, and NRBQ interpreting Monk's tunes. Mulligan Meets Monk was released by Milestone that same year. It contained the original album appended with alternate takes -- including a 21-minute version of the title tune in the process of being recorded. Mosaic, the jazz collector's label, offered The Complete Blue Note Recordings of Thelonious Monk as its debut release. It sold out almost instantly. A few years later they followed with The Complete Vogue Recordings/The Black Lion Sessions, fomenting a major critical reappraisal of the work; they were once maligned as inferior. In 1988, director Charlotte Zwerin's biographical documentary Straight, No Chaser appeared to thunderous acclaim and awards; Clint Eastwood was executive producer.\r\nVirtually all of Monk's officially released recordings have been remastered and reissued several times. In 2005, Blue Note released The Thelonious Monk Quartet with John Coltrane at Carnegie Hall to unanimous critical acclaim and chart success. Recorded during a benefit concert in 1957, the tape sat untouched in the Library of Congress until recording lab supervisor Larry Appelbaum unearthed it for restoration by Michael Cuscuna and T.S. Monk. In 2013, Robin D.G. Kelley's award-winning biography Thelonious Monk: The Life and Times of an American Original, was published. In 2017, the release of Les Liaisons Dangereuses 1960 contained 30 unreleased minutes of Monk's music cut in a single day by his quartet for Roger Vadim's film of the same name. In 2019, a long-lost 1968 recording of the Thelonious Monk Quartet (with Rouse, Gales, and Riley) at Palo Alto High School by Danny Scher emerged. Simply titled Palo Alto: Live at Palo Alto High School, it was set for release by Impulse! during the summer, but a dispute between Monk's estate and the label delayed its issue indefinitely.",
+    "Recognized as one of the most original musicians in American history, Thelonious Monk fashioned a startlingly unique, inimitable playing and composing style that influenced virtually every succeeding generation of jazz musicians. His technique was percussive and sparse with complex, dissonant harmonies developed from unusual intervals and rhythms marked by warmth, dramatic pauses, and playfulness. Monk's name is synonymous with the creation of modern jazz, and his compositions are among the genre's most recorded. His early recordings for Blue Note were released in two volumes as Genius of Modern Music. He cut outstanding '50s albums for Riverside, including Monk's Music and Brilliant Corners. His last great recording period occurred on Columbia in the '60s, with a host of quartet and solo outings, notably Monk's Dream and Criss-Cross."
+  ]
+}

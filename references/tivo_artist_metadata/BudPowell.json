@@ -1,0 +1,174 @@
+{
+  "moods": [
+    {
+      "name": "Rollicking",
+      "weight": 9
+    },
+    {
+      "name": "Passionate",
+      "weight": 9
+    },
+    {
+      "name": "Confident",
+      "weight": 9
+    },
+    {
+      "name": "Rambunctious",
+      "weight": 7
+    },
+    {
+      "name": "Quirky",
+      "weight": 8
+    },
+    {
+      "name": "Exuberant",
+      "weight": 7
+    },
+    {
+      "name": "Lively",
+      "weight": 7
+    },
+    {
+      "name": "Energetic",
+      "weight": 8
+    },
+    {
+      "name": "Ambitious",
+      "weight": 9
+    },
+    {
+      "name": "Bright",
+      "weight": 7
+    },
+    {
+      "name": "Searching",
+      "weight": 9
+    },
+    {
+      "name": "Uplifting",
+      "weight": 7
+    },
+    {
+      "name": "Witty",
+      "weight": 7
+    },
+    {
+      "name": "Complex",
+      "weight": 9
+    },
+    {
+      "name": "Urgent",
+      "weight": 6
+    },
+    {
+      "name": "Sophisticated",
+      "weight": 9
+    },
+    {
+      "name": "Elaborate",
+      "weight": 7
+    },
+    {
+      "name": "Brash",
+      "weight": 7
+    },
+    {
+      "name": "Playful",
+      "weight": 9
+    },
+    {
+      "name": "Wry",
+      "weight": 7
+    },
+    {
+      "name": "Dramatic",
+      "weight": 7
+    },
+    {
+      "name": "Freewheeling",
+      "weight": 8
+    },
+    {
+      "name": "Earthy",
+      "weight": 6
+    },
+    {
+      "name": "Literate",
+      "weight": 8
+    },
+    {
+      "name": "Uncompromising",
+      "weight": 8
+    },
+    {
+      "name": "Earnest",
+      "weight": 8
+    }
+  ],
+  "genres": [
+    {
+      "name": "Piano Jazz",
+      "weight": 5
+    },
+    {
+      "name": "Jazz",
+      "weight": 10
+    },
+    {
+      "name": "Bop",
+      "weight": 9
+    },
+    {
+      "name": "Jazz Instrument",
+      "weight": 5
+    }
+  ],
+  "similars": [
+    {
+      "name": "George Shearing",
+      "weight": 5
+    },
+    {
+      "name": "Erroll Garner",
+      "weight": 5
+    },
+    {
+      "name": "Tommy Flanagan",
+      "weight": 9
+    },
+    {
+      "name": "Horace Parlan",
+      "weight": 8
+    },
+    {
+      "name": "Wynton Kelly",
+      "weight": 8
+    },
+    {
+      "name": "Thelonious Monk",
+      "weight": 8
+    },
+    {
+      "name": "Mulgrew Miller",
+      "weight": 8
+    },
+    {
+      "name": "Hank Jones",
+      "weight": 8
+    },
+    {
+      "name": "George Cables",
+      "weight": 8
+    },
+    {
+      "name": "Herbie Nichols",
+      "weight": 8
+    }
+  ],
+  "tivo_artist_name": "Bud Powell",
+  "bio": [
+    "Pioneering jazz pianist whose innovative style was one of the cornerstones of the bebop revolution.",
+    "One of the giants of the jazz piano, Bud Powell changed the way that virtually all post-swing pianists play their instruments. He did away with the left-hand striding that had been considered essential earlier and used his left hand to state chords on an irregular basis. His right often played speedy single-note lines, essentially transforming Charlie Parker's vocabulary to the piano (although he developed parallel to \"Bird\").\r\nTragically, Bud Powell was a seriously ill genius. After being encouraged and tutored to an extent by his friend Thelonious Monk at jam sessions in the early '40s, Powell was with Cootie Williams' orchestra during 1943-1945. In a racial incident, he was beaten on the head by police; Powell never fully recovered and would suffer from bad headaches and mental breakdowns throughout the remainder of his life. Despite this, he recorded some true gems during 1947-1951 for Roost, Blue Note, and Verve, composing such major works as \"Dance of the Infidels,\" \"Hallucinations\" (also known as \"Budo\"), \"Un Poco Loco,\" \"Bouncing with Bud,\" and \"Tempus Fugit.\" Even early on, his erratic behavior resulted in lost opportunities (Charlie Parker supposedly told Miles Davis that he would not hire Powell because \"he's even crazier than me!\"), but Powell's playing during this period was often miraculous.\r\nA breakdown in 1951 and hospitalization that resulted in electroshock treatments weakened him, but Powell was still capable of playing at his best now and then, most notably at the 1953 Massey Hall Concert. Generally in the 1950s his Blue Notes find him in excellent form, while he is much more erratic on his Verve recordings. His warm welcome and lengthy stay in Paris (1959-1964) extended his life a bit, but even here Powell spent part of 1962-1963 in the hospital. He returned to New York in 1964, disappeared after a few concerts, and did not live through 1966.\r\nIn later years, Bud Powell's recordings and performances could be so intense as to be scary, but other times he sounded quite sad. However, his influence on jazz (particularly up until the rise of McCoy Tyner and Bill Evans in the 1960s) was very strong and he remains one of the greatest jazz pianists of all time.",
+    "Bud Powell was one of the creators of bebop and the era's greatest pianist. His highly complex recordings were rife with emotionally profound improvisations, and he was equally gifted as a composer--a number of his compositions from the 1940s and 1950s have become jazz standards. Unfortunately, the immensity of his gifts was matched by deeply troubling mental-health problems, which took a toll on his career as the years progressed."
+  ]
+}
