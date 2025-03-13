@@ -208,5 +208,24 @@ def base_round(x: float, base: int = 10) -> int:
     return int(base * round(float(x) / base))
 
 
+def weighted_sample(to_sample: list[str], probabilities: list[int], n_to_sample: int) -> list[int]:
+    """Takes a weighted sample of N elements from to_sample. If N < |to_sample|, N = |to_sample|"""
+    total = sum(probabilities)
+    # We need to "softmax" our probabilities for NumPy (make them sum to one)
+    if total != 1.:
+        probabilities = [w / total for w in probabilities] if total != 0 else [0] * len(probabilities)
+    # If we're trying to sample too many elements, reduce the number we're trying to sample
+    if n_to_sample > len(to_sample):
+        n_to_sample = len(to_sample)
+    return np.random.choice(to_sample, n_to_sample, p=probabilities, replace=False)
+
+
+def validate_paths(filepaths: list[str], expected_extension: str = ".mid"):
+    """Validates that all paths exist on disk and have an expected extension"""
+    for file in filepaths:
+        assert os.path.isfile(file), f"File {file} does not exist on the disk!"
+        assert file.endswith(expected_extension), f"File {file} does not have expected extension {expected_extension}!"
+
+
 if __name__ == "__main__":
     logger.info(f"Root directory: {get_project_root()}")
