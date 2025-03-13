@@ -125,7 +125,7 @@ class ConditionsTest(unittest.TestCase):
                 'African': 'GENRES_African',
                 'Afro-Cuban Jazz': 'GENRES_AfroCubanJazz',
                 'Asian': 'GENRES_Asian',
-                'Avant-Garde': 'GENRES_AvantGarde',
+                'Avant-Garde Jazz': 'GENRES_AvantGardeJazz',
             },
         }
         # Create the tokenizer and add to the vocabulary
@@ -145,7 +145,7 @@ class ConditionsTest(unittest.TestCase):
                 }
             ]
         }
-        expected = [tokenizer["GENRES_African"], tokenizer["GENRES_AvantGarde"], tokenizer["PIANIST_BillyBob"]]
+        expected = [tokenizer["GENRES_African"], tokenizer["GENRES_AvantGardeJazz"], tokenizer["PIANIST_BillyBob"]]
         actual_strs = cond.get_conditions_for_track(condition_mapping, metadata, tokenizer)
         actual = [tokenizer[t] for t in actual_strs]
         self.assertEqual(expected, actual)
