@@ -15,9 +15,14 @@ from tqdm import tqdm
 from transformers import GPT2Config, GPT2LMHeadModel
 
 from jazz_style_conditioned_generation import utils
-from jazz_style_conditioned_generation.data.conditions import validate_conditions, get_condition_special_tokens
 from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIExhaustive, DatasetMIDIRandomChunk, DATA_DIR
-from jazz_style_conditioned_generation.data.tokenizer import load_or_train_tokenizer
+from jazz_style_conditioned_generation.data.tokenizer import (
+    load_or_train_tokenizer,
+    add_genres_to_vocab,
+    add_pianists_to_vocab,
+    add_tempos_to_vocab,
+    add_timesignatures_to_vocab
+)
 from jazz_style_conditioned_generation.encoders import MusicTransformer, MusicTransformerScheduler
 from jazz_style_conditioned_generation.preprocessing.splits import SPLIT_TYPES, SPLIT_DIR, check_all_splits_unique
 
@@ -90,8 +95,11 @@ class TrainingModule:
         self.track_splits = {split_type: list(self.read_tracks_for_split(split_type)) for split_type in SPLIT_TYPES}
         check_all_splits_unique(*list(self.track_splits.values()))
         self.track_paths = sorted([x for xs in self.track_splits.values() for x in xs])  # unpack to a flat list
+        utils.validate_paths(self.track_paths, expected_extension=".mid")
         logger.debug(f"Loaded {len(self.track_paths)} tracks from {self.data_dir}")
         logger.debug("Split tracks: " + ", ".join([f'{k}: {len(list(v))}' for k, v in self.track_splits.items()]))
+        self.metadata_paths = [fp.replace("piano_midi.mid", "metadata_tivo.json") for fp in self.track_paths]
+        utils.validate_paths(self.metadata_paths, expected_extension=".json")
 
         # TOKENIZER
         tokenizer_path = os.path.join(
@@ -103,17 +111,10 @@ class TrainingModule:
         logger.debug(f'... tokenizer initialised: {self.tokenizer}')
 
         # CONDITIONS
-        validate_conditions(self.conditions)
-        # this maps e.g. {"genre": {"African Jazz": 0, "African Folk": 1}, "moods": {"Aggressive": 0}, ...}
-        self.condition_mapping = {c: get_condition_special_tokens(c) for c in self.conditions}
-        logger.debug(f"Using conditions: " + ", ".join(self.conditions))
-        logger.debug(
-            "Unique conditions: " + ", ".join([f'{k}: {len(list(v))}' for k, v in self.condition_mapping.items()])
-        )
-        # Add condition tokens to tokenizer vocabulary
-        for mapping in self.condition_mapping.values():
-            for token in mapping.values():
-                self.tokenizer.add_to_vocab(token)
+        add_genres_to_vocab(self.tokenizer, self.metadata_paths)
+        add_pianists_to_vocab(self.tokenizer, self.metadata_paths)
+        add_tempos_to_vocab(self.tokenizer, (80, 300), 32)
+        add_timesignatures_to_vocab(self.tokenizer, [3, 4])
 
         # DATALOADERS
         logger.debug(f'Initialising training loader with args {self.train_dataset_cfg}')
@@ -162,7 +163,7 @@ class TrainingModule:
             tokenizer=self.tokenizer,
             files_paths=self.track_splits[split],
             max_seq_len=utils.MAX_SEQUENCE_LENGTH,
-            condition_mapping=self.condition_mapping,
+            # condition_mapping=self.condition_mapping,
             **dataset_cfg
         )
         # We don't need a collate function here

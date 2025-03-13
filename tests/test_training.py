@@ -52,8 +52,6 @@ class TrainingTest(unittest.TestCase):
             self.assertEqual(len(TRAINER.track_splits[split]), 1)
         # Testing tokenizer
         self.assertFalse(TRAINER.tokenizer.is_trained)  # config is specifying no training
-        # Testing conditions
-        self.assertEqual(len(TRAINER.condition_mapping.keys()), 0)  # config specifies no conditions
         # Testing training dataloader
         self.assertEqual(len(TRAINER.train_loader.dataset), 1)  # uses random chunks
         self.assertFalse(TRAINER.train_loader.dataset.do_augmentation)  # no augmentation as specified in config
