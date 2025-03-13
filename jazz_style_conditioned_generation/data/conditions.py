@@ -38,9 +38,17 @@ EXCLUDE = {
         "Vocal Pop",
     ],
     "moods": [],
-    "pianist": [],
+    "pianist": [
+        "JJA Pianist 1",
+        "JJA Pianist 2",
+        "JJA Pianist 3",
+        "JJA Pianist 4",
+        "JJA Pianist 5",
+        "Doug McKenzie"
+    ],
     "themes": [],
 }
+# Xu et al. (2023): 1.5 million musescore MIDI files, yet only 20 genre tags. We want to reduce to sub-30 genres.
 MERGE = {
     "genres": {
         "Adult Alternative Pop/Rock": "Pop/Rock",
@@ -48,51 +56,84 @@ MERGE = {
         "African Folk": "African",
         "African Jazz": "African",
         "African Traditions": "African",
+        "Afro-Cuban Jazz": "African",
         "American Popular Song": "Pop/Rock",
-        "Avant-Garde Jazz": "Avant-Garde",
+        "Avant-Garde": "Avant-Garde Jazz",
+        # "Avant-Garde Jazz": "Avant-Garde",
         "Ballet": "Stage & Screen",
-        "Brazilian Pop": "Brazilian",
-        "Brazilian Jazz": "Brazilian",
-        "Brazilian Traditions": "Brazilian",
-        "Black Gospel": "Gospel",
+        "Brazilian": "Southern American",
+        "Brazilian Pop": "Southern American",
+        "Brazilian Jazz": "Southern American",
+        "Brazilian Traditions": "Southern American",
+        "Black Gospel": "Gospel & Religious",
+        "Boogie-Woogie": "Blues",
         "Cast Recordings": "Stage & Screen",
         "Calypso": "Caribbean",
         "Caribbean Traditions": "Caribbean",
         "Central/West Asian Traditions": "Asian",
-        "Chamber Jazz": "Chamber",
-        "Chamber Music": "Chamber",
-        "Christmas": "Holiday",
-        "Classical Crossover": "Classical",
-        "Concerto": "Classical",
+        "Chamber": "Classical & Chamber",
+        "Chamber Jazz": "Classical & Chamber",
+        "Chamber Music": "Classical & Chamber",
+        "Christmas": "Gospel & Religious",
+        "Classical": "Classical & Chamber",
+        "Classical Crossover": "Classical & Chamber",
+        "Cool": "Cool Jazz",
+        "Concerto": "Classical & Chamber",
         "Contemporary Jazz": "Modern Jazz",
+        "Crossover Jazz": "Easy Listening",
         "Club/Dance": "Electronic",
-        "Cuban Jazz": "Afro-Cuban Jazz",
+        "Cuban Jazz": "Caribbean",
+        "Dixieland": "Early & Trad Jazz",
+        "Early Jazz": "Early & Trad Jazz",
         "Electro": "Electronic",
         "European Folk": "European",
         "French": "European",
+        "Free Improvisation": "Free Jazz",
         "Film Score": "Stage & Screen",
         "Film Music": "Stage & Screen",
+        "Funk": "Pop/Rock",
         "Global Jazz": "International",
-        "Holidays": "Holiday",
+        "Gospel": "Gospel & Religious",
+        "Holidays": "Gospel & Religious",
+        "Holiday": "Gospel & Religious",
+        "Highlife": "African",
         "Jazz Blues": "Blues",
-        "Jazz-Funk": "Funk",
+        "Jazz-Funk": "Pop/Rock",
         "Jazz-Pop": "Pop/Rock",
         "Latin": "Latin Jazz",
+        "Lounge": "Easy Listening",
+        "Mainstream Jazz": "Straight-Ahead Jazz",
+        "Modal Music": "Modal Jazz",
         "Modern Composition": "Modern Jazz",
         "Modern Creative": "Modern Jazz",
-        "Modern Free": "Modern Jazz",
+        "Modern Free": "Free Jazz",
         "Musical Theater": "Stage & Screen",
-        "New Orleans Jazz Revival": "New Orleans Jazz",
+        "Neo-Bop": "Post-Bop",
+        "New Age": "Easy Listening",
+        "New Orleans Jazz Revival": "Early & Trad Jazz",
+        "New Orleans Jazz": "Early & Trad Jazz",
         "Original Score": "Stage & Screen",
         "Piano/Easy Listening": "Easy Listening",
+        "Progressive Jazz": "Modern Jazz",
+        "Ragtime": "Early & Trad Jazz",
+        "Religious": "Gospel & Religious",
         "Show Tunes": "Stage & Screen",
         "Show/Musical": "Stage & Screen",
+        "Smooth Jazz": "Easy Listening",
         "Soundtracks": "Stage & Screen",
         "South African Folk": "African",
+        "Southern African": "African",
         "South American Traditions": "Southern American",
-        "Spirituals": "Gospel",
+        "Spirituals": "Gospel & Religious",
         "Spy Music": "Stage & Screen",
+        "Standards": "Straight-Ahead Jazz",
+        "Stride": "Early & Trad Jazz",
+        "Swing": "Early & Trad Jazz",
+        "Third Stream": "Classical & Chamber",
+        "Trad Jazz": "Early & Trad Jazz",
         "Traditional Pop": "Pop/Rock",
+        "Township Jazz": "African",
+        "West Coast Jazz": "Cool Jazz",
         "Western European Traditions": "European",
         "Venezuelan": "Southern American"
     },
@@ -198,6 +239,7 @@ def get_conditions_for_track(
     condition_tokens = []
     # By sorting, we ensure that tokens are always inserted in a consistent order
     conditions = sorted(list(conditions_and_mapping.keys()))
+    # TODO: we also want to get the ARTIST genres too!
     for condition in conditions:
         mapper = conditions_and_mapping[condition]
         values_for_track = metadata[condition]
@@ -205,6 +247,8 @@ def get_conditions_for_track(
             values_for_track = [c["name"] for c in values_for_track]
         # This merges similar values together, removes invalid values etc.
         validated_condition_values = validate_condition_values(values_for_track, condition)
+        # TODO: add functionality to control the number of tokens we add here, based on their weighting?
+        #  This can extend to similar pianists, too
         # This converts values into their token form
         condition_tokens.extend([mapper[c] for c in validated_condition_values if c in mapper.keys()])
     for c in condition_tokens:
@@ -265,6 +309,7 @@ def add_condition_tokens_to_sequence(
 
 if __name__ == "__main__":
     for condition_type in ACCEPT_CONDITIONS:
+        # Get the tokens associated with this condition
         sts = get_condition_special_tokens(condition_type)
         print(f"{condition_type.title()} number of unique values: {len(list(sts.keys()))}")
         print(f"{condition_type.title()} unique values: {list(sts.keys())}")
