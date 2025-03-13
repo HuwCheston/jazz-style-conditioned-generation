@@ -17,9 +17,8 @@ from tqdm import tqdm
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.augmentation import data_augmentation
 from jazz_style_conditioned_generation.data.conditions import (
-    validate_conditions,
-    get_condition_special_tokens,
-    get_conditions_for_track,
+    get_pianist_tokens,
+    get_genre_tokens,
     get_tempo_token,
     get_time_signature_token,
     add_condition_tokens_to_sequence
@@ -40,13 +39,6 @@ __all__ = [
 ]
 
 DATA_DIR = os.path.join(utils.get_project_root(), "data")
-
-
-def validate_paths(filepaths: list[str], expected_extension: str = ".mid"):
-    """Validates that all paths exist on disk and have an expected extension"""
-    for file in filepaths:
-        assert os.path.isfile(file), f"File {file} does not exist on the disk!"
-        assert file.endswith(expected_extension), f"File {file} does not have expected extension {expected_extension}!"
 
 
 def add_beginning_and_ending_tokens_to_sequence(
@@ -118,7 +110,6 @@ class DatasetMIDIRandomChunk:
             max_seq_len: int,
             do_augmentation: bool = True,
             do_conditioning: bool = True,
-            condition_mapping: dict[str, dict] = None,
             n_clips: int = None,
             chunk_end_overlap: float = 0.5,
     ):
@@ -129,7 +120,7 @@ class DatasetMIDIRandomChunk:
 
         # MIDI file paths
         self.files_paths = files_paths
-        validate_paths(self.files_paths, expected_extension=".mid")
+        utils.validate_paths(self.files_paths, expected_extension=".mid")
         if n_clips is not None:
             self.files_paths = self.files_paths[:n_clips]
             random.shuffle(self.files_paths)
@@ -137,15 +128,10 @@ class DatasetMIDIRandomChunk:
         # Conditioning
         self.do_conditioning = do_conditioning
         if self.do_conditioning:
-            if not condition_mapping:
-                raise AttributeError("Passed `do_conditioning == True`, but did not pass `condition_mapping`")
-            self.conditions = list(condition_mapping.keys())
-            self.condition_mapping = condition_mapping
-            validate_conditions(self.conditions)
             self.metadata_paths = [
                 fp.replace("piano_midi.mid", "metadata_tivo.json") for fp in self.files_paths
             ]
-            validate_paths(self.metadata_paths, expected_extension=".json")
+            utils.validate_paths(self.metadata_paths, expected_extension=".json")
 
     def __len__(self):
         return len(self.files_paths)
@@ -203,16 +189,17 @@ class DatasetMIDIRandomChunk:
             # Read the metadata JSON file (with a large cache to prevent redundant reads)
             metadata_read = utils.read_json_cached(self.metadata_paths[idx])
             # Grab the condition tokens for this track (genre, pianist)
-            extra_tokens = get_conditions_for_track(self.condition_mapping, metadata_read, self.tokenizer)
+            extra_tokens = []
+            extra_tokens.extend(get_genre_tokens(metadata_read, self.tokenizer, n_genres=None))  # use all genres
+            extra_tokens.extend(get_pianist_tokens(metadata_read, self.tokenizer, n_pianists=1))  # only track pianist
+            # Also grab the tempo and time signature tokens, if we have them
             if "tempo" in metadata_read.keys():
                 tempo = metadata_read["tempo"] * tempo_scale  # accounts for data augmentation
                 extra_tokens.append(get_tempo_token(tempo, self.tokenizer))
             if "time_signature" in metadata_read.keys():
                 extra_tokens.append(get_time_signature_token(metadata_read["time_signature"], self.tokenizer))
-            # By sorting the list, we get tokens in the order GENRE, PIANIST, TEMPO, TIME SIGNATURE
-            #  In other words, we start with the least specific and progress to the most specific
-            extra_tokens.sort()
             # Convert the extra tokens into token indices
+            # TODO: check we don't have duplicates here
             extra_token_idxs = [self.tokenizer[et] for et in extra_tokens]
             # If we actually have condition tokens
             if len(extra_token_idxs) > 0:
@@ -252,7 +239,6 @@ class DatasetMIDIExhaustive:
             max_seq_len: int,
             do_augmentation: bool = False,
             do_conditioning: bool = True,
-            condition_mapping: dict[str, dict] = None,
             n_clips: int = None,
     ):
         self.tokenizer = tokenizer
@@ -260,16 +246,7 @@ class DatasetMIDIExhaustive:
         if do_augmentation:
             raise NotImplementedError("Data augmentation not implemented for exhaustive MIDI loader")
 
-        # Conditioning
-        self.do_conditioning = do_conditioning
-        if self.do_conditioning and not condition_mapping:
-            raise AttributeError("Passed `do_conditioning == True`, but no conditions were passed")
-        if self.do_conditioning:
-            self.conditions = list(condition_mapping.keys())
-            self.condition_mapping = condition_mapping
-            validate_conditions(self.conditions)
-
-        validate_paths(files_paths, expected_extension=".mid")
+        utils.validate_paths(files_paths, expected_extension=".mid")
         # [filename1, filename2, ...]
         self.files_paths = files_paths
         if n_clips is not None:
@@ -278,12 +255,14 @@ class DatasetMIDIExhaustive:
         # [(filename1, chunk1), (filename1, chunk2), (filename2, chunk1), ...]
         self.chunk_paths_and_idxs = list(self.get_chunks_per_track())
 
+        # Conditioning
+        self.do_conditioning = do_conditioning
         if self.do_conditioning:
             self.metadata_paths = [
                 fp.replace("piano_midi.mid", "metadata_tivo.json")
                 for fp, _ in self.chunk_paths_and_idxs
             ]
-            validate_paths(self.metadata_paths, expected_extension=".json")
+            utils.validate_paths(self.metadata_paths, expected_extension=".json")
 
     def chunker(self, score: Score) -> list[list[int]]:
         """Chunks a symusic.Score object into chunks of `max_seq_len` size"""
@@ -342,9 +321,18 @@ class DatasetMIDIExhaustive:
             # Read the metadata JSON file (with a large cache to prevent redundant reads)
             metadata_read = utils.read_json_cached(self.metadata_paths[idx])
             # Grab the condition tokens for this track (genre, pianist)
-            condition_tokens = get_conditions_for_track(self.condition_mapping, metadata_read, self.tokenizer)
+            extra_tokens = []
+            extra_tokens.extend(get_genre_tokens(metadata_read, self.tokenizer, n_genres=None))  # use all genres
+            extra_tokens.extend(get_pianist_tokens(metadata_read, self.tokenizer, n_pianists=1))  # only track pianist
+            # Also grab the tempo and time signature tokens, if we have them
+            if "tempo" in metadata_read.keys():
+                tempo = metadata_read["tempo"]  # never any augmentation, so can use raw tempo value
+                extra_tokens.append(get_tempo_token(tempo, self.tokenizer))
+            if "time_signature" in metadata_read.keys():
+                extra_tokens.append(get_time_signature_token(metadata_read["time_signature"], self.tokenizer))
             # Convert the extra tokens into token indices
-            extra_token_idxs = [self.tokenizer[et] for et in condition_tokens]
+            # TODO: check we don't have duplicates here
+            extra_token_idxs = [self.tokenizer[et] for et in extra_tokens]
             # If we actually have condition tokens
             if len(extra_token_idxs) > 0:
                 # Add them to the sequence, preserving the target length and the BOS token (if this is present)
@@ -374,7 +362,8 @@ if __name__ == "__main__":
     from miditok import MIDILike, TokenizerConfig
     from jazz_style_conditioned_generation.data.tokenizer import (
         DEFAULT_TOKENIZER_CONFIG,
-        add_conditions_to_vocab,
+        add_genres_to_vocab,
+        add_pianists_to_vocab,
         add_tempos_to_vocab,
         add_timesignatures_to_vocab
     )
@@ -383,9 +372,10 @@ if __name__ == "__main__":
     token_factory = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
     # Get filepaths for all MIDI files in the /data/raw/ directories
     midi_paths = utils.get_data_files_with_ext(ext="**/*.mid")[:100]
+    metadata_paths = [i.replace("piano_midi.mid", "metadata_tivo.json") for i in midi_paths]
     # Add all of our condition tokens to the tokenizer
-    cmap = {c: get_condition_special_tokens(c) for c in ["genres", "pianist"]}
-    add_conditions_to_vocab(token_factory, cmap)
+    add_pianists_to_vocab(token_factory, metadata_paths)
+    add_genres_to_vocab(token_factory, metadata_paths)
     add_tempos_to_vocab(token_factory, (80, 300), 32)
     add_timesignatures_to_vocab(token_factory, [3, 4])
     # Train the tokenizer with BPE
@@ -397,7 +387,6 @@ if __name__ == "__main__":
         max_seq_len=2048,
         do_augmentation=True,
         do_conditioning=True,
-        condition_mapping=cmap
     )
     print(dm)
 
@@ -416,7 +405,6 @@ if __name__ == "__main__":
         max_seq_len=100,
         do_augmentation=False,
         do_conditioning=True,
-        condition_mapping=cmap
     )
     print(dm)
     for i in range(len(dm)):
