@@ -3,6 +3,7 @@
 
 """Test suite for music transformer"""
 
+import os
 import unittest
 
 import torch
@@ -66,6 +67,29 @@ class MusicTransformerTest(unittest.TestCase):
         # We should do the same function for both RPR=True, RPR=False
         runner(MODEL)
         runner(MODEL_RPR)
+
+    def test_sulun_configuration(self):
+        """Tests config in Sulun et al. (2022), Symbolic Music Generation Conditioned on Continuous-Valued Emotion"""
+        tok = REMI()
+        fps = [
+            os.path.join(utils.get_project_root(), "tests/test_resources/test_midi1/piano_midi.mid"),
+            os.path.join(utils.get_project_root(), "tests/test_resources/test_midi2/piano_midi.mid"),
+            os.path.join(utils.get_project_root(), "tests/test_resources/test_midi3/piano_midi.mid"),
+        ]
+        tok.train(vocab_size=1007, files_paths=fps)  # this is just simply to get the reported vocabulary size
+        model = MusicTransformer(
+            tok,
+            rpr=True,
+            n_layers=20,
+            num_heads=16,
+            d_model=768,
+            dim_feedforward=3072,
+            dropout=0.1,
+            max_sequence=1216
+        )
+        n_params = utils.total_parameters(model)
+        n_params_round = utils.base_round(n_params, 5000000)  # rounding to nearest 5 million
+        self.assertTrue(n_params_round == 145000000)  # paper reports "about 145 million parameters"
 
 
 if __name__ == '__main__':

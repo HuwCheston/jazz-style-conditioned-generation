@@ -63,11 +63,11 @@ class MusicTransformer(nn.Module):
     def __init__(
             self,
             tokenizer,
-            n_layers: int = 6,
-            num_heads: int = 8,
-            d_model: int = 512,
-            dim_feedforward: int = 1024,
-            dropout: float = 0.1,
+            n_layers: int = 6,  # Sulun == 20
+            num_heads: int = 8,  # Sulun === 16
+            d_model: int = 512,  # Sulun == 768
+            dim_feedforward: int = 1024,  # Sulun == 3072
+            dropout: float = 0.1,  # Sulun == 0.1
             max_sequence: int = utils.MAX_SEQUENCE_LENGTH,
             rpr: bool = False
     ):
@@ -269,6 +269,7 @@ if __name__ == "__main__":
     # Create the model
     token_factory = REMI()
     mt = MusicTransformer(token_factory, max_sequence=2048).to(utils.DEVICE)
+    print(f"N parameters: {utils.total_parameters(mt)}")
     # Create a dummy sequence of inputs: IDs, targets, and padding mask
     dummy_tensor = torch.randint(0, 100, (4, 2049)).to(utils.DEVICE)
     inp = dummy_tensor[:, :-1].to(utils.DEVICE)
