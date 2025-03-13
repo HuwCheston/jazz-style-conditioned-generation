@@ -3,53 +3,19 @@
 
 """Test suite for creating conditions"""
 
+import os
 import unittest
 
 from miditok import REMI
 
+from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data import conditions as cond
 from jazz_style_conditioned_generation.data.tokenizer import (
-    add_conditions_to_vocab,
+    add_pianists_to_vocab,
+    add_genres_to_vocab,
     add_timesignatures_to_vocab,
     add_tempos_to_vocab
 )
-
-TEST_DICT = [
-    {
-        "artist_genres": [
-            {
-                "name": "artist_genre1"
-            },
-            {
-                "name": "artist_genre2"
-            }
-        ],
-        "album_genres": [
-            {
-                "name": "album_genre1"
-            },
-            {
-                "name": "album_genre2"
-            },
-            {
-                "name": "Jazz"
-            }
-        ]
-    },
-    {
-        "artist_genres": [
-            {
-                "name": "artist_genre1"
-            },
-            {
-                "name": "artist_genre3",
-            },
-            {
-                "name": "Jazz Instrument",
-            }
-        ]
-    }
-]
 
 
 class ConditionsTest(unittest.TestCase):
@@ -76,29 +42,15 @@ class ConditionsTest(unittest.TestCase):
         expected2 = ["nested_value1", "nested_value2"]
         self.assertEqual(list(cond.get_inner_json_values(metadata, "nested_key")), expected2)
 
-    def test_get_condition_tokens(self):
-        condition = "genres"
-        expected_keys = [
-            "artist_genre1",
-            "artist_genre2",
-            "artist_genre3",
-            "album_genre1",
-            "album_genre2",
-        ]
-        expected_values = [
-            "GENRES_artistgenre1",
-            "GENRES_artistgenre2",
-            "GENRES_artistgenre3",
-            "GENRES_albumgenre1",
-            "GENRES_albumgenre2",
-        ]
-        actual = cond.get_condition_special_tokens(condition, TEST_DICT)
-        self.assertEqual(sorted(list(actual.keys())), sorted(expected_keys))
-        self.assertEqual(sorted(list(actual.values())), sorted(expected_values))
-
     def test_validate_condition_values(self):
-        values = ["African Folk", "Adult Alternative Pop/Rock", "African Folk", "Guitar Jazz"]
-        expected = ["African", "Pop/Rock"]
+        values = [
+            ("African Folk", 3),  # merged into African
+            ("Adult Alternative Pop/Rock", 8),  # merged into Pop/Rock
+            ("African Folk", 5),  # merged into African, replaces the 3 weighting from African Folk
+            ("Guitar Jazz", 9),  # Removed
+            ("Modal Jazz", 3),  # Kept as is
+        ]
+        expected = [("Pop/Rock", 8), ("African", 5), ("Modal Jazz", 3)]
         actual = cond.validate_condition_values(values, "genres")
         self.assertEqual(actual, expected)
 
@@ -115,40 +67,94 @@ class ConditionsTest(unittest.TestCase):
         condition_tokens = []
         self.assertRaises(AssertionError, cond.add_condition_tokens_to_sequence, dummy, condition_tokens)
 
-    def test_get_condition_tokens_for_track(self):
-        # Create fake mapping of genres -> token strings
-        condition_mapping = {
-            "pianist": {
-                "Billy Bob": "PIANIST_BillyBob",
-            },
-            'genres': {
-                'African': 'GENRES_African',
-                'Afro-Cuban Jazz': 'GENRES_AfroCubanJazz',
-                'Asian': 'GENRES_Asian',
-                'Avant-Garde Jazz': 'GENRES_AvantGardeJazz',
-            },
-        }
+    def test_get_pianist_token(self):
         # Create the tokenizer and add to the vocabulary
         tokenizer = REMI()
-        add_conditions_to_vocab(tokenizer, condition_mapping)
-        # Create the metadata for a track
-        metadata = {
-            "pianist": "Billy Bob",
-            "genres": [
-                {
-                    "name": "African",
-                    "weight": 5
-                },
-                {
-                    "name": "Avant-Garde",
-                    "weight": 9
-                }
-            ]
-        }
-        expected = [tokenizer["GENRES_African"], tokenizer["GENRES_AvantGardeJazz"], tokenizer["PIANIST_BillyBob"]]
-        actual_strs = cond.get_conditions_for_track(condition_mapping, metadata, tokenizer)
-        actual = [tokenizer[t] for t in actual_strs]
-        self.assertEqual(expected, actual)
+        # These are the files we have dummy metadata for
+        files = [
+            "test_midi1",
+            "test_midi2",
+            "test_midi3",
+            "test_midi_bushgrafts1",
+            "test_midi_bushgrafts2",
+            "test_midi_bushgrafts3",
+            "test_midi_jja1"
+        ]
+        files = [os.path.join(utils.get_project_root(), "tests/test_resources", f, "metadata_tivo.json") for f in files]
+        # Test without adding any tokens to the vocabulary
+        with self.assertRaises(AssertionError):
+            cond.get_pianist_tokens({}, tokenizer)
+        # Add to the vocabulary using the metadata files we've defined
+        add_pianists_to_vocab(tokenizer, files)
+        # Test just getting the actual pianist from the track
+        # This track is by Kenny Barron
+        track = utils.read_json_cached(files[0])
+        expected_token = ["PIANIST_KennyBarron"]
+        actual_tokens = cond.get_pianist_tokens(track, tokenizer, n_pianists=1)
+        self.assertEqual(expected_token, actual_tokens)
+        self.assertTrue(len(actual_tokens) == 1)
+        # This track is by Beegie Adair
+        track = utils.read_json_cached(files[1])
+        expected_token = ["PIANIST_BeegieAdair"]
+        actual_tokens = cond.get_pianist_tokens(track, tokenizer, n_pianists=1)
+        self.assertEqual(expected_token, actual_tokens)
+        self.assertTrue(len(actual_tokens) == 1)
+        # Test getting the actual pianist + top-1 most similar pianists
+        # This track is by Kenny Barron, who is most similar to John Hicks
+        track = utils.read_json_cached(files[0])
+        expected_token = ["PIANIST_KennyBarron", "PIANIST_JohnHicks"]
+        actual_tokens = cond.get_pianist_tokens(track, tokenizer, n_pianists=2)
+        self.assertEqual(expected_token, actual_tokens)
+        self.assertTrue(len(actual_tokens) == 2)
+        # Test getting the actual pianist + top-2 most similar pianists
+        # This track is by Beegie Adair, who is most similar to Cyrus Chestnut + Brad Mehldau
+        track = utils.read_json_cached(files[1])
+        expected_token = ["PIANIST_BeegieAdair", "PIANIST_CyrusChestnut", "PIANIST_BradMehldau"]
+        actual_tokens = cond.get_pianist_tokens(track, tokenizer, n_pianists=3)
+        self.assertEqual(expected_token, actual_tokens)
+        self.assertTrue(len(actual_tokens) == 3)
+
+    def test_get_genre_token(self):
+        # Create the tokenizer and add to the vocabulary
+        tokenizer = REMI()
+        # These are the files we have dummy metadata for
+        files = [
+            "test_midi1",
+            "test_midi2",
+            "test_midi3",
+            "test_midi_bushgrafts1",
+            "test_midi_bushgrafts2",
+            "test_midi_bushgrafts3",
+            "test_midi_jja1"
+        ]
+        files = [os.path.join(utils.get_project_root(), "tests/test_resources", f, "metadata_tivo.json") for f in files]
+        # Test without adding any tokens to the vocabulary
+        with self.assertRaises(AssertionError):
+            cond.get_genre_tokens({}, tokenizer)
+        # Add to the vocabulary using the metadata files we've defined
+        add_genres_to_vocab(tokenizer, files)
+        # This track has genres associated with it directly
+        track = utils.read_json_cached(files[0])
+        expected_token = sorted(["GENRES_HardBop", "GENRES_PostBop", "GENRES_Caribbean"])
+        actual_tokens = cond.get_genre_tokens(track, tokenizer, n_genres=None)
+        self.assertEqual(expected_token, actual_tokens)
+        self.assertTrue(len(actual_tokens) == 3)
+        # Now, we can test by getting only the top-2 tokens with the strongest weighting
+        expected_token = sorted(["GENRES_Caribbean", "GENRES_HardBop"])
+        actual_tokens = cond.get_genre_tokens(track, tokenizer, n_genres=2)
+        self.assertEqual(expected_token, actual_tokens)
+        self.assertTrue(len(actual_tokens) == 2)
+        # This track does not have genres associated with it, so we'll grab those associated with the pianist instead
+        track = utils.read_json_cached(files[1])
+        expected_token = ["GENRES_StraightAheadJazz"]  # Associated with Beegie Adair the artist, not this track
+        actual_tokens = cond.get_genre_tokens(track, tokenizer)
+        self.assertEqual(expected_token, actual_tokens)
+        self.assertTrue(len(actual_tokens) == 1)
+        # This track does not have any genres associated with it at all, so we should get an empty list
+        track = utils.read_json_cached(files[-1])
+        expected_token = []
+        actual_tokens = cond.get_genre_tokens(track, tokenizer)
+        self.assertEqual(expected_token, actual_tokens)
 
     def test_get_timesignature_token(self):
         # Create the tokenizer and add to the vocabulary
@@ -168,6 +174,9 @@ class ConditionsTest(unittest.TestCase):
         expected_token = "TIMESIGNATURECUSTOM_34"
         actual_token = cond.get_time_signature_token(ts, tokenizer)
         self.assertTrue(expected_token == actual_token)
+        # Test a 6/4 time signature: we haven't added this one, so should get an error
+        with self.assertRaises(AttributeError):
+            _ = cond.get_time_signature_token(6, tokenizer)
 
     def test_get_tempo_token(self):
         # Create the tokenizer and add to the vocabulary
@@ -177,17 +186,47 @@ class ConditionsTest(unittest.TestCase):
             _ = cond.get_tempo_token(100, tokenizer)
         # Add in tempo tokens from [100, 110, 120, ..., 200]
         add_tempos_to_vocab(tokenizer, (100, 200), 11)
-        # Test with 154 BPM
+        # Test with 154 BPM, should be rounded to 150
         expected = "TEMPOCUSTOM_150"
         actual = cond.get_tempo_token(154, tokenizer)
         self.assertEqual(expected, actual)
-        # Test with 156 BPM
+        # Test with 156 BPM, should be rounded to 160
         expected = "TEMPOCUSTOM_160"
         actual = cond.get_tempo_token(156, tokenizer)
         self.assertEqual(expected, actual)
         # Raise an error if we try an out of range value
         with self.assertRaises(ValueError):
             _ = cond.get_tempo_token(20000, tokenizer)
+
+    @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
+    def test_genre_tokens_with_full_dataset(self):
+        tokfactory = REMI()
+        js_fps = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
+        # Here, we're adding genre tokens from the ENTIRE dataset to our vocabulary
+        add_genres_to_vocab(tokfactory, js_fps)
+        track_genres = []
+        # Now we simulate "getting" all the genre tokens for every track in the dataset
+        for js in js_fps:
+            js_loaded = utils.read_json_cached(js)
+            track_genres.extend(cond.get_genre_tokens(js_loaded, tokfactory, n_genres=None))  # get all genres
+        # We should have at least one appearance of every genre token we added to the tokenizer
+        self.assertEqual(sorted(set(track_genres)), sorted(set([i for i in tokfactory.vocab.keys() if "GENRES" in i])))
+
+    @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
+    def test_pianist_tokens_with_full_dataset(self):
+        tokfactory = REMI()
+        js_fps = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
+        self.assertTrue(len(js_fps) > 1000)  # should have a lot of files!
+        # Here, we're adding pianist tokens from the ENTIRE dataset to our vocabulary
+        add_pianists_to_vocab(tokfactory, js_fps)
+        track_pianists = []
+        # Now, we simulate "getting" all the pianist tokens for every track
+        for js in js_fps:
+            js_loaded = utils.read_json_cached(js)
+            track_pianists.extend(cond.get_pianist_tokens(js_loaded, tokfactory, n_pianists=1))  # track pianist only
+        tok_pianists = sorted(set([i for i in tokfactory.vocab.keys() if "PIANIST" in i]))
+        # We should have at least one appearance of every pianist token we added to the tokenizer
+        self.assertEqual(sorted(set(track_pianists)), tok_pianists)
 
 
 if __name__ == '__main__':

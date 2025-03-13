@@ -45,6 +45,7 @@ EXCLUDE = {
         "JJA Pianist 4",
         "JJA Pianist 5",
         "Doug McKenzie"
+        # TODO: consider adding pianists who have fewer than N tracks here
     ],
     "themes": [],
 }
@@ -91,14 +92,14 @@ MERGE = {
         "Free Improvisation": "Free Jazz",
         "Film Score": "Stage & Screen",
         "Film Music": "Stage & Screen",
-        "Funk": "Pop/Rock",
+        # "Funk": "Pop/Rock",
         "Global Jazz": "International",
         "Gospel": "Gospel & Religious",
         "Holidays": "Gospel & Religious",
         "Holiday": "Gospel & Religious",
         "Highlife": "African",
         "Jazz Blues": "Blues",
-        "Jazz-Funk": "Pop/Rock",
+        "Jazz-Funk": "Funk",
         "Jazz-Pop": "Pop/Rock",
         "Latin": "Latin Jazz",
         "Lounge": "Easy Listening",
@@ -186,75 +187,139 @@ def get_inner_json_values(metadata: dict, key: str):
     yield from res
 
 
-def validate_condition_values(condition_values: list[str] | str, condition_key: str) -> list[str]:
+def validate_condition_values(
+        condition_values: list[tuple[str, int]],
+        condition_name: str
+) -> list[tuple[str, int]]:
     """Validates values for a given condition by merging similar entries, removing invalid ones, etc."""
-    new_values = []
-    # Allow both single strings and list of strings as input
-    if isinstance(condition_values, str):
-        condition_values = [condition_values]
-    for c in condition_values:
-        # Merge similar values together
-        if c in MERGE[condition_key].keys():
-            c = MERGE[condition_key][c]
-        # Remove any values for this condition that we don't want to use
-        if c not in EXCLUDE[condition_key]:
-            new_values.append(c)
-    # Remove duplicates and sort
-    return list(sorted(set(new_values)))
+    validated = {}
+    for value, weight in condition_values:
+        # Merge a value with its "master" key (i.e., Show Tunes -> Stage & Screen, Soundtrack -> Stage & Screen)
+        if value in MERGE[condition_name]:
+            value = MERGE[condition_name][value]
+        # Skip over value that we don't want to use
+        if value not in EXCLUDE[condition_name]:
+            # This ensures that we only store the HIGHEST weight for any value
+            if value not in validated.keys() or weight > validated[value]:
+                validated[value] = weight
+    # Sanity check that none of our values should now be duplicates
+    assert len(set(validated.keys())) == len(validated.keys())
+    # Sort the values by their weight, in descending order (highest weight first)
+    return sorted(list(validated.items()), key=lambda x: x[1], reverse=True)
 
 
-def get_condition_special_tokens(condition: str, metadata_dicts: list[dict] | dict = None):
-    """Given a condition in ACCEPT_CONDITIONS, extract all observed values from all metadata dicts"""
-    # Check that the condition we've passed in is valid
-    validate_conditions(condition)
-    # Allow a single dictionary as input
-    if isinstance(metadata_dicts, dict):
-        metadata_dicts = [metadata_dicts]
-    # Otherwise, if we haven't passed any metadata in, just grab this from the entire dataset
-    elif metadata_dicts is None:
-        metadata_dicts = load_tivo_metadata()
-    # We'll skip over these values
-    condition_values = []
-    for metadata in metadata_dicts:
-        # This will give us e.g., ["artist_genres", "album_genres"] for the input "genres"
-        accept_keys = [k for k in metadata.keys() if condition.lower() in k.lower()]
-        # Iterate over all of these keys and get the required value from the metadata dictionary
-        for accept_key in accept_keys:
-            condition_values.extend(get_inner_json_values(metadata, accept_key))
-    # Merge similar values, remove exclude values + duplicates, and sort alphabetically
-    condition_values_validated_deduped_sorted = validate_condition_values(condition_values, condition)
-    # Return a mapping of condition value: special token
-    return {
-        s: f'{condition.upper()}_{utils.remove_punctuation(s).replace(" ", "")}'
-        for s in condition_values_validated_deduped_sorted
-    }
+def _get_pianist_genres(pianist_name: str) -> list[tuple[str, int]]:
+    """Get the genres & weights associated with the PIANIST playing on a track (not the track itself)"""
+    pianist_metadata = os.path.join(
+        utils.get_project_root(),
+        "references/tivo_artist_metadata",
+        pianist_name.replace(" ", "") + ".json"
+    )
+    # If we have metadata for the pianist, grab the associated genres
+    if os.path.isfile(pianist_metadata):
+        # Read the metadata for the pianist
+        pianist_metadata_dict = utils.read_json_cached(pianist_metadata)
+        # If we have genres for the pianist
+        if len(pianist_metadata_dict["genres"]) > 0:
+            genres = [(x["name"], x["weight"]) for x in pianist_metadata_dict["genres"]]
+            return validate_condition_values(genres, "genres")
+        # Otherwise, return an empty list
+        else:
+            return []
+    # This will trigger if we SHOULD have metadata for the current pianist, but we can't find the file
+    elif pianist_name not in EXCLUDE["pianist"]:
+        raise FileNotFoundError(f"Could not find metadata file at {pianist_metadata}!")
+    # This will trigger if we shouldn't have metadata for the pianist: silently return an empty list
+    else:
+        return []
 
 
-def get_conditions_for_track(
-        conditions_and_mapping: dict[str, dict],
-        metadata: dict,
-        tokenizer: MusicTokenizer
-) -> list[str]:
-    """Given a mapping {condition: {val1: token1}}, convert track metadata into token format"""
-    condition_tokens = []
-    # By sorting, we ensure that tokens are always inserted in a consistent order
-    conditions = sorted(list(conditions_and_mapping.keys()))
-    # TODO: we also want to get the ARTIST genres too!
-    for condition in conditions:
-        mapper = conditions_and_mapping[condition]
-        values_for_track = metadata[condition]
-        if isinstance(values_for_track, list):
-            values_for_track = [c["name"] for c in values_for_track]
-        # This merges similar values together, removes invalid values etc.
-        validated_condition_values = validate_condition_values(values_for_track, condition)
-        # TODO: add functionality to control the number of tokens we add here, based on their weighting?
-        #  This can extend to similar pianists, too
-        # This converts values into their token form
-        condition_tokens.extend([mapper[c] for c in validated_condition_values if c in mapper.keys()])
-    for c in condition_tokens:
-        assert c in tokenizer.vocab.keys()
-    # Sort the tokens alphabetically
-    return sorted(condition_tokens)
+def _get_track_genres(track_metadata_dict: dict) -> list[tuple[str, int]]:
+    """Get the genres & weights associated with a track"""
+    # Grab the genres associated with the track
+    if len(track_metadata_dict) > 0:
+        genres = [(x["name"], x["weight"]) for x in track_metadata_dict["genres"]]
+        # Validate the genres: remove any duplicates/values we don't want
+        return validate_condition_values(genres, "genres")
+    else:
+        return []
+
+
+def get_genre_tokens(track_metadata_dict: dict, tokenizer: MusicTokenizer, n_genres: int = None):
+    """Gets tokens for a track's genres: either from the track itself, or (if none found) from the artist"""
+    # Check that we've added pianist tokens to our tokenizer
+    assert len([i for i in tokenizer.vocab.keys() if "GENRES" in i]) > 0, "Genre tokens not added to tokenizer!"
+    # Try and get the tokens for the TRACK first
+    genres = _get_track_genres(track_metadata_dict)
+    # If we don't have any genres for the TRACK
+    if len(genres) == 0:
+        # Try and get them for the PIANIST
+        pianist_genres = _get_pianist_genres(track_metadata_dict["pianist"])
+        # If we still don't have any genres, just return an empty list
+        if len(pianist_genres) == 0:
+            return []
+        # Otherwise, we can use the genres associated with the pianist
+        else:
+            genres = pianist_genres
+    # Remove the weight term from each tuple to get a single list
+    finalised_genres = [g[0] for g in genres]
+    # Subset to only get the top-N genres, if required
+    if n_genres is not None:
+        finalised_genres = finalised_genres[:n_genres]
+    # Add the prefix to the token
+    prefixed = [f'GENRES_{utils.remove_punctuation(g).replace(" ", "")}' for g in finalised_genres]
+    # Sanity check that the tokens are part of the vocabulary for the tokenizer
+    for pfix in prefixed:
+        assert pfix in tokenizer.vocab.keys(), f"Could not find token {pfix} in tokenizer vocabulary!"
+    return prefixed
+
+
+def _get_similar_pianists(pianist_name: str) -> list[tuple[str, int]]:
+    """Get names + weights for pianists SIMILAR to the current pianist on a track"""
+    pianist_metadata = os.path.join(
+        utils.get_project_root(),
+        "references/tivo_artist_metadata",
+        pianist_name.replace(" ", "") + ".json"
+    )
+    # If we have metadata for the pianist, grab the other pianists that TiVo says they are similar to
+    if os.path.isfile(pianist_metadata):
+        pianist_metadata_dict = utils.read_json_cached(pianist_metadata)
+        all_pianists = [(x["name"], x["weight"]) for x in pianist_metadata_dict["similars"]]
+        return validate_condition_values(all_pianists, "pianist")
+    # This will trigger if we SHOULD have metadata for the current pianist, but we can't find the file
+    elif pianist_name not in EXCLUDE["pianist"]:
+        raise FileNotFoundError(f"Could not find metadata file at {pianist_metadata}!")
+    # This will trigger if we DON'T have metadata for the current pianist, and we SHOULDN't have metadata
+    else:
+        return []
+
+
+def get_pianist_tokens(track_metadata_dict: dict, tokenizer: MusicTokenizer, n_pianists: int = None) -> list[str]:
+    # Check that we've added pianist tokens to our tokenizer
+    assert len([i for i in tokenizer.vocab.keys() if "PIANIST" in i]) > 0, "Pianist tokens not added to tokenizer!"
+    # Get the pianist FROM THIS TRACK
+    track_pianist = track_metadata_dict["pianist"]
+    # Get pianists that are similar to this pianist
+    similar_pianists = _get_similar_pianists(track_pianist)
+    # Remove the weight term
+    similar_pianists = [s[0] for s in similar_pianists]
+    # If we can use the track pianist
+    if track_pianist not in EXCLUDE["pianist"]:
+        # Subset to get only the top-N - 1 pianists if required
+        if n_pianists is not None:
+            similar_pianists = similar_pianists[:n_pianists - 1]
+        finalised_pianists = [track_pianist] + similar_pianists
+    # Otherwise, we want to keep top-N pianists
+    else:
+        if n_pianists is not None:
+            similar_pianists = similar_pianists[:n_pianists]
+        finalised_pianists = similar_pianists
+    # Add the prefix to the token
+    prefixed = [f'PIANIST_{utils.remove_punctuation(g).replace(" ", "")}' for g in finalised_pianists]
+    # Sanity check that the tokens are part of the vocabulary for the tokenizer
+    for pfix in prefixed:
+        assert pfix in tokenizer.vocab.keys(), f"Could not find token {pfix} in tokenizer vocabulary!"
+    return prefixed
 
 
 def get_tempo_token(tempo: float, tokenizer: MusicTokenizer, _raise_on_difference_exceeding: int = 50) -> str:
@@ -308,10 +373,25 @@ def add_condition_tokens_to_sequence(
 
 
 if __name__ == "__main__":
-    for condition_type in ACCEPT_CONDITIONS:
-        # Get the tokens associated with this condition
-        sts = get_condition_special_tokens(condition_type)
-        print(f"{condition_type.title()} number of unique values: {len(list(sts.keys()))}")
-        print(f"{condition_type.title()} unique values: {list(sts.keys())}")
-        print(f"{condition_type.title()} special tokens: {list(sts.values())}")
-        print('\n')
+    from collections import Counter
+
+    from miditok import MIDILike
+    from jazz_style_conditioned_generation.data.tokenizer import add_genres_to_vocab, add_pianists_to_vocab
+
+    tokfactory = MIDILike()
+    js_fps = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
+    add_genres_to_vocab(tokfactory, js_fps)
+    add_pianists_to_vocab(tokfactory, js_fps)
+
+    track_genres, track_pianists = [], []
+    for js in js_fps:
+        js_loaded = utils.read_json_cached(js)
+        track_genres.extend(get_genre_tokens(js_loaded, tokfactory))
+        track_pianists.extend(get_pianist_tokens(js_loaded, tokfactory))
+
+    print("Loaded", len(set(track_genres)), "genres")
+    assert len(set(track_genres)) == len([i for i in tokfactory.vocab.keys() if "GENRES" in i])
+    print("Genre counts: ", Counter(track_genres))
+    print("Loaded", len(set(track_pianists)), "pianists")
+    assert len(set(track_pianists)) == len([i for i in tokfactory.vocab.keys() if "PIANIST" in i])
+    print("Pianist counts: ", Counter(track_pianists))

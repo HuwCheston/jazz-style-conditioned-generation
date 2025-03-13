@@ -12,7 +12,8 @@ from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.tokenizer import (
     add_tempos_to_vocab,
     add_timesignatures_to_vocab,
-    add_conditions_to_vocab,
+    add_pianists_to_vocab,
+    add_genres_to_vocab,
     get_tokenizer_class_from_string,
     TokTrainingIteratorAugmentation,
     load_or_train_tokenizer,
@@ -96,16 +97,84 @@ class TokenizerTest(unittest.TestCase):
         self.assertTrue("TIMESIGNATURECUSTOM_44" in tok.vocab.keys())
         self.assertTrue("TIMESIGNATURECUSTOM_54" in tok.vocab.keys())
 
-    def test_add_conditions(self):
+    def test_add_pianists(self):
         tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
         prev_vocab = tok.vocab_size
-        # Adding in one genre and one pianist condition token
-        mapping = {"genres": {"African Jazz": "GENRES_AfricanJazz"}, "pianist": {"Billy Bob": "PIANIST_BillyBob"}}
-        add_conditions_to_vocab(tok, mapping)
-        expected_vocab = prev_vocab + 2
-        self.assertEqual(tok.vocab_size, expected_vocab)
-        self.assertTrue("GENRES_AfricanJazz" in tok.vocab.keys())
-        self.assertTrue("PIANIST_BillyBob" in tok.vocab.keys())
+        # These are the files we have dummy metadata for
+        files = [
+            "test_midi1",
+            "test_midi2",
+            "test_midi3",
+            "test_midi_bushgrafts1",
+            "test_midi_bushgrafts2",
+            "test_midi_bushgrafts3",
+            "test_midi_jja1"
+        ]
+        files = [os.path.join(utils.get_project_root(), "tests/test_resources", f, "metadata_tivo.json") for f in files]
+        # Add to the vocabulary using the metadata files we've defined
+        add_pianists_to_vocab(tok, files)
+        self.assertTrue(tok.vocab_size > prev_vocab)
+        self.assertTrue(len(tok.vocab.keys()) == len(set(tok.vocab.keys())))  # should be no duplicates
+        # These are the pianists we should be adding to our vocab
+        expected_pianist_tokens = [
+            "PIANIST_KennyBarron", "PIANIST_BeegieAdair", "PIANIST_BradMehldau", "PIANIST_HerbieHancock"
+        ]
+        for expect in expected_pianist_tokens:
+            self.assertTrue(expect in tok.vocab)
+        # We should not add the following pianists: they're in our EXCLUDE list
+        not_expected = ["PIANIST_DougMcKenzie", "PIANIST_JJAPianist1"]
+        for not_expect in not_expected:
+            self.assertFalse(not_expect in tok.vocab)
+
+    def test_add_genres(self):
+        tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
+        prev_vocab = tok.vocab_size
+        # These are the files we have dummy metadata for
+        files = [
+            "test_midi1",
+            "test_midi2",
+            "test_midi3",
+            "test_midi_bushgrafts1",
+            "test_midi_bushgrafts2",
+            "test_midi_bushgrafts3",
+            "test_midi_jja1"
+        ]
+        files = [os.path.join(utils.get_project_root(), "tests/test_resources", f, "metadata_tivo.json") for f in files]
+        # Add to the vocabulary using the metadata files we've defined
+        add_genres_to_vocab(tok, files)
+        self.assertTrue(tok.vocab_size == prev_vocab + 4)
+        self.assertTrue(len(tok.vocab.keys()) == len(set(tok.vocab.keys())))  # should be no duplicates
+        # These are the genres we're expecting to add to the vocabulary
+        expected_genres = [
+            "GENRES_HardBop", "GENRES_PostBop", "GENRES_Caribbean",  # from test_midi1 track metadata
+            "GENRES_StraightAheadJazz"  # from Beegie Adair's artist metadata
+        ]
+        for expected in expected_genres:
+            self.assertTrue(expected in tok.vocab)
+        # These are the genres we're not expecting to add
+        not_expected_genres = [
+            # from Beegie Adair's artist metadata, but will be removed/merged with other genres
+            "GENRES_Vocal", "GENRES_JazzInstrument", "GENRES_Jazz",
+            "GENRES_Calypso"  # from Kenny Barron's artist metadata, will be merged with Caribbean
+        ]
+        for not_expected in not_expected_genres:
+            self.assertFalse(not_expected in tok.vocab)
+
+    @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
+    def test_add_all_genres(self):
+        tokfactory = REMI()
+        js_fps = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
+        add_genres_to_vocab(tokfactory, js_fps)
+        tok_genres = sorted(set([i for i in tokfactory.vocab.keys() if "GENRES" in i]))
+        self.assertEqual(len(tok_genres), 26)
+
+    @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
+    def test_add_all_pianists(self):
+        tokfactory = REMI()
+        js_fps = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
+        add_pianists_to_vocab(tokfactory, js_fps)
+        tok_pianists = sorted(set([i for i in tokfactory.vocab.keys() if "PIANIST" in i]))
+        self.assertEqual(len(tok_pianists), 129)  # pijama + JTD pianists
 
 
 if __name__ == '__main__':

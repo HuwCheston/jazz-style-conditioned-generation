@@ -23,6 +23,7 @@ from jazz_style_conditioned_generation.data.augmentation import (
     PITCH_AUGMENT_RANGE,
     DURATION_AUGMENT_RANGE
 )
+from jazz_style_conditioned_generation.data.conditions import validate_condition_values
 from jazz_style_conditioned_generation.data.scores import load_score, preprocess_score
 
 DEFAULT_TOKENIZER_CONFIG = {
@@ -168,12 +169,57 @@ class TokTrainingIteratorAugmentation(TokTrainingIterator):
         return f"{self.tokenizer} - {len(self.files_paths)} tracks, {len(self)} augmented tracks"
 
 
-def add_conditions_to_vocab(tokenizer: MusicTokenizer, condition_mapping: dict) -> None:
-    """Given a mapping with form {condition_type: {condition1: token1, ...}}, add tokens to tokenizer"""
-    for mapping in condition_mapping.values():
-        for token in mapping.values():
-            tokenizer.add_to_vocab(token)
-    # No need to return, add_to_vocab works inplace
+def add_pianists_to_vocab(tokenizer, metadata_paths: list[str]) -> None:
+    """Adds all valid pianists on all tracks to the tokenizer"""
+    all_pianists = []
+    # Iterate through all the tracks, load the metadata JSON and add the name of the pianist to the list
+    for metadata_path in metadata_paths:
+        metadata_loaded = utils.read_json_cached(metadata_path)
+        all_pianists.append((metadata_loaded["pianist"], 9))  # add a dummy weight here, we just care about the name
+    # Second we get all SIMILAR PIANISTS
+    tivo_artist_metadata_path = os.path.join(utils.get_project_root(), "references/tivo_artist_metadata")
+    for pianist_metadata in os.listdir(tivo_artist_metadata_path):
+        pianist_loaded = utils.read_json_cached(os.path.join(tivo_artist_metadata_path, pianist_metadata))
+        if len(pianist_loaded["similars"]) == 0:
+            continue
+        all_pianists.extend([(x["name"], x["weight"]) for x in pianist_loaded["similars"]])
+    validated_pianists = validate_condition_values(all_pianists, "pianist")
+    # We only care about the name of the genre, not the weight
+    for pianist, _ in validated_pianists:
+        with_prefix = f'PIANIST_{utils.remove_punctuation(pianist).replace(" ", "")}'
+        tokenizer.add_to_vocab(with_prefix)
+
+
+def add_genres_to_vocab(tokenizer: MusicTokenizer, metadata_paths: list[str]) -> None:
+    """Adds all valid genres for all tracks and artists to the tokenizer"""
+    all_genres = []
+    tivo_artist_metadata_path = os.path.join(utils.get_project_root(), "references/tivo_artist_metadata")
+
+    # First, we try and get metadata for the TRACK
+    for metadata_path in metadata_paths:
+        metadata_loaded = utils.read_json_cached(metadata_path)
+        track_genres = [(x["name"], x["weight"]) for x in metadata_loaded["genres"]]
+        validated_genres = validate_condition_values(track_genres, "genres")
+        # If we don't have any genres for the track
+        if len(validated_genres) == 0:
+            # Then, we can get genres for the ARTIST
+            pianist_name = metadata_loaded["pianist"].replace(" ", "")
+            pianist_fpath = os.path.join(tivo_artist_metadata_path, pianist_name + ".json")
+            if os.path.exists(pianist_fpath):
+                pianist_loaded = utils.read_json_cached(pianist_fpath)
+                pianist_genres = [(x["name"], x["weight"]) for x in pianist_loaded["genres"]]
+                validated_genres = validate_condition_values(pianist_genres, "genres")
+                if len(validated_genres) == 0:
+                    continue
+            else:
+                continue
+        all_genres.extend(validated_genres)
+    # This deduplicates, merges, and sorts genres
+    validated_genres = validate_condition_values(all_genres, "genres")
+    # We only care about the name of the genre, not the weight
+    for genre, _ in validated_genres:
+        with_prefix = f'GENRES_{utils.remove_punctuation(genre).replace(" ", "")}'
+        tokenizer.add_to_vocab(with_prefix)
 
 
 def add_timesignatures_to_vocab(tokenizer: MusicTokenizer, time_signatures: list[int]) -> None:
@@ -274,6 +320,15 @@ def load_or_train_tokenizer(
 
 if __name__ == "__main__":
     tokfactory = REMI()
-    midi_fps = utils.get_data_files_with_ext("data/raw", "**/*.mid")[:100]
-    ts = TokTrainingIteratorAugmentation(tokfactory, midi_fps)
-    print(ts)
+    js_fps = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
+    # Add genre tokens
+    add_genres_to_vocab(tokfactory, js_fps)
+    gen_toks = [t for t in tokfactory.vocab.keys() if "GENRES" in t]
+    print(f'Loaded {len(gen_toks)} genre tokens')
+    print(sorted(set(gen_toks)))
+
+    # Add pianist tokens
+    add_pianists_to_vocab(tokfactory, js_fps)
+    pian_toks = [t for t in tokfactory.vocab.keys() if "PIANIST" in t]
+    print(f'Loaded {len(pian_toks)} pianist tokens')
+    print(pian_toks)
