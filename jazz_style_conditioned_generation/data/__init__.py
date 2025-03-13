@@ -6,7 +6,11 @@
 from .conditions import (
     validate_conditions,
     get_inner_json_values,
-    get_condition_special_tokens
+    get_genre_tokens,
+    get_pianist_tokens,
+    get_tempo_token,
+    get_time_signature_token,
+    add_condition_tokens_to_sequence
 )
 from .dataloader import (
     DATA_DIR,
@@ -17,5 +21,10 @@ from .tokenizer import (
     DEFAULT_TOKENIZER_CLASS,
     DEFAULT_TOKENIZER_CONFIG,
     DEFAULT_VOCAB_SIZE,
-    DEFAULT_TRAINING_METHOD
+    DEFAULT_TRAINING_METHOD,
+    add_genres_to_vocab,
+    add_pianists_to_vocab,
+    add_tempos_to_vocab,
+    add_timesignatures_to_vocab,
+    load_or_train_tokenizer
 )
