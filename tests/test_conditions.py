@@ -74,32 +74,26 @@ class ConditionsTest(unittest.TestCase):
         # Add to the vocabulary using the metadata files we've defined
         add_pianists_to_vocab(tokenizer)
         # Test just getting the actual pianist from the track
-        # This track is by Kenny Barron
+        # This track is by Kenny Barron, who we want to include
         track = utils.read_json_cached(files[0])
         expected_token = ["PIANIST_KennyBarron"]
         actual_tokens = cond.get_pianist_tokens(track, tokenizer, n_pianists=1)
         self.assertEqual(expected_token, actual_tokens)
         self.assertTrue(len(actual_tokens) == 1)
-        # This track is by Beegie Adair
+
+        # This track is by Beegie Adair, but he is in our exclude list!
         track = utils.read_json_cached(files[1])
-        expected_token = ["PIANIST_BeegieAdair"]
+        expected_token = []
         actual_tokens = cond.get_pianist_tokens(track, tokenizer, n_pianists=1)
         self.assertEqual(expected_token, actual_tokens)
-        self.assertTrue(len(actual_tokens) == 1)
-        # Test getting the actual pianist + top-1 most similar pianists
-        # This track is by Kenny Barron, who is most similar to John Hicks
-        track = utils.read_json_cached(files[0])
-        expected_token = ["PIANIST_KennyBarron", "PIANIST_JohnHicks"]
-        actual_tokens = cond.get_pianist_tokens(track, tokenizer, n_pianists=2)
+        self.assertTrue(len(actual_tokens) == 0)
+
+        # This track is by a pianist who is also in our exclude list
+        track = utils.read_json_cached(files[2])
+        expected_token = []
+        actual_tokens = cond.get_pianist_tokens(track, tokenizer, n_pianists=1)
         self.assertEqual(expected_token, actual_tokens)
-        self.assertTrue(len(actual_tokens) == 2)
-        # Test getting the actual pianist + top-2 most similar pianists
-        # This track is by Beegie Adair, who is most similar to Cyrus Chestnut + Brad Mehldau
-        track = utils.read_json_cached(files[1])
-        expected_token = ["PIANIST_BeegieAdair", "PIANIST_CyrusChestnut", "PIANIST_BradMehldau"]
-        actual_tokens = cond.get_pianist_tokens(track, tokenizer, n_pianists=3)
-        self.assertEqual(expected_token, actual_tokens)
-        self.assertTrue(len(actual_tokens) == 3)
+        self.assertTrue(len(actual_tokens) == 0)
 
     def test_get_genre_token(self):
         # Create the tokenizer and add to the vocabulary

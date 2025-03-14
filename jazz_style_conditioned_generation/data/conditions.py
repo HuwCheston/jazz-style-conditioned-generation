@@ -50,8 +50,113 @@ EXCLUDE = {
         "JJA Pianist 3",
         "JJA Pianist 4",
         "JJA Pianist 5",
-        "Doug McKenzie"
+        "Doug McKenzie",
         # TODO: consider adding pianists who have fewer than N tracks here
+        # These pianists all have fewer than 50 tracks
+        'Roland Hanna',
+        'Herbie Nichols',
+        'Erroll Garner',
+        'George Shearing',
+        'Hampton Hawes',
+        'Duke Jordan',
+        'Andy Laverne',
+        'Bill Cunliffe',
+        'Stanley Cowell',
+        'Alan Pasqua',
+        'Barry Harris',
+        'Alan Broadbent',
+        'Bobby Timmons',
+        'Jessica Williams',
+        'Ellis Marsalis',
+        'Denny Zeitlin',
+        'Wynton Kelly',
+        'Marcus Roberts',
+        'George Cables',
+        'Joanne Brackeen',
+        'Beegie Adair',
+        'Gonzalo Rubalcaba',
+        'Simon Mulligan',
+        'Horace Parlan',
+        'David Berkman',
+        'Red Garland',
+        'George Colligan',
+        'Paul Bley',
+        'Don Grusin',
+        'Eldar Djangirov',
+        'Eric Reed',
+        'Gene Harris',
+        'Monty Alexander',
+        'Randy Weston',
+        'Lennie Tristano',
+        'Jed Distler',
+        'Clare Fischer',
+        'Geri Allen',
+        'Michel Camilo',
+        'Adam Birnbaum',
+        'Michel Legrand',
+        'Marian McPartland',
+        'Makoto Ozone',
+        'John Colianni',
+        'James Williams',
+        'Donald Brown',
+        'Buddy Montgomery',
+        'Tigran Hamasyan',
+        'Andr Previn',
+        'Benny Green',
+        'Geoffrey Keezer',
+        'Ralph Sutton',
+        'Mitchel Forman',
+        'Larry Goldings',
+        'Cyrus Chestnut',
+        'Sonny Clark',
+        'Bill Mays',
+        'Allen Farnham',
+        'Jacky Terrasson',
+        'Adam Makowicz',
+        'Hiromi',
+        'Kirk Lightsey',
+        'Ted Rosenthal',
+        'Ellis Larkins',
+        'Lynne Arriale',
+        'Vijay Iyer',
+        'Harold Mabern',
+        'Phineas Newborn Jr',
+        'Kenny Drew Jr',
+        'Mike Wofford',
+        'Toshiko Akiyoshi',
+        'Richard Beirach',
+        'John Taylor',
+        'Jim McNeely',
+        'Michel Petrucciani',
+        'Earl Hines',
+        'Don Friedman',
+        'Gerald Clayton',
+        'Hal Galper',
+        'Walter Norris',
+        'Marc Copland',
+        'Mulgrew Miller',
+        'Kris Davis',
+        'Roger Kellaway',
+        'John Campbell',
+        'Jaki Byard',
+        'Kenny Werner',
+        'Jason Moran',
+        'Steve Kuhn',
+        'Mary Lou Williams',
+        'Chris Anderson',
+        'Eliane Elias',
+        'Bill Charlap',
+        'Edward Simon',
+        'Robi Botos',
+        'Joe Sample',
+        'Paul Smith',
+        'Dado Moroni',
+        'Justin Kauflin',
+        'Ramsey Lewis',
+        'Lance Anderson',
+        'Renee Rosnes',
+        'Joey Alexander',
+        'Ethan Iverson',
     ],
     "themes": [],
 }
@@ -362,27 +467,38 @@ def get_pianist_tokens(track_metadata_dict: dict, tokenizer: MusicTokenizer, n_p
     assert len([i for i in tokenizer.vocab.keys() if "PIANIST" in i]) > 0, "Pianist tokens not added to tokenizer!"
     # Get the pianist FROM THIS TRACK
     track_pianist = track_metadata_dict["pianist"]
-    # Get pianists that are similar to this pianist
-    similar_pianists = _get_similar_pianists(track_pianist)
-    # Remove the weight term
-    similar_pianists = [s[0] for s in similar_pianists]
-    # If we can use the track pianist
+    # If we want to use this pianist
     if track_pianist not in EXCLUDE["pianist"]:
-        # Subset to get only the top-N - 1 pianists if required
-        if n_pianists is not None:
-            similar_pianists = similar_pianists[:n_pianists - 1]
-        finalised_pianists = [track_pianist] + similar_pianists
-    # Otherwise, we want to keep top-N pianists
+        # Add the prefix to the token
+        prefixed = f'PIANIST_{utils.remove_punctuation(track_pianist).replace(" ", "")}'
+        # Sanity check that the tokens are part of the vocabulary for the tokenizer
+        assert prefixed in tokenizer.vocab.keys(), f"Could not find token {prefixed} in tokenizer vocabulary!"
+        return [prefixed]
     else:
-        if n_pianists is not None:
-            similar_pianists = similar_pianists[:n_pianists]
-        finalised_pianists = similar_pianists
-    # Add the prefix to the token
-    prefixed = [f'PIANIST_{utils.remove_punctuation(g).replace(" ", "")}' for g in finalised_pianists]
-    # Sanity check that the tokens are part of the vocabulary for the tokenizer
-    for pfix in prefixed:
-        assert pfix in tokenizer.vocab.keys(), f"Could not find token {pfix} in tokenizer vocabulary!"
-    return prefixed
+        # TODO: here, we can get N similar pianists instead
+        return []
+
+    # # Get pianists that are similar to this pianist
+    # similar_pianists = _get_similar_pianists(track_pianist)
+    # # Remove the weight term
+    # similar_pianists = [s[0] for s in similar_pianists]
+    # # If we can use the track pianist
+    # if track_pianist not in EXCLUDE["pianist"]:
+    #     # Subset to get only the top-N - 1 pianists if required
+    #     if n_pianists is not None:
+    #         similar_pianists = similar_pianists[:n_pianists - 1]
+    #     finalised_pianists = [track_pianist] + similar_pianists
+    # # Otherwise, we want to keep top-N pianists
+    # else:
+    #     if n_pianists is not None:
+    #         similar_pianists = similar_pianists[:n_pianists]
+    #     finalised_pianists = similar_pianists
+    # # Add the prefix to the token
+    # prefixed = [f'PIANIST_{utils.remove_punctuation(g).replace(" ", "")}' for g in finalised_pianists]
+    # # Sanity check that the tokens are part of the vocabulary for the tokenizer
+    # for pfix in prefixed:
+    #     assert pfix in tokenizer.vocab.keys(), f"Could not find token {pfix} in tokenizer vocabulary!"
+    # return prefixed
 
 
 def get_tempo_token(tempo: float, tokenizer: MusicTokenizer, _raise_on_difference_exceeding: int = 50) -> str:

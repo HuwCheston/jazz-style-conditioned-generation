@@ -105,13 +105,13 @@ class TokenizerTest(unittest.TestCase):
         self.assertTrue(len(tok.vocab.keys()) == len(set(tok.vocab.keys())))  # should be no duplicates
         # These are the pianists we should be adding to our vocab
         expected_pianist_tokens = [
-            "PIANIST_KennyBarron", "PIANIST_BeegieAdair", "PIANIST_BradMehldau", "PIANIST_HerbieHancock"
+            "PIANIST_KennyBarron", "PIANIST_BradMehldau", "PIANIST_HerbieHancock", "PIANIST_BudPowell"
         ]
         for expect in expected_pianist_tokens:
             self.assertTrue(expect in tok.vocab)
             # self.assertTrue(expect in tok.special_tokens)
         # We should not add the following pianists: they're in our EXCLUDE list
-        not_expected = ["PIANIST_DougMcKenzie", "PIANIST_JJAPianist1"]
+        not_expected = ["PIANIST_DougMcKenzie", "PIANIST_JJAPianist1", "PIANIST_BeegieAdair", "PIANIST_Hiromi"]
         for not_expect in not_expected:
             self.assertFalse(not_expect in tok.vocab)
 
@@ -153,7 +153,7 @@ class TokenizerTest(unittest.TestCase):
         tokfactory = REMI()
         add_pianists_to_vocab(tokfactory)
         tok_pianists = sorted(set([i for i in tokfactory.vocab.keys() if "PIANIST" in i]))
-        self.assertEqual(len(tok_pianists), 129)  # pijama + JTD pianists
+        self.assertEqual(len(tok_pianists), 25)  # only 25 pianists with more than 50 recordings
         # tok_pianists = sorted(set([i for i in tokfactory.special_tokens if "PIANIST" in i]))
         # self.assertEqual(len(tok_pianists), 129)  # pijama + JTD pianists
 
