@@ -1,6 +1,5 @@
 experiment: tester
 run: tester_config
-conditions: [ ]
 batch_size: 2
 epochs: 1
 data_dir: tests/test_resources
