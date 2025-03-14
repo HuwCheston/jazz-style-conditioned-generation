@@ -444,8 +444,8 @@ class DataloaderTest(unittest.TestCase):
         self.assertRaises(AssertionError, ds.add_condition_tokens_to_input, dummy, condition_tokens)
 
     @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
-    def test_overlap_between_condition_and_track_tokens(self):
-        """There should be no overlap between the token IDs from a TRACK, and the condition token IDs"""
+    def test_conditioning_full_dataset(self):
+        """Test our conditioning with a large number of tracks (will be skipped on remote)"""
 
         def runner(tokenizer):
             # Create the dataset
@@ -481,6 +481,13 @@ class DataloaderTest(unittest.TestCase):
                     self.assertTrue(decoded_token in all_condition_tokens)
                     # When decoded, condition tokens SHOULD start with one of our condition token patterns
                     self.assertTrue(decoded_token.startswith(tuple(CONDITION_TOKEN_STARTS)))
+                # Decoding the input IDs into a score should give the same results as decoding the input ids + condition
+                inputs_decoded = tokenizer.decode(torch.tensor([input_ids]))
+                inputs_conditions_decoded = tokenizer.decode(torch.tensor([condition_idxs + input_ids]))
+                self.assertEqual(inputs_decoded, inputs_conditions_decoded)
+                self.assertEqual(inputs_decoded.tracks, inputs_conditions_decoded.tracks)
+                self.assertEqual(inputs_decoded.tracks[0].notes, inputs_conditions_decoded.tracks[0].notes)
+                self.assertEqual(len(inputs_decoded.tracks[0].notes), len(inputs_conditions_decoded.tracks[0].notes))
 
         # Get a large number of tracks + equivalent metadata files
         idx = int(utils.now()[-1]) * 100  # bootleg random index, should operate independently of our set seed
@@ -497,6 +504,45 @@ class DataloaderTest(unittest.TestCase):
         # SECOND: we test WITH training the tokenizer
         train_tokenizer(tok, midi_fps, vocab_size=1000, training_method="BPE")
         runner(tok)
+
+    def test_adding_condition_tokens_does_not_change_score(self):
+        """A score created using raw inputs should be identical to a score created after adding conditions to inputs"""
+
+        def runner(token_factory):
+            ds = DatasetMIDIRandomChunk(
+                tokenizer=token_factory,
+                files_paths=[TEST_MIDI1, TEST_MIDI2, TEST_MIDI3],
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                do_augmentation=False,
+                do_conditioning=True
+            )
+            for idx in range(len(ds)):
+                # Get the input IDs and targets for the item
+                input_ids, targets, tempo_shift = ds.load_file(ds.files_paths[idx])
+                input_ids_tensor = torch.tensor([input_ids])  # stack into a tensor for decoding
+                # Decode the input IDs into a score
+                inputs_decoded = tokenizer.decode(input_ids_tensor)
+                # Get the condition tokens for the item and combine with the input ids
+                condition_idxs = ds.get_conditioning_tokens(ds.metadata_paths[idx], tempo_shift)
+                inputs_with_conditions_tensor = torch.tensor([condition_idxs + input_ids])
+                self.assertGreaterEqual(inputs_with_conditions_tensor.size(1), input_ids_tensor.size(1))
+                # Decode the condition tokens + input IDs into a score
+                inputs_with_conditions_decoded = tokenizer.decode(inputs_with_conditions_tensor)
+                # Both scores should be identical
+                self.assertEqual(inputs_decoded, inputs_with_conditions_decoded)
+                # Both scores should have identical notes, tracks, tempos, and time signatures
+                self.assertEqual(inputs_decoded.tracks[0].notes, inputs_with_conditions_decoded.tracks[0].notes)
+                self.assertEqual(inputs_decoded.tracks, inputs_with_conditions_decoded.tracks)
+                self.assertEqual(inputs_decoded.tempos, inputs_with_conditions_decoded.tempos)
+                self.assertEqual(inputs_decoded.time_signatures, inputs_with_conditions_decoded.time_signatures)
+                self.assertEqual(inputs_decoded.ticks_per_quarter, inputs_with_conditions_decoded.ticks_per_quarter)
+
+        # FIRST, we test without training the tokenizer
+        tokenizer = prepare_conditioned_tokenizer()
+        runner(tokenizer)
+        # SECOND, we train the tokenizer and test again
+        train_tokenizer(tokenizer, [TEST_MIDI1], vocab_size=1000, training_method="BPE")
+        runner(tokenizer)
 
 
 if __name__ == '__main__':
