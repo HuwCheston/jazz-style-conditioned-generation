@@ -11,6 +11,7 @@ from miditok import MusicTokenizer
 from jazz_style_conditioned_generation import utils
 
 MAX_GENRE_TOKENS_PER_TRACK = 5  # This is the maximum number of genre tokens we'll consider per track
+MAX_SIMILAR_PIANISTS = 5  # This is the maximum number of "similar pianists" we'll get per track
 
 # These are the only conditions we'll accept values for
 ACCEPT_CONDITIONS = ["moods", "genres", "pianist", "themes"]
@@ -462,21 +463,31 @@ def _get_similar_pianists(pianist_name: str) -> list[tuple[str, int]]:
         return []
 
 
-def get_pianist_tokens(track_metadata_dict: dict, tokenizer: MusicTokenizer, n_pianists: int = None) -> list[str]:
+def get_pianist_tokens(
+        track_metadata_dict: dict,
+        tokenizer: MusicTokenizer,
+        n_pianists: int = MAX_SIMILAR_PIANISTS
+) -> list[str]:
     # Check that we've added pianist tokens to our tokenizer
     assert len([i for i in tokenizer.vocab.keys() if "PIANIST" in i]) > 0, "Pianist tokens not added to tokenizer!"
     # Get the pianist FROM THIS TRACK
     track_pianist = track_metadata_dict["pianist"]
     # If we want to use this pianist
     if track_pianist not in EXCLUDE["pianist"]:
-        # Add the prefix to the token
-        prefixed = f'PIANIST_{utils.remove_punctuation(track_pianist).replace(" ", "")}'
-        # Sanity check that the tokens are part of the vocabulary for the tokenizer
-        assert prefixed in tokenizer.vocab.keys(), f"Could not find token {prefixed} in tokenizer vocabulary!"
-        return [prefixed]
+        finalised_pianists = [track_pianist]
     else:
-        # TODO: here, we can get N similar pianists instead
-        return []
+        similar_pianists = _get_similar_pianists(track_pianist)
+        if n_pianists is not None:
+            similar_pianists = similar_pianists[:n_pianists]
+        # Subset to remove weight
+        finalised_pianists = [i[0] for i in similar_pianists]
+    # Add the prefix to the token
+    prefixed = [f'PIANIST_{utils.remove_punctuation(g).replace(" ", "")}' for g in finalised_pianists]
+    # Sanity check that the tokens are part of the vocabulary for the tokenizer
+    for pfix in prefixed:
+        assert pfix in tokenizer.vocab.keys(), f"Could not find token {pfix} in tokenizer vocabulary!"
+    return prefixed
+
 
     # # Get pianists that are similar to this pianist
     # similar_pianists = _get_similar_pianists(track_pianist)
@@ -550,7 +561,7 @@ if __name__ == "__main__":
     for js in js_fps:
         js_loaded = utils.read_json_cached(js)
         track_genres.extend(get_genre_tokens(js_loaded, tokfactory, n_genres=5))
-        track_pianists.extend(get_pianist_tokens(js_loaded, tokfactory, n_pianists=1))
+        track_pianists.extend(get_pianist_tokens(js_loaded, tokfactory, n_pianists=5))
 
     print("Loaded", len(set(track_genres)), "genres")
     assert len(set(track_genres)) == len([i for i in tokfactory.vocab.keys() if "GENRES" in i])

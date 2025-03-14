@@ -107,8 +107,8 @@ class DatasetMIDIConditioned:
         metadata_read = utils.read_json_cached(metadata_fpath)
         # Grab the condition tokens for this track (genre, pianist)
         extra_tokens = [
-            *get_genre_tokens(metadata_read, self.tokenizer, n_genres=None),  # use all genres
-            *get_pianist_tokens(metadata_read, self.tokenizer, n_pianists=1)  # only track pianist
+            *get_genre_tokens(metadata_read, self.tokenizer),
+            *get_pianist_tokens(metadata_read, self.tokenizer)
         ]
         # Also grab the tempo and time signature tokens, if we have them
         if "tempo" in metadata_read.keys():

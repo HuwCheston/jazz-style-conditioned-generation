@@ -195,10 +195,13 @@ class DataloaderTest(unittest.TestCase):
         self.assertEqual(len(ds), 1)
         item = ds.__getitem__(0)
         input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
-        # This track has one GENRE and one PIANIST token. The GENRE token is associated with the PIANIST, not the track
-        self.assertEqual(input_ids[0], token_factory["GENRES_StraightAheadJazz"])  # associated with PIANIST
-        # self.assertEqual(input_ids[1], token_factory["PIANIST_BeegieAdair"])
-        # self.assertEqual(targets[0], token_factory["PIANIST_BeegieAdair"])
+        # This track has one GENRE token, associated with the pianist
+        #  It also has two SIMILAR PIANISTS
+        self.assertEqual(input_ids[0], token_factory["GENRES_StraightAheadJazz"])
+        self.assertEqual(input_ids[1], token_factory["PIANIST_BradMehldau"])  # similar to Beegie Adair
+        self.assertEqual(input_ids[2], token_factory["PIANIST_KennyDrew"])
+        self.assertEqual(targets[0], token_factory["PIANIST_BradMehldau"])
+        self.assertEqual(targets[1], token_factory["PIANIST_KennyDrew"])
         # We should not have any tempo or time signature tokens for this track
         for tok in input_ids:
             for t in ["TEMPO", "TIMESIGNATURE"]:
@@ -334,9 +337,13 @@ class DataloaderTest(unittest.TestCase):
         input_tokens = decoder(token_factory, input_ids)
         target_tokens = decoder(token_factory, targets)
         # Now we can do our checking
-        self.assertEqual(input_tokens[0], "GENRES_StraightAheadJazz")  # associated with PIANIST
-        # self.assertEqual(input_tokens[1], "PIANIST_BeegieAdair")
-        # self.assertEqual(target_tokens[0], "PIANIST_BeegieAdair")
+        # This track has one GENRE token, associated with the pianist
+        #  It also has two SIMILAR PIANISTS
+        self.assertEqual(input_ids[0], token_factory["GENRES_StraightAheadJazz"])
+        self.assertEqual(input_ids[1], token_factory["PIANIST_BradMehldau"])  # similar to Beegie Adair
+        self.assertEqual(input_ids[2], token_factory["PIANIST_KennyDrew"])
+        self.assertEqual(targets[0], token_factory["PIANIST_BradMehldau"])
+        self.assertEqual(targets[1], token_factory["PIANIST_KennyDrew"])
         # With training the token IDs, the length of the decoded tokens > the encoded token IDs
         self.assertGreater(len(input_tokens), len(input_ids))
         self.assertGreater(len(target_tokens), len(targets))

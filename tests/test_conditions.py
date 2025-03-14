@@ -75,21 +75,24 @@ class ConditionsTest(unittest.TestCase):
         add_pianists_to_vocab(tokenizer)
         # Test just getting the actual pianist from the track
         # This track is by Kenny Barron, who we want to include
+        # Therefore, we won't get any additional pianists: the recording is by Kenny Barron only
         track = utils.read_json_cached(files[0])
         expected_token = ["PIANIST_KennyBarron"]
-        actual_tokens = cond.get_pianist_tokens(track, tokenizer, n_pianists=1)
+        actual_tokens = cond.get_pianist_tokens(track, tokenizer, n_pianists=5)
         self.assertEqual(expected_token, actual_tokens)
         self.assertTrue(len(actual_tokens) == 1)
 
         # This track is by Beegie Adair, but he is in our exclude list!
+        #  However, Beegie Adair is similar to Kenny Drew and Brad Mehldau, who we are including
+        #  Therefore, we'll get their tokens here
         track = utils.read_json_cached(files[1])
-        expected_token = []
-        actual_tokens = cond.get_pianist_tokens(track, tokenizer, n_pianists=1)
+        expected_token = ["PIANIST_BradMehldau", "PIANIST_KennyDrew"]
+        actual_tokens = cond.get_pianist_tokens(track, tokenizer, n_pianists=2)
         self.assertEqual(expected_token, actual_tokens)
-        self.assertTrue(len(actual_tokens) == 0)
+        self.assertTrue(len(actual_tokens) == 2)
 
-        # This track is by a pianist who is also in our exclude list
-        track = utils.read_json_cached(files[2])
+        # This track is by a pianist who is also in our exclude list, and we have no similar pianists for them
+        track = utils.read_json_cached(files[-1])
         expected_token = []
         actual_tokens = cond.get_pianist_tokens(track, tokenizer, n_pianists=1)
         self.assertEqual(expected_token, actual_tokens)
