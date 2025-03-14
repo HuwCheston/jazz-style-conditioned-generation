@@ -494,6 +494,10 @@ class DataloaderTest(unittest.TestCase):
                     self.assertTrue(decoded_token in all_condition_tokens)
                     # When decoded, condition tokens SHOULD start with one of our condition token patterns
                     self.assertTrue(decoded_token.startswith(tuple(CONDITION_TOKEN_STARTS)))
+                # Test that there are no more than 5 pianist and genre tokens for one recording
+                for tok_start in ["PIANIST", "GENRE"]:
+                    ts = [i for i in decoded_condition_tokens if i.startswith(tok_start)]
+                    self.assertTrue(len(ts) <= 5)
                 # Decoding the input IDs into a score should give the same results as decoding the input ids + condition
                 inputs_decoded = tokenizer.decode(torch.tensor([input_ids]))
                 inputs_conditions_decoded = tokenizer.decode(torch.tensor([condition_idxs + input_ids]))
