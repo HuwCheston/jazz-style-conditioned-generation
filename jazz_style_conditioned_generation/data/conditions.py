@@ -356,22 +356,6 @@ def get_time_signature_token(time_signature: int, tokenizer: MusicTokenizer) -> 
         raise AttributeError(f"Tokenizer does not have token {timesig_token} in vocabulary!")
 
 
-def add_condition_tokens_to_sequence(
-        sequence: list[int],
-        condition_tokens: list[int],
-) -> tuple[list[int], list[int]]:
-    """Add condition tokens to a sequence, preserving length"""
-    assert len(condition_tokens) > 0, "Condition token list is empty"
-    max_seq_len = len(sequence)
-    # Condition tokens go before the beginning of the sequence
-    comb = condition_tokens + sequence
-    # Chunk everything to the required length and sanity check
-    x = comb[:max_seq_len]
-    targets = comb[1: max_seq_len + 1]
-    assert len(x) == len(targets) == len(sequence)
-    return x, targets
-
-
 if __name__ == "__main__":
     from collections import Counter
 

@@ -9,13 +9,14 @@ from .conditions import (
     get_genre_tokens,
     get_pianist_tokens,
     get_tempo_token,
-    get_time_signature_token,
-    add_condition_tokens_to_sequence
+    get_time_signature_token
 )
 from .dataloader import (
     DATA_DIR,
     DatasetMIDIExhaustive,
-    DatasetMIDIRandomChunk
+    DatasetMIDIRandomChunk,
+    pad_sequence,
+    create_padding_mask
 )
 from .tokenizer import (
     DEFAULT_TOKENIZER_CLASS,
