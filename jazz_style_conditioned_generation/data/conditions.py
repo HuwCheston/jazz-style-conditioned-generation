@@ -10,6 +10,8 @@ from miditok import MusicTokenizer
 
 from jazz_style_conditioned_generation import utils
 
+MAX_GENRE_TOKENS_PER_TRACK = 5  # This is the maximum number of genre tokens we'll consider per track
+
 # These are the only conditions we'll accept values for
 ACCEPT_CONDITIONS = ["moods", "genres", "pianist", "themes"]
 # Each list should be populated with values for a condition that we don't want to use
@@ -287,8 +289,7 @@ def _get_pianist_genres(pianist_name: str) -> list[tuple[str, int]]:
         pianist_metadata_dict = utils.read_json_cached(pianist_metadata)
         # If we have genres for the pianist
         if len(pianist_metadata_dict["genres"]) > 0:
-            genres = [(x["name"], x["weight"]) for x in pianist_metadata_dict["genres"]]
-            return validate_condition_values(genres, "genres")
+            return [(x["name"], x["weight"]) for x in pianist_metadata_dict["genres"]]
         # Otherwise, return an empty list
         else:
             return []
@@ -304,38 +305,37 @@ def _get_track_genres(track_metadata_dict: dict) -> list[tuple[str, int]]:
     """Get the genres & weights associated with a track"""
     # Grab the genres associated with the track
     if len(track_metadata_dict) > 0:
-        genres = [(x["name"], x["weight"]) for x in track_metadata_dict["genres"]]
-        # Validate the genres: remove any duplicates/values we don't want
-        return validate_condition_values(genres, "genres")
+        return [(x["name"], x["weight"]) for x in track_metadata_dict["genres"]]
     else:
         return []
 
 
-def get_genre_tokens(track_metadata_dict: dict, tokenizer: MusicTokenizer, n_genres: int = None):
+def get_genre_tokens(
+        track_metadata_dict: dict,
+        tokenizer: MusicTokenizer,
+        n_genres: int = MAX_GENRE_TOKENS_PER_TRACK
+) -> list[str]:
     """Gets tokens for a track's genres: either from the track itself, or (if none found) from the artist"""
     # Check that we've added pianist tokens to our tokenizer
     assert len([i for i in tokenizer.vocab.keys() if "GENRES" in i]) > 0, "Genre tokens not added to tokenizer!"
-    # Try and get the tokens for the TRACK first
-    genres = _get_track_genres(track_metadata_dict)
-    # If we don't have any genres for the TRACK
-    # TODO: I think we should always use the pianist genres, too
+    # Get the genres from the track and from the pianist
+    genres_track = _get_track_genres(track_metadata_dict)
+    genres_pianist = _get_pianist_genres(track_metadata_dict["pianist"])
+    # Merge them together
+    genres = genres_track + genres_pianist
     if len(genres) == 0:
-        # Try and get them for the PIANIST
-        pianist_genres = _get_pianist_genres(track_metadata_dict["pianist"])
-        # If we still don't have any genres, just return an empty list
-        if len(pianist_genres) == 0:
-            return []
-        # Otherwise, we can use the genres associated with the pianist
-        else:
-            genres = pianist_genres
+        return []
+    # Run validation: this will remove duplicates and sort depending on weight
+    validated_genres = validate_condition_values(genres, "genres")
     # Remove the weight term from each tuple to get a single list
-    finalised_genres = [g[0] for g in genres]
+    finalised_genres = [g[0] for g in validated_genres]
     # Subset to only get the top-N genres, if required
     if n_genres is not None:
         finalised_genres = finalised_genres[:n_genres]
     # Add the prefix to the token
     prefixed = [f'GENRES_{utils.remove_punctuation(g).replace(" ", "")}' for g in finalised_genres]
-    # Sanity check that the tokens are part of the vocabulary for the tokenizer
+    # Sanity checks
+    assert len(set(prefixed)) == len(prefixed)
     for pfix in prefixed:
         assert pfix in tokenizer.vocab.keys(), f"Could not find token {pfix} in tokenizer vocabulary!"
     return prefixed
@@ -431,13 +431,13 @@ if __name__ == "__main__":
 
     tokfactory = MIDILike()
     js_fps = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
-    add_genres_to_vocab(tokfactory, js_fps)
+    add_genres_to_vocab(tokfactory)
     add_pianists_to_vocab(tokfactory, js_fps)
 
     track_genres, track_pianists = [], []
     for js in js_fps:
         js_loaded = utils.read_json_cached(js)
-        track_genres.extend(get_genre_tokens(js_loaded, tokfactory, n_genres=None))
+        track_genres.extend(get_genre_tokens(js_loaded, tokfactory, n_genres=5))
         track_pianists.extend(get_pianist_tokens(js_loaded, tokfactory, n_pianists=1))
 
     print("Loaded", len(set(track_genres)), "genres")

@@ -37,7 +37,7 @@ def prepare_conditioned_tokenizer():
     # Add in all of our tokens to the vocabulary
     testers = [TEST_MIDI1, TEST_MIDI2, TEST_MIDI3]
     metadata_fps = [tm.replace("piano_midi.mid", "metadata_tivo.json") for tm in testers]
-    add_genres_to_vocab(token_factory, metadata_fps)
+    add_genres_to_vocab(token_factory)
     add_pianists_to_vocab(token_factory, metadata_fps)
     add_tempos_to_vocab(token_factory, (80, 300), 32)
     add_timesignatures_to_vocab(token_factory, [3, 4])
@@ -162,21 +162,25 @@ class DataloaderTest(unittest.TestCase):
         self.assertEqual(len(ds), 1)
         item = ds.__getitem__(0)
         input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
-        # Input IDs should start with the expected conditioning tokens
+        # Input IDs should start with condition tokens, followed by BOS
         #  IDs are sorted in order of GENRE -> PIANIST -> TEMPO -> TIMESIG
         #  GENRE and PIANIST are sorted in DESCENDING weight order, with the track pianist always placed first
-        self.assertEqual(input_ids[0], token_factory["GENRES_Caribbean"])  # most strongly weighted genre
+        self.assertEqual(input_ids[0], token_factory["GENRES_Caribbean"])  # most strongly weighted genre, = 10
         self.assertEqual(input_ids[1], token_factory["GENRES_HardBop"])
-        self.assertEqual(input_ids[2], token_factory["GENRES_PostBop"])  # least strongly weighted genre
-        self.assertEqual(input_ids[3], token_factory["PIANIST_KennyBarron"])
-        self.assertEqual(input_ids[4], token_factory["TEMPOCUSTOM_300"])  # closest match to our provided tempo
-        self.assertEqual(input_ids[5], token_factory["TIMESIGNATURECUSTOM_44"])
-        # Targets are just the inputs shifted by one
+        self.assertEqual(input_ids[2], token_factory["GENRES_PostBop"])
+        self.assertEqual(input_ids[3], token_factory["GENRES_StraightAheadJazz"])
+        self.assertEqual(input_ids[4], token_factory["GENRES_Fusion"])  # least strongly weighted genre, = 5
+        self.assertEqual(input_ids[5], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(input_ids[6], token_factory["TEMPOCUSTOM_300"])  # closest match to our provided tempo
+        self.assertEqual(input_ids[7], token_factory["TIMESIGNATURECUSTOM_44"])
+        # Targets should be input_ids, shifted to the left
         self.assertEqual(targets[0], token_factory["GENRES_HardBop"])
         self.assertEqual(targets[1], token_factory["GENRES_PostBop"])
-        self.assertEqual(targets[2], token_factory["PIANIST_KennyBarron"])
-        self.assertEqual(targets[3], token_factory["TEMPOCUSTOM_300"])
-        self.assertEqual(targets[4], token_factory["TIMESIGNATURECUSTOM_44"])
+        self.assertEqual(targets[2], token_factory["GENRES_StraightAheadJazz"])
+        self.assertEqual(targets[3], token_factory["GENRES_Fusion"])  # least strongly weighted genre, = 5
+        self.assertEqual(targets[4], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(targets[5], token_factory["TEMPOCUSTOM_300"])  # closest match to our provided tempo
+        self.assertEqual(targets[6], token_factory["TIMESIGNATURECUSTOM_44"])
         # Should be the desired length
         self.assertEqual(len(input_ids), 10)
         self.assertEqual(len(targets), 10)
@@ -280,20 +284,24 @@ class DataloaderTest(unittest.TestCase):
         # Input IDs should start with condition tokens, followed by BOS
         #  IDs are sorted in order of GENRE -> PIANIST -> TEMPO -> TIMESIG
         #  GENRE and PIANIST are sorted in DESCENDING weight order, with the track pianist always placed first
-        self.assertEqual(input_ids[0], token_factory["GENRES_Caribbean"])  # most strongly weighted genre
+        self.assertEqual(input_ids[0], token_factory["GENRES_Caribbean"])  # most strongly weighted genre, = 10
         self.assertEqual(input_ids[1], token_factory["GENRES_HardBop"])
-        self.assertEqual(input_ids[2], token_factory["GENRES_PostBop"])  # least strongly weighted genre
-        self.assertEqual(input_ids[3], token_factory["PIANIST_KennyBarron"])
-        self.assertEqual(input_ids[4], token_factory["TEMPOCUSTOM_300"])  # closest match to our provided tempo
-        self.assertEqual(input_ids[5], token_factory["TIMESIGNATURECUSTOM_44"])
-        self.assertEqual(input_ids[6], token_factory["BOS_None"])
+        self.assertEqual(input_ids[2], token_factory["GENRES_PostBop"])
+        self.assertEqual(input_ids[3], token_factory["GENRES_StraightAheadJazz"])
+        self.assertEqual(input_ids[4], token_factory["GENRES_Fusion"])  # least strongly weighted genre, = 5
+        self.assertEqual(input_ids[5], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(input_ids[6], token_factory["TEMPOCUSTOM_300"])  # closest match to our provided tempo
+        self.assertEqual(input_ids[7], token_factory["TIMESIGNATURECUSTOM_44"])
+        self.assertEqual(input_ids[8], token_factory["BOS_None"])
         # Targets should be input_ids, shifted to the left
         self.assertEqual(targets[0], token_factory["GENRES_HardBop"])
-        self.assertEqual(targets[1], token_factory["GENRES_PostBop"])  # least strongly weighted genre
-        self.assertEqual(targets[2], token_factory["PIANIST_KennyBarron"])
-        self.assertEqual(targets[3], token_factory["TEMPOCUSTOM_300"])  # closest match to our provided tempo
-        self.assertEqual(targets[4], token_factory["TIMESIGNATURECUSTOM_44"])
-        self.assertEqual(targets[5], token_factory["BOS_None"])
+        self.assertEqual(targets[1], token_factory["GENRES_PostBop"])
+        self.assertEqual(targets[2], token_factory["GENRES_StraightAheadJazz"])
+        self.assertEqual(targets[3], token_factory["GENRES_Fusion"])  # least strongly weighted genre, = 5
+        self.assertEqual(targets[4], token_factory["PIANIST_KennyBarron"])
+        self.assertEqual(targets[5], token_factory["TEMPOCUSTOM_300"])  # closest match to our provided tempo
+        self.assertEqual(targets[6], token_factory["TIMESIGNATURECUSTOM_44"])
+        self.assertEqual(targets[7], token_factory["BOS_None"])
         # Should be the desired length
         self.assertEqual(len(input_ids), 100)
         self.assertEqual(len(targets), 100)
@@ -301,12 +309,12 @@ class DataloaderTest(unittest.TestCase):
         final_item = ds.__getitem__(len(ds) - 1)
         input_ids, targets = final_item["input_ids"].tolist(), final_item["labels"].tolist()
         self.assertEqual(input_ids[0], token_factory["GENRES_Caribbean"])  # most strongly weighted genre
-        self.assertEqual(input_ids[5], token_factory["TIMESIGNATURECUSTOM_44"])
-        self.assertNotEquals(input_ids[6], token_factory["BOS_None"])  # should NOT have the BOS token here
+        self.assertEqual(input_ids[7], token_factory["TIMESIGNATURECUSTOM_44"])
+        self.assertNotEquals(input_ids[8], token_factory["BOS_None"])  # should NOT have the BOS token here
         # Targets should be input_ids, shifted to the left
         self.assertEqual(targets[0], token_factory["GENRES_HardBop"])
-        self.assertEqual(targets[4], token_factory["TIMESIGNATURECUSTOM_44"])
-        self.assertNotEquals(targets[5], token_factory["BOS_None"])
+        self.assertEqual(targets[6], token_factory["TIMESIGNATURECUSTOM_44"])
+        self.assertNotEquals(targets[7], token_factory["BOS_None"])  # should NOT have the BOS token here
         # and end with the EOS token, after padding is removed
         input_ids_no_pad = [i for i in input_ids if i != token_factory["PAD_None"]]
         self.assertEqual(input_ids_no_pad[-1], token_factory["EOS_None"])
@@ -498,7 +506,7 @@ class DataloaderTest(unittest.TestCase):
         add_tempos_to_vocab(tok, (80, 300), 32)
         add_timesignatures_to_vocab(tok, [3, 4])
         add_pianists_to_vocab(tok, metadata_fps)
-        add_genres_to_vocab(tok, metadata_fps)
+        add_genres_to_vocab(tok)
         # FIRST: we test without training the tokenizer
         runner(tok)
         # SECOND: we test WITH training the tokenizer

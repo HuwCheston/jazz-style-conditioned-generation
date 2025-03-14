@@ -119,18 +119,21 @@ class ConditionsTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             cond.get_genre_tokens({}, tokenizer)
         # Add to the vocabulary using the metadata files we've defined
-        add_genres_to_vocab(tokenizer, files)
+        add_genres_to_vocab(tokenizer)
         # This track has genres associated with it directly
         track = utils.read_json_cached(files[0])
-        expected_token = sorted(["GENRES_HardBop", "GENRES_PostBop", "GENRES_Caribbean"])
-        actual_tokens = cond.get_genre_tokens(track, tokenizer, n_genres=None)
+        expected_token = sorted([
+            "GENRES_HardBop", "GENRES_PostBop", "GENRES_Caribbean",  # These genres are associated with the track
+            "GENRES_Fusion", "GENRES_StraightAheadJazz"  # These genres are associated with the pianist (Kenny Barron)
+        ])
+        actual_tokens = sorted(cond.get_genre_tokens(track, tokenizer, n_genres=5))
         self.assertEqual(expected_token, actual_tokens)
-        self.assertTrue(len(actual_tokens) == 3)
-        # Now, we can test by getting only the top-2 tokens with the strongest weighting
-        expected_token = sorted(["GENRES_Caribbean", "GENRES_HardBop"])
-        actual_tokens = cond.get_genre_tokens(track, tokenizer, n_genres=2)
+        self.assertTrue(len(actual_tokens) == 5)
+        # Now, we can test by getting the 1 token with the strongest weighting
+        expected_token = sorted(["GENRES_Caribbean"])
+        actual_tokens = cond.get_genre_tokens(track, tokenizer, n_genres=1)
         self.assertEqual(expected_token, actual_tokens)
-        self.assertTrue(len(actual_tokens) == 2)
+        self.assertTrue(len(actual_tokens) == 1)
         # This track does not have genres associated with it, so we'll grab those associated with the pianist instead
         track = utils.read_json_cached(files[1])
         expected_token = ["GENRES_StraightAheadJazz"]  # Associated with Beegie Adair the artist, not this track
@@ -190,7 +193,7 @@ class ConditionsTest(unittest.TestCase):
         tokfactory = REMI()
         js_fps = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
         # Here, we're adding genre tokens from the ENTIRE dataset to our vocabulary
-        add_genres_to_vocab(tokfactory, js_fps)
+        add_genres_to_vocab(tokfactory)
         track_genres = []
         # Now we simulate "getting" all the genre tokens for every track in the dataset
         for js in js_fps:

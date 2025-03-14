@@ -135,34 +135,11 @@ def add_pianists_to_vocab(tokenizer, metadata_paths: list[str]) -> None:
             tokenizer.add_to_vocab(with_prefix, special_token=False)
 
 
-def add_genres_to_vocab(tokenizer: MusicTokenizer, metadata_paths: list[str]) -> None:
+def add_genres_to_vocab(tokenizer: MusicTokenizer) -> None:
     """Adds all valid genres for all tracks and artists to the tokenizer"""
-    all_genres = []
-    tivo_artist_metadata_path = os.path.join(utils.get_project_root(), "references/tivo_artist_metadata")
+    from jazz_style_conditioned_generation.data.conditions import MERGE
 
-    # First, we try and get metadata for the TRACK
-    for metadata_path in metadata_paths:
-        metadata_loaded = utils.read_json_cached(metadata_path)
-        track_genres = [(x["name"], x["weight"]) for x in metadata_loaded["genres"]]
-        validated_genres = validate_condition_values(track_genres, "genres")
-        # If we don't have any genres for the track
-        if len(validated_genres) == 0:
-            # Then, we can get genres for the ARTIST
-            pianist_name = metadata_loaded["pianist"].replace(" ", "")
-            pianist_fpath = os.path.join(tivo_artist_metadata_path, pianist_name + ".json")
-            if os.path.exists(pianist_fpath):
-                pianist_loaded = utils.read_json_cached(pianist_fpath)
-                pianist_genres = [(x["name"], x["weight"]) for x in pianist_loaded["genres"]]
-                validated_genres = validate_condition_values(pianist_genres, "genres")
-                if len(validated_genres) == 0:
-                    continue
-            else:
-                continue
-        all_genres.extend(validated_genres)
-    # This deduplicates, merges, and sorts genres
-    validated_genres = validate_condition_values(all_genres, "genres")
-    # We only care about the name of the genre, not the weight
-    for genre, _ in validated_genres:
+    for genre in list(MERGE["genres"].keys()):
         with_prefix = f'GENRES_{utils.remove_punctuation(genre).replace(" ", "")}'
         if with_prefix not in tokenizer.vocab:
             tokenizer.add_to_vocab(with_prefix, special_token=False)
@@ -259,7 +236,7 @@ if __name__ == "__main__":
     midi_fps = utils.get_data_files_with_ext("data/raw", "**/*.mid")
     js_fps = [i.replace("piano_midi.mid", "metadata_tivo.json") for i in midi_fps]
     # Add genre tokens
-    add_genres_to_vocab(tokfactory, js_fps)
+    add_genres_to_vocab(tokfactory)
     gen_toks = [t for t in tokfactory.vocab.keys() if "GENRES" in t]
     print(f'Loaded {len(gen_toks)} genre tokens')
     print(sorted(set(gen_toks)))
