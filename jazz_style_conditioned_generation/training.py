@@ -117,7 +117,7 @@ class TrainingModule:
             logger.debug("Adding condition tokens...")
             # These functions add all the required condition tokens into the tokenizer's vocabulary
             add_genres_to_vocab(self.tokenizer)
-            add_pianists_to_vocab(self.tokenizer, self.metadata_paths)
+            add_pianists_to_vocab(self.tokenizer)
             # TODO: allow tempo range, number of tempos, and time signatures to be passed in as keywords
             #  this probably means having a new conditioning_cfg dictionary
             add_tempos_to_vocab(self.tokenizer, (80, 300), 32)

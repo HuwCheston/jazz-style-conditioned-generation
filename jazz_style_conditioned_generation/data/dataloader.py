@@ -379,7 +379,7 @@ if __name__ == "__main__":
     midi_paths = utils.get_data_files_with_ext(ext="**/*.mid")[:100]
     metadata_paths = [i.replace("piano_midi.mid", "metadata_tivo.json") for i in midi_paths]
     # Add all of our condition tokens to the tokenizer
-    add_pianists_to_vocab(token_factory, metadata_paths)
+    add_pianists_to_vocab(token_factory)
     add_genres_to_vocab(token_factory)
     add_tempos_to_vocab(token_factory, (80, 300), 32)
     add_timesignatures_to_vocab(token_factory, [3, 4])

@@ -72,7 +72,7 @@ class ConditionsTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             cond.get_pianist_tokens({}, tokenizer)
         # Add to the vocabulary using the metadata files we've defined
-        add_pianists_to_vocab(tokenizer, files)
+        add_pianists_to_vocab(tokenizer)
         # Test just getting the actual pianist from the track
         # This track is by Kenny Barron
         track = utils.read_json_cached(files[0])
@@ -208,7 +208,7 @@ class ConditionsTest(unittest.TestCase):
         js_fps = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
         self.assertTrue(len(js_fps) > 1000)  # should have a lot of files!
         # Here, we're adding pianist tokens from the ENTIRE dataset to our vocabulary
-        add_pianists_to_vocab(tokfactory, js_fps)
+        add_pianists_to_vocab(tokfactory)
         track_pianists = []
         # Now, we simulate "getting" all the pianist tokens for every track
         for js in js_fps:

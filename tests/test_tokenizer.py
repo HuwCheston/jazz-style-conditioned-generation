@@ -99,19 +99,8 @@ class TokenizerTest(unittest.TestCase):
     def test_add_pianists(self):
         tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
         prev_vocab = tok.vocab_size
-        # These are the files we have dummy metadata for
-        files = [
-            "test_midi1",
-            "test_midi2",
-            "test_midi3",
-            "test_midi_bushgrafts1",
-            "test_midi_bushgrafts2",
-            "test_midi_bushgrafts3",
-            "test_midi_jja1"
-        ]
-        files = [os.path.join(utils.get_project_root(), "tests/test_resources", f, "metadata_tivo.json") for f in files]
         # Add to the vocabulary using the metadata files we've defined
-        add_pianists_to_vocab(tok, files)
+        add_pianists_to_vocab(tok)
         self.assertTrue(tok.vocab_size > prev_vocab)
         self.assertTrue(len(tok.vocab.keys()) == len(set(tok.vocab.keys())))  # should be no duplicates
         # These are the pianists we should be adding to our vocab
@@ -153,7 +142,6 @@ class TokenizerTest(unittest.TestCase):
     @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
     def test_add_all_genres(self):
         tokfactory = REMI()
-        js_fps = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
         add_genres_to_vocab(tokfactory)
         tok_genres = sorted(set([i for i in tokfactory.vocab.keys() if "GENRES" in i]))
         self.assertEqual(len(tok_genres), 22)
@@ -163,8 +151,7 @@ class TokenizerTest(unittest.TestCase):
     @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
     def test_add_all_pianists(self):
         tokfactory = REMI()
-        js_fps = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
-        add_pianists_to_vocab(tokfactory, js_fps)
+        add_pianists_to_vocab(tokfactory)
         tok_pianists = sorted(set([i for i in tokfactory.vocab.keys() if "PIANIST" in i]))
         self.assertEqual(len(tok_pianists), 129)  # pijama + JTD pianists
         # tok_pianists = sorted(set([i for i in tokfactory.special_tokens if "PIANIST" in i]))

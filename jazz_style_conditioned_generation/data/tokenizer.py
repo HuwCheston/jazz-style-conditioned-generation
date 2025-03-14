@@ -113,23 +113,19 @@ class CustomTokTrainingIterator(TokTrainingIterator):
         return bytes_
 
 
-def add_pianists_to_vocab(tokenizer, metadata_paths: list[str]) -> None:
+def add_pianists_to_vocab(tokenizer) -> None:
     """Adds all valid pianists on all tracks to the tokenizer"""
+    # Load up all the track metadata paths
+    all_metadatas = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
     all_pianists = []
-    # Iterate through all the tracks, load the metadata JSON and add the name of the pianist to the list
-    for metadata_path in metadata_paths:
-        metadata_loaded = utils.read_json_cached(metadata_path)
-        all_pianists.append((metadata_loaded["pianist"], 9))  # add a dummy weight here, we just care about the name
-    # Second we get all SIMILAR PIANISTS
-    tivo_artist_metadata_path = os.path.join(utils.get_project_root(), "references/tivo_artist_metadata")
-    for pianist_metadata in os.listdir(tivo_artist_metadata_path):
-        pianist_loaded = utils.read_json_cached(os.path.join(tivo_artist_metadata_path, pianist_metadata))
-        if len(pianist_loaded["similars"]) == 0:
-            continue
-        all_pianists.extend([(x["name"], x["weight"]) for x in pianist_loaded["similars"]])
-    validated_pianists = validate_condition_values(all_pianists, "pianist")
-    # We only care about the name of the genre, not the weight
-    for pianist, _ in validated_pianists:
+    # Get the names of every pianist
+    for metadata in all_metadatas:
+        loaded = utils.read_json_cached(metadata)
+        all_pianists.append((loaded["pianist"], 9))  # add a fake "weight" so that validation works properly
+    # Remove duplicates, drop invalid pianists, etc.
+    pianists_validated = validate_condition_values(all_pianists, "pianist")
+    for pianist, _ in pianists_validated:
+        # Add the tokenizer prefix here
         with_prefix = f'PIANIST_{utils.remove_punctuation(pianist).replace(" ", "")}'
         if with_prefix not in tokenizer.vocab:
             tokenizer.add_to_vocab(with_prefix, special_token=False)
@@ -242,7 +238,7 @@ if __name__ == "__main__":
     print(sorted(set(gen_toks)))
 
     # Add pianist tokens
-    add_pianists_to_vocab(tokfactory, js_fps)
+    add_pianists_to_vocab(tokfactory)
     pian_toks = [t for t in tokfactory.vocab.keys() if "PIANIST" in t]
     print(f'Loaded {len(pian_toks)} pianist tokens')
     print(pian_toks)

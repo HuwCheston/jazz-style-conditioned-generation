@@ -432,7 +432,7 @@ if __name__ == "__main__":
     tokfactory = MIDILike()
     js_fps = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
     add_genres_to_vocab(tokfactory)
-    add_pianists_to_vocab(tokfactory, js_fps)
+    add_pianists_to_vocab(tokfactory)
 
     track_genres, track_pianists = [], []
     for js in js_fps:

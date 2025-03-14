@@ -35,10 +35,8 @@ CONDITION_TOKEN_STARTS = ["GENRES", "PIANIST", "TEMPO", "TIMESIGNATURE"]
 def prepare_conditioned_tokenizer():
     token_factory = deepcopy(TOKENIZER)
     # Add in all of our tokens to the vocabulary
-    testers = [TEST_MIDI1, TEST_MIDI2, TEST_MIDI3]
-    metadata_fps = [tm.replace("piano_midi.mid", "metadata_tivo.json") for tm in testers]
     add_genres_to_vocab(token_factory)
-    add_pianists_to_vocab(token_factory, metadata_fps)
+    add_pianists_to_vocab(token_factory)
     add_tempos_to_vocab(token_factory, (80, 300), 32)
     add_timesignatures_to_vocab(token_factory, [3, 4])
     return token_factory
@@ -261,7 +259,7 @@ class DataloaderTest(unittest.TestCase):
             self.assertTrue(actual_ids[-1] == tokenizer["EOS_None"])
         # Should raise an error if we try and use augmentation
         with self.assertRaises(NotImplementedError):
-            ds_big = DatasetMIDIExhaustive(
+            _ = DatasetMIDIExhaustive(
                 tokenizer=tokenizer,
                 files_paths=[TEST_MIDI1],
                 do_augmentation=True,
@@ -500,12 +498,11 @@ class DataloaderTest(unittest.TestCase):
         # Get a large number of tracks + equivalent metadata files
         idx = int(utils.now()[-1]) * 100  # bootleg random index, should operate independently of our set seed
         midi_fps = utils.get_data_files_with_ext("data/raw", "**/*.mid")[idx: idx + 500]
-        metadata_fps = [i.replace("piano_midi.mid", "metadata_tivo.json") for i in midi_fps]
         # Create a tokenizer
         tok = load_tokenizer(tokenizer_str="midilike", )
         add_tempos_to_vocab(tok, (80, 300), 32)
         add_timesignatures_to_vocab(tok, [3, 4])
-        add_pianists_to_vocab(tok, metadata_fps)
+        add_pianists_to_vocab(tok)
         add_genres_to_vocab(tok)
         # FIRST: we test without training the tokenizer
         runner(tok)
