@@ -228,6 +228,7 @@ def train_tokenizer(tokenizer: MusicTokenizer, files_paths: list[str], **kwargs)
     vocab_size = kwargs.get("vocab_size", DEFAULT_VOCAB_SIZE)
     logger.debug(f'... training tokenizer with method {training_method}, vocab size {vocab_size}')
     # We need to train with our custom iterator so that we use our custom score loading + preprocessing functions
+    utils.validate_paths(files_paths, expected_extension=".mid")
     tti = CustomTokTrainingIterator(tokenizer, files_paths)
     tokenizer.train(vocab_size=vocab_size, model=training_method, iterator=tti)
     logger.debug(f'... training finished: {tokenizer}')

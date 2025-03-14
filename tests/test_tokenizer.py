@@ -15,6 +15,8 @@ from jazz_style_conditioned_generation.data.tokenizer import (
     add_pianists_to_vocab,
     add_genres_to_vocab,
     get_tokenizer_class_from_string,
+    load_tokenizer,
+    train_tokenizer,
     DEFAULT_TOKENIZER_CONFIG
 )
 
@@ -27,14 +29,37 @@ class TokenizerTest(unittest.TestCase):
             actual = get_tokenizer_class_from_string(name)
             self.assertEqual(actual, ty)
 
-    def test_get_tokenizer(self):
-        pass
+    def test_load_tokenizer(self):
+        # Test with all defaults
+        tok = load_tokenizer()
+        self.assertTrue(isinstance(tok, TSD))
+        self.assertFalse(tok.config.use_tempos)
+        self.assertFalse(tok.config.use_pitch_bends)
+        self.assertFalse(tok.config.use_time_signatures)
+        self.assertFalse(tok.is_trained)
+        # Test with a different tokenizer type
+        tok = load_tokenizer(tokenizer_str="midilike")
+        self.assertTrue(isinstance(tok, MIDILike))
+        # Should have exactly 100 timeshift tokens
+        ts_tokens = [t for t in tok.vocab if "TimeShift" in t]
+        self.assertTrue(len(ts_tokens) == 100)
 
     def test_train_tokenizer(self):
-        pass
-
-    def test_custom_training_iterator(self):
-        pass
+        midi_files = [
+            "test_midi1/piano_midi.mid",
+            "test_midi2/piano_midi.mid",
+            "test_midi3/piano_midi.mid",
+        ]
+        midi_files = [os.path.join(utils.get_project_root(), "tests/test_resources", mf) for mf in midi_files]
+        # Get the tokenizer
+        tok = load_tokenizer(tokenizer_str="midilike")
+        # Train with 1000 vocab size and our three midi files
+        train_tokenizer(tok, midi_files, vocab_size=1000)
+        self.assertTrue(tok.is_trained)
+        self.assertTrue(tok.vocab_size == 1000)
+        # Should have exactly 100 timeshift tokens
+        ts_tokens = [t for t in tok.vocab if "TimeShift" in t]
+        self.assertTrue(len(ts_tokens) == 100)
 
     def test_default_tokenizer_config(self):
         tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
