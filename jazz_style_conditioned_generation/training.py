@@ -17,7 +17,8 @@ from transformers import GPT2Config, GPT2LMHeadModel
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIExhaustive, DatasetMIDIRandomChunk, DATA_DIR
 from jazz_style_conditioned_generation.data.tokenizer import (
-    load_or_train_tokenizer,
+    load_tokenizer,
+    train_tokenizer,
     add_genres_to_vocab,
     add_pianists_to_vocab,
     add_tempos_to_vocab,
@@ -55,7 +56,6 @@ class TrainingModule:
             self,
             experiment: str,
             run: str,
-            conditions: list[int],
             batch_size: int,
             epochs: int,
             train_dataset_cfg: dict,
@@ -73,7 +73,6 @@ class TrainingModule:
         # Set all keyword arguments to class parameters
         self.experiment = experiment
         self.run = run
-        self.conditions = conditions
         self.batch_size = batch_size
         self.epochs = epochs
         self.train_dataset_cfg = train_dataset_cfg
@@ -94,27 +93,47 @@ class TrainingModule:
         # DATA SPLITS
         self.track_splits = {split_type: list(self.read_tracks_for_split(split_type)) for split_type in SPLIT_TYPES}
         check_all_splits_unique(*list(self.track_splits.values()))
+        logger.debug("Split tracks: " + ", ".join([f'{k}: {len(list(v))}' for k, v in self.track_splits.items()]))
+
+        # MIDI PATHS
         self.track_paths = sorted([x for xs in self.track_splits.values() for x in xs])  # unpack to a flat list
         utils.validate_paths(self.track_paths, expected_extension=".mid")
         logger.debug(f"Loaded {len(self.track_paths)} tracks from {self.data_dir}")
-        logger.debug("Split tracks: " + ", ".join([f'{k}: {len(list(v))}' for k, v in self.track_splits.items()]))
+
+        # METADATA PATHS
         self.metadata_paths = [fp.replace("piano_midi.mid", "metadata_tivo.json") for fp in self.track_paths]
         utils.validate_paths(self.metadata_paths, expected_extension=".json")
+        logger.debug(f"Loaded {len(self.metadata_paths)} metadata JSONs from {self.data_dir}")
 
         # TOKENIZER
-        tokenizer_path = os.path.join(
-            utils.get_project_root(),
-            "outputs/tokenizers",
-            f"{self.experiment}_{self.run}.json"
-        )
-        self.tokenizer = load_or_train_tokenizer(tokenizer_path, self.tokenizer_cfg, self.track_paths)
+        self.tokenizer = load_tokenizer(**self.tokenizer_cfg)
         logger.debug(f'... tokenizer initialised: {self.tokenizer}')
 
         # CONDITIONS
-        add_genres_to_vocab(self.tokenizer, self.metadata_paths)
-        add_pianists_to_vocab(self.tokenizer, self.metadata_paths)
-        add_tempos_to_vocab(self.tokenizer, (80, 300), 32)
-        add_timesignatures_to_vocab(self.tokenizer, [3, 4])
+        if self.train_dataset_cfg.get("do_conditioning", True) != self.test_dataset_cfg.get("do_conditioning", True):
+            raise AttributeError('Got conflicting options for `do_conditioning` for test and train dataloaders!')
+        if self.train_dataset_cfg.get("do_conditioning", True):
+            logger.debug("Adding condition tokens...")
+            # These functions add all the required condition tokens into the tokenizer's vocabulary
+            add_genres_to_vocab(self.tokenizer, self.metadata_paths)
+            add_pianists_to_vocab(self.tokenizer, self.metadata_paths)
+            # TODO: allow tempo range, number of tempos, and time signatures to be passed in as keywords
+            #  this probably means having a new conditioning_cfg dictionary
+            add_tempos_to_vocab(self.tokenizer, (80, 300), 32)
+            add_timesignatures_to_vocab(self.tokenizer, [3, 4])
+            # Log the number of tokens we've added for each condition type to the console
+            for condition in ["GENRES", "PIANIST", "TIMESIGNATURE", "TEMPO"]:
+                n_conditions = [i for i in self.tokenizer.special_tokens if i.startswith(condition)]
+                logger.debug(f'... added {len(n_conditions)} {condition} tokens!')
+
+        # TRAIN THE TOKENIZER
+        if self.tokenizer_cfg.get("do_training", False):
+            train_tokenizer(
+                tokenizer=self.tokenizer,
+                files_paths=self.track_paths,
+                do_conditioning=self.train_dataset_cfg.get("do_conditioning", True),
+                **self.tokenizer_cfg
+            )
 
         # DATALOADERS
         logger.debug(f'Initialising training loader with args {self.train_dataset_cfg}')

@@ -21,7 +21,7 @@ from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIExhaustive
-from jazz_style_conditioned_generation.data.tokenizer import load_or_train_tokenizer
+from jazz_style_conditioned_generation.data.tokenizer import load_tokenizer, train_tokenizer
 
 
 def _symusic_to_muspy(score: Score) -> muspy.Music:
@@ -284,9 +284,9 @@ def compute_metrics_for_dataset(dataset_tracks: list[str], tokenizer: MusicToken
 
 
 if __name__ == "__main__":
-    token = load_or_train_tokenizer("", {"tokenizer_str": "midilike"}, [])
+    token = load_tokenizer()
     jtd = utils.get_data_files_with_ext("data/raw/jtd", "**/*.mid")[:10]
-    token.train(500, files_paths=jtd)
+    train_tokenizer(token, jtd)
     cm = compute_metrics_for_dataset(jtd, token)
 
     print('Metrics for 10 JTD tracks: ')
