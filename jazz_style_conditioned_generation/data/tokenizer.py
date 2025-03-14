@@ -27,7 +27,6 @@ DEFAULT_TOKENIZER_CONFIG = {
         "PAD",  # add for short inputs to ensure consistent sequence length for all inputs
         "BOS",  # beginning of sequence
         "EOS",  # end of sequence
-        # TODO: is this needed?
         # "MASK",  # prevent attention to future tokens
     ],
     "use_chords": False,
@@ -62,6 +61,9 @@ class CustomTokTrainingIterator(TokTrainingIterator):
             bars_idx_random_ratio_range: tuple[float, float] | None = None,
     ):
         super().__init__(tokenizer, files_paths, tracks_idx_random_ratio_range, bars_idx_random_ratio_range)
+        self.condition_tokens = [
+            i for i in tokenizer.vocab if i.startswith(("GENRES", "PIANIST", "TEMPO", "TIMESIGNATURE"))
+        ]
 
     def load_file(self, path: Path) -> list[str]:
         """Load a file and preprocess with our custom functions, then convert to a byte representation"""
@@ -95,13 +97,16 @@ class CustomTokTrainingIterator(TokTrainingIterator):
             no_preprocess_score=True,
             attribute_controls_indexes=ac_indexes,
         )
+        # ADDED: check that no tokens are in the list of condition tokens
+        for tok in tokseq[0].tokens:
+            assert tok not in self.condition_tokens
+
         # REMOVED: splitting IDs (we don't want to do this ever)
         # Convert ids to bytes for training
         if isinstance(tokseq, TokSequence):
             token_ids = tokseq.ids
         else:
             token_ids = [seq.ids for seq in tokseq]
-        # TODO: check that no conditioning tokens are in the IDs
         bytes_ = self.tokenizer._ids_to_bytes(token_ids, as_one_str=True)
         if isinstance(bytes_, str):
             bytes_ = [bytes_]
@@ -250,8 +255,9 @@ def train_tokenizer(tokenizer: MusicTokenizer, files_paths: list[str], **kwargs)
 
 
 if __name__ == "__main__":
-    tokfactory = REMI()
-    js_fps = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
+    tokfactory = load_tokenizer()
+    midi_fps = utils.get_data_files_with_ext("data/raw", "**/*.mid")
+    js_fps = [i.replace("piano_midi.mid", "metadata_tivo.json") for i in midi_fps]
     # Add genre tokens
     add_genres_to_vocab(tokfactory, js_fps)
     gen_toks = [t for t in tokfactory.vocab.keys() if "GENRES" in t]
@@ -263,3 +269,6 @@ if __name__ == "__main__":
     pian_toks = [t for t in tokfactory.vocab.keys() if "PIANIST" in t]
     print(f'Loaded {len(pian_toks)} pianist tokens')
     print(pian_toks)
+
+    # Train the tokenizer
+    train_tokenizer(tokfactory, midi_fps)
