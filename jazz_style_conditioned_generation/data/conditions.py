@@ -100,7 +100,10 @@ MERGE = {
             "Chamber Music",
             "Concerto",
             "Third Stream",
-            "Modern Composition"
+            "Modern Composition",
+            "French",
+            "Western European Traditions",
+            "European Folk"
         ],
         "Cool Jazz": [
             "Cool",
@@ -112,11 +115,6 @@ MERGE = {
             "Smooth Jazz",
             "Lounge",
             "Easy Listening"
-        ],
-        "European": [
-            "French",
-            "Western European Traditions",
-            "European Folk"
         ],
         "Fusion": [
             "Funk",
@@ -134,7 +132,13 @@ MERGE = {
         ],
         "Latin": [
             "Latin",
-            "Latin Jazz"
+            "Latin Jazz",
+            "Venezuelan",  # i.e., "Latin America"
+            "South American Traditions",
+            "Brazilian",
+            "Brazilian Pop",
+            "Brazilian Jazz",
+            "Brazilian Traditions"
         ],
         "Straight-Ahead Jazz": [
             "Mainstream Jazz",
@@ -171,14 +175,6 @@ MERGE = {
         ],
         "Soul Jazz": [
             "Soul Jazz"
-        ],
-        "South American": [
-            "Venezuelan",
-            "South American Traditions",
-            "Brazilian",
-            "Brazilian Pop",
-            "Brazilian Jazz",
-            "Brazilian Traditions"
         ],
         "Pop/Rock": [
             "Traditional Pop",

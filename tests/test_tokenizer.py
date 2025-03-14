@@ -144,7 +144,7 @@ class TokenizerTest(unittest.TestCase):
         tokfactory = REMI()
         add_genres_to_vocab(tokfactory)
         tok_genres = sorted(set([i for i in tokfactory.vocab.keys() if "GENRES" in i]))
-        self.assertEqual(len(tok_genres), 22)
+        self.assertEqual(len(tok_genres), 20)
         # tok_genres = sorted(set([i for i in tokfactory.special_tokens if "GENRES" in i]))
         # self.assertEqual(len(tok_genres), 26)
 
