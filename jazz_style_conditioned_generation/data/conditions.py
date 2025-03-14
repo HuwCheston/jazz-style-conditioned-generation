@@ -14,6 +14,7 @@ from jazz_style_conditioned_generation import utils
 ACCEPT_CONDITIONS = ["moods", "genres", "pianist", "themes"]
 # Each list should be populated with values for a condition that we don't want to use
 EXCLUDE = {
+    # There are 117 "raw" genres scraped from TiVo
     "genres": [
         # Nearly every track could be described as one of these genres
         "Jazz Instrument",
@@ -26,6 +27,9 @@ EXCLUDE = {
         "Big Band",
         "Choral",
         "Electronic",
+        "Electro",
+        "Club/Dance",
+        "M-Base",  # Steve Coleman says that "M-Base is not a musical style"
         "Guitar Jazz",
         "Modern Big Band",
         "Orchestral",
@@ -49,94 +53,153 @@ EXCLUDE = {
     ],
     "themes": [],
 }
-# Xu et al. (2023): 1.5 million musescore MIDI files, yet only 20 genre tags. We want to reduce to sub-30 genres.
+# Xu et al. (2023): 1.5 million musescore MIDI files, yet only 20 genre tags.
+# Sarmento et al. (2023): remove genre tags with fewer than 100 appearances in a dataset of 25000 tracks
 MERGE = {
     "genres": {
-        "Adult Alternative Pop/Rock": "Pop/Rock",
-        "Alternative/Indie Rock": "Pop/Rock",
-        "African Folk": "African",
-        "African Jazz": "African",
-        "African Traditions": "African",
-        "Afro-Cuban Jazz": "African",
-        "American Popular Song": "Pop/Rock",
-        "Avant-Garde": "Avant-Garde Jazz",
-        # "Avant-Garde Jazz": "Avant-Garde",
-        "Ballet": "Stage & Screen",
-        "Brazilian": "Southern American",
-        "Brazilian Pop": "Southern American",
-        "Brazilian Jazz": "Southern American",
-        "Brazilian Traditions": "Southern American",
-        "Black Gospel": "Gospel & Religious",
-        "Boogie-Woogie": "Blues",
-        "Cast Recordings": "Stage & Screen",
-        "Calypso": "Caribbean",
-        "Caribbean Traditions": "Caribbean",
-        "Central/West Asian Traditions": "Asian",
-        "Chamber": "Classical & Chamber",
-        "Chamber Jazz": "Classical & Chamber",
-        "Chamber Music": "Classical & Chamber",
-        "Christmas": "Gospel & Religious",
-        "Classical": "Classical & Chamber",
-        "Classical Crossover": "Classical & Chamber",
-        "Cool": "Cool Jazz",
-        "Concerto": "Classical & Chamber",
-        "Contemporary Jazz": "Modern Jazz",
-        "Crossover Jazz": "Easy Listening",
-        "Club/Dance": "Electronic",
-        "Cuban Jazz": "Caribbean",
-        "Dixieland": "Early & Trad Jazz",
-        "Early Jazz": "Early & Trad Jazz",
-        "Electro": "Electronic",
-        "European Folk": "European",
-        "French": "European",
-        "Free Improvisation": "Free Jazz",
-        "Film Score": "Stage & Screen",
-        "Film Music": "Stage & Screen",
-        # "Funk": "Pop/Rock",
-        "Global Jazz": "International",
-        "Gospel": "Gospel & Religious",
-        "Holidays": "Gospel & Religious",
-        "Holiday": "Gospel & Religious",
-        "Highlife": "African",
-        "Jazz Blues": "Blues",
-        "Jazz-Funk": "Funk",
-        "Jazz-Pop": "Pop/Rock",
-        "Latin": "Latin Jazz",
-        "Lounge": "Easy Listening",
-        "Mainstream Jazz": "Straight-Ahead Jazz",
-        "Modal Music": "Modal Jazz",
-        "Modern Composition": "Modern Jazz",
-        "Modern Creative": "Modern Jazz",
-        "Modern Free": "Free Jazz",
-        "Musical Theater": "Stage & Screen",
-        "Neo-Bop": "Post-Bop",
-        "New Age": "Easy Listening",
-        "New Orleans Jazz Revival": "Early & Trad Jazz",
-        "New Orleans Jazz": "Early & Trad Jazz",
-        "Original Score": "Stage & Screen",
-        "Piano/Easy Listening": "Easy Listening",
-        "Progressive Jazz": "Modern Jazz",
-        "Ragtime": "Early & Trad Jazz",
-        "Religious": "Gospel & Religious",
-        "Show Tunes": "Stage & Screen",
-        "Show/Musical": "Stage & Screen",
-        "Smooth Jazz": "Easy Listening",
-        "Soundtracks": "Stage & Screen",
-        "South African Folk": "African",
-        "Southern African": "African",
-        "South American Traditions": "Southern American",
-        "Spirituals": "Gospel & Religious",
-        "Spy Music": "Stage & Screen",
-        "Standards": "Straight-Ahead Jazz",
-        "Stride": "Early & Trad Jazz",
-        "Swing": "Early & Trad Jazz",
-        "Third Stream": "Classical & Chamber",
-        "Trad Jazz": "Early & Trad Jazz",
-        "Traditional Pop": "Pop/Rock",
-        "Township Jazz": "African",
-        "West Coast Jazz": "Cool Jazz",
-        "Western European Traditions": "European",
-        "Venezuelan": "Southern American"
+        "African": [
+            "African Jazz",
+            "African Folk",
+            "African Traditions",
+            "Township Jazz",
+            "South African Folk",
+            "Southern African",
+            "Highlife"
+        ],
+        "Avant-Garde Jazz": [
+            "Modern Free",
+            "Free Improvisation",
+            "Free Jazz",
+            "Avant-Garde Jazz",
+            "Progressive Jazz",
+            "Modern Creative",
+            "Modern Jazz",
+            "Avant-Garde"
+        ],
+        "Blues": [
+            "Blues",
+            "Jazz Blues",
+            "Boogie-Woogie"
+        ],
+        "Bop": [
+            "Bop",
+            "Bebop"
+        ],
+        "Caribbean": [
+            "Calypso",
+            "Cuban Jazz",
+            "Afro-Cuban Jazz",
+            "Caribbean Traditions"
+        ],
+        "Classical": [
+            "Classical",
+            "Chamber Jazz",
+            "Classical Crossover",
+            "Chamber Music",
+            "Concerto",
+            "Third Stream",
+            "Modern Composition"
+        ],
+        "Cool Jazz": [
+            "Cool",
+            "West Coast Jazz"
+        ],
+        "Easy Listening": [
+            "Piano/Easy Listening",
+            "New Age",
+            "Smooth Jazz",
+            "Lounge",
+            "Easy Listening"
+        ],
+        "European": [
+            "French",
+            "Western European Traditions",
+            "European Folk"
+        ],
+        "Fusion": [
+            "Funk",
+            "Jazz Funk",
+            "Fusion",
+            "Jazz-Funk"
+        ],
+        "Global": [
+            "Global Jazz",
+            "International",
+            "Central/West Asian Traditions"
+        ],
+        "Hard Bop": [
+            "Hard Bop"
+        ],
+        "Latin": [
+            "Latin",
+            "Latin Jazz"
+        ],
+        "Straight-Ahead Jazz": [
+            "Mainstream Jazz",
+            "Standards",
+            "Straight-Ahead Jazz",
+            "Contemporary Jazz",
+            "Crossover Jazz"
+        ],
+        "Modal Jazz": [
+            "Modal Music",
+            "Modal Jazz"
+        ],
+        "Religious": [
+            "Black Gospel",
+            "Gospel",
+            "Religious",
+            "Holidays",
+            "Christmas",
+            "Holiday",
+            "Spirituals"
+        ],
+        "Stage & Screen": [
+            "Ballet",
+            "Film Music",
+            "Original Score",
+            "Cast Recordings",
+            "Show Tunes",
+            "Film Score",
+            "Spy Music",
+            "Soundtracks",
+            "Stage & Screen",
+            "Show/Musical",
+            "Musical Theater"
+        ],
+        "Soul Jazz": [
+            "Soul Jazz"
+        ],
+        "South American": [
+            "Venezuelan",
+            "South American Traditions",
+            "Brazilian",
+            "Brazilian Pop",
+            "Brazilian Jazz",
+            "Brazilian Traditions"
+        ],
+        "Pop/Rock": [
+            "Traditional Pop",
+            "Adult Alternative Pop/Rock",
+            "Alternative/Indie Rock",
+            "American Popular Song",
+            "Jazz-Pop",
+            "Pop/Rock"
+        ],
+        "Post-Bop": [
+            "Post-Bop",
+            "Neo-Bop"
+        ],
+        "Traditional & Early Jazz": [
+            "Trad Jazz",
+            "Ragtime",
+            "Early Jazz",
+            "Swing",
+            "Stride",
+            "New Orleans Jazz",
+            "New Orleans Jazz Revival",
+            "Dixieland"
+        ],
     },
     "moods": {},
     "pianist": {},
@@ -194,11 +257,14 @@ def validate_condition_values(
     """Validates values for a given condition by merging similar entries, removing invalid ones, etc."""
     validated = {}
     for value, weight in condition_values:
-        # Merge a value with its "master" key (i.e., Show Tunes -> Stage & Screen, Soundtrack -> Stage & Screen)
-        if value in MERGE[condition_name]:
-            value = MERGE[condition_name][value]
-        # Skip over value that we don't want to use
-        if value not in EXCLUDE[condition_name]:
+        # Skip over values that we don't want to use
+        if value in EXCLUDE[condition_name]:
+            continue
+        else:
+            # Merge a value with its "master" key (i.e., Show Tunes -> Stage & Screen, Soundtrack -> Stage & Screen)
+            for merge_key, merge_values in MERGE[condition_name].items():
+                if value in merge_values:
+                    value = merge_key
             # This ensures that we only store the HIGHEST weight for any value
             if value not in validated.keys() or weight > validated[value]:
                 validated[value] = weight
@@ -252,6 +318,7 @@ def get_genre_tokens(track_metadata_dict: dict, tokenizer: MusicTokenizer, n_gen
     # Try and get the tokens for the TRACK first
     genres = _get_track_genres(track_metadata_dict)
     # If we don't have any genres for the TRACK
+    # TODO: I think we should always use the pianist genres, too
     if len(genres) == 0:
         # Try and get them for the PIANIST
         pianist_genres = _get_pianist_genres(track_metadata_dict["pianist"])
@@ -370,8 +437,8 @@ if __name__ == "__main__":
     track_genres, track_pianists = [], []
     for js in js_fps:
         js_loaded = utils.read_json_cached(js)
-        track_genres.extend(get_genre_tokens(js_loaded, tokfactory))
-        track_pianists.extend(get_pianist_tokens(js_loaded, tokfactory))
+        track_genres.extend(get_genre_tokens(js_loaded, tokfactory, n_genres=None))
+        track_pianists.extend(get_pianist_tokens(js_loaded, tokfactory, n_pianists=1))
 
     print("Loaded", len(set(track_genres)), "genres")
     assert len(set(track_genres)) == len([i for i in tokfactory.vocab.keys() if "GENRES" in i])

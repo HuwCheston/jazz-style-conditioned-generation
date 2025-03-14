@@ -167,7 +167,7 @@ class TokenizerTest(unittest.TestCase):
         js_fps = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
         add_genres_to_vocab(tokfactory, js_fps)
         tok_genres = sorted(set([i for i in tokfactory.vocab.keys() if "GENRES" in i]))
-        self.assertEqual(len(tok_genres), 26)
+        self.assertEqual(len(tok_genres), 22)
         # tok_genres = sorted(set([i for i in tokfactory.special_tokens if "GENRES" in i]))
         # self.assertEqual(len(tok_genres), 26)
 
