@@ -365,7 +365,8 @@ if __name__ == "__main__":
         add_genres_to_vocab,
         add_pianists_to_vocab,
         add_tempos_to_vocab,
-        add_timesignatures_to_vocab
+        add_timesignatures_to_vocab,
+        train_tokenizer
     )
 
     # Get a tokenizer with default arguments
@@ -379,7 +380,7 @@ if __name__ == "__main__":
     add_tempos_to_vocab(token_factory, (80, 300), 32)
     add_timesignatures_to_vocab(token_factory, [3, 4])
     # Train the tokenizer with BPE
-    token_factory.train(vocab_size=1000, model="BPE", files_paths=midi_paths)
+    train_tokenizer(token_factory, vocab_size=1000, model="BPE", files_paths=midi_paths)
     # Test out our random chunking dataloader
     dm = DatasetMIDIRandomChunk(
         token_factory,
