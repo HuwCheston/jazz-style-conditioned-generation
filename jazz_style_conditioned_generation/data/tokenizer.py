@@ -16,7 +16,7 @@ from miditok.tokenizations import REMI, MIDILike, TSD, Structured, PerTok
 from miditok.tokenizer_training_iterator import TokTrainingIterator
 
 from jazz_style_conditioned_generation import utils
-from jazz_style_conditioned_generation.data.conditions import validate_condition_values
+from jazz_style_conditioned_generation.data.conditions import INCLUDE
 from jazz_style_conditioned_generation.data.scores import load_score, preprocess_score
 
 DEFAULT_TOKENIZER_CONFIG = {
@@ -115,16 +115,7 @@ class CustomTokTrainingIterator(TokTrainingIterator):
 
 def add_pianists_to_vocab(tokenizer) -> None:
     """Adds all valid pianists on all tracks to the tokenizer"""
-    # Load up all the track metadata paths
-    all_metadatas = utils.get_data_files_with_ext("data/raw", "**/*_tivo.json")
-    all_pianists = []
-    # Get the names of every pianist
-    for metadata in all_metadatas:
-        loaded = utils.read_json_cached(metadata)
-        all_pianists.append((loaded["pianist"], 9))  # add a fake "weight" so that validation works properly
-    # Remove duplicates, drop invalid pianists, etc.
-    pianists_validated = validate_condition_values(all_pianists, "pianist")
-    for pianist, _ in pianists_validated:
+    for pianist in INCLUDE["pianist"]:
         # Add the tokenizer prefix here
         with_prefix = f'PIANIST_{utils.remove_punctuation(pianist).replace(" ", "")}'
         if with_prefix not in tokenizer.vocab:
@@ -133,9 +124,7 @@ def add_pianists_to_vocab(tokenizer) -> None:
 
 def add_genres_to_vocab(tokenizer: MusicTokenizer) -> None:
     """Adds all valid genres for all tracks and artists to the tokenizer"""
-    from jazz_style_conditioned_generation.data.conditions import MERGE
-
-    for genre in list(MERGE["genres"].keys()):
+    for genre in list(INCLUDE["genres"]):
         with_prefix = f'GENRES_{utils.remove_punctuation(genre).replace(" ", "")}'
         if with_prefix not in tokenizer.vocab:
             tokenizer.add_to_vocab(with_prefix, special_token=False)

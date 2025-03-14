@@ -16,6 +16,7 @@ MAX_SIMILAR_PIANISTS = 5  # This is the maximum number of "similar pianists" we'
 # These are the only conditions we'll accept values for
 ACCEPT_CONDITIONS = ["moods", "genres", "pianist", "themes"]
 # Each list should be populated with values for a condition that we don't want to use
+# TODO: now we've defined "INCLUDE", maybe we can remove this?
 EXCLUDE = {
     # There are 117 "raw" genres scraped from TiVo
     "genres": [
@@ -309,6 +310,57 @@ MERGE = {
     "pianist": {},
     "themes": {},
 }
+INCLUDE = {
+    "genres": [
+        'African',
+        'Avant-Garde Jazz',
+        'Blues',
+        'Bop',
+        'Caribbean',
+        'Classical',
+        'Cool Jazz',
+        'Easy Listening',
+        'Fusion',
+        'Global',
+        'Hard Bop',
+        'Latin',
+        'Modal Jazz',
+        'Pop/Rock',
+        'Post-Bop',
+        'Religious',
+        'Soul Jazz',
+        'Stage & Screen',
+        'Straight-Ahead Jazz',
+        'Traditional & Early Jazz'
+    ],
+    "pianist": [
+        'Abdullah Ibrahim',
+        'Ahmad Jamal',
+        'Art Tatum',
+        'Bill Evans',
+        'Brad Mehldau',
+        'Bud Powell',
+        'Cedar Walton',
+        'Chick Corea',
+        'Dave McKenna',
+        'Dick Hyman',
+        'Fred Hersch',
+        'Hank Jones',
+        'Herbie Hancock',
+        'John Hicks',
+        'Junior Mance',
+        'Keith Jarrett',
+        'Kenny Barron',
+        'Kenny Drew',
+        'McCoy Tyner',
+        'Oscar Peterson',
+        'Ray Bryant',
+        'Teddy Wilson',
+        'Tete Montoliu',
+        'Thelonious Monk',
+        'Tommy Flanagan'
+    ]
+}
 
 
 def validate_conditions(conditions: list[str] | str) -> None:
@@ -487,29 +539,6 @@ def get_pianist_tokens(
     for pfix in prefixed:
         assert pfix in tokenizer.vocab.keys(), f"Could not find token {pfix} in tokenizer vocabulary!"
     return prefixed
-
-
-    # # Get pianists that are similar to this pianist
-    # similar_pianists = _get_similar_pianists(track_pianist)
-    # # Remove the weight term
-    # similar_pianists = [s[0] for s in similar_pianists]
-    # # If we can use the track pianist
-    # if track_pianist not in EXCLUDE["pianist"]:
-    #     # Subset to get only the top-N - 1 pianists if required
-    #     if n_pianists is not None:
-    #         similar_pianists = similar_pianists[:n_pianists - 1]
-    #     finalised_pianists = [track_pianist] + similar_pianists
-    # # Otherwise, we want to keep top-N pianists
-    # else:
-    #     if n_pianists is not None:
-    #         similar_pianists = similar_pianists[:n_pianists]
-    #     finalised_pianists = similar_pianists
-    # # Add the prefix to the token
-    # prefixed = [f'PIANIST_{utils.remove_punctuation(g).replace(" ", "")}' for g in finalised_pianists]
-    # # Sanity check that the tokens are part of the vocabulary for the tokenizer
-    # for pfix in prefixed:
-    #     assert pfix in tokenizer.vocab.keys(), f"Could not find token {pfix} in tokenizer vocabulary!"
-    # return prefixed
 
 
 def get_tempo_token(tempo: float, tokenizer: MusicTokenizer, _raise_on_difference_exceeding: int = 50) -> str:
