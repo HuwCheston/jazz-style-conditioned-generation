@@ -15,6 +15,37 @@ from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.dataloader import create_padding_mask
 from jazz_style_conditioned_generation.encoders.rpr import TransformerEncoderRPR, TransformerEncoderLayerRPR
 
+SULUN_2022_CONFIG = dict(
+    rpr=True,
+    n_layers=20,
+    num_heads=16,
+    d_model=768,
+    dim_feedforward=3072,
+    dropout=0.1,
+    max_sequence=1216
+)
+ROW_2024_MODEL_1_CONFIG = dict(
+    rpr=True,
+    n_layers=2,
+    dim_feedforward=256,
+    num_heads=8,
+    d_model=64,
+)
+ROW_2024_MODEL_2_CONFIG = dict(
+    rpr=True,
+    n_layers=4,
+    dim_feedforward=512,
+    num_heads=8,
+    d_model=128
+)
+DEFAULT_CONFIG = dict(
+    n_layers=6,
+    num_heads=8,
+    d_model=512,
+    dim_feedforward=1024,
+    dropout=0.1,
+)
+
 
 def top_k_top_p_filtering(
         logits: torch.Tensor,
@@ -268,8 +299,13 @@ if __name__ == "__main__":
 
     # Create the model
     token_factory = REMI()
-    mt = MusicTransformer(token_factory, max_sequence=2048).to(utils.DEVICE)
-    print(f"N parameters: {utils.total_parameters(mt)}")
+    # Test out some different configurations
+    for config, config_name in zip(
+            [SULUN_2022_CONFIG, ROW_2024_MODEL_1_CONFIG, ROW_2024_MODEL_2_CONFIG, DEFAULT_CONFIG],
+            ["Sulun (2022)", "Row (2024), model 1", "Row (2024), model 2", "Default"]
+    ):
+        mt = MusicTransformer(token_factory, **config, ).to(utils.DEVICE)
+        print(f"N parameters, config {config_name}: {utils.total_parameters(mt)}")
     # Create a dummy sequence of inputs: IDs, targets, and padding mask
     dummy_tensor = torch.randint(0, 100, (4, 2049)).to(utils.DEVICE)
     inp = dummy_tensor[:, :-1].to(utils.DEVICE)
