@@ -7,7 +7,9 @@ import os
 import unittest
 from copy import deepcopy
 
+import torch
 from miditok import MIDILike
+from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.dataloader import *
@@ -15,7 +17,9 @@ from jazz_style_conditioned_generation.data.tokenizer import (
     add_tempos_to_vocab,
     add_genres_to_vocab,
     add_pianists_to_vocab,
-    add_timesignatures_to_vocab
+    add_timesignatures_to_vocab,
+    train_tokenizer,
+    load_tokenizer
 )
 
 TEST_RESOURCES = os.path.join(utils.get_project_root(), "tests/test_resources")
@@ -25,12 +29,37 @@ TEST_MIDI3 = os.path.join(TEST_RESOURCES, "test_midi_bushgrafts1/piano_midi.mid"
 
 TOKENIZER = MIDILike()
 
+CONDITION_TOKEN_STARTS = ["GENRES", "PIANIST", "TEMPO", "TIMESIGNATURE"]
+
+
+def prepare_conditioned_tokenizer():
+    token_factory = deepcopy(TOKENIZER)
+    # Add in all of our tokens to the vocabulary
+    testers = [TEST_MIDI1, TEST_MIDI2, TEST_MIDI3]
+    metadata_fps = [tm.replace("piano_midi.mid", "metadata_tivo.json") for tm in testers]
+    add_genres_to_vocab(token_factory, metadata_fps)
+    add_pianists_to_vocab(token_factory, metadata_fps)
+    add_tempos_to_vocab(token_factory, (80, 300), 32)
+    add_timesignatures_to_vocab(token_factory, [3, 4])
+    return token_factory
+
+
+def decoder(tokenizer, input_ids: list[int]) -> list[str]:
+    converted = tokenizer._convert_sequence_to_tokseq(torch.tensor([input_ids]))
+    tokenizer._preprocess_tokseq_before_decoding(converted[0])
+    return converted[0].tokens
+
 
 class DataloaderTest(unittest.TestCase):
     def test_add_eos_bos(self):
+        ds = DatasetMIDIRandomChunk(
+            tokenizer=TOKENIZER,
+            files_paths=[TEST_MIDI1],
+            max_seq_len=512,
+        )
         tokseq = [2, 2, 2, 3, 4, 5]
-        actual = add_beginning_and_ending_tokens_to_sequence(tokseq, 0, 1)
-        expected = [0, 2, 2, 2, 3, 4, 5, 1]
+        actual = ds.add_beginning_and_ending_tokens_to_sequence(tokseq)
+        expected = [TOKENIZER["BOS_None"], 2, 2, 2, 3, 4, 5, TOKENIZER["EOS_None"]]
         self.assertEqual(actual, expected)
 
     def test_pad_sequence(self):
@@ -47,9 +76,15 @@ class DataloaderTest(unittest.TestCase):
     def test_randomly_slice(self):
         tokseq = [2, 2, 2, 3, 4, 5, 7, 6, 4, 3, 8, ]
         desired_len = 5
+        ds = DatasetMIDIRandomChunk(
+            tokenizer=TOKENIZER,
+            files_paths=[TEST_MIDI1],
+            max_seq_len=desired_len,
+            chunk_end_overlap=0.
+        )
         # Test a few times
         for _ in range(10):
-            returned = randomly_slice_sequence(tokseq, desired_len, end_overlap=0.)
+            returned = ds.randomly_slice_sequence(tokseq)
             self.assertTrue(len(returned) < len(tokseq))
             self.assertEqual(len(returned), desired_len)
 
@@ -114,15 +149,7 @@ class DataloaderTest(unittest.TestCase):
         self.assertEqual(actual_targets, [4, 5, 6, 7, 8, 9, 10, 11, 12, 0])
 
     def test_dataset_random_chunk_with_conditioning(self):
-        token_factory = deepcopy(TOKENIZER)
-        # Add in all of our tokens to the vocabulary
-        testers = [TEST_MIDI1, TEST_MIDI2, TEST_MIDI3]
-        metadata_fps = [tm.replace("piano_midi.mid", "metadata_tivo.json") for tm in testers]
-        add_genres_to_vocab(token_factory, metadata_fps)
-        add_pianists_to_vocab(token_factory, metadata_fps)
-        add_tempos_to_vocab(token_factory, (80, 300), 32)
-        add_timesignatures_to_vocab(token_factory, [3, 4])
-
+        token_factory = prepare_conditioned_tokenizer()
         # Create the dataset with MIDI file 1
         ds = DatasetMIDIRandomChunk(
             tokenizer=token_factory,
@@ -192,7 +219,7 @@ class DataloaderTest(unittest.TestCase):
         input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
         # Input IDs should NOT start with any conditioning tokens
         for tok in input_ids:
-            for t in ["GENRES", "PIANIST", "TEMPO", "TIMESIGNATURE"]:
+            for t in CONDITION_TOKEN_STARTS:
                 self.assertFalse(token_factory[tok].startswith(t))
         # Should be the desired length
         self.assertEqual(len(input_ids), 10)
@@ -228,15 +255,18 @@ class DataloaderTest(unittest.TestCase):
             actual_inputs, _ = last_chunk["input_ids"], last_chunk["labels"]
             actual_ids = [i_ for i_ in actual_inputs.tolist() if i_ != tokenizer["PAD_None"]]
             self.assertTrue(actual_ids[-1] == tokenizer["EOS_None"])
+        # Should raise an error if we try and use augmentation
+        with self.assertRaises(NotImplementedError):
+            ds_big = DatasetMIDIExhaustive(
+                tokenizer=tokenizer,
+                files_paths=[TEST_MIDI1],
+                do_augmentation=True,
+                max_seq_len=100000,
+                do_conditioning=False,
+            )
 
     def test_dataset_exhaustive_with_conditioning(self):
-        token_factory = deepcopy(TOKENIZER)
-        # Add in all of our tokens to the vocabulary
-        metadata_fps = [TEST_MIDI1.replace("piano_midi.mid", "metadata_tivo.json")]
-        add_genres_to_vocab(token_factory, metadata_fps)
-        add_pianists_to_vocab(token_factory, metadata_fps)
-        add_tempos_to_vocab(token_factory, (80, 300), 32)
-        add_timesignatures_to_vocab(token_factory, [3, 4])
+        token_factory = prepare_conditioned_tokenizer()
         # Create the dataset
         ds = DatasetMIDIExhaustive(
             tokenizer=token_factory,
@@ -281,6 +311,30 @@ class DataloaderTest(unittest.TestCase):
         input_ids_no_pad = [i for i in input_ids if i != token_factory["PAD_None"]]
         self.assertEqual(input_ids_no_pad[-1], token_factory["EOS_None"])
 
+    def test_dataset_conditioning_with_trained_tokenizer(self):
+        token_factory = prepare_conditioned_tokenizer()
+        train_tokenizer(token_factory, [TEST_MIDI1, TEST_MIDI2, TEST_MIDI3], vocab_size=1000, training_method="BPE")
+        # Create the dataset
+        ds = DatasetMIDIExhaustive(
+            tokenizer=token_factory,
+            files_paths=[TEST_MIDI2],
+            do_augmentation=False,
+            max_seq_len=100,
+            do_conditioning=True,
+        )
+        item = ds.__getitem__(0)
+        input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
+        # We have to do something slightly different to decode the input_ids when using a trained tokenizer
+        input_tokens = decoder(token_factory, input_ids)
+        target_tokens = decoder(token_factory, targets)
+        # Now we can do our checking
+        self.assertEqual(input_tokens[0], "GENRES_StraightAheadJazz")  # associated with PIANIST
+        self.assertEqual(input_tokens[1], "PIANIST_BeegieAdair")
+        self.assertEqual(target_tokens[0], "PIANIST_BeegieAdair")
+        # With training the token IDs, the length of the decoded tokens > the encoded token IDs
+        self.assertGreater(len(input_tokens), len(input_ids))
+        self.assertGreater(len(target_tokens), len(targets))
+
     def test_non_existing_filepath(self):
         tokenizer = deepcopy(TOKENIZER)
         # This API is the same for both datasets
@@ -295,10 +349,8 @@ class DataloaderTest(unittest.TestCase):
             # Modify the file paths
             ds_init.files_paths = ["a/fake/file"]
             ds_init.chunk_paths_and_idxs = [("a/fake/file", 0)]
-            # Values from dictionary should be None
-            gotitem = ds_init.__getitem__(0)
-            self.assertIsNone(gotitem["input_ids"])
-            self.assertIsNone(gotitem["labels"])
+            with self.assertRaises(ValueError):
+                ds_init.__getitem__(0)
 
     def test_dataset_attention_mask(self):
         # Test exhaustive dataloader
@@ -336,9 +388,15 @@ class DataloaderTest(unittest.TestCase):
         seq = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         desired_len = 8
         end_overlap = 0.9
+        ds = DatasetMIDIRandomChunk(
+            tokenizer=TOKENIZER,
+            files_paths=[TEST_MIDI1],
+            max_seq_len=desired_len,
+            chunk_end_overlap=end_overlap
+        )
         # Test a few times
         for i in range(10):
-            out = randomly_slice_sequence(seq, desired_len, end_overlap)
+            out = ds.randomly_slice_sequence(seq)
             self.assertTrue(1 <= len(out) <= desired_len)
         # Test this out with a dataloader
         token_factory = deepcopy(TOKENIZER)
@@ -366,6 +424,79 @@ class DataloaderTest(unittest.TestCase):
         expected = [False, False, False, False, False, False, False, False, False, False, ]
         actual = create_padding_mask(tokseq, pad_token_id=0)
         self.assertEqual(expected, actual.tolist())
+
+    def test_add_condition_tokens_to_sequence(self):
+        ds = DatasetMIDIRandomChunk(
+            tokenizer=TOKENIZER,
+            files_paths=[TEST_MIDI1],
+            max_seq_len=6,
+        )
+        dummy = [1, 3, 3, 3, 5, 6]
+        condition_tokens = [100, 200, 300]
+        # Condition tokens should be added before the start of the sequence, and it should be truncated to fit
+        expected_inputs = [100, 200, 300, 1, 3, 3]
+        expected_targets = [200, 300, 1, 3, 3, 3]
+        actual_inputs, actual_targets = ds.add_condition_tokens_to_input(dummy, condition_tokens)
+        self.assertEqual(expected_inputs, actual_inputs)
+        self.assertEqual(expected_targets, actual_targets)
+        # Testing with adding no condition tokens
+        condition_tokens = []
+        self.assertRaises(AssertionError, ds.add_condition_tokens_to_input, dummy, condition_tokens)
+
+    @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
+    def test_overlap_between_condition_and_track_tokens(self):
+        """There should be no overlap between the token IDs from a TRACK, and the condition token IDs"""
+
+        def runner(tokenizer):
+            # Create the dataset
+            ds = DatasetMIDIRandomChunk(
+                tokenizer=tokenizer,
+                files_paths=midi_fps,
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                do_augmentation=False,
+                do_conditioning=True
+            )
+            # Get the list of condition tokens from our tokenizer
+            all_condition_tokens = [i for i in tokenizer.vocab.keys() if i.startswith(tuple(CONDITION_TOKEN_STARTS))]
+            # Iterate over every track in the dataset
+            for i in tqdm(range(len(ds)), desc="Checking overlap between track and condition tokens..."):
+                # Get the input IDs and targets
+                input_ids, targets, tempo_shift = ds.load_file(ds.files_paths[i])
+                condition_idxs = ds.get_conditioning_tokens(ds.metadata_paths[i], tempo_shift)
+                # There should be no overlap between the track IDs and the condition tokens
+                self.assertTrue(set(condition_idxs).isdisjoint(set(input_ids)))
+                self.assertTrue(set(condition_idxs).isdisjoint(set(targets)))
+                # Iterate over "track" tokens (input IDs, targets)
+                for tokseq in [input_ids, targets]:
+                    decoded = decoder(tokenizer, tokseq)
+                    for decoded_token in decoded:
+                        # When decoded, input tokens should not be included in our list of condition tokens
+                        self.assertFalse(decoded_token in all_condition_tokens)
+                        # When decoded, input tokens should NOT start with condition token patterns
+                        self.assertFalse(decoded_token.startswith(tuple(CONDITION_TOKEN_STARTS)))
+                # Iterate over "condition" tokens
+                decoded_condition_tokens = decoder(tokenizer, condition_idxs)
+                for decoded_token in decoded_condition_tokens:
+                    # When decoded, condition tokens SHOULD be in our list of all condition tokens
+                    self.assertTrue(decoded_token in all_condition_tokens)
+                    # When decoded, condition tokens SHOULD start with one of our condition token patterns
+                    self.assertTrue(decoded_token.startswith(tuple(CONDITION_TOKEN_STARTS)))
+
+        # Get a large number of tracks + equivalent metadata files
+        idx = int(utils.now()[-1]) * 100  # bootleg random index, should operate independently of our set seed
+        midi_fps = utils.get_data_files_with_ext("data/raw", "**/*.mid")[idx: idx + 500]
+        metadata_fps = [i.replace("piano_midi.mid", "metadata_tivo.json") for i in midi_fps]
+        # Create a tokenizer
+        tok = load_tokenizer(tokenizer_str="midilike", )
+        add_tempos_to_vocab(tok, (80, 300), 32)
+        add_timesignatures_to_vocab(tok, [3, 4])
+        add_pianists_to_vocab(tok, metadata_fps)
+        add_genres_to_vocab(tok, metadata_fps)
+        # FIRST: we test without training the tokenizer
+        runner(tok)
+        # SECOND: we test WITH training the tokenizer
+        train_tokenizer(tok, midi_fps, vocab_size=1000, training_method="BPE")
+        runner(tok)
 
 
 if __name__ == '__main__':
