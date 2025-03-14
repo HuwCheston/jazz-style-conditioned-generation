@@ -106,7 +106,8 @@ class TrainingModule:
         logger.debug(f"Loaded {len(self.metadata_paths)} metadata JSONs from {self.data_dir}")
 
         # TOKENIZER
-        self.tokenizer = load_tokenizer(**self.tokenizer_cfg)
+        self.tokenizer_path = os.path.join(self.checkpoint_dir, "tokenizer.json")
+        self.tokenizer = load_tokenizer(tokenizer_path=self.tokenizer_path, **self.tokenizer_cfg)
         logger.debug(f'... tokenizer initialised: {self.tokenizer}')
 
         # CONDITIONS
@@ -123,7 +124,7 @@ class TrainingModule:
             add_timesignatures_to_vocab(self.tokenizer, [3, 4])
             # Log the number of tokens we've added for each condition type to the console
             for condition in ["GENRES", "PIANIST", "TIMESIGNATURE", "TEMPO"]:
-                n_conditions = [i for i in self.tokenizer.special_tokens if i.startswith(condition)]
+                n_conditions = [i for i in self.tokenizer.vocab if i.startswith(condition)]
                 logger.debug(f'... added {len(n_conditions)} {condition} tokens!')
 
         # TRAIN THE TOKENIZER
@@ -134,6 +135,11 @@ class TrainingModule:
                 do_conditioning=self.train_dataset_cfg.get("do_conditioning", True),
                 **self.tokenizer_cfg
             )
+
+        # SAVE THE TOKENIZER (if it doesn't already exist)
+        if not os.path.isfile(self.tokenizer_path):
+            self.tokenizer.save(out_path=self.tokenizer_path)
+            logger.debug(f"... dumped tokenizer to {self.tokenizer_path}")
 
         # DATALOADERS
         logger.debug(f'Initialising training loader with args {self.train_dataset_cfg}')

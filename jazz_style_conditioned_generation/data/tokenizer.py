@@ -101,6 +101,7 @@ class CustomTokTrainingIterator(TokTrainingIterator):
             token_ids = tokseq.ids
         else:
             token_ids = [seq.ids for seq in tokseq]
+        # TODO: check that no conditioning tokens are in the IDs
         bytes_ = self.tokenizer._ids_to_bytes(token_ids, as_one_str=True)
         if isinstance(bytes_, str):
             bytes_ = [bytes_]
@@ -125,7 +126,8 @@ def add_pianists_to_vocab(tokenizer, metadata_paths: list[str]) -> None:
     # We only care about the name of the genre, not the weight
     for pianist, _ in validated_pianists:
         with_prefix = f'PIANIST_{utils.remove_punctuation(pianist).replace(" ", "")}'
-        tokenizer.add_to_vocab(with_prefix, special_token=False)
+        if with_prefix not in tokenizer.vocab:
+            tokenizer.add_to_vocab(with_prefix, special_token=False)
 
 
 def add_genres_to_vocab(tokenizer: MusicTokenizer, metadata_paths: list[str]) -> None:
@@ -157,14 +159,16 @@ def add_genres_to_vocab(tokenizer: MusicTokenizer, metadata_paths: list[str]) ->
     # We only care about the name of the genre, not the weight
     for genre, _ in validated_genres:
         with_prefix = f'GENRES_{utils.remove_punctuation(genre).replace(" ", "")}'
-        tokenizer.add_to_vocab(with_prefix, special_token=False)
+        if with_prefix not in tokenizer.vocab:
+            tokenizer.add_to_vocab(with_prefix, special_token=False)
 
 
 def add_timesignatures_to_vocab(tokenizer: MusicTokenizer, time_signatures: list[int]) -> None:
     """Given a list of time signatures, add these to the vocabulary as custom tokens (shouldn't be used in decoding)"""
     for time_signature in time_signatures:
         tok_id = f'TIMESIGNATURECUSTOM_{time_signature}4'
-        tokenizer.add_to_vocab(tok_id, special_token=False)
+        if tok_id not in tokenizer.vocab:
+            tokenizer.add_to_vocab(tok_id, special_token=False)
 
 
 def add_tempos_to_vocab(tokenizer: MusicTokenizer, tempo_range: tuple, n_tempos: int = 32) -> None:
@@ -172,7 +176,8 @@ def add_tempos_to_vocab(tokenizer: MusicTokenizer, tempo_range: tuple, n_tempos:
     tempo_range = np.linspace(*tempo_range, n_tempos).round().astype(int)
     for tempo in tempo_range:
         tok_id = f'TEMPOCUSTOM_{tempo}'
-        tokenizer.add_to_vocab(tok_id, special_token=False)
+        if tok_id not in tokenizer.vocab:
+            tokenizer.add_to_vocab(tok_id, special_token=False)
 
 
 def get_tokenizer_class_from_string(tokenizer_type: str):
@@ -208,21 +213,31 @@ def fix_pertok_microtiming_bug(tokenizer: PerTok) -> None:
 
 
 def load_tokenizer(**kwargs) -> MusicTokenizer:
-    # Get the variables from the config dictionary
+    # Get the name of the tokenizer from the config dictionary
     tokenizer_method = kwargs.get("tokenizer_str", DEFAULT_TOKENIZER_CLASS)
-    tokenizer_kws = kwargs.get("tokenizer_kws", DEFAULT_TOKENIZER_CONFIG)
-    # Add in any missing parameters with defaults
-    tokenizer_kws = utils.update_dictionary(tokenizer_kws, DEFAULT_TOKENIZER_CONFIG)
-    logger.debug(f'Initialising tokenizer type {tokenizer_method} with params {tokenizer_kws}')
-    # Create the tokenizer configuration + tokenizer
-    cfg = TokenizerConfig(**tokenizer_kws)
-    tokenizer = get_tokenizer_class_from_string(tokenizer_method)(cfg)
+    # Try and load a trained tokenizer
+    tokenizer_path = kwargs.get("tokenizer_path", False)
+    if os.path.isfile(tokenizer_path):
+        logger.debug(f'Initialising tokenizer tupe {tokenizer_method} from path {tokenizer_path}')
+        tokenizer = get_tokenizer_class_from_string(tokenizer_method)(params=tokenizer_path)
+    # Otherwise, create the tokenizer from scratch
+    else:
+        tokenizer_kws = kwargs.get("tokenizer_kws", DEFAULT_TOKENIZER_CONFIG)
+        # Add in any missing parameters with defaults
+        tokenizer_kws = utils.update_dictionary(tokenizer_kws, DEFAULT_TOKENIZER_CONFIG)
+        logger.debug(f'Initialising tokenizer type {tokenizer_method} with params {tokenizer_kws}')
+        # Create the tokenizer configuration + tokenizer
+        cfg = TokenizerConfig(**tokenizer_kws)
+        tokenizer = get_tokenizer_class_from_string(tokenizer_method)(cfg)
     logger.debug(f'... got tokenizer: {tokenizer}')
     return tokenizer
 
 
 def train_tokenizer(tokenizer: MusicTokenizer, files_paths: list[str], **kwargs) -> None:
     """Trains a tokenizer given kwargs using our custom iterator class"""
+    if tokenizer.is_trained:
+        logger.warning(f'... tried to train a tokenizer that has already been trained, skipping')
+        return
     # Get the parameters again from the dictionary
     training_method = kwargs.get("training_method", DEFAULT_TRAINING_METHOD)
     vocab_size = kwargs.get("vocab_size", DEFAULT_VOCAB_SIZE)
