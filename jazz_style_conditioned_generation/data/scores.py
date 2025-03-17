@@ -152,7 +152,7 @@ def preprocess_score(
     # Next, we merge successive notes with the same pitch and a very short onset-offset time into the same pitch
     merged_notes = merge_repeated_notes(no_short_notes, overlap_milliseconds=overlap_milliseconds)
     # Finally, we convert everything back to a Score object that can be passed to our tokenizer
-    score.tracks[0].notes = merged_notes
+    score.tracks[0].notes = sorted(merged_notes, key=lambda x: x.start)
     return score
 
 
