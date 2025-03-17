@@ -41,6 +41,8 @@ def main(
         logger.info(f"Generating using primer MIDI at {primer_fp}")
         # Load the primer file
         assert os.path.isfile(primer_fp), f"Could not find MIDI file at {primer_fp}!"
+        # TODO: this doesn't seem to be getting BOS/EOS/Condition tokens
+        #  Should probably pass through the dataloader functions instead
         # Convert to a symusic object
         sc = load_score(primer_fp)
         # Do our preprocessing
@@ -65,7 +67,7 @@ def main(
     # Convert the generated token indices back to a Score
     tok_out = tm.tokenizer(gen_out.to("cpu"))
     # (post)-process the generated score
-    tok_out = preprocess_score(tok_out)
+    # tok_out = preprocess_score(tok_out)
     # Get the filepaths to save the generation to
     out_fp = os.path.join(output_dir, f"generation_{utils.now()}")
     # Save the midi + wav file (if required)
@@ -113,7 +115,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-p",
         "--top-p",
-        default=0.92,
+        default=0.7,
         type=float,
         help="Top-p value to use in nucleus sampling (defaults to 0.92). Must be between 0 and 1."
     )
