@@ -245,26 +245,30 @@ def pad_sequence(
     return x
 
 
-def decode_bpe_sequence(sequence: torch.tensor, tokenizer: MusicTokenizer) -> torch.tensor:
+def decode_bpe_sequence(sequence: torch.Tensor, tokenizer: MusicTokenizer) -> torch.Tensor:
     """Decodes a sequence of BPE-encoded token IDs into "raw" token IDs"""
-    converted = tokenizer._convert_sequence_to_tokseq(sequence.cpu())
+    # Convert list of integers to a torch tensor
+    if not isinstance(sequence, torch.Tensor):
+        sequence = torch.tensor(sequence, dtype=torch.long)
+
     # Input was passed as (sequence_len)
     if len(sequence.size()) == 1:
-        tokenizer._preprocess_tokseq_before_decoding(converted)
-        # Can just be returned as a tensor straight away
-        return torch.tensor(converted)
-    # Input was passed as (batch_size, sequence_len)
-    elif len(sequence.size()) == 2:
-        for seq in converted:
-            tokenizer._preprocess_tokseq_before_decoding(seq)
-        # We need to pad the input to match the longest sequence length in the batch, as this may be ragged
-        all_ids = [i.ids for i in converted]
-        pad_size = max(all_ids, key=lambda x: len(x))
-        padded = [pad_sequence(s, pad_size, tokenizer.pad_token_id) for s in all_ids]
-        return torch.tensor(padded)
-    # Unknown input dimensions, raise an error
-    else:
-        raise ValueError("Tensor must be one- or two-dimensional to decode from BPE")
+        # Coerce it to (batch_size, sequence_len)
+        sequence = sequence.unsqueeze(0)
+
+    # These two private functions are called inside MusicTokenizer.decode
+    converted = tokenizer._convert_sequence_to_tokseq(sequence.cpu())
+    for seq in converted:
+        tokenizer._preprocess_tokseq_before_decoding(seq)
+        # Sanity check that the de-tokenized ID is in the base vocab of our model
+        for detok in seq:
+            assert detok in list(tokenizer.vocab.values())
+    # We need to pad the input to match the longest sequence length in the batch, as this may be ragged
+    all_ids = [i.ids for i in converted]
+    pad_size = max(len(i) for i in all_ids)
+    # This applies right padding, so that the tensor becomes (batch_size, longest_detokenized_sequence)
+    padded = [pad_sequence(s, pad_size, tokenizer.pad_token_id) for s in all_ids]
+    return torch.tensor(padded)
 
 
 if __name__ == "__main__":

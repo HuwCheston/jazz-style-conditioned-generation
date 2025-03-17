@@ -10,6 +10,7 @@ from symusic import Note
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.scores import note_list_to_score
+from jazz_style_conditioned_generation.data.tokenizer import load_tokenizer, train_tokenizer
 
 
 class TestUtils(unittest.TestCase):
@@ -84,6 +85,33 @@ class TestUtils(unittest.TestCase):
         expected = [0, 0, 0, 0, 2, 2, 2, 3, 4, 5]
         actual = utils.pad_sequence(tokseq, desired_len=10, pad_token_id=0, right_pad=False)
         self.assertEqual(actual, expected)
+
+    def test_decode_bpe_sequence(self):
+        # Get a random file
+        dummy_file = os.path.join(utils.get_project_root(), "tests/test_resources/test_midi1/piano_midi.mid")
+        # Load and train the tokenizer with this file
+        dummy_tokenizer = load_tokenizer()
+        train_tokenizer(dummy_tokenizer, [dummy_file], vocab_size=1000)
+        # Encode as a token sequence
+        dummy_tokseq = dummy_tokenizer.encode(dummy_file)
+        dummy_ids = dummy_tokseq[0].ids
+        # These token IDs shouldn't be in our base vocabulary
+        with self.assertRaises(KeyError):
+            for i in dummy_ids:
+                _ = dummy_tokenizer[i]
+        # Decode the tokenized results
+        decoded_ids = utils.decode_bpe_sequence(dummy_ids, dummy_tokenizer)
+        # The decoded sequence should be longer than the non-decoded sequence
+        #  (i.e., BPE is compressing the length of our initial sequence)
+        self.assertGreater(decoded_ids.size(1), len(dummy_ids))
+        # All the decoded IDs should be in our base vocabulary
+        for i in decoded_ids.squeeze(0).tolist():
+            try:
+                _ = dummy_tokenizer[i]
+            except KeyError:
+                raise self.fail()
+            # We also shouldn't have any padding tokens as we've only passed in a batch of one item
+            self.assertTrue(i != dummy_tokenizer.pad_token_id)
 
 
 if __name__ == '__main__':
