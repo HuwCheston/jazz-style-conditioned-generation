@@ -20,7 +20,7 @@ from symusic import Score
 from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
-from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIExhaustive
+from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIConditioned
 from jazz_style_conditioned_generation.data.tokenizer import load_tokenizer, train_tokenizer
 
 
@@ -265,7 +265,7 @@ def compute_metrics_for_dataset(dataset_tracks: list[str], tokenizer: MusicToken
     if isinstance(dataset_tracks[0], Path):
         dataset_tracks = [str(dt) for dt in dataset_tracks]
     # Create the dataset object, which will chunk every track into non-overlapping chunks of N tokens
-    dataset = DatasetMIDIExhaustive(
+    dataset = DatasetMIDIConditioned(
         tokenizer,
         dataset_tracks,
         max_seq_len=utils.MAX_SEQUENCE_LENGTH,

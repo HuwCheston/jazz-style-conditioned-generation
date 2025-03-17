@@ -15,7 +15,7 @@ from tqdm import tqdm
 from transformers import GPT2Config, GPT2LMHeadModel
 
 from jazz_style_conditioned_generation import utils
-from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIExhaustive, DatasetMIDIRandomChunk, DATA_DIR
+from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIConditioned, DATA_DIR
 from jazz_style_conditioned_generation.data.tokenizer import (
     load_tokenizer,
     train_tokenizer,
@@ -143,10 +143,10 @@ class TrainingModule:
 
         # DATALOADERS
         logger.debug(f'Initialising training loader with args {self.train_dataset_cfg}')
-        self.train_loader = self.create_dataloader(DatasetMIDIRandomChunk, "train", self.train_dataset_cfg)
+        self.train_loader = self.create_dataloader("train", self.train_dataset_cfg)
         logger.debug(f'Initialising testing + validation loaders with args {self.test_dataset_cfg}')
-        self.test_loader = self.create_dataloader(DatasetMIDIExhaustive, "test", self.test_dataset_cfg)
-        self.validation_loader = self.create_dataloader(DatasetMIDIExhaustive, "validation", self.test_dataset_cfg)
+        self.test_loader = self.create_dataloader("test", self.test_dataset_cfg)
+        self.validation_loader = self.create_dataloader("validation", self.test_dataset_cfg)
 
         # MODEL
         model_type = self.model_cfg.get("model_type", "gpt2-lm")
@@ -179,16 +179,17 @@ class TrainingModule:
 
     def create_dataloader(
             self,
-            dataset_constructor,
             split: str,
             dataset_cfg: dict
     ) -> torch.utils.data.DataLoader:
         """Creates a dataloader for a given split and configuration"""
-        dataset = dataset_constructor(
+        if dataset_cfg.get("do_augmentation", False) and split != "train":
+            raise AttributeError("Augmentation only allowed for training dataloader!")
+
+        dataset = DatasetMIDIConditioned(
             tokenizer=self.tokenizer,
             files_paths=self.track_splits[split],
             max_seq_len=utils.MAX_SEQUENCE_LENGTH,
-            # condition_mapping=self.condition_mapping,
             **dataset_cfg
         )
         # We don't need a collate function here

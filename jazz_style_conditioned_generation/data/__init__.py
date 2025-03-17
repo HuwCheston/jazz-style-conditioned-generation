@@ -13,8 +13,7 @@ from .conditions import (
 )
 from .dataloader import (
     DATA_DIR,
-    DatasetMIDIExhaustive,
-    DatasetMIDIRandomChunk,
+    DatasetMIDIConditioned,
     pad_sequence,
     create_padding_mask
 )
