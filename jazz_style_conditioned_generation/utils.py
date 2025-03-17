@@ -18,6 +18,7 @@ import numpy as np
 import torch
 import transformers
 from loguru import logger
+from miditok import MusicTokenizer
 from symusic import Score, Synthesizer, BuiltInSF3, dump_wav
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -225,6 +226,45 @@ def validate_paths(filepaths: list[str], expected_extension: str = ".mid"):
     for file in filepaths:
         assert os.path.isfile(file), f"File {file} does not exist on the disk!"
         assert file.endswith(expected_extension), f"File {file} does not have expected extension {expected_extension}!"
+
+
+def pad_sequence(
+        sequence: list[int],
+        desired_len: int,
+        pad_token_id: int,
+        right_pad: bool = True
+) -> list[int]:
+    """(Right- or left-) pads a sequence to desired length"""
+    # Create an array of padding tokens
+    x = [pad_token_id for _ in range(desired_len)]
+    # Replace the initial tokens with our sequence
+    if right_pad:
+        x[:len(sequence)] = sequence
+    else:
+        x[-len(sequence):] = sequence
+    return x
+
+
+def decode_bpe_sequence(sequence: torch.tensor, tokenizer: MusicTokenizer) -> torch.tensor:
+    """Decodes a sequence of BPE-encoded token IDs into "raw" token IDs"""
+    converted = tokenizer._convert_sequence_to_tokseq(sequence.cpu())
+    # Input was passed as (sequence_len)
+    if len(sequence.size()) == 1:
+        tokenizer._preprocess_tokseq_before_decoding(converted)
+        # Can just be returned as a tensor straight away
+        return torch.tensor(converted)
+    # Input was passed as (batch_size, sequence_len)
+    elif len(sequence.size()) == 2:
+        for seq in converted:
+            tokenizer._preprocess_tokseq_before_decoding(seq)
+        # We need to pad the input to match the longest sequence length in the batch, as this may be ragged
+        all_ids = [i.ids for i in converted]
+        pad_size = max(all_ids, key=lambda x: len(x))
+        padded = [pad_sequence(s, pad_size, tokenizer.pad_token_id) for s in all_ids]
+        return torch.tensor(padded)
+    # Unknown input dimensions, raise an error
+    else:
+        raise ValueError("Tensor must be one- or two-dimensional to decode from BPE")
 
 
 if __name__ == "__main__":

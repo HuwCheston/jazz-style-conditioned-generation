@@ -76,17 +76,6 @@ class DatasetConditionedTest(unittest.TestCase):
         expected = [TOKENIZER["BOS_None"], 2, 2, 2, 3, 4, 5, TOKENIZER["EOS_None"]]
         self.assertEqual(actual, expected)
 
-    def test_pad_sequence(self):
-        # Test right padding
-        tokseq = [2, 2, 2, 3, 4, 5]
-        expected = [2, 2, 2, 3, 4, 5, 0, 0, 0, 0]
-        actual = pad_sequence(tokseq, desired_len=10, pad_token_id=0)
-        self.assertEqual(actual, expected)
-        # Test left padding
-        expected = [0, 0, 0, 0, 2, 2, 2, 3, 4, 5]
-        actual = pad_sequence(tokseq, desired_len=10, pad_token_id=0, right_pad=False)
-        self.assertEqual(actual, expected)
-
     def test_attention_mask(self):
         # First chunk should not have any padding
         first_chunk = DUMMY_DATASET.__getitem__(0)

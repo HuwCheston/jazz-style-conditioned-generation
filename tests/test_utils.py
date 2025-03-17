@@ -74,6 +74,17 @@ class TestUtils(unittest.TestCase):
     def test_skip_on_github_actions(self):
         self.assertTrue(len(os.listdir(os.path.join(utils.get_project_root(), "data/raw/pijama"))) > 100)
 
+    def test_pad_sequence(self):
+        # Test right padding
+        tokseq = [2, 2, 2, 3, 4, 5]
+        expected = [2, 2, 2, 3, 4, 5, 0, 0, 0, 0]
+        actual = utils.pad_sequence(tokseq, desired_len=10, pad_token_id=0)
+        self.assertEqual(actual, expected)
+        # Test left padding
+        expected = [0, 0, 0, 0, 2, 2, 2, 3, 4, 5]
+        actual = utils.pad_sequence(tokseq, desired_len=10, pad_token_id=0, right_pad=False)
+        self.assertEqual(actual, expected)
+
 
 if __name__ == '__main__':
     unittest.main()

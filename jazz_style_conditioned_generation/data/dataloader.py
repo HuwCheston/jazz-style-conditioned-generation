@@ -28,29 +28,11 @@ from jazz_style_conditioned_generation.data.scores import (
 
 __all__ = [
     "DATA_DIR",
-    "pad_sequence",
     "create_padding_mask",
     "DatasetMIDIConditioned"
 ]
 
 DATA_DIR = os.path.join(utils.get_project_root(), "data")
-
-
-def pad_sequence(
-        sequence: list[int],
-        desired_len: int,
-        pad_token_id: int,
-        right_pad: bool = True
-) -> list[int]:
-    """(Right- or left-) pads a sequence to desired length"""
-    # Create an array of padding tokens
-    x = [pad_token_id for _ in range(desired_len)]
-    # Replace the initial tokens with our sequence
-    if right_pad:
-        x[:len(sequence)] = sequence
-    else:
-        x[-len(sequence):] = sequence
-    return x
 
 
 def create_padding_mask(x, pad_token_id: int) -> torch.tensor:
@@ -299,7 +281,7 @@ class DatasetMIDIConditioned:
         # Pad or truncate the sequence if required
         #  Again, add one to the maximum sequence length so that we have enough tokens for autoregressive shifting later
         if len(tokseq_ids_chunked) < self.max_seq_len + 1:
-            tokseq_ids_chunked = pad_sequence(
+            tokseq_ids_chunked = utils.pad_sequence(
                 tokseq_ids_chunked, desired_len=self.max_seq_len + 1, pad_token_id=self.tokenizer["PAD_None"]
             )
         else:
