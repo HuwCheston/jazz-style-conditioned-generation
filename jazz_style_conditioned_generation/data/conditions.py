@@ -552,7 +552,8 @@ def get_tempo_token(tempo: float, tokenizer: MusicTokenizer, _raise_on_differenc
     sub = np.abs(tempo - tempo_stripped)
     # Raise an error if the closest tempo token is too far away from the actual token
     if np.min(sub) > _raise_on_difference_exceeding:
-        raise ValueError(f"Closest tempo token is too far from passed tempo! Smallest difference is {sub}")
+        raise ValueError(f"Closest tempo token is too far from passed tempo! "
+                         f"Got tempo {tempo:.3f}, smallest difference with passed array is {np.min(sub):.3f}")
     # Get the actual tempo token
     tempo_token = tempo_tokens[np.argmin(sub)]
     # Sanity check
