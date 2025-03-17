@@ -406,10 +406,11 @@ class TrainingModule:
         predicted = torch.argmax(torch.softmax(logits, dim=-1), dim=-1)
         # We need to decode the BPE-encoded predicted + actual labels if the tokenizer is trained
         if self.tokenizer.is_trained:
+            # Truncating the sequence to SEQUENCE_LENGTH ensures parity with a model where the tokenizer isn't trained
             predicted = utils.decode_bpe_sequence(predicted, self.tokenizer)[:, :utils.MAX_SEQUENCE_LENGTH]
             labels = utils.decode_bpe_sequence(labels, self.tokenizer)[:, :utils.MAX_SEQUENCE_LENGTH]
         # True if the label is not a padding token, False if it is a padding token
-        non_padded: torch.tensor = (labels != self.tokenizer.pad_token_id) & (predicted != self.tokenizer.pad_token_id)
+        non_padded = labels != self.tokenizer.pad_token_id
         # Get the cases where the predicted label is the same as the actual label and neither the label/logit is padded
         correct = (predicted == labels) & non_padded
         # Calculate the accuracy from this
