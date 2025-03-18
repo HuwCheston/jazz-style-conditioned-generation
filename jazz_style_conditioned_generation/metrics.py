@@ -13,6 +13,7 @@ from typing import Callable, Any
 import muspy
 import numpy as np
 import torch
+import torch.nn.functional as F
 from joblib import Parallel, delayed
 from loguru import logger
 from miditok import MusicTokenizer
@@ -64,10 +65,78 @@ def accuracy_score(logits: torch.Tensor, labels: torch.Tensor, tokenizer: MusicT
                     if p == t:
                         hits += 1
                 # Break out of the loop once we've reached the target length after BPE decoding
-                if this_seq_len >= utils.MAX_SEQUENCE_LENGTH:
+                if this_seq_len >= labels.size(1):
                     break
     # Simple accuracy measurement, return as tensor for compatibility with e.g. loss metric
     return torch.tensor(hits / total_seq_len)
+
+
+def cross_entropy_loss(
+        batched_logits: torch.Tensor,
+        batched_labels: torch.Tensor,
+        tokenizer: MusicTokenizer,
+        base_vocab_size: int
+) -> torch.Tensor:
+    """Calculate cross-entropy loss between logits and labels while handling BPE decoding"""
+    ys, ts = [], []
+    # This iterates through every item: logits (bpe_sequence_len, bpe_vocab), labels (bpe_sequence_len)
+    for logits, labels in zip(batched_logits, batched_labels):
+        all_ys, all_ts = [], []
+        # Iterating through (BPE-tokenized) steps in the sequence
+        for log, lab in zip(logits, labels):
+            # Decode target to a list of base tokens
+            lab_decoded = tokenizer.bpe_token_mapping[lab.item()]
+            all_ts.extend(lab_decoded)
+            # Create a mapping of [decoded_step_idx1: [[base_token1, ...], [base_token2, ...], [base_token3, ...]]]
+            results_at_step = [[[] for __ in range(base_vocab_size)] for _ in range(len(lab_decoded))]
+            # Iterate over BPE token IDX, non-normalised probability at this BPE step
+            for log_idx, log_prob in enumerate(log.tolist()):
+                # Decode BPE token IDX to a list of base tokens
+                log_idx_decoded = tokenizer.bpe_token_mapping[log_idx]
+                # The length of both lists might be different
+                #  If we have more target labels than predicted labels
+                if len(log_idx_decoded) < len(lab_decoded):
+                    # Pad the sequence by continuing to predict the final token
+                    overlap = len(lab_decoded) - len(log_idx_decoded)
+                    log_idx_decoded = log_idx_decoded + [log_idx_decoded[-1] for _ in range(overlap)]
+                #  If we have fewer target labels than predicted labels
+                elif len(log_idx_decoded) > len(lab_decoded):
+                    # Truncate the predicted labels to match the length of the predicted labels
+                    log_idx_decoded = log_idx_decoded[:len(lab_decoded)]
+                # Lengths should now match
+                # Smooth the probability over all the decoded tokens
+                #  So, if we decode to 2 base tokens with a probability of 1.
+                #  We assign a probability of 0.5 to each decoded base token
+                smoothed_log_prob = log_prob / len(log_idx_decoded)
+                for step_idx, decoded_token in enumerate(log_idx_decoded):
+                    results_at_step[step_idx][decoded_token].append(smoothed_log_prob)
+            # Sum everything so we get a single probability for each base token at every step
+            all_ys.extend([[sum(v) for v in r] for r in results_at_step])
+        # (decoded_sequence_len, base_vocab_size)
+        ys.append(torch.tensor(all_ys))
+        # (decoded_sequence_len,)
+        ts.append(torch.tensor(all_ts))
+
+    # Pad all the tensors to the length of the longest decoded sequence
+    max_len = max(i.size(0) for i in ts)
+    ys_padded = torch.stack([F.pad(y, pad=(0, 0, 0, max_len - y.size(0)), value=tokenizer.pad_token_id) for y in ys])
+    ts_padded = torch.stack([F.pad(s, pad=(0, max_len - s.size(0)), value=tokenizer.pad_token_id) for s in ts])
+    # Now, truncate to the length of the originally BPE-encoded sequence
+    ys_trunc = ys_padded[:, :batched_labels.size(1), :]  # (batch_size, seq_len, vocab_size)
+    ts_trunc = ts_padded[:, :batched_labels.size(1)]  # (batch_size, seq_len)
+    # Everything else can just use the torch function
+    return _cross_entropy_loss(ys_trunc, ts_trunc, tokenizer)
+
+
+def _cross_entropy_loss(logits: torch.Tensor, labels: torch.Tensor, tokenizer: MusicTokenizer) -> torch.Tensor:
+    """Just implements the vanilla cross entropy loss from torch with some reshaping"""
+    return F.cross_entropy(
+        # Reshapes logits to (batch_size * sequence_len, vocab_size)
+        logits.reshape(logits.shape[0] * logits.shape[1], -1).to(torch.float),
+        # Reshapes targets to (batch_size * sequence_len)
+        labels.flatten().to(torch.long),
+        ignore_index=tokenizer.pad_token_id
+    )
 
 
 def _symusic_to_muspy(score: Score) -> muspy.Music:

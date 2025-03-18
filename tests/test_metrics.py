@@ -293,7 +293,7 @@ class MetricsTest(unittest.TestCase):
         }
         setattr(toke, "bpe_token_mapping", token_mapping)
         # Test with an un-batched dummy tensor
-        dummy_labels = torch.tensor([[1, 2, 3]])  # decodes to [1, 2, 1, 3, 3]
+        dummy_labels = torch.tensor([[1, 2, 3, 0, 0]])  # decodes to [1, 2, 1, 3, 3], ignoring padding tokens
         dummy_tensor = torch.tensor([
             [
                 # 0,   1,   2,   3
@@ -308,8 +308,8 @@ class MetricsTest(unittest.TestCase):
         # Test with a batched dummy tensor
         dummy_labels = torch.tensor(
             [
-                [1, 2, 3],  # decodes to [1, 2, 1, 3, 3]
-                [3, 2, 1]  # decodes to [3, 1, 3, 1, 2]
+                [1, 2, 3, 0, 0],  # decodes to [1, 2, 1, 3, 3], again ignoring padding tokens
+                [3, 2, 1, 0, 0]  # decodes to [3, 1, 3, 1, 2]
             ]
         )
         dummy_tensor = torch.tensor([
@@ -328,6 +328,60 @@ class MetricsTest(unittest.TestCase):
         expected_accuracy = 1 / 2
         actual_accuracy = metrics.accuracy_score(dummy_tensor, dummy_labels, toke).item()
         self.assertTrue(np.isclose(expected_accuracy, actual_accuracy))
+
+    def test_cross_entropy_loss(self):
+        # First, use a tokenizer that hasn't been trained
+        t = load_tokenizer()
+        token_mapping = {
+            0: [0],  # This just maps a base token ID onto a list of itself
+            1: [1],
+            # Might seem redundant, but it allows us to use the same function with a trained/non-trained tokenizer
+            2: [2],
+            3: [3],
+            4: [4],
+            5: [5],
+            6: [6],
+        }
+        base_vocab_size = len(set([x for xs in token_mapping.values() for x in xs]))
+        # Set everything as attributes of the tokenizer
+        setattr(t, "bpe_token_mapping", token_mapping)
+        # (batch_size, seq_length)
+        labs = torch.tensor([
+            [1, 2, 3, 4, 5, 6, 0, 0, 0, 0],
+            [3, 2, 3, 5, 6, 6, 6, 0, 0, 0],
+        ])
+        # (batch_size, seq_length, vocab_size)
+        logs = torch.rand((labs.size(0), labs.size(1), base_vocab_size))
+        # The loss calculated with our function should be identical to the vanilla torch cross entropy loss
+        our_loss = metrics.cross_entropy_loss(logs, labs, t, base_vocab_size).item()
+        vanilla_loss = metrics._cross_entropy_loss(logs, labs, t).item()
+        self.assertEqual(our_loss, vanilla_loss)
+
+    def test_cross_entropy_loss_bpe(self):
+        # Second, "train" the tokenizer (actually, just use a hack to simulate a trained tokenizer)
+        t = MIDILike()
+        token_mapping = {
+            0: [0],  # Now, this maps a BPE token IDX onto a list of base token IDXs
+            1: [1],  # The values are the IDXs of our "base" vocabulary
+            2: [2],  # And the keys are the IDXs of the tokens learned with BPE
+            3: [3],  # This means that some BPE token IDXs can map onto MULTIPLE base token IDXs!
+            4: [1, 2],
+            5: [1, 3],
+            6: [1, 2, 3]
+        }
+        base_vocab_size = len(set([x for xs in token_mapping.values() for x in xs]))
+        setattr(t, "bpe_token_mapping", token_mapping)  # hack, will be set in train_tokenizer
+        # (batch_size, bpe_seq_length)
+        labs = torch.tensor([
+            [1, 2, 3, 4, 5, 6, 0, 0, 0, 0],  # decodes to [1, 2, 3, 1, 2, 1, 3, 1, 2, 3, 0, 0, 0, 0]
+            [3, 2, 3, 5, 6, 6, 6, 0, 0, 0]  # decodes to [3, 2, 3, 1, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 0, 0, 0]
+        ])
+        # (batch_size, bpe_seq_length, bpe_vocab_size)
+        logs = torch.rand((labs.size(0), labs.size(1), len(token_mapping)))
+        # The loss calculated with our function should be identical to the vanilla torch cross entropy loss
+        our_loss = metrics.cross_entropy_loss(logs, labs, t, base_vocab_size).item()
+        vanilla_loss = metrics._cross_entropy_loss(logs, labs, t).item()
+        self.assertLessEqual(our_loss, vanilla_loss)
 
 
 if __name__ == '__main__':

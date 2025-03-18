@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 from transformers.utils import ModelOutput
 
-from jazz_style_conditioned_generation import utils
+from jazz_style_conditioned_generation import utils, metrics
 from jazz_style_conditioned_generation.data.dataloader import create_padding_mask
 from jazz_style_conditioned_generation.encoders.rpr import TransformerEncoderRPR, TransformerEncoderLayerRPR
 
@@ -58,7 +58,7 @@ def top_k_top_p_filtering(
     if top_k > 0:
         top_k = min(max(top_k, min_tokens_to_keep), logits.size(-1))  # Safety check
         # Remove all tokens with a probability less than the last token of the top-k
-        indices_to_remove = logits < torch.topk(logits, top_k)[0][..., -1, None]
+        indices_to_remove = logits < torch.topk(logits, top_k)[0][:, -1, None]
         logits[indices_to_remove] = filter_value
     if top_p < 1.0:
         sorted_logits, sorted_indices = torch.sort(logits, descending=True)
@@ -67,10 +67,10 @@ def top_k_top_p_filtering(
         sorted_indices_to_remove = cumulative_probs > top_p
         if min_tokens_to_keep > 1:
             # Keep at least min_tokens_to_keep (set to min_tokens_to_keep-1 because we add the first one below)
-            sorted_indices_to_remove[..., :min_tokens_to_keep] = 0
+            sorted_indices_to_remove[:, :min_tokens_to_keep] = 0
         # Shift the indices to the right to keep also the first token above the threshold
-        sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone()
-        sorted_indices_to_remove[..., 0] = 0
+        sorted_indices_to_remove[:, 1:] = sorted_indices_to_remove[:, :-1].clone()
+        sorted_indices_to_remove[:, 0] = 0
         # scatter sorted tensors to original indexing
         indices_to_remove = sorted_indices_to_remove.scatter(1, sorted_indices, sorted_indices_to_remove)
         logits[indices_to_remove] = filter_value
@@ -81,6 +81,7 @@ def top_k_top_p_filtering(
 class MusicTransformerOutput(ModelOutput):
     """For consistency with the `transformers` API"""
     loss: Optional[torch.FloatTensor] = None
+    decoded_loss: Optional[torch.FloatTensor] = None
     logits: torch.FloatTensor = None
     past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None
     hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
@@ -158,8 +159,6 @@ class MusicTransformer(nn.Module):
         # Final output is a softmaxed linear layer
         self.Wout = nn.Linear(self.d_model, self.tokenizer.vocab_size)
         self.softmax = nn.Softmax(dim=-1)
-        # Calculate loss internally within the class, as in `transformers`
-        self.loss = nn.CrossEntropyLoss(ignore_index=self.tokenizer.pad_token_id)
 
     def forward(
             self,
@@ -184,19 +183,13 @@ class MusicTransformer(nn.Module):
         )
         # Back to (batch_size, max_seq, d_model)
         x_out = x_out.permute(1, 0, 2)
-        # Compute logits from FC layer
+        # Compute logits from FC layer: shape (batch_size, seq_len, vocab_size)
         logits = self.Wout(x_out)  # No softmax as nn.CrossEntropyLoss computes it for us
-        # Flatten logits to (sequence_len * batch_size, vocab_size)
-        y = logits.reshape(logits.shape[0] * logits.shape[1], -1).to(torch.float32)
-        # Flatten targets to (sequence_len * batch_size)
-        t = labels.flatten().to(torch.int64)
-        # Compute cross-entropy loss
-        loss = self.loss(y, t)
+        # Compute loss: vanilla first (i.e., without decoding BPE tokens), then with decoding
+        vanilla_loss = metrics._cross_entropy_loss(logits, labels, self.tokenizer)
+        decoded_loss = metrics.cross_entropy_loss(logits, labels, self.tokenizer, len(self.tokenizer._vocab_base))
         # Returns output in the same format as transformers
-        return MusicTransformerOutput(
-            loss=loss,
-            logits=logits
-        )
+        return MusicTransformerOutput(loss=vanilla_loss, logits=logits, decoded_loss=decoded_loss)
 
     def generate(
             self,
@@ -243,6 +236,7 @@ class MusicTransformer(nn.Module):
             # Apply the softmax
             smaxed = self.softmax(topk_topp)
             # Create the distribution
+            # TODO: somehow this can end up all NaNs?
             dist = torch.distributions.Categorical(probs=smaxed)
             # Get the next token by sampling from the distribution
             # Elements not in top-k/top-p have probability 0
@@ -295,28 +289,81 @@ class PositionalEncoding(nn.Module):
 
 
 if __name__ == "__main__":
-    from miditok import REMI
+    from jazz_style_conditioned_generation.data.tokenizer import load_tokenizer, train_tokenizer
+    from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIConditioned
+
+    # Create a tokenizer and train with a small number of tracks
+    midis = utils.get_data_files_with_ext("data/raw", "**/*.mid")[:50]
+    tokenizer = load_tokenizer()
+    train_tokenizer(tokenizer, midis, vocab_size=1000)
+
+    # Create the dataset + loader
+    dataset = DatasetMIDIConditioned(
+        tokenizer, midis, do_conditioning=False, do_augmentation=False, max_seq_len=utils.MAX_SEQUENCE_LENGTH
+    )
+    loader = torch.utils.data.DataLoader(dataset, shuffle=True, drop_last=False, batch_size=2)
 
     # Create the model
-    token_factory = REMI()
-    # Test out some different configurations
-    for config, config_name in zip(
-            [SULUN_2022_CONFIG, ROW_2024_MODEL_1_CONFIG, ROW_2024_MODEL_2_CONFIG, DEFAULT_CONFIG],
-            ["Sulun (2022)", "Row (2024), model 1", "Row (2024), model 2", "Default"]
-    ):
-        mt = MusicTransformer(token_factory, **config, ).to(utils.DEVICE)
-        print(f"N parameters, config {config_name}: {utils.total_parameters(mt)}")
-    # Create a dummy sequence of inputs: IDs, targets, and padding mask
-    dummy_tensor = torch.randint(0, 100, (4, 2049)).to(utils.DEVICE)
-    inp = dummy_tensor[:, :-1].to(utils.DEVICE)
-    targ = dummy_tensor[:, 1:].to(utils.DEVICE)
-    padding_mask = create_padding_mask(dummy_tensor, token_factory.pad_token_id)[:, :-1].to(utils.DEVICE)
+    mt = MusicTransformer(tokenizer=tokenizer, **DEFAULT_CONFIG).to(utils.DEVICE)
+
+    # Get an input batch
+    batch1 = next(iter(loader))
+    inp, targ = batch1["input_ids"].to(utils.DEVICE), batch1["labels"].to(utils.DEVICE)
+    padding_mask = create_padding_mask(inp, tokenizer.pad_token_id).to(utils.DEVICE)
+
     # Pass through the model
     out = mt(inp, targ, padding_mask)
     print(f'Dummy loss: {out.loss.item()}')
+
     # Do some generation with the dummy tensor
     mt.eval()
-    gen = mt.generate(primer=dummy_tensor[0, :10].squeeze(0))
+    gen = mt.generate(primer=inp[0, :10].squeeze(0))
+
     # Convert back to a score
-    retok = token_factory(gen)
+    retok = tokenizer(gen)
     print(f'Dummy generation: {retok}')
+
+# This converts the ID for a learned byte to a list of IDs of the actual tokens
+# token_mapping = {
+#     self.tokenizer.vocab_model[byt]: [self.tokenizer[t] for t in token_list]
+#     for byt, token_list in self.tokenizer._vocab_learned_bytes_to_tokens.items()
+# }
+# batch_results = []
+# for item in logits:
+#     item_results = []
+#     for step in item:
+#         logits_at_step = {id_: [] for id_ in self.tokenizer.vocab.values()}
+#         for learned_byte_id, logit in enumerate(step.tolist()):
+#             for nonbpe_byte_id in token_mapping[learned_byte_id]:
+#                 logits_at_step[nonbpe_byte_id].append(logit)
+#         logits_summed = torch.tensor([sum(v) for v in logits_at_step.values()])
+#         assert logits_summed.size(0) == len(self.tokenizer.vocab)
+#         item_results.append(logits_summed)
+#     batch_results.append(torch.stack(item_results))
+# logits_decoded = torch.stack(batch_results)
+# # Simply take the first token for each BPE index
+# labels_decoded = torch.tensor([[token_mapping[i.item()][0] for i in batch] for batch in labels])
+# # Flatten everything
+# y = logits_decoded.reshape(logits_decoded.shape[0] * logits_decoded.shape[1], -1).to(torch.float32)
+# t = labels_decoded.flatten().to(torch.int64)
+# loss1 = self.loss(y, t)
+# print(loss, loss1)
+
+
+# for item_logits, item_labels in zip(logits, labels):
+#     item_res = []
+#     for logit, label in zip(item_logits, item_labels):
+#         decoded_label = token_mapping[label.item()]
+#         res_at_label = [[[] for _ in range(len(self.tokenizer.vocab.values()))] for _ in range(len(decoded_label))]
+#         for log_byte_id, log in enumerate(logit.tolist()):
+#             log_token_ids = token_mapping[log_byte_id]
+#             if len(log_token_ids) < len(decoded_label):
+#                 log_token_ids.extend([log_token_ids[-1] for _ in range(len(decoded_label) - len(log_token-ids))])
+#             else:
+#                 log_token_ids = log_token_ids[:len(decoded_label)]
+#             assert len(log_token_ids) == len(decoded_label)
+#             for idx, id_ in enumerate(log_token_ids):
+#                 res_at_label[idx][id_].append(log)
+#
+#         break
+#     break

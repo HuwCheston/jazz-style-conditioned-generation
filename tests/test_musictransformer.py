@@ -7,14 +7,14 @@ import os
 import unittest
 
 import torch
-from miditok import REMI
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.dataloader import create_padding_mask
+from jazz_style_conditioned_generation.data.tokenizer import load_tokenizer
 from jazz_style_conditioned_generation.encoders.music_transformer import MusicTransformer
 
 # Create the model with default parameters
-TOKENIZER = REMI()
+TOKENIZER = load_tokenizer()
 MODEL = MusicTransformer(tokenizer=TOKENIZER).to(utils.DEVICE)
 MODEL_RPR = MusicTransformer(tokenizer=TOKENIZER, rpr=True).to(utils.DEVICE)
 
@@ -81,11 +81,12 @@ class MusicTransformerTest(unittest.TestCase):
 
         # We should do the same function for both RPR=True, RPR=False
         runner(MODEL)
+        # This test is flaky!
         runner(MODEL_RPR)
 
     def test_sulun_configuration(self):
         """Tests config in Sulun et al. (2022), Symbolic Music Generation Conditioned on Continuous-Valued Emotion"""
-        tok = REMI()
+        tok = load_tokenizer()
         fps = [
             os.path.join(utils.get_project_root(), "tests/test_resources/test_midi1/piano_midi.mid"),
             os.path.join(utils.get_project_root(), "tests/test_resources/test_midi2/piano_midi.mid"),
