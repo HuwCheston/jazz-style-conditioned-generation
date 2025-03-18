@@ -14,7 +14,7 @@ from loguru import logger
 from tqdm import tqdm
 from transformers import GPT2Config, GPT2LMHeadModel
 
-from jazz_style_conditioned_generation import utils
+from jazz_style_conditioned_generation import utils, metrics
 from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIConditioned, DATA_DIR
 from jazz_style_conditioned_generation.data.tokenizer import (
     load_tokenizer,
@@ -400,28 +400,12 @@ class TrainingModule:
             logger.warning(f"Failed to get LR from scheduler! Returning 0.0... {sched_e}")
             return 0.
 
-    def accuracy_score(self, logits: torch.tensor, labels: torch.tensor) -> torch.tensor:
-        """Given logits with shape (batch, sequence, vocab), compute accuracy vs labels of shape (batch, sequence)"""
-        # For each step in the sequence, this is the predicted label
-        predicted = torch.argmax(torch.softmax(logits, dim=-1), dim=-1)
-        # We need to decode the BPE-encoded predicted + actual labels if the tokenizer is trained
-        if self.tokenizer.is_trained:
-            # Truncating the sequence to SEQUENCE_LENGTH ensures parity with a model where the tokenizer isn't trained
-            predicted = utils.decode_bpe_sequence(predicted, self.tokenizer)[:, :utils.MAX_SEQUENCE_LENGTH]
-            labels = utils.decode_bpe_sequence(labels, self.tokenizer)[:, :utils.MAX_SEQUENCE_LENGTH]
-        # True if the label is not a padding token, False if it is a padding token
-        non_padded = labels != self.tokenizer.pad_token_id
-        # Get the cases where the predicted label is the same as the actual label and neither the label/logit is padded
-        correct = (predicted == labels) & non_padded
-        # Calculate the accuracy from this
-        return correct.sum().item() / non_padded.sum()
-
     def step(self, batch: dict[str, torch.tensor]) -> tuple[torch.tensor, torch.tensor]:
         input_ids = batch["input_ids"].to(utils.DEVICE)
         labels = batch["labels"].to(utils.DEVICE)
         attention_mask = batch["attention_mask"].to(utils.DEVICE)
         outputs = self.model(input_ids=input_ids, labels=labels, attention_mask=attention_mask)
-        accuracy = self.accuracy_score(outputs["logits"], labels)
+        accuracy = metrics.accuracy_score(outputs["logits"], labels, self.tokenizer)
         return outputs.loss, accuracy
 
     def training(self, epoch_num: int) -> tuple[float, float]:

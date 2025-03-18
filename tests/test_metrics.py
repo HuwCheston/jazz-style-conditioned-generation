@@ -15,6 +15,7 @@ from symusic import Note
 from jazz_style_conditioned_generation import metrics
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.scores import note_list_to_score
+from jazz_style_conditioned_generation.data.tokenizer import load_tokenizer
 
 
 class MetricsTest(unittest.TestCase):
@@ -240,6 +241,93 @@ class MetricsTest(unittest.TestCase):
         self.assertEqual(agg["test2_mean"], 2.5)
         self.assertEqual(agg["test1_std"], 0.5)
         self.assertEqual(agg["test2_std"], 0.5)
+
+    def test_accuracy_score(self):
+        toke = load_tokenizer()
+        # Test with an un-batched dummy tensor
+        dummy_labels = torch.tensor([[1, 2, 2, 1]])
+        dummy_tensor = torch.tensor([
+            [
+                [0.5, 0.6, 0.4],  # correct
+                [0.3, 0.2, 0.9],  # correct
+                [0.5, 0.2, 0.1],  # incorrect
+                [0.3, 0.7, 0.2],  # correct
+            ]
+        ])
+        expected_accuracy = 0.75
+        actual_accuracy = metrics.accuracy_score(dummy_tensor, dummy_labels, toke).item()
+        self.assertEqual(expected_accuracy, actual_accuracy)
+        # Test with a batched dummy tensor
+        dummy_labels = torch.tensor(
+            [
+                [1, 2, 2, 1],
+                [2, 2, 2, 2]
+            ]
+        )
+        dummy_tensor = torch.tensor([
+            [
+                [0.5, 0.6, 0.4],  # correct
+                [0.3, 0.2, 0.9],  # correct
+                [0.5, 0.2, 0.1],  # incorrect
+                [0.3, 0.7, 0.2],  # correct
+            ],
+            [
+                [0.5, 0.6, 1.1],  # correct
+                [5.5, 0.2, 1.5],  # incorrect
+                [5.5, 0.2, 1.3],  # incorrect
+                [5.5, 0.7, 1.2],  # incorrect
+            ]
+        ])
+        expected_accuracy = 0.5
+        actual_accuracy = metrics.accuracy_score(dummy_tensor, dummy_labels, toke).item()
+        self.assertEqual(expected_accuracy, actual_accuracy)
+
+    def test_accuracy_score_bpe(self):
+        """Test accuracy score with BPE-encoded tokens"""
+        toke = load_tokenizer()
+        # Falsify training a BPE tokenizer
+        token_mapping = {
+            1: [1, 2],
+            2: [1, 3],
+            3: [3],
+        }
+        setattr(toke, "bpe_token_mapping", token_mapping)
+        # Test with an un-batched dummy tensor
+        dummy_labels = torch.tensor([[1, 2, 3]])  # decodes to [1, 2, 1, 3, 3]
+        dummy_tensor = torch.tensor([
+            [
+                # 0,   1,   2,   3
+                [0.0, 0.5, 0.6, 0.4],  # we predict 2 == [1, 3]. we're correct on 1, but not on 2
+                [0.0, 0.3, 0.2, 0.9],  # we predict 3 == 3. we're incorrect at IDX 1, but expanded to IDX2, we are
+                [0.0, 0.3, 0.7, 0.2],  # we predict 2 == [1, 3]. we're not correct at either index
+            ]
+        ])
+        expected_accuracy = 2 / 5
+        actual_accuracy = metrics.accuracy_score(dummy_tensor, dummy_labels, toke).item()
+        self.assertTrue(np.isclose(expected_accuracy, actual_accuracy))  # allow for some floating point tolerance
+        # Test with a batched dummy tensor
+        dummy_labels = torch.tensor(
+            [
+                [1, 2, 3],  # decodes to [1, 2, 1, 3, 3]
+                [3, 2, 1]  # decodes to [3, 1, 3, 1, 2]
+            ]
+        )
+        dummy_tensor = torch.tensor([
+            [
+                # 0,   1,   2,   3
+                [0.0, 0.5, 0.6, 0.4],  # we predict 2 == [1, 3]. we're correct on 1, but not on 2
+                [0.0, 0.3, 0.2, 0.9],  # we predict 3 == 3. we're incorrect at IDX 1, but expanded to IDX2, we are
+                [0.0, 0.3, 0.7, 0.2],  # we predict 2 == [1, 3]. we're not correct at either index
+            ],
+            [
+                [0.0, 5.5, 0.6, 1.1],  # we predict 1 == [1, 2] == [1] (after truncating to match labels) == incorrect
+                [0.0, 5.5, 0.2, 1.3],  # we predict 1 == [1, 2]. We're correct at index 1, not at index 2.
+                [0.0, 5.5, 0.7, 1.2],  # we predict 1 == [1, 2]. We're correct at both indices
+            ]
+        ])
+        expected_accuracy = 1 / 2
+        actual_accuracy = metrics.accuracy_score(dummy_tensor, dummy_labels, toke).item()
+        self.assertTrue(np.isclose(expected_accuracy, actual_accuracy))
 
 
 if __name__ == '__main__':

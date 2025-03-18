@@ -84,45 +84,6 @@ class TrainingTest(unittest.TestCase):
         expected_generation_path = os.path.join(utils.get_project_root(), "outputs/generation/tester/tester_config")
         self.assertEqual(expected_generation_path, TRAINER.output_midi_dir)
 
-    def test_accuracy_score(self):
-        # Test with an un-batched dummy tensor
-        dummy_labels = torch.tensor([[1, 2, 2, 1]])
-        dummy_tensor = torch.tensor([
-            [
-                [0.5, 0.6, 0.4],  # correct
-                [0.3, 0.2, 0.9],  # correct
-                [0.5, 0.2, 0.1],  # incorrect
-                [0.3, 0.7, 0.2],  # correct
-            ]
-        ])
-        expected_accuracy = 0.75
-        actual_accuracy = TRAINER.accuracy_score(dummy_tensor, dummy_labels).item()
-        self.assertEqual(expected_accuracy, actual_accuracy)
-        # Test with a batched dummy tensor
-        dummy_labels = torch.tensor(
-            [
-                [1, 2, 2, 1],
-                [2, 2, 2, 2]
-            ]
-        )
-        dummy_tensor = torch.tensor([
-            [
-                [0.5, 0.6, 0.4],  # correct
-                [0.3, 0.2, 0.9],  # correct
-                [0.5, 0.2, 0.1],  # incorrect
-                [0.3, 0.7, 0.2],  # correct
-            ],
-            [
-                [0.5, 0.6, 1.1],  # correct
-                [5.5, 0.2, 1.5],  # incorrect
-                [5.5, 0.2, 1.3],  # incorrect
-                [5.5, 0.7, 1.2],  # incorrect
-            ]
-        ])
-        expected_accuracy = 0.5
-        actual_accuracy = TRAINER.accuracy_score(dummy_tensor, dummy_labels).item()
-        self.assertEqual(expected_accuracy, actual_accuracy)
-
     @handle_cuda_exceptions
     def test_step(self):
         batch = next(iter(TRAINER.train_loader))

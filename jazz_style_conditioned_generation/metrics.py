@@ -24,6 +24,52 @@ from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIConditi
 from jazz_style_conditioned_generation.data.tokenizer import load_tokenizer, train_tokenizer
 
 
+def accuracy_score(logits: torch.Tensor, labels: torch.Tensor, tokenizer: MusicTokenizer) -> torch.Tensor:
+    """Calculate accuracy between predicted + target labels while handling BPE decoding"""
+    assert hasattr(tokenizer, "bpe_token_mapping"), "Must have set the `bpe_token_mapping` attribute!"
+    # Tracks the length of all sequences after BPE decoding + the number of hits
+    total_seq_len, hits = 0, 0
+    # Iterate over each item in the batch
+    for logits_item, labels_item in zip(logits, labels):
+        # Convert the raw logits into softmaxed predictions
+        predictions_item = torch.argmax(torch.softmax(logits_item, dim=-1), dim=-1)
+        this_seq_len = 0  # tracks the length of the current prediction
+        # Iterate over maybe-BPE encoded predicted + target tokens
+        for predict, targ in zip(predictions_item, labels_item):
+            # Convert BPE encoded tokens into a list of non-BPE encoded tokens
+            predict_decode = tokenizer.bpe_token_mapping[predict.item()]
+            targ_decode = tokenizer.bpe_token_mapping[targ.item()]
+            # The length of both lists might be different
+            #  If we have more target labels than predicted labels
+            if len(predict_decode) < len(targ_decode):
+                # Pad the sequence by continuing to predict the final token
+                overlap = len(targ_decode) - len(predict_decode)
+                predict_decode = predict_decode + [predict_decode[-1] for _ in range(overlap)]
+            #  If we have fewer target labels than predicted labels
+            elif len(predict_decode) > len(targ_decode):
+                # Truncate the predicted labels to match the length of the predicted labels
+                predict_decode = predict_decode[:len(targ_decode)]
+            # Sanity check that everything should now be identical
+            assert len(predict_decode) == len(targ_decode)
+            # Iterate over INDIVIDUAL, non-BPE predicted + target labels
+            for p, t in zip(predict_decode, targ_decode):
+                # Skip over padded label tokens
+                if t == tokenizer.pad_token_id:
+                    continue
+                else:
+                    # Append to our counters
+                    this_seq_len += 1
+                    total_seq_len += 1
+                    # If the predicted label is equal to the target label
+                    if p == t:
+                        hits += 1
+                # Break out of the loop once we've reached the target length after BPE decoding
+                if this_seq_len >= utils.MAX_SEQUENCE_LENGTH:
+                    break
+    # Simple accuracy measurement, return as tensor for compatibility with e.g. loss metric
+    return torch.tensor(hits / total_seq_len)
+
+
 def _symusic_to_muspy(score: Score) -> muspy.Music:
     """Converts a symusic.Score object to a muspy.Music object by dumping a temporary MIDI file and cleaning up after"""
     # Dump the score object to a temporary midi file
