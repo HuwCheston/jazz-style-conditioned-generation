@@ -400,17 +400,17 @@ class TrainingModule:
             logger.warning(f"Failed to get LR from scheduler! Returning 0.0... {sched_e}")
             return 0.
 
-    def step(self, batch: dict[str, torch.tensor]) -> tuple[torch.tensor, torch.tensor]:
+    def step(self, batch: dict[str, torch.tensor]) -> tuple[torch.tensor, torch.tensor, torch.tensor]:
         input_ids = batch["input_ids"].to(utils.DEVICE)
         labels = batch["labels"].to(utils.DEVICE)
         attention_mask = batch["attention_mask"].to(utils.DEVICE)
         outputs = self.model(input_ids=input_ids, labels=labels, attention_mask=attention_mask)
         accuracy = metrics.accuracy_score(outputs["logits"], labels, self.tokenizer)
-        return outputs.loss, accuracy
+        return outputs.loss, outputs.decoded_loss, accuracy
 
-    def training(self, epoch_num: int) -> tuple[float, float]:
+    def training(self, epoch_num: int) -> tuple[float, float, float]:
         self.model.train()
-        epoch_loss, epoch_accuracy = [], []
+        epoch_loss, epoch_decoded_loss, epoch_accuracy = [], [], []
         # Iterate over every batch in the dataloader
         for batch in tqdm(
                 self.train_loader,
@@ -418,15 +418,16 @@ class TrainingModule:
                 desc=f'Training, epoch {epoch_num} / {self.epochs}...'
         ):
             # Forwards pass
-            loss, accuracy = self.step(batch)
+            loss, decoded_loss, accuracy = self.step(batch)
             # Backwards pass
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
             # Append metrics to the list
             epoch_loss.append(loss.item())
+            epoch_decoded_loss.append(decoded_loss.item())
             epoch_accuracy.append(accuracy.item())
-        return np.mean(epoch_loss), np.mean(epoch_accuracy)
+        return np.mean(epoch_loss), np.mean(epoch_decoded_loss), np.mean(epoch_accuracy)
 
     def remove_condition_tokens(self, tensor: torch.tensor) -> torch.tensor:
         """Removes conditioning tokens from a tensor"""
@@ -469,9 +470,9 @@ class TrainingModule:
             outs.dump_midi(f"{self.output_midi_dir}/output_{stage}_epoch{self.current_epoch}_{now}.mid")
             logger.info(f"Dumped {stage} MIDI from epoch {self.current_epoch} to {self.output_midi_dir}")
 
-    def validation(self, epoch_num: int) -> tuple[float, float]:
+    def validation(self, epoch_num: int) -> tuple[float, float, float]:
         self.model.eval()
-        epoch_loss, epoch_accuracy = [], []
+        epoch_loss, epoch_decoded_loss, epoch_accuracy = [], [], []
         # Iterate over every batch in the dataloader
         for batch in tqdm(
                 self.validation_loader,
@@ -480,22 +481,23 @@ class TrainingModule:
         ):
             # Forwards pass
             with torch.no_grad():
-                loss, accuracy = self.step(batch)
+                loss, decoded_loss, accuracy = self.step(batch)
             # No backwards pass
             epoch_loss.append(loss.item())
+            epoch_decoded_loss.append(decoded_loss.item())
             epoch_accuracy.append(accuracy.item())
             # Generate from this batch if required
             if self.generate_cfg.get("do_generation", True):
                 if utils.random_probability() < self.generate_cfg.get("generation_probability", 0.01):
                     self.generate_from_batch(batch, "validation")
-        return np.mean(epoch_loss), np.mean(epoch_accuracy)
+        return np.mean(epoch_loss), np.mean(epoch_decoded_loss), np.mean(epoch_accuracy)
 
-    def testing(self) -> tuple[float, float]:
+    def testing(self) -> tuple[float, float, float]:
         # Load the checkpoint with the best validation loss
         if self.checkpoint_cfg.get("load_checkpoints", True):
             self.load_checkpoint(os.path.join(self.checkpoint_dir, 'validation_best.pth'))
         self.model.eval()
-        epoch_loss, epoch_accuracy = [], []
+        epoch_loss, epoch_decoded_loss, epoch_accuracy = [], [], []
         # Iterate over every batch in the dataloader
         for batch in tqdm(
                 self.test_loader,
@@ -504,15 +506,16 @@ class TrainingModule:
         ):
             # Forwards pass
             with torch.no_grad():
-                loss, accuracy = self.step(batch)
+                loss, decoded_loss, accuracy = self.step(batch)
             # No backwards pass
             epoch_loss.append(loss.item())
             epoch_accuracy.append(accuracy.item())
+            epoch_decoded_loss.append(decoded_loss.item())
             # Generate from this batch if required
             if self.generate_cfg.get("do_generation", True):
                 if utils.random_probability() < self.generate_cfg.get("generation_probability", 0.01):
                     self.generate_from_batch(batch, "testing")
-        return np.mean(epoch_loss), np.mean(epoch_accuracy)
+        return np.mean(epoch_loss), np.mean(epoch_decoded_loss), np.mean(epoch_accuracy)
 
     def log_run_params_to_mlflow(self):
         """If we're using MLFlow, log all run parameters to the dashboard"""
@@ -549,13 +552,15 @@ class TrainingModule:
             self.current_epoch = epoch
             epoch_start = time()
             # Training
-            train_loss, train_accuracy = self.training(epoch)
+            train_loss, train_decoded_loss, train_accuracy = self.training(epoch)
             logger.debug(f'Epoch {epoch} / {self.epochs}, training finished: '
-                         f'loss {train_loss:.3f}, accuracy {train_accuracy:.3f}')
+                         f'loss {train_loss:.3f}, accuracy {train_accuracy:.3f}, '
+                         f'decoded loss {train_decoded_loss:.3f}')
             # Validation
-            self.current_validation_loss, validation_accuracy = self.validation(epoch)
+            self.current_validation_loss, validation_decoded_loss, validation_accuracy = self.validation(epoch)
             logger.debug(f'Epoch {epoch} / {self.epochs}, validation finished: '
-                         f'loss {self.current_validation_loss:.3f}, accuracy {validation_accuracy:.3f}')
+                         f'loss {self.current_validation_loss:.3f}, accuracy {validation_accuracy:.3f}, '
+                         f'decoded loss {validation_decoded_loss:.3f}')
             # Log if this is our best epoch
             if self.current_validation_loss < self.best_validation_loss:
                 self.best_validation_loss = self.current_validation_loss
@@ -564,8 +569,10 @@ class TrainingModule:
             metrics = dict(
                 epoch_time=time() - epoch_start,
                 train_loss=train_loss,
+                train_decoded_loss=train_decoded_loss,
                 train_accuracy=train_accuracy,
                 current_validation_loss=self.current_validation_loss,
+                current_validation_decoded_loss=validation_decoded_loss,
                 best_validation_loss=self.best_validation_loss,
                 validation_accuracy=validation_accuracy,
                 lr=self.get_scheduler_lr()
@@ -593,16 +600,18 @@ class TrainingModule:
             logger.debug(f'LR for epoch {epoch + 1} will be {self.get_scheduler_lr()}')
         # Run testing after training completes
         logger.info('Training complete!')
-        test_loss, test_accuracy = self.testing()
+        test_loss, test_decoded_loss, test_accuracy = self.testing()
         # Report results to MLFlow, if we're using this
         if self.mlflow_cfg.get("use", False):
             test_metrics = dict(
                 test_accuracy=test_accuracy,
+                test_decoded_loss=test_decoded_loss,
                 test_loss=test_loss
             )
             mlflow.log_metrics(test_metrics, step=self.current_epoch)
         # Log everything to the console
-        logger.info(f"Testing finished: loss {test_loss:.3f}, accuracy {test_accuracy:.3f}")
+        logger.info(f"Testing finished: loss {test_loss:.3f}, accuracy {test_accuracy:.3f}, "
+                    f"decoded loss {test_decoded_loss:.3f}")
         logger.info(f'Finished in {(time() - training_start) // 60} minutes!')
 
 
