@@ -197,23 +197,36 @@ def load_tokenizer(**kwargs) -> MusicTokenizer:
         cfg = TokenizerConfig(**tokenizer_kws)
         tokenizer = get_tokenizer_class_from_string(tokenizer_method)(cfg)
     logger.debug(f'... got tokenizer: {tokenizer}')
+    # We need to set this attribute to make decoding tokens easier
+    #  At this point, the mapping just goes from token IDX -> [token IDX]
+    #  However, if we train the tokenizer, we'll update it to go BPE token IDX -> [token1 IDX, token2 IDX]
+    #  By setting it here, we ensure compatibility between trained + non-trained tokenizers when calculating
+    #  evaluation metrics e.g. negative log-likelihood loss, accuracy scores etc.
+    setattr(tokenizer, "bpe_token_mapping", {v: [v] for v in tokenizer.vocab.values()})
     return tokenizer
 
 
 def train_tokenizer(tokenizer: MusicTokenizer, files_paths: list[str], **kwargs) -> None:
     """Trains a tokenizer given kwargs using our custom iterator class"""
+    # We don't need to train a tokenizer if it's already been trained!
     if tokenizer.is_trained:
         logger.warning(f'... tried to train a tokenizer that has already been trained, skipping')
-        return
-    # Get the parameters again from the dictionary
-    training_method = kwargs.get("training_method", DEFAULT_TRAINING_METHOD)
-    vocab_size = kwargs.get("vocab_size", DEFAULT_VOCAB_SIZE)
-    logger.debug(f'... training tokenizer with method {training_method}, vocab size {vocab_size}')
-    # We need to train with our custom iterator so that we use our custom score loading + preprocessing functions
-    utils.validate_paths(files_paths, expected_extension=".mid")
-    tti = CustomTokTrainingIterator(tokenizer, files_paths)
-    tokenizer.train(vocab_size=vocab_size, model=training_method, iterator=tti)
-    logger.debug(f'... training finished: {tokenizer}')
+    else:
+        # Get the parameters again from the dictionary
+        training_method = kwargs.get("training_method", DEFAULT_TRAINING_METHOD)
+        vocab_size = kwargs.get("vocab_size", DEFAULT_VOCAB_SIZE)
+        logger.debug(f'... training tokenizer with method {training_method}, vocab size {vocab_size}')
+        # We need to train with our custom iterator so that we use our custom score loading + preprocessing functions
+        utils.validate_paths(files_paths, expected_extension=".mid")
+        tti = CustomTokTrainingIterator(tokenizer, files_paths)
+        tokenizer.train(vocab_size=vocab_size, model=training_method, iterator=tti)
+        logger.debug(f'... training finished: {tokenizer}')
+    # Now, we update our token mapping to go BPE token1 IDX -> [token1 IDX, token2 IDX], BPE token 2 IDX -> [token3 IDX]
+    bpe_token_mapping = {
+        tokenizer.vocab_model[byt]: [tokenizer[t] for t in token_list]
+        for byt, token_list in tokenizer._vocab_learned_bytes_to_tokens.items()
+    }
+    setattr(tokenizer, "bpe_token_mapping", bpe_token_mapping)
 
 
 if __name__ == "__main__":

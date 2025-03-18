@@ -37,6 +37,13 @@ class TokenizerTest(unittest.TestCase):
         self.assertFalse(tok.config.use_pitch_bends)
         self.assertFalse(tok.config.use_time_signatures)
         self.assertFalse(tok.is_trained)
+        # Test that we've set our "BPE" token mapping correctly
+        #  This should just go from token1 IDX -> [token1 IDX], token2 IDX -> [token2 IDX]
+        #  We set it here to ensure compatibility between trained + non-trained tokenizers
+        self.assertTrue(hasattr(tok, "bpe_token_mapping"))
+        for k, v in tok.bpe_token_mapping.items():
+            self.assertTrue(len(v) == 1)
+            self.assertTrue(k == v[0])
         # Test with a different tokenizer type
         tok = load_tokenizer(tokenizer_str="midilike")
         self.assertTrue(isinstance(tok, MIDILike))
@@ -60,6 +67,20 @@ class TokenizerTest(unittest.TestCase):
         # Should have exactly 100 timeshift tokens
         ts_tokens = [t for t in tok.vocab if "TimeShift" in t]
         self.assertTrue(len(ts_tokens) == 100)
+        # We should have updated the BPE token mapping item
+        self.assertTrue(hasattr(tok, "bpe_token_mapping"))
+        self.assertTrue(len(tok.bpe_token_mapping) == tok.vocab_size)
+        # All the VALUES should correspond to "base" tokens
+        for v in tok.bpe_token_mapping.values():
+            for id_ in v:
+                try:
+                    _ = tok[id_]
+                except KeyError:
+                    self.fail()
+        # However, the KEYS should correspond to "BPE" tokens
+        with self.assertRaises(KeyError):
+            for k in tok.bpe_token_mapping.keys():
+                _ = tok[k]
 
     def test_default_tokenizer_config(self):
         tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
