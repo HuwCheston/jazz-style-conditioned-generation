@@ -87,7 +87,7 @@ class TrainingTest(unittest.TestCase):
     @handle_cuda_exceptions
     def test_step(self):
         batch = next(iter(TRAINER.train_loader))
-        loss, decoded_loss, accuracy = TRAINER.step(batch)
+        loss, decoded_loss, accuracy = TRAINER.step(batch, 0)
         self.assertTrue(loss.requires_grad)
         self.assertTrue(0. <= accuracy <= 1.)
 

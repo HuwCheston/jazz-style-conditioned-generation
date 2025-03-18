@@ -187,9 +187,9 @@ class MusicTransformer(nn.Module):
         logits = self.Wout(x_out)  # No softmax as nn.CrossEntropyLoss computes it for us
         # Compute loss: vanilla first (i.e., without decoding BPE tokens), then with decoding
         vanilla_loss = metrics._cross_entropy_loss(logits, labels, self.tokenizer)
-        decoded_loss = metrics.cross_entropy_loss(logits, labels, self.tokenizer, len(self.tokenizer._vocab_base))
+        # decoded_loss = metrics.cross_entropy_loss(logits, labels, self.tokenizer, len(self.tokenizer._vocab_base))
         # Returns output in the same format as transformers
-        return MusicTransformerOutput(loss=vanilla_loss, logits=logits, decoded_loss=decoded_loss)
+        return MusicTransformerOutput(loss=vanilla_loss, logits=logits)
 
     def generate(
             self,

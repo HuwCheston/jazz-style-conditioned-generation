@@ -400,34 +400,40 @@ class TrainingModule:
             logger.warning(f"Failed to get LR from scheduler! Returning 0.0... {sched_e}")
             return 0.
 
-    def step(self, batch: dict[str, torch.tensor]) -> tuple[torch.tensor, torch.tensor, torch.tensor]:
+    def step(self, batch: dict[str, torch.tensor], batch_idx: int) -> tuple[torch.tensor, torch.tensor, torch.tensor]:
         input_ids = batch["input_ids"].to(utils.DEVICE)
         labels = batch["labels"].to(utils.DEVICE)
         attention_mask = batch["attention_mask"].to(utils.DEVICE)
         outputs = self.model(input_ids=input_ids, labels=labels, attention_mask=attention_mask)
+        if batch_idx % 100 == 0:
+            decoded_loss = metrics.cross_entropy_loss(
+                outputs.logits, labels, self.tokenizer, len(self.tokenizer._vocab_base)
+            ).item()
+        else:
+            decoded_loss = np.nan
         accuracy = metrics.accuracy_score(outputs["logits"], labels, self.tokenizer)
-        return outputs.loss, outputs.decoded_loss, accuracy
+        return outputs.loss, decoded_loss, accuracy
 
     def training(self, epoch_num: int) -> tuple[float, float, float]:
         self.model.train()
         epoch_loss, epoch_decoded_loss, epoch_accuracy = [], [], []
         # Iterate over every batch in the dataloader
-        for batch in tqdm(
-                self.train_loader,
+        for batch_idx, batch in tqdm(
+                enumerate(self.train_loader),
                 total=len(self.train_loader),
                 desc=f'Training, epoch {epoch_num} / {self.epochs}...'
         ):
             # Forwards pass
-            loss, decoded_loss, accuracy = self.step(batch)
+            loss, decoded_loss, accuracy = self.step(batch, batch_idx)
             # Backwards pass
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
             # Append metrics to the list
             epoch_loss.append(loss.item())
-            epoch_decoded_loss.append(decoded_loss.item())
+            epoch_decoded_loss.append(decoded_loss)
             epoch_accuracy.append(accuracy.item())
-        return np.mean(epoch_loss), np.mean(epoch_decoded_loss), np.mean(epoch_accuracy)
+        return np.mean(epoch_loss), np.nanmean(epoch_decoded_loss), np.mean(epoch_accuracy)
 
     def remove_condition_tokens(self, tensor: torch.tensor) -> torch.tensor:
         """Removes conditioning tokens from a tensor"""
@@ -474,23 +480,23 @@ class TrainingModule:
         self.model.eval()
         epoch_loss, epoch_decoded_loss, epoch_accuracy = [], [], []
         # Iterate over every batch in the dataloader
-        for batch in tqdm(
-                self.validation_loader,
+        for batch_idx, batch in tqdm(
+                enumerate(self.validation_loader),
                 total=len(self.validation_loader),
                 desc=f'Validating, epoch {epoch_num} / {self.epochs}...'
         ):
             # Forwards pass
             with torch.no_grad():
-                loss, decoded_loss, accuracy = self.step(batch)
+                loss, decoded_loss, accuracy = self.step(batch, batch_idx)
             # No backwards pass
             epoch_loss.append(loss.item())
-            epoch_decoded_loss.append(decoded_loss.item())
+            epoch_decoded_loss.append(decoded_loss)
             epoch_accuracy.append(accuracy.item())
             # Generate from this batch if required
             if self.generate_cfg.get("do_generation", True):
                 if utils.random_probability() < self.generate_cfg.get("generation_probability", 0.01):
                     self.generate_from_batch(batch, "validation")
-        return np.mean(epoch_loss), np.mean(epoch_decoded_loss), np.mean(epoch_accuracy)
+        return np.mean(epoch_loss), np.nanmean(epoch_decoded_loss), np.mean(epoch_accuracy)
 
     def testing(self) -> tuple[float, float, float]:
         # Load the checkpoint with the best validation loss
@@ -499,23 +505,23 @@ class TrainingModule:
         self.model.eval()
         epoch_loss, epoch_decoded_loss, epoch_accuracy = [], [], []
         # Iterate over every batch in the dataloader
-        for batch in tqdm(
-                self.test_loader,
+        for batch_idx, batch in tqdm(
+                enumerate(self.test_loader),
                 total=len(self.test_loader),
                 desc='Testing...'
         ):
             # Forwards pass
             with torch.no_grad():
-                loss, decoded_loss, accuracy = self.step(batch)
+                loss, decoded_loss, accuracy = self.step(batch, batch_idx)
             # No backwards pass
             epoch_loss.append(loss.item())
             epoch_accuracy.append(accuracy.item())
-            epoch_decoded_loss.append(decoded_loss.item())
+            epoch_decoded_loss.append(decoded_loss)
             # Generate from this batch if required
             if self.generate_cfg.get("do_generation", True):
                 if utils.random_probability() < self.generate_cfg.get("generation_probability", 0.01):
                     self.generate_from_batch(batch, "testing")
-        return np.mean(epoch_loss), np.mean(epoch_decoded_loss), np.mean(epoch_accuracy)
+        return np.mean(epoch_loss), np.nanmean(epoch_decoded_loss), np.mean(epoch_accuracy)
 
     def log_run_params_to_mlflow(self):
         """If we're using MLFlow, log all run parameters to the dashboard"""
