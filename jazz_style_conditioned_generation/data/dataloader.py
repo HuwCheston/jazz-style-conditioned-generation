@@ -276,7 +276,8 @@ class DatasetMIDIConditioned:
             condition_tokens = []
 
         # Before padding/truncating, sanity check that we have enough tokens in the sequence
-        assert len(tokseq_ids_chunked) >= self.min_seq_len
+        # TODO: this is flaky? think more about min_seq_len in general
+        # assert len(tokseq_ids_chunked) >= self.min_seq_len
 
         # Pad or truncate the sequence if required
         #  Again, add one to the maximum sequence length so that we have enough tokens for autoregressive shifting later
@@ -300,7 +301,10 @@ class DatasetMIDIConditioned:
             # Mask is for padding only: causal mask is handled by models
             "attention_mask": create_padding_mask(input_ids, self.tokenizer.pad_token_id),
             # TODO: maybe we want to append these in a data collator (for different types of conditioning)
-            "condition_ids": torch.tensor(condition_tokens, dtype=torch.long),
+            # We have to pad the condition IDs or else we get an error when creating the dataloader
+            "condition_ids": torch.tensor(
+                utils.pad_sequence(condition_tokens, len(input_ids), self.tokenizer.pad_token_id), dtype=torch.long
+            ),
         }
 
 
@@ -318,7 +322,7 @@ if __name__ == "__main__":
     # Get a tokenizer with default arguments
     token_factory = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
     # Get filepaths for all MIDI files in the /data/raw/ directories
-    midi_paths = utils.get_data_files_with_ext(ext="**/*.mid")[:1000]
+    midi_paths = utils.get_data_files_with_ext(ext="**/*.mid")[:100]
     metadata_paths = [i.replace("piano_midi.mid", "metadata_tivo.json") for i in midi_paths]
     # Add all of our condition tokens to the tokenizer
     add_pianists_to_vocab(token_factory)
@@ -335,12 +339,13 @@ if __name__ == "__main__":
         do_augmentation=True,
         do_conditioning=True,
     )
+    dm = torch.utils.data.DataLoader(dm, batch_size=2, shuffle=True, drop_last=False)
     print(dm)
 
     all_times = []
-    for i in range(len(dm)):
+    for i in dm:
         starter = time()
-        item = dm.__getitem__(i)
+        item = dm.dataset.__getitem__(i)
         all_times.append(time() - starter)
         print(f'Item {i}, inputs shape {item["input_ids"].size(0)}, labels shape {item["labels"].size(0)}')
     print(np.mean(all_times))

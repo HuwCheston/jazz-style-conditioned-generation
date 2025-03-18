@@ -194,6 +194,8 @@ class DatasetConditionedTest(unittest.TestCase):
         for i in ds:
             # Unpack the input IDs (with conditioning) and condition tokens
             input_ids, condition_tokens = i["input_ids"], i["condition_ids"]
+            # Remove padding tokens from the condition IDs
+            condition_tokens = torch.tensor([i for i in condition_tokens if i != token_factory.pad_token_id])
             # Remove the condition tokens from the input ids
             raw_input_ids = input_ids[len(condition_tokens):]
             self.assertFalse(set(condition_tokens.tolist()) & set(raw_input_ids.tolist()))  # should now be no overlap
@@ -383,6 +385,8 @@ class DatasetConditionedTest(unittest.TestCase):
             for item in tqdm(ds, desc=f"Checking dataset with {to_test} tracks"):
                 # Get the input IDs, targets, and condition_ids
                 input_ids, targets, condition_ids = item["input_ids"], item["labels"], item["condition_ids"]
+                # Remove padding from the condition IDs
+                condition_ids = torch.tensor([i for i in condition_ids if i != tokenizer.pad_token_id])
                 self.assertTrue(input_ids.tolist()[1:] == targets.tolist()[:-1])
 
                 # Remove the condition tokens from the input ids
