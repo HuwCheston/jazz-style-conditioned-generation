@@ -29,7 +29,8 @@ from jazz_style_conditioned_generation.data.scores import (
 __all__ = [
     "DATA_DIR",
     "create_padding_mask",
-    "DatasetMIDIConditioned"
+    "DatasetMIDIConditioned",
+    "DatasetMIDIConditionedRandomChunk"
 ]
 
 DATA_DIR = os.path.join(utils.get_project_root(), "data")
@@ -46,7 +47,7 @@ def create_padding_mask(x, pad_token_id: int) -> torch.tensor:
 
 
 class DatasetMIDIConditioned:
-    """Dataset class: slices a track into N MAX_SEQ_LEN chunks, applies augmentation and conditioning"""
+    """Dataset class: slices a track into N MAX_SEQ_LEN chunks (no overlap), applies augmentation and conditioning"""
 
     def __init__(
             self,
@@ -56,8 +57,6 @@ class DatasetMIDIConditioned:
             do_augmentation: bool = False,
             do_conditioning: bool = True,
             n_clips: int = None,
-            overlap: int = None,
-            min_seq_len: int = None,
     ):
         # Set attributes
         self.tokenizer = tokenizer
@@ -66,11 +65,8 @@ class DatasetMIDIConditioned:
 
         # The size of the maximum sequence
         self.max_seq_len = max_seq_len
-        # The overlap between successive chunks from the same track (in tokens)
-        self.overlap = overlap if overlap is not None else max_seq_len // 2  # default to 50% overlap between chunks
         # The size of the smallest sequence we'll consider during training
-        self.min_seq_len = min_seq_len if min_seq_len is not None else max_seq_len // 10  # default to 10% of max
-        assert self.min_seq_len <= self.overlap <= self.max_seq_len
+        self.min_seq_len = max_seq_len // 10  # default to 10% of desired sequence length
 
         # MIDI file paths
         self.files_paths = files_paths
@@ -81,10 +77,10 @@ class DatasetMIDIConditioned:
         utils.validate_paths(self.metadata_paths, expected_extension=".json")
 
         # Preloaded tuples of (score, (seq_start, seq_end), metadata): can have many items for 1 track in the dataset
-        self.track_slices = list(self.preload_track_slices())
+        self.preloaded_data = list(self.preload_data())
         if n_clips is not None:
-            random.shuffle(self.track_slices)
-            self.track_slices = self.track_slices[:n_clips]
+            random.shuffle(self.preloaded_data)
+            self.preloaded_data = self.preloaded_data[:n_clips]
 
     def score_to_token_sequence(self, score: Score, add_bos_eos: bool = True) -> list[int]:
         """Converts a (loaded, preprocessed) score into a token sequence with the tokenizer, also adds BOS/EOS"""
@@ -96,44 +92,12 @@ class DatasetMIDIConditioned:
             tok_ids = self.add_beginning_and_ending_tokens_to_sequence(tok_ids)
         return tok_ids
 
-    def slice_token_sequence(
-            self,
-            token_sequence: list[int],
-            sequence_length: int = None,
-            min_sequence_length: int = None,
-            overlap: int = None
-    ) -> list[tuple[int, int]]:
-        """Slices a sequence of tokens into sequence_len chunks (with overlap) and returns starting and stopping idxs"""
-        if sequence_length is None:
-            sequence_length = self.max_seq_len
-        if min_sequence_length is None:
-            min_sequence_length = self.min_seq_len
-        if overlap is None:
-            overlap = self.overlap
-        # Split the full score into separate sequences, with our overlap
-        all_slice_idxs = []
-        for slice_begin in range(0, len(token_sequence), sequence_length - overlap):
-            # Break out of the loop once we've finished chunking the track
-            if slice_begin >= len(token_sequence):
-                break
-            # Get the end point of the current slice
-            slice_end = slice_begin + sequence_length
-            # Slice according to the beginning and ending point
-            tokseq_slice = token_sequence[slice_begin:slice_end]
-            # This drops very small slices
-            if len(tokseq_slice) < min_sequence_length:
-                break
-            assert min_sequence_length <= len(tokseq_slice) <= sequence_length
-            # Append the INDICES that this slice begins/ends at: we may need to modify these after augmenting!
-            all_slice_idxs.append((slice_begin, slice_end))
-        return all_slice_idxs
-
-    def preload_track_slices(self) -> tuple[Score, [int, int], dict]:
+    def preload_data(self) -> tuple[Score, [int, int], dict]:
         """For every track, return tuple of FULL SCORE, (slice_begin, slice_end), METADATA"""
         # Iterate over every file
         for midi_file, json_file in tqdm(
                 zip(self.files_paths, self.metadata_paths),
-                desc='Getting track chunks...',
+                desc='Getting track chunks (exhaustive)...',
                 total=len(self.files_paths)
         ):
             # If we're doing conditioning, we need to know the number of condition tokens we'll be adding to this track
@@ -158,7 +122,13 @@ class DatasetMIDIConditioned:
             #  to instead get sequences of length 90, so that we can add our condition tokens in later without missing
             #  anything out of the original sequence
             sequence_length = self.max_seq_len - n_condition_tokens
-            all_slices_idxs = self.slice_token_sequence(ids_with_bos_eos, sequence_length)
+            all_slices_idxs = [
+                # Start, end of every slice
+                (i, i + sequence_length)
+                for i in range(0, len(ids_with_bos_eos), sequence_length)
+                # This drops sequences that are too short (i.e., those taken from the very end of a track)
+                if min(i + sequence_length, len(ids_with_bos_eos)) - i >= self.min_seq_len
+            ]
 
             # For every track, we return the FULL SCORE, the slice indices, and the metadata JSON file
             for slice_begin, slice_end in all_slices_idxs:
@@ -227,18 +197,18 @@ class DatasetMIDIConditioned:
         return slice_start, slice_end
 
     def __str__(self) -> str:
-        return f"Dataset {len(self.files_paths)} tracks corresponding to {len(self)} slices."
+        return f"Dataset with {len(self)} track slices."
 
     def __repr__(self) -> str:
         return self.__str__()
 
     def __len__(self):
-        return len(self.track_slices)
+        return len(self.preloaded_data)
 
     def __getitem__(self, idx: int) -> dict[str, torch.LongTensor]:
         # Unpack everything that we've preloaded from our list of tuples
         #  We make a copy here so that we don't modify the underlying object when we augment
-        loaded = deepcopy(self.track_slices[idx])
+        loaded = deepcopy(self.preloaded_data[idx])
         full_score, (slice_start, slice_end), metadata = loaded
         # The score is already loaded + preprocessed, so we don't need to call `load_score` + `preprocess_score` here
 
@@ -254,6 +224,8 @@ class DatasetMIDIConditioned:
                 # If we didn't make a copy of this object earlier, this line would modify the metadata object
                 #  FOR ALL SLICES of the same underlying track!
                 metadata["tempo"] = self.scale_tempo(metadata["tempo"], tempo_scale)
+        else:
+            tempo_scale = 1.
 
         # Tokenise the score (with BOS + EOS tokens) and get the IDs
         tokseq_ids = self.score_to_token_sequence(full_score, add_bos_eos=True)
@@ -265,20 +237,16 @@ class DatasetMIDIConditioned:
         # If we're conditioning, we need to add the condition tokens to the token sequence
         if self.do_conditioning:
             condition_tokens = self.get_conditioning_tokens(metadata)
-            # Sanity checks
             # Condition tokens + sliced sequence length == maximum sequence we want to consider
             assert len(condition_tokens) + (slice_end - slice_start) == self.max_seq_len
-            # No conditioning tokens should be in the input sequence (and vice versa)
-            assert not set(condition_tokens) & set(tokseq_ids_chunked)
-            # Combine everything into a single list of integers, with conditioning tokens at the start
-            tokseq_ids_chunked = condition_tokens + tokseq_ids_chunked  # type: list[int]
         # Otherwise, set this to an empty list
         else:
             condition_tokens = []
-
-        # Before padding/truncating, sanity check that we have enough tokens in the sequence
-        # TODO: this is flaky? think more about min_seq_len in general
-        # assert len(tokseq_ids_chunked) >= self.min_seq_len
+        # No conditioning tokens should be in the input sequence (and vice versa)
+        assert not set(condition_tokens) & set(tokseq_ids_chunked)
+        # Combine everything into a single list of integers, with conditioning tokens at the start
+        tokseq_ids_chunked = condition_tokens + tokseq_ids_chunked  # type: list[int]
+        assert len(tokseq_ids_chunked) >= (self.min_seq_len / tempo_scale)
 
         # Pad or truncate the sequence if required
         #  Again, add one to the maximum sequence length so that we have enough tokens for autoregressive shifting later
@@ -309,19 +277,149 @@ class DatasetMIDIConditioned:
         }
 
 
+class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
+    """Training dataloader: slices a track into a different random chunk of MAX_SEQ_LEN tokens every epoch"""
+
+    START_TOKENS = ("BOS", "TimeShift", "NoteOn", "Pitch", "Chord", "Bar")
+
+    def __init__(
+            self,
+            tokenizer,
+            files_paths: list[str],
+            max_seq_len: int,
+            do_augmentation: bool = False,
+            do_conditioning: bool = True,
+            n_clips: int = None,
+    ):
+        super().__init__(tokenizer, files_paths, max_seq_len, do_augmentation, do_conditioning, n_clips)
+
+    def preload_data(self) -> tuple[Score, [int, int], dict]:
+        # Iterate over every file
+        for midi_file, json_file in tqdm(
+                zip(self.files_paths, self.metadata_paths),
+                desc='Getting track chunks (random)...',
+                total=len(self.files_paths)
+        ):
+            # If we're doing conditioning, we want to load the metadata for the track
+            if self.do_conditioning:
+                # Load up the metadata for this file
+                metadata = utils.read_json_cached(json_file)
+            else:
+                metadata = dict()
+
+            # Open MIDI file as a symusic score object
+            score = load_score(midi_file)
+            # Apply our own preprocessing to the score
+            preprocessed_score = preprocess_score(score)
+            # Tokenise the score and get the token IDs
+            ids_with_bos_eos = self.score_to_token_sequence(preprocessed_score, add_bos_eos=True)
+
+            # Return the preprocessed score, the length of the track (we'll randomly sample in getitem) and the metadata
+            yield preprocessed_score, (0, len(ids_with_bos_eos)), metadata
+
+    def get_slice_start_point(self, tokseq_ids: list[int]) -> int:
+        """Our random sequence MUST start with a realistic starting token (i.e., not a NoteOff or Velocity token)"""
+        # Detokenize the IDs into raw tokens: e.g., NoteOn, NoteOff, TimeShift, Velocity tokens
+        trunc = tokseq_ids[:-self.min_seq_len]  # ensures that our sequences will have a minimum desired length
+        detokenized = [[self.tokenizer[v] for v in self.tokenizer.bpe_token_mapping[i]] for i in trunc]
+        # These are the IDXs of the token ID list that decode to one of our acceptable values
+        accept_idxs = [idx for idx, tok in enumerate(detokenized) if tok[0].startswith(self.START_TOKENS)]
+        # Make a random choice for the starting token
+        start = random.choice(accept_idxs)
+        # Sanity check
+        assert self.tokenizer[self.tokenizer.bpe_token_mapping[tokseq_ids[start]][0]].startswith(self.START_TOKENS)
+        return start
+
+    def __getitem__(self, idx: int) -> dict[str, torch.LongTensor]:
+        # Unpack everything that we've preloaded from our list of tuples
+        #  We make a copy here so that we don't modify the underlying object when we augment
+        loaded = deepcopy(self.preloaded_data[idx])
+        full_score, _, metadata = loaded
+        # The score is already loaded + preprocessed, so we don't need to call `load_score` + `preprocess_score` here
+
+        # Perform data augmentation on the score object if required
+        if self.do_augmentation:
+            full_score, tempo_scale = data_augmentation(full_score)
+            # No need to adjust any of the slice starting/stopping points as we'll sample these later
+            # Adjust track tempo in metadata if required
+            if "tempo" in metadata.keys():
+                # If we didn't make a copy of this object earlier, this line would modify the metadata object
+                #  FOR ALL SLICES of the same underlying track!
+                metadata["tempo"] = self.scale_tempo(metadata["tempo"], tempo_scale)
+        else:
+            tempo_scale = 1.
+
+        # Tokenise the score (with BOS + EOS tokens) and get the IDs
+        tokseq_ids = self.score_to_token_sequence(full_score, add_bos_eos=True)
+
+        # Get the starting and stopping points for the random slice
+        #  The starting point MUST be a timeshift, BOS, or note-on token (or equivalent)
+        #  This is so that we don't start learning with e.g. a note-off token when there has been no previous note-on
+        slice_start = self.get_slice_start_point(tokseq_ids)
+        slice_end = slice_start + self.max_seq_len
+
+        # If we're conditioning, we need to get the conditioning tokens
+        if self.do_conditioning:
+            condition_tokens = self.get_conditioning_tokens(metadata)
+            slice_end -= len(condition_tokens)  # account for number of conditioning tokens in sequence length
+            # Condition tokens + sliced sequence length == maximum sequence we want to consider
+            assert len(condition_tokens) + (slice_end - slice_start) == self.max_seq_len
+        # Otherwise, set the conditioning tokens to an empty list
+        else:
+            condition_tokens = []
+
+        # Now we truncate according to the slice starting + stopping points
+        #  We add one so that we have enough tokens for autoregressive label shifting later on
+        tokseq_ids_chunked = tokseq_ids[slice_start: slice_end + 1]
+        # No conditioning tokens should be in the input sequence (and vice versa)
+        assert not set(condition_tokens) & set(tokseq_ids_chunked)
+        # Combine everything into a single list of integers, with conditioning tokens at the start
+        tokseq_ids_chunked = condition_tokens + tokseq_ids_chunked  # type: list[int]
+        assert len(tokseq_ids_chunked) >= (self.min_seq_len / tempo_scale)
+
+        # Pad or truncate the sequence if required
+        #  Again, add one to the maximum sequence length so that we have enough tokens for autoregressive shifting later
+        if len(tokseq_ids_chunked) < self.max_seq_len + 1:
+            tokseq_ids_chunked = utils.pad_sequence(
+                tokseq_ids_chunked,
+                desired_len=self.max_seq_len + 1,
+                pad_token_id=self.tokenizer["PAD_None"]
+            )
+        else:
+            tokseq_ids_chunked = tokseq_ids_chunked[: self.max_seq_len + 1]
+        assert len(tokseq_ids_chunked) == self.max_seq_len + 1
+
+        # Shift labels for autoregressive teacher forcing
+        input_ids, targets = self.shift_labels(tokseq_ids_chunked)
+        # Now, everything should be equivalent to the desired sequence length
+        assert len(input_ids) == len(targets) == self.max_seq_len
+
+        # Return everything nicely formatted as a dictionary
+        return {
+            "input_ids": torch.tensor(input_ids, dtype=torch.long),
+            "labels": torch.tensor(targets, dtype=torch.long),
+            # Mask is for padding only: causal mask is handled by models
+            "attention_mask": create_padding_mask(input_ids, self.tokenizer.pad_token_id),
+            # TODO: maybe we want to append these in a data collator (for different types of conditioning)
+            # We have to pad the condition IDs or else we get an error when creating the dataloader
+            "condition_ids": torch.tensor(
+                utils.pad_sequence(condition_tokens, len(input_ids), self.tokenizer.pad_token_id), dtype=torch.long
+            ),
+        }
+
+
 if __name__ == "__main__":
-    from miditok import MIDILike, TokenizerConfig
     from jazz_style_conditioned_generation.data.tokenizer import (
-        DEFAULT_TOKENIZER_CONFIG,
         add_genres_to_vocab,
         add_pianists_to_vocab,
         add_tempos_to_vocab,
         add_timesignatures_to_vocab,
+        load_tokenizer,
         train_tokenizer
     )
 
-    # Get a tokenizer with default arguments
-    token_factory = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
+    # Get a MIDILike tokenizer with default arguments
+    token_factory = load_tokenizer(tokenizer_str="midilike")
     # Get filepaths for all MIDI files in the /data/raw/ directories
     midi_paths = utils.get_data_files_with_ext(ext="**/*.mid")[:100]
     metadata_paths = [i.replace("piano_midi.mid", "metadata_tivo.json") for i in midi_paths]
@@ -333,20 +431,21 @@ if __name__ == "__main__":
     # Train the tokenizer with BPE
     train_tokenizer(token_factory, vocab_size=1000, model="BPE", files_paths=midi_paths)
     # Test out our random chunking dataloader
-    dm = DatasetMIDIConditioned(
-        token_factory,
-        midi_paths,
-        max_seq_len=2048,
+    kwargs = dict(
+        tokenizer=token_factory,
+        files_paths=midi_paths,
+        max_seq_len=utils.MAX_SEQUENCE_LENGTH,
         do_augmentation=True,
-        do_conditioning=True,
+        do_conditioning=True
     )
-    dm = torch.utils.data.DataLoader(dm, batch_size=2, shuffle=True, drop_last=False)
-    print(dm)
+    for dataset_cls in [DatasetMIDIConditioned, DatasetMIDIConditionedRandomChunk]:
+        dm = dataset_cls(**kwargs)
+        print(dm)
 
-    all_times = []
-    for i in dm:
-        starter = time()
-        item = dm.dataset.__getitem__(i)
-        all_times.append(time() - starter)
-        print(f'Item {i}, inputs shape {item["input_ids"].size(0)}, labels shape {item["labels"].size(0)}')
-    print(np.mean(all_times))
+        all_times = []
+        for i in range(len(dm)):
+            starter = time()
+            item = dm.__getitem__(i)
+            all_times.append(time() - starter)
+            print(f'Item {i}, inputs shape {item["input_ids"].size(0)}, labels shape {item["labels"].size(0)}')
+        print(np.mean(all_times))
