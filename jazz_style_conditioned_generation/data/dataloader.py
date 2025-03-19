@@ -162,8 +162,7 @@ class DatasetMIDIConditioned:
 
             # For every track, we return the FULL SCORE, the slice indices, and the metadata JSON file
             for slice_begin, slice_end in all_slices_idxs:
-                metadata_copy = deepcopy(metadata)  # we need to make a copy so we don't modify the underlying object
-                yield preprocessed_score, (slice_begin, slice_end), metadata_copy
+                yield preprocessed_score, (slice_begin, slice_end), metadata
 
     def add_beginning_and_ending_tokens_to_sequence(self, token_ids: list[int]) -> list[int]:
         """Adds beginning and ending of sequence tokens to a COMPLETE track"""
@@ -238,7 +237,9 @@ class DatasetMIDIConditioned:
 
     def __getitem__(self, idx: int) -> dict[str, torch.LongTensor]:
         # Unpack everything that we've preloaded from our list of tuples
-        full_score, (slice_start, slice_end), metadata = self.track_slices[idx]
+        #  We make a copy here so that we don't modify the underlying object when we augment
+        loaded = deepcopy(self.track_slices[idx])
+        full_score, (slice_start, slice_end), metadata = loaded
         # The score is already loaded + preprocessed, so we don't need to call `load_score` + `preprocess_score` here
 
         # Perform data augmentation on the score object if required

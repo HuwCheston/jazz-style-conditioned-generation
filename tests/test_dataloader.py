@@ -434,6 +434,27 @@ class DatasetConditionedTest(unittest.TestCase):
         train_tokenizer(tok, midi_fps, vocab_size=1000, training_method="BPE")
         runner(tok)
 
+    def test_getitem_consistency_across_epochs(self):
+        """Test that we don't modify the underlying preloaded objects across successive epochs with augmentation"""
+        # Create the dataset
+        tok = prepare_conditioned_tokenizer()
+        ds = DatasetMIDIConditioned(
+            tokenizer=tok,
+            files_paths=[TEST_MIDI1, TEST_MIDI2, TEST_MIDI3],
+            max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+            do_augmentation=True,  # need augmentation for this to work properly
+            do_conditioning=True
+        )
+        before_augment = deepcopy(ds.track_slices[0])
+        # Create the item a few times --- this will apply augmentation to the item in .track_slices[0]
+        for _ in range(20):
+            _ = ds.__getitem__(0)
+        # Check that we haven't manipulated the underlying item at all
+        after_augment = ds.track_slices[0]
+        self.assertEqual(before_augment[-1]["tempo"], after_augment[-1]["tempo"])  # check tempo field in metadata
+        self.assertTrue(scores_are_identical(before_augment[0], after_augment[0]))  # check score items
+        self.assertEqual(before_augment[1], after_augment[1])  # check slices
+
 
 if __name__ == '__main__':
     utils.seed_everything(utils.SEED)
