@@ -635,7 +635,7 @@ class TrainingModule:
                     self.remove_old_checkpoints()
                 # Save an additional checkpoint for the run if this is the best epoch
                 if self.current_validation_loss == self.best_validation_loss:
-                    self.save_checkpoint(metrics, os.path.join(self.checkpoint_dir, 'validation_best.pth'))
+                    self.save_checkpoint(epoch_metrics, os.path.join(self.checkpoint_dir, 'validation_best.pth'))
             # Report results to MLFlow, if we're using this
             if self.mlflow_cfg.get("use", False):
                 mlflow.log_metrics(metrics, step=epoch)
