@@ -30,7 +30,8 @@ __all__ = [
     "DATA_DIR",
     "create_padding_mask",
     "DatasetMIDIConditioned",
-    "DatasetMIDIConditionedRandomChunk"
+    "DatasetMIDIConditionedRandomChunk",
+    "DatasetMIDIConditionedFullTrack"
 ]
 
 DATA_DIR = os.path.join(utils.get_project_root(), "data")
@@ -74,7 +75,8 @@ class DatasetMIDIConditioned:
 
         # Metadata file paths
         self.metadata_paths = [fp.replace("piano_midi.mid", "metadata_tivo.json") for fp in self.files_paths]
-        utils.validate_paths(self.metadata_paths, expected_extension=".json")
+        if self.do_conditioning:  # files only need to exist when we're actually going to use them...
+            utils.validate_paths(self.metadata_paths, expected_extension=".json")
 
         # Preloaded tuples of (score, (seq_start, seq_end), metadata): can have many items for 1 track in the dataset
         self.preloaded_data = list(self.preload_data())
@@ -401,6 +403,96 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
             # Mask is for padding only: causal mask is handled by models
             "attention_mask": create_padding_mask(input_ids, self.tokenizer.pad_token_id),
             # TODO: maybe we want to append these in a data collator (for different types of conditioning)
+            # We have to pad the condition IDs or else we get an error when creating the dataloader
+            "condition_ids": torch.tensor(
+                utils.pad_sequence(condition_tokens, len(input_ids), self.tokenizer.pad_token_id), dtype=torch.long
+            ),
+        }
+
+
+class DatasetMIDIConditionedFullTrack(DatasetMIDIConditioned):
+    """Returns FULL LENGTH tracks. Should be used with batch_size=1 in dataloader as sequence lengths are ragged"""
+
+    def __init__(
+            self,
+            tokenizer,
+            files_paths: list[str],
+            max_seq_len: int,
+            do_augmentation: bool = False,
+            do_conditioning: bool = True,
+            n_clips: int = None,
+    ):
+        if do_augmentation:
+            raise AttributeError("Cannot use augmentation in a dataset that returns full length tracks")
+        super().__init__(tokenizer, files_paths, max_seq_len, do_augmentation, do_conditioning, n_clips)
+
+    def preload_data(self) -> tuple[Score, [int, int], dict]:
+        # Iterate over every file
+        for midi_file, json_file in tqdm(
+                zip(self.files_paths, self.metadata_paths),
+                desc='Getting full-length tracks...',
+                total=len(self.files_paths)
+        ):
+            # If we're doing conditioning, we want to load the metadata for the track
+            if self.do_conditioning:
+                # Load up the metadata for this file
+                metadata = utils.read_json_cached(json_file)
+            else:
+                metadata = dict()
+
+            # Open MIDI file as a symusic score object
+            score = load_score(midi_file)
+            # Apply our own preprocessing to the score
+            preprocessed_score = preprocess_score(score)
+            # Return the preprocessed score, an empty tuple of ints (for signature) and the metadata
+            yield preprocessed_score, (0, 0), metadata
+
+    def shift_labels(self, token_sequence: list[int]) -> list[int]:
+        """Overrides base method to allow for sequences of any length"""
+        targets = token_sequence[1:]
+        x = token_sequence[:-1]
+        assert len(targets) == len(x)
+        return x, targets
+
+    def __getitem__(self, idx: int) -> dict[str, torch.LongTensor]:
+        # Unpack everything that we've preloaded from our list of tuples
+        #  We make a copy here so that we don't modify the underlying object when we augment
+        loaded = deepcopy(self.preloaded_data[idx])
+        full_score, _, metadata = loaded
+        # The score is already loaded + preprocessed, so we don't need to call `load_score` + `preprocess_score` here
+        # No data augmentation for this class
+
+        # Tokenise the score (with BOS + EOS tokens) and get the IDs
+        tokseq_ids = self.score_to_token_sequence(full_score, add_bos_eos=True)
+
+        # No slicing for this class
+
+        # If we're conditioning, we need to get the conditioning tokens
+        if self.do_conditioning:
+            condition_tokens = self.get_conditioning_tokens(metadata)
+        # Otherwise, set the conditioning tokens to an empty list
+        else:
+            condition_tokens = []
+
+        # No conditioning tokens should be in the input sequence (and vice versa)
+        assert not set(condition_tokens) & set(tokseq_ids)
+        # Combine everything into a single list of integers, with conditioning tokens at the start
+        tokseq_ids = condition_tokens + tokseq_ids  # type: list[int]
+
+        # Only padding is required for this class: we need at least max_seq_len + 1 tokens
+        if len(tokseq_ids) < self.max_seq_len + 1:
+            tokseq_ids = utils.pad_sequence(tokseq_ids, self.max_seq_len + 1, self.tokenizer["PAD_None"])
+        # No need to truncate, we want the full length sequence
+
+        # Shift labels for autoregressive teacher forcing
+        input_ids, targets = self.shift_labels(tokseq_ids)
+        assert len(input_ids) >= self.max_seq_len
+
+        # Return everything nicely formatted as a dictionary
+        return {
+            "input_ids": torch.tensor(input_ids, dtype=torch.long),
+            "labels": torch.tensor(targets, dtype=torch.long),
+            "attention_mask": create_padding_mask(input_ids, self.tokenizer.pad_token_id),
             # We have to pad the condition IDs or else we get an error when creating the dataloader
             "condition_ids": torch.tensor(
                 utils.pad_sequence(condition_tokens, len(input_ids), self.tokenizer.pad_token_id), dtype=torch.long

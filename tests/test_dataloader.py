@@ -172,7 +172,7 @@ class DatasetConditionedTest(unittest.TestCase):
             do_augmentation=False
         )
         # This test will work with multiple dataset types
-        for ds_cls in [DatasetMIDIConditioned, DatasetMIDIConditionedRandomChunk]:
+        for ds_cls in [DatasetMIDIConditioned, DatasetMIDIConditionedRandomChunk, DatasetMIDIConditionedFullTrack]:
             ds = ds_cls(**kwargs)
             # Iterate over every item
             for i in ds:
@@ -204,6 +204,7 @@ class DatasetConditionedTest(unittest.TestCase):
             for tok in input_ids:
                 for t in CONDITION_TOKEN_STARTS:
                     self.assertFalse(TOKENIZER[tok].startswith(t))
+
         # Now, just try the first slice
         slice1 = DUMMY_DATASET.__getitem__(0)
         slice1_input_ids = slice1["input_ids"].tolist()
@@ -405,6 +406,7 @@ class DatasetConditionedTest(unittest.TestCase):
                 for tok_start in ["PIANIST", "GENRE"]:
                     ts = [i for i in decoded_condition_tokens if i.startswith(tok_start)]
                     self.assertTrue(len(ts) <= 5)
+
                 # Iterate over "condition" tokens
                 for decoded_token in decoded_condition_tokens:
                     # When decoded, condition tokens SHOULD be in our list of all condition tokens
@@ -424,8 +426,8 @@ class DatasetConditionedTest(unittest.TestCase):
             do_conditioning=True,
             n_clips=to_test
         )
-        # This test works with both tokenizer classes
-        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditioned]:
+        # This test works with multiple tokenizer classes
+        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditioned, DatasetMIDIConditionedFullTrack]:
             # Create a tokenizer
             tok = load_tokenizer(tokenizer_str="midilike", )
             add_tempos_to_vocab(tok, (80, 300), 32)
@@ -486,6 +488,70 @@ class DatasetConditionedTest(unittest.TestCase):
             self.assertTrue(detokenized.startswith(ds.START_TOKENS))
             # Chunking the sequence with this starting point should lead to sequences longer than our desired length
             self.assertTrue(len(tokseq_ids[chunked:chunked + ds.max_seq_len]) >= ds.min_seq_len)
+
+    def test_fulltrack_dataloader(self):
+        # Create the dataset
+        tok = load_tokenizer(tokenizer_str="midilike")  # no conditioning here
+        train_tokenizer(tok, [TEST_MIDI1, TEST_MIDI2, TEST_MIDI3])
+        ds = DatasetMIDIConditionedFullTrack(
+            tokenizer=tok,
+            files_paths=[TEST_MIDI1, TEST_MIDI2, TEST_MIDI3],
+            max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+            do_augmentation=False,
+            do_conditioning=False
+        )
+        self.assertTrue(len(ds) == 3)  # we should have the same number of items as we have tracks
+
+        # Iterate over all tracks
+        for t in range(len(ds)):
+            # Grab the corresponding data and remove any padding
+            batch = ds.__getitem__(t)
+            item = batch["input_ids"].tolist()
+            padding_removed = [i for i in item if i != tok.pad_token_id]
+
+            # If we don't have any padding, should be longer than the desired sequence length
+            if len(padding_removed) == len(item):
+                self.assertGreaterEqual(len(item), utils.MAX_SEQUENCE_LENGTH)
+            # Otherwise, the sequence should have been padded
+            else:
+                self.assertLess(len(padding_removed), utils.MAX_SEQUENCE_LENGTH)
+
+            # Grab the first and last token from the item (ignoring padding)
+            first_token = padding_removed[0]
+            targ_padding_removed = [i for i in batch["labels"].tolist() if i != tok.pad_token_id]
+            last_token = targ_padding_removed[-1]  # can only get the final token from the labels
+
+            # Decoding the first token, should be BOS (as we don't have conditioning)
+            self.assertTrue(tok.bpe_token_mapping[first_token][0] == tok["BOS_None"])
+            # Decoding the last token, should be EOS
+            self.assertTrue(tok.bpe_token_mapping[last_token][0] == tok["EOS_None"])
+
+        # Trying to use augmentation with this dataloader should raise an error
+        with self.assertRaises(AttributeError):
+            _ = DatasetMIDIConditionedFullTrack(
+                tokenizer=tok,
+                files_paths=[TEST_MIDI1, TEST_MIDI2, TEST_MIDI3],
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                do_augmentation=True,
+                do_conditioning=False
+            )
+
+    def test_fulltrack_dataloader_shift_labels(self):
+        # Create the dataset
+        tok = load_tokenizer(tokenizer_str="midilike")
+        ds = DatasetMIDIConditionedFullTrack(
+            tokenizer=tok,
+            files_paths=[TEST_MIDI1],
+            max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+            do_augmentation=False,
+            do_conditioning=False
+        )
+        inp = list(range(1002))
+        x, t = ds.shift_labels(inp)
+        self.assertTrue(len(x) == len(inp) - 1)
+        self.assertTrue(len(t) == len(inp) - 1)
+        self.assertTrue(len(x) == len(t))
+        self.assertTrue(x[1:] == t[:-1])
 
 
 if __name__ == '__main__':
