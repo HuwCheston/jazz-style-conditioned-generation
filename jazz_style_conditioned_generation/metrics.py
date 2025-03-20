@@ -28,26 +28,18 @@ from jazz_style_conditioned_generation.data.tokenizer import load_tokenizer, tra
 def accuracy_score(logits: torch.Tensor, labels: torch.Tensor, tokenizer: MusicTokenizer) -> torch.Tensor:
     """Calculate accuracy between predicted + target labels while handling BPE decoding"""
     assert hasattr(tokenizer, "bpe_token_mapping"), "Must have set the `bpe_token_mapping` attribute!"
-    # Decode BPE-encoded labels
-    decoded_labels = [
-        torch.tensor([x for xs in batch.tolist() for x in tokenizer.bpe_token_mapping[xs]]) for batch in labels
-    ]
-    # We'll use these variables to keep track of all of our results
-    label_store = torch.nn.utils.rnn.pad_sequence(decoded_labels, batch_first=True, padding_side="right")
-    predict_store = torch.zeros_like(label_store)
-    # Apply the softmax to get the predicted (encoded) labels and pad
-    softmaxed_predictions = torch.argmax(torch.softmax(logits, dim=-1), dim=-1)
-    overlap = (0, labels.size(1) - softmaxed_predictions.size(1))  # pad the right side of the input
-    softmaxed_predictions = F.pad(softmaxed_predictions, overlap, value=tokenizer.pad_token_id)
-    # Iterate over every batch
-    for batch_idx in range(label_store.size(0)):
-        batch_labels, batch_logits = labels[batch_idx, :], softmaxed_predictions[batch_idx, :]
-        # Iterate over each encoded label + prediction with a counter
-        sequence_idx = 0
-        for actual_label, predicted_label in zip(batch_labels, batch_logits):
-            # Decode everything into actual labels
-            targ_decode = tokenizer.bpe_token_mapping[actual_label.item()]
-            predict_decode = tokenizer.bpe_token_mapping[predicted_label.item()]
+    # Tracks the length of all sequences after BPE decoding + the number of hits
+    total_seq_len, hits = 0, 0
+    # Iterate over each item in the batch
+    for logits_item, labels_item in zip(logits, labels):
+        # Convert the raw logits into softmaxed predictions
+        predictions_item = torch.argmax(torch.softmax(logits_item, dim=-1), dim=-1)
+        this_seq_len = 0  # tracks the length of the current prediction
+        # Iterate over maybe-BPE encoded predicted + target tokens
+        for predict, targ in zip(predictions_item, labels_item):
+            # Convert BPE encoded tokens into a list of non-BPE encoded tokens
+            predict_decode = tokenizer.bpe_token_mapping[predict.item()]
+            targ_decode = tokenizer.bpe_token_mapping[targ.item()]
             # The length of both lists might be different
             #  If we have more target labels than predicted labels
             if len(predict_decode) < len(targ_decode):
@@ -58,22 +50,25 @@ def accuracy_score(logits: torch.Tensor, labels: torch.Tensor, tokenizer: MusicT
             elif len(predict_decode) > len(targ_decode):
                 # Truncate the predicted labels to match the length of the predicted labels
                 predict_decode = predict_decode[:len(targ_decode)]
-            # Iterate individually over each predicted + target label
+            # Sanity check that everything should now be identical
+            assert len(predict_decode) == len(targ_decode)
+            # Iterate over INDIVIDUAL, non-BPE predicted + target labels
             for p, t in zip(predict_decode, targ_decode):
-                assert label_store[batch_idx, sequence_idx] == t
-                # Add the predicted label to the sequence
-                predict_store[batch_idx, sequence_idx] = p
-                sequence_idx += 1  # increment the counter
-                # Break once we've exceeded the length of the initial sequence
-                if sequence_idx == labels.size(1):
+                # Skip over padded label tokens
+                if t == tokenizer.pad_token_id:
+                    continue
+                else:
+                    # Append to our counters
+                    this_seq_len += 1
+                    total_seq_len += 1
+                    # If the predicted label is equal to the target label
+                    if p == t:
+                        hits += 1
+                # Break out of the loop once we've reached the target length after BPE decoding
+                if this_seq_len >= utils.MAX_SEQUENCE_LENGTH:
                     break
-    # Truncate everything to match the length of the initial sequence
-    label_store = label_store[:, :labels.size(1)]
-    predict_store = predict_store[:, :labels.size(1)]
-    # Calculate the accuracy measurement, respecting the padded tokens
-    non_padded = label_store != tokenizer.pad_token_id  # type: torch.Tensor
-    correct = (label_store == predict_store) & non_padded
-    return correct.sum() / non_padded.sum()
+    # Simple accuracy measurement, return as tensor for compatibility with e.g. loss metric
+    return torch.tensor(hits / total_seq_len)
 
 
 def cross_entropy_loss(logits: torch.Tensor, labels: torch.Tensor, tokenizer: MusicTokenizer) -> torch.Tensor:
