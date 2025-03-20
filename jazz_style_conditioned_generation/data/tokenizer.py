@@ -14,6 +14,7 @@ from miditok.attribute_controls import create_random_ac_indexes
 from miditok.constants import SCORE_LOADING_EXCEPTION
 from miditok.tokenizations import REMI, MIDILike, TSD, Structured, PerTok
 from miditok.tokenizer_training_iterator import TokTrainingIterator
+from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.conditions import INCLUDE
@@ -237,7 +238,7 @@ def train_tokenizer(tokenizer: MusicTokenizer, files_paths: list[str], **kwargs)
     #  This will trigger if the tokenizer has already been trained BEFORE calling this function, too
     bpe_token_mapping = {
         tokenizer.vocab_model[byt]: [tokenizer[t] for t in token_list]
-        for byt, token_list in tokenizer._vocab_learned_bytes_to_tokens.items()
+        for byt, token_list in tqdm(tokenizer._vocab_learned_bytes_to_tokens.items(), desc="Creating token mapping...")
     }
     setattr(tokenizer, "bpe_token_mapping", bpe_token_mapping)
 

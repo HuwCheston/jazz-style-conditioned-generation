@@ -197,7 +197,7 @@ class TrainingModule:
         train_loader = DataLoader(
             DatasetMIDIConditionedRandomChunk(
                 tokenizer=self.tokenizer,
-                files_paths=self.track_splits["train"][:100],
+                files_paths=self.track_splits["train"],
                 max_seq_len=utils.MAX_SEQUENCE_LENGTH,
                 **self.train_dataset_cfg
             ),
