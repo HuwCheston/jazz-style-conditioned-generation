@@ -5,6 +5,7 @@
 
 import os
 import unittest
+from copy import deepcopy
 
 from miditok import REMI, TSD, Structured, PerTok, MIDILike, TokenizerConfig
 
@@ -81,6 +82,12 @@ class TokenizerTest(unittest.TestCase):
         with self.assertRaises(KeyError):
             for k in tok.bpe_token_mapping.keys():
                 _ = tok[k]
+        # If we try to train a tokenizer with a vocabulary size smaller than what it currently has
+        tok = load_tokenizer(tokenizer_str="midilike")
+        tok_bpe_mapping = deepcopy(tok.bpe_token_mapping)
+        train_tokenizer(tok, midi_files, vocab_size=-1)
+        # We shouldn't update our BPE token mapping from the base
+        self.assertEqual(tok_bpe_mapping, tok.bpe_token_mapping)
 
     def test_default_tokenizer_config(self):
         tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
