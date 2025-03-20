@@ -87,7 +87,7 @@ class TrainingTest(unittest.TestCase):
     @handle_cuda_exceptions
     def test_step(self):
         batch = next(iter(TRAINER.train_loader))
-        loss, decoded_loss, accuracy = TRAINER.step(batch, 0)
+        loss, accuracy = TRAINER.step(batch)
         self.assertTrue(loss.requires_grad)
         self.assertTrue(0. <= accuracy <= 1.)
 
@@ -97,7 +97,7 @@ class TrainingTest(unittest.TestCase):
         params = [np for np in TRAINER.model.named_parameters() if np[1].requires_grad]
         initial_params = [(name, p.clone()) for (name, p) in params]
         # Do a single training "epoch"
-        train_loss, train_decoded_loss, train_acc = TRAINER.training(0)
+        train_loss, train_acc = TRAINER.training(0)
         self.assertTrue(isinstance(train_loss, float))
         self.assertTrue(isinstance(train_acc, float))
         self.assertTrue(0. <= train_acc <= 1.)
@@ -108,12 +108,13 @@ class TrainingTest(unittest.TestCase):
             # If vars have changed, will return True; if not, will return False
             self.assertTrue(not torch.equal(p0.to(utils.DEVICE), p1.to(utils.DEVICE)))
 
+    @handle_cuda_exceptions
     def test_eval(self):
-        valid_loss, valid_decoded_loss, valid_acc = TRAINER.validation(0)
+        valid_loss, valid_acc = TRAINER.validation(0)
         self.assertTrue(isinstance(valid_loss, float))
         self.assertTrue(isinstance(valid_acc, float))
         self.assertTrue(0. <= valid_acc <= 1.)
-        test_loss, test_decoded_loss, test_acc = TRAINER.testing()
+        test_loss, test_acc = TRAINER.testing()
         self.assertTrue(isinstance(test_loss, float))
         self.assertTrue(isinstance(test_acc, float))
         self.assertTrue(0. <= test_acc <= 1.)
@@ -131,7 +132,7 @@ class TrainingTest(unittest.TestCase):
         # Get model parameters and make a copy for later comparison
         params = [np for np in TRAINER.model.named_parameters() if np[1].requires_grad]
         initial_params = [(name, p.clone()) for (name, p) in params]
-        _, __, ___ = TRAINER.training(0)
+        _, ___ = TRAINER.training(0)
         # Iterate through all the parameters in the model: they should have updated
         for (_, p0), (name, p1) in zip(initial_params, params):
             # If vars have changed, will return True; if not, will return False

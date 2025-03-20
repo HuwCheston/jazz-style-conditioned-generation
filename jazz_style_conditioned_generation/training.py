@@ -15,7 +15,11 @@ from tqdm import tqdm
 from transformers import GPT2Config, GPT2LMHeadModel
 
 from jazz_style_conditioned_generation import utils, metrics
-from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIConditioned, DATA_DIR
+from jazz_style_conditioned_generation.data.dataloader import (
+    DatasetMIDIConditioned,
+    DatasetMIDIConditionedRandomChunk,
+    DATA_DIR
+)
 from jazz_style_conditioned_generation.data.tokenizer import (
     load_tokenizer,
     train_tokenizer,
@@ -186,12 +190,20 @@ class TrainingModule:
         if dataset_cfg.get("do_augmentation", False) and split != "train":
             raise AttributeError("Augmentation only allowed for training dataloader!")
 
-        dataset = DatasetMIDIConditioned(
-            tokenizer=self.tokenizer,
-            files_paths=self.track_splits[split],
-            max_seq_len=utils.MAX_SEQUENCE_LENGTH,
-            **dataset_cfg
-        )
+        if split == "train":
+            dataset = DatasetMIDIConditionedRandomChunk(
+                tokenizer=self.tokenizer,
+                files_paths=self.track_splits[split],
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                **dataset_cfg
+            )
+        else:
+            dataset = DatasetMIDIConditioned(
+                tokenizer=self.tokenizer,
+                files_paths=self.track_splits[split],
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                **dataset_cfg
+            )
         # We don't need a collate function here
         return torch.utils.data.DataLoader(
             dataset,
@@ -232,7 +244,7 @@ class TrainingModule:
         elif model_type == "music-transformer":
             return MusicTransformer(
                 tokenizer=self.tokenizer,
-                max_sequence=utils.MAX_SEQUENCE_LENGTH,
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
                 **model_cfg
             )
         # For debug purposes
@@ -318,7 +330,7 @@ class TrainingModule:
         # Set a NEW random seed according to the epoch, otherwise we'll just use the same randomisations as epoch 1
         utils.seed_everything(utils.SEED * self.current_epoch)
 
-    def save_checkpoint(self, metrics: dict, path: str) -> None:
+    def save_checkpoint(self, epoch_metrics: dict, path: str) -> None:
         """Saves a checkpoint with given metrics to required path"""
         # Get the folder of checkpoints for the current experiment/run, and create if it doesn't exist
         run_folder = os.path.dirname(path)
@@ -327,7 +339,7 @@ class TrainingModule:
         # Save everything, including the metrics, state dictionaries, and current epoch
         torch.save(
             dict(
-                **metrics,
+                **epoch_metrics,
                 model_state_dict=self.model.state_dict(),
                 optimizer_state_dict=self.optimizer.state_dict(),
                 scheduler_state_dict=self.scheduler.state_dict(),
@@ -400,23 +412,18 @@ class TrainingModule:
             logger.warning(f"Failed to get LR from scheduler! Returning 0.0... {sched_e}")
             return 0.
 
-    def step(self, batch: dict[str, torch.tensor], batch_idx: int) -> tuple[torch.tensor, torch.tensor, torch.tensor]:
+    def step(self, batch: dict[str, torch.tensor]) -> tuple[torch.Tensor, torch.Tensor]:
         input_ids = batch["input_ids"].to(utils.DEVICE)
         labels = batch["labels"].to(utils.DEVICE)
         attention_mask = batch["attention_mask"].to(utils.DEVICE)
-        outputs = self.model(input_ids=input_ids, labels=labels, attention_mask=attention_mask)
-        if batch_idx % 100 == 0:
-            decoded_loss = metrics.cross_entropy_loss(
-                outputs.logits, labels, self.tokenizer, len(self.tokenizer._vocab_base)
-            ).item()
-        else:
-            decoded_loss = np.nan
-        accuracy = metrics.accuracy_score(outputs["logits"], labels, self.tokenizer)
-        return outputs.loss, decoded_loss, accuracy
+        logits = self.model(input_ids=input_ids, labels=labels, attention_mask=attention_mask)
+        loss = metrics.cross_entropy_loss(logits, labels, self.tokenizer)
+        accuracy = metrics.accuracy_score(logits, labels, self.tokenizer)
+        return loss, accuracy
 
-    def training(self, epoch_num: int) -> tuple[float, float, float]:
+    def training(self, epoch_num: int) -> tuple[float, float]:
         self.model.train()
-        epoch_loss, epoch_decoded_loss, epoch_accuracy = [], [], []
+        epoch_loss, epoch_accuracy = [], []
         # Iterate over every batch in the dataloader
         for batch_idx, batch in tqdm(
                 enumerate(self.train_loader),
@@ -424,16 +431,15 @@ class TrainingModule:
                 desc=f'Training, epoch {epoch_num} / {self.epochs}...'
         ):
             # Forwards pass
-            loss, decoded_loss, accuracy = self.step(batch, batch_idx)
+            loss, accuracy = self.step(batch)
             # Backwards pass
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
             # Append metrics to the list
             epoch_loss.append(loss.item())
-            epoch_decoded_loss.append(decoded_loss)
             epoch_accuracy.append(accuracy.item())
-        return np.mean(epoch_loss), np.nanmean(epoch_decoded_loss), np.mean(epoch_accuracy)
+        return np.mean(epoch_loss), np.mean(epoch_accuracy)
 
     def remove_condition_tokens(self, tensor: torch.tensor) -> torch.tensor:
         """Removes conditioning tokens from a tensor"""
@@ -476,9 +482,9 @@ class TrainingModule:
             outs.dump_midi(f"{self.output_midi_dir}/output_{stage}_epoch{self.current_epoch}_{now}.mid")
             logger.info(f"Dumped {stage} MIDI from epoch {self.current_epoch} to {self.output_midi_dir}")
 
-    def validation(self, epoch_num: int) -> tuple[float, float, float]:
+    def validation(self, epoch_num: int) -> tuple[float, float]:
         self.model.eval()
-        epoch_loss, epoch_decoded_loss, epoch_accuracy = [], [], []
+        epoch_loss, epoch_accuracy = [], []
         # Iterate over every batch in the dataloader
         for batch_idx, batch in tqdm(
                 enumerate(self.validation_loader),
@@ -487,23 +493,22 @@ class TrainingModule:
         ):
             # Forwards pass
             with torch.no_grad():
-                loss, decoded_loss, accuracy = self.step(batch, batch_idx)
+                loss, accuracy = self.step(batch)
             # No backwards pass
             epoch_loss.append(loss.item())
-            epoch_decoded_loss.append(decoded_loss)
             epoch_accuracy.append(accuracy.item())
             # Generate from this batch if required
             if self.generate_cfg.get("do_generation", True):
                 if utils.random_probability() < self.generate_cfg.get("generation_probability", 0.01):
                     self.generate_from_batch(batch, "validation")
-        return np.mean(epoch_loss), np.nanmean(epoch_decoded_loss), np.mean(epoch_accuracy)
+        return np.mean(epoch_loss), np.mean(epoch_accuracy)
 
-    def testing(self) -> tuple[float, float, float]:
+    def testing(self) -> tuple[float, float]:
         # Load the checkpoint with the best validation loss
         if self.checkpoint_cfg.get("load_checkpoints", True):
             self.load_checkpoint(os.path.join(self.checkpoint_dir, 'validation_best.pth'))
         self.model.eval()
-        epoch_loss, epoch_decoded_loss, epoch_accuracy = [], [], []
+        epoch_loss, epoch_accuracy = [], []
         # Iterate over every batch in the dataloader
         for batch_idx, batch in tqdm(
                 enumerate(self.test_loader),
@@ -512,16 +517,15 @@ class TrainingModule:
         ):
             # Forwards pass
             with torch.no_grad():
-                loss, decoded_loss, accuracy = self.step(batch, batch_idx)
+                loss, accuracy = self.step(batch)
             # No backwards pass
             epoch_loss.append(loss.item())
             epoch_accuracy.append(accuracy.item())
-            epoch_decoded_loss.append(decoded_loss)
             # Generate from this batch if required
             if self.generate_cfg.get("do_generation", True):
                 if utils.random_probability() < self.generate_cfg.get("generation_probability", 0.01):
                     self.generate_from_batch(batch, "testing")
-        return np.mean(epoch_loss), np.nanmean(epoch_decoded_loss), np.mean(epoch_accuracy)
+        return np.mean(epoch_loss), np.mean(epoch_accuracy)
 
     def log_run_params_to_mlflow(self):
         """If we're using MLFlow, log all run parameters to the dashboard"""
@@ -558,27 +562,23 @@ class TrainingModule:
             self.current_epoch = epoch
             epoch_start = time()
             # Training
-            train_loss, train_decoded_loss, train_accuracy = self.training(epoch)
+            train_loss, train_accuracy = self.training(epoch)
             logger.debug(f'Epoch {epoch} / {self.epochs}, training finished: '
-                         f'loss {train_loss:.3f}, accuracy {train_accuracy:.3f}, '
-                         f'decoded loss {train_decoded_loss:.3f}')
+                         f'loss {train_loss:.3f}, accuracy {train_accuracy:.3f}')
             # Validation
-            self.current_validation_loss, validation_decoded_loss, validation_accuracy = self.validation(epoch)
+            self.current_validation_loss, validation_accuracy = self.validation(epoch)
             logger.debug(f'Epoch {epoch} / {self.epochs}, validation finished: '
-                         f'loss {self.current_validation_loss:.3f}, accuracy {validation_accuracy:.3f}, '
-                         f'decoded loss {validation_decoded_loss:.3f}')
+                         f'loss {self.current_validation_loss:.3f}, accuracy {validation_accuracy:.3f}')
             # Log if this is our best epoch
             if self.current_validation_loss < self.best_validation_loss:
                 self.best_validation_loss = self.current_validation_loss
                 logger.info(f'New best validation loss: {self.current_validation_loss:.3f}')
             # Log parameters from this epoch in MLFlow
-            metrics = dict(
+            epoch_metrics = dict(
                 epoch_time=time() - epoch_start,
                 train_loss=train_loss,
-                train_decoded_loss=train_decoded_loss,
                 train_accuracy=train_accuracy,
                 current_validation_loss=self.current_validation_loss,
-                current_validation_decoded_loss=validation_decoded_loss,
                 best_validation_loss=self.best_validation_loss,
                 validation_accuracy=validation_accuracy,
                 lr=self.get_scheduler_lr()
@@ -591,7 +591,7 @@ class TrainingModule:
                 new_check_name = f'checkpoint_{str(self.current_epoch).zfill(3)}.pth'
                 # We always want to checkpoint on the final epoch!
                 if (self.current_epoch % checkpoint_after == 0) or (self.current_epoch + 1 == self.epochs):
-                    self.save_checkpoint(metrics, os.path.join(self.checkpoint_dir, new_check_name))
+                    self.save_checkpoint(epoch_metrics, os.path.join(self.checkpoint_dir, new_check_name))
                 # If we want to remove old checkpoints after saving a new one
                 if self.checkpoint_cfg.get("delete_old_checkpoints", False):
                     self.remove_old_checkpoints()
@@ -606,18 +606,16 @@ class TrainingModule:
             logger.debug(f'LR for epoch {epoch + 1} will be {self.get_scheduler_lr()}')
         # Run testing after training completes
         logger.info('Training complete!')
-        test_loss, test_decoded_loss, test_accuracy = self.testing()
+        test_loss, test_accuracy = self.testing()
         # Report results to MLFlow, if we're using this
         if self.mlflow_cfg.get("use", False):
             test_metrics = dict(
                 test_accuracy=test_accuracy,
-                test_decoded_loss=test_decoded_loss,
                 test_loss=test_loss
             )
             mlflow.log_metrics(test_metrics, step=self.current_epoch)
         # Log everything to the console
-        logger.info(f"Testing finished: loss {test_loss:.3f}, accuracy {test_accuracy:.3f}, "
-                    f"decoded loss {test_decoded_loss:.3f}")
+        logger.info(f"Testing finished: loss {test_loss:.3f}, accuracy {test_accuracy:.3f}")
         logger.info(f'Finished in {(time() - training_start) // 60} minutes!')
 
 
