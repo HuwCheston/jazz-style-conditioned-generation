@@ -127,3 +127,13 @@ target/
 
 # Exclude blindfold tests
 /data/blindfold_tests/*.txt
+
+*.yaml
+# Allow YAML files in specific folders
+#!/config/
+#!/config/initial-experiments/
+!/config/initial-experiments/*.yaml
+
+#!/tests/
+#!/tests/test_resources/
+!/tests/test_resources/*.yaml
