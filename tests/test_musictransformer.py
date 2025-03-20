@@ -87,8 +87,8 @@ class MusicTransformerTest(unittest.TestCase):
         # This test is flaky!
         runner(MODEL_RPR)
 
-    @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
     @handle_cuda_exceptions
+    @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
     def test_evaluate(self):
         def runner(tokenizer):
             model = MusicTransformer(tokenizer=tokenizer).to(utils.DEVICE)
@@ -101,6 +101,9 @@ class MusicTransformerTest(unittest.TestCase):
                 tokens_loss = model.evaluate(inputs, targets, mask)
                 # We'd expect the loss to be between 0 and an arbitrarily large value (the model hasn't been trained!)
                 self.assertTrue(0. <= tokens_loss.item() <= 10.)
+
+        if os.getenv("REMOTE") == "true":
+            self.skipTest("Skipping test on GitHub Actions")
 
         # First, test without a trained tokenizer
         toker = load_tokenizer(tokenizer_str="midilike")
