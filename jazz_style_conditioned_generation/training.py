@@ -147,7 +147,7 @@ class TrainingModule:
             for tok in self.tokenizer.vocab.values():
                 if tok not in self.tokenizer.bpe_token_mapping:
                     self.tokenizer.bpe_token_mapping[tok] = [tok]
-        assert len(self.tokenizer.bpe_token_mapping) == len(self.tokenizer.vocab)
+            assert len(self.tokenizer.bpe_token_mapping) == len(self.tokenizer.vocab)
 
         # SAVE THE TOKENIZER (if it doesn't already exist)
         if not os.path.isfile(self.tokenizer_path):
