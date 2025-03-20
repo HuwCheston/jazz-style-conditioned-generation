@@ -9,6 +9,7 @@ from typing import Optional, Tuple
 
 import torch
 import torch.nn as nn
+from tqdm import tqdm
 from transformers.utils import ModelOutput
 
 from jazz_style_conditioned_generation import utils
@@ -215,7 +216,8 @@ class MusicTransformer(nn.Module):
         bpe_decoded = [x for xs in bpe_decoded for x in xs]  # flatten
         # Compute the length of the decoded sequence: should be equal or larger than the initial sequence
         decoded_seq_len = len(bpe_decoded)
-        assert decoded_seq_len >= input_ids_full_track.size(0)
+        encoded_seq_len = input_ids_full_track.size(0)
+        assert decoded_seq_len >= encoded_seq_len
 
         # Unfold inputs into (minibatch, max_seq_len)
         targets = targets_full_track.unfold(0, self.max_seq_len, 1).detach()
@@ -231,13 +233,17 @@ class MusicTransformer(nn.Module):
         all_nlls = all_nlls[~window1_masks].flatten().tolist()
 
         # If we need to start sliding the window across to get more than max_seq_len items
-        if input_ids_full_track.size(0) > self.max_seq_len:
+        if encoded_seq_len > self.max_seq_len:
             # Split the remaining sliding windows into ((minibatch1, max_seq_len), (minibatch2, max_seq_len), ...)
             inputs_batched = torch.split(inputs[1:, :], batch_size)
             targets_batched = torch.split(targets[1:, :], batch_size)
             masks_batched = torch.split(masks[1:, :], batch_size)
             # Process each (minibatch, max_seq_len) individually
-            for window_input, window_target, window_mask in zip(inputs_batched, targets_batched, masks_batched):
+            for window_input, window_target, window_mask in tqdm(
+                    zip(inputs_batched, targets_batched, masks_batched),
+                    desc=f"Processing track with {encoded_seq_len} encoded tokens, {decoded_seq_len} raw tokens...",
+                    total=len(inputs_batched)
+            ):
                 # Compute the NLL for this batch of sliding windows
                 batched_nll = calculate_nll(window_input, window_target, window_mask)
                 # We don't have to worry about padding here as we know that the whole input is longer than max_seq_len
