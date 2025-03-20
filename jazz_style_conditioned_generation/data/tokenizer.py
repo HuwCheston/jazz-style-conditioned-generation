@@ -215,12 +215,11 @@ def train_tokenizer(tokenizer: MusicTokenizer, files_paths: list[str], **kwargs)
     # We don't need to train a tokenizer if it's already been trained!
     if tokenizer.is_trained:
         logger.warning(f'... tried to train a tokenizer that has already been trained, skipping')
-        # We don't want to update the bpe token mapping either
-        return
     else:
         # Get the parameters again from the dictionary
         training_method = kwargs.get("training_method", DEFAULT_TRAINING_METHOD)
         vocab_size = kwargs.get("vocab_size", DEFAULT_VOCAB_SIZE)
+
         # If we try to train with a smaller vocab size than the model currently has
         if vocab_size <= tokenizer.vocab_size:
             # Skip over training and just return without updating anything
@@ -234,12 +233,13 @@ def train_tokenizer(tokenizer: MusicTokenizer, files_paths: list[str], **kwargs)
         tti = CustomTokTrainingIterator(tokenizer, files_paths)
         tokenizer.train(vocab_size=vocab_size, model=training_method, iterator=tti)
         logger.debug(f'... training finished: {tokenizer}')
-        # Now, we update our token mapping to go BPE token1 IDX -> [token1 IDX, token2 IDX], ...
-        bpe_token_mapping = {
-            tokenizer.vocab_model[byt]: [tokenizer[t] for t in token_list]
-            for byt, token_list in tokenizer._vocab_learned_bytes_to_tokens.items()
-        }
-        setattr(tokenizer, "bpe_token_mapping", bpe_token_mapping)
+    # Now, we update our token mapping to go BPE token1 IDX -> [token1 IDX, token2 IDX], ...
+    #  This will trigger if the tokenizer has already been trained BEFORE calling this function, too
+    bpe_token_mapping = {
+        tokenizer.vocab_model[byt]: [tokenizer[t] for t in token_list]
+        for byt, token_list in tokenizer._vocab_learned_bytes_to_tokens.items()
+    }
+    setattr(tokenizer, "bpe_token_mapping", bpe_token_mapping)
 
 
 if __name__ == "__main__":
