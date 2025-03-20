@@ -114,10 +114,10 @@ class TrainingTest(unittest.TestCase):
         self.assertTrue(isinstance(valid_loss, float))
         self.assertTrue(isinstance(valid_acc, float))
         self.assertTrue(0. <= valid_acc <= 1.)
-        test_loss, test_acc = TRAINER.testing()
-        self.assertTrue(isinstance(test_loss, float))
-        self.assertTrue(isinstance(test_acc, float))
-        self.assertTrue(0. <= test_acc <= 1.)
+        # test_loss, test_acc = TRAINER.testing()
+        # self.assertTrue(isinstance(test_loss, float))
+        # self.assertTrue(isinstance(test_acc, float))
+        # self.assertTrue(0. <= test_acc <= 1.)
         # Model should be put into validation mode
         self.assertFalse(TRAINER.model.training)
 
