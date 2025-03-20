@@ -142,6 +142,12 @@ class TrainingModule:
                 do_conditioning=self.train_dataset_cfg.get("do_conditioning", True),
                 **self.tokenizer_cfg
             )
+        # If we're not training, we need to add the condition tokens into the bpe_token_mapping attribute
+        else:
+            for tok in self.tokenizer.vocab.values():
+                if tok not in self.tokenizer.bpe_token_mapping:
+                    self.tokenizer.bpe_token_mapping[tok] = [tok]
+        assert len(self.tokenizer.bpe_token_mapping) == len(self.tokenizer.vocab)
 
         # SAVE THE TOKENIZER (if it doesn't already exist)
         if not os.path.isfile(self.tokenizer_path):
