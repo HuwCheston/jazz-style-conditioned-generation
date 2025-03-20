@@ -11,6 +11,8 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+from jazz_style_conditioned_generation import utils
+
 # Define constants
 WIDTH = 18.8  # This is a full page width: half page plots will need to use 18.8 / 2
 FONTSIZE = 18
@@ -154,3 +156,45 @@ class BarPlotTiVoMetadataTagCounts(BasePlot):
     def save_fig(self, fpath):
         fpath += '_' + self.tag_str.lower()
         super().save_fig(fpath)
+
+
+class PointPlotVocabSizeCustomLoss(BasePlot):
+    PPLOT_KWS = dict(
+        estimator="mean", color=BLACK, linewidth=LINEWIDTH, linestyle=LINESTYLE,
+        capsize=LINEWIDTH / 10, err_kws=dict(linewidth=LINEWIDTH), x="vocab_size",
+    )
+
+    def __init__(self):
+        super().__init__()
+        self.df = pd.read_csv(os.path.join(utils.get_project_root(), "references/vocab_size_vs_loss.csv"))
+        self.fig, (self.ax1, self.ax2) = plt.subplots(
+            nrows=1, ncols=2, sharex=True, sharey=False, figsize=(WIDTH, WIDTH // 3)
+        )
+
+    def _create_plot(self) -> None:
+        sns.pointplot(data=self.df, y="decoded_length_loss", errorbar="sd", ax=self.ax1, **self.PPLOT_KWS)
+        sns.pointplot(data=self.df, y="mean_loss", errorbar=None, ax=self.ax2, **self.PPLOT_KWS)
+
+    def _format_ax(self) -> None:
+        self.ax1.set(
+            xlabel="Vocabulary Size",
+            ylabel=r"$\dfrac{\text{sum}(\text{loss})}{\text{len}(\text{sequence}_{\text{raw}})}$"
+        )
+        self.ax2.set(
+            xlabel="Vocabulary Size",
+            ylabel=r"$\dfrac{\text{sum}(\text{loss})}{\text{len}(\text{sequence})}$"
+        )
+        for ax in [self.ax1, self.ax2]:
+            ax.set_xticks(ax.get_xticks(), ["Raw"] + [i.get_text() for i in ax.get_xticklabels()][1:], rotation=90)
+            ax.grid(axis='y', zorder=0, **GRID_KWS)
+            plt.setp(ax.spines.values(), linewidth=LINEWIDTH, color=BLACK)
+            ax.tick_params(axis='both', width=TICKWIDTH, color=BLACK)
+
+    def _format_fig(self) -> None:
+        self.fig.tight_layout()
+
+
+if __name__ == "__main__":
+    pp = PointPlotVocabSizeCustomLoss()
+    pp.create_plot()
+    pp.save_fig(os.path.join(utils.get_project_root(), "outputs/figures/vocab_size/pointplot_vocab_size_custom_loss"))
