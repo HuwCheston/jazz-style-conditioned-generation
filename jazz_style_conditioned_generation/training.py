@@ -638,7 +638,7 @@ class TrainingModule:
                     self.save_checkpoint(epoch_metrics, os.path.join(self.checkpoint_dir, 'validation_best.pth'))
             # Report results to MLFlow, if we're using this
             if self.mlflow_cfg.get("use", False):
-                mlflow.log_metrics(metrics, step=epoch)
+                mlflow.log_metrics(epoch_metrics, step=epoch)
             # Step forward in the LR scheduler
             self.scheduler.step()
             logger.debug(f'LR for epoch {epoch + 1} will be {self.get_scheduler_lr()}')
