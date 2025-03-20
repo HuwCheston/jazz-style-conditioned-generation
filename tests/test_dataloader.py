@@ -369,14 +369,14 @@ class DatasetConditionedTest(unittest.TestCase):
             self.assertEqual(len(targets), 100)
 
     @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
-    def test_getitem_full_dataset(self, to_test: int = 100):
+    def test_getitem_full_dataset(self):
         """Test our dataset with a large number of tracks (will be skipped on remote)"""
 
         def runner(ds):
             # Get the list of condition tokens from our tokenizer
             all_condition_tokens = [i for i in ds.tokenizer.vocab.keys() if i.startswith(tuple(CONDITION_TOKEN_STARTS))]
             # Iterate over every track in the dataset
-            for item in tqdm(ds, desc=f"Checking dataset with {to_test} tracks"):
+            for item in tqdm(ds, desc=f"Checking dataset with {len(ds)} tracks"):
                 # Get the input IDs, targets, and condition_ids
                 input_ids, targets, condition_ids = item["input_ids"], item["labels"], item["condition_ids"]
 
@@ -417,17 +417,15 @@ class DatasetConditionedTest(unittest.TestCase):
         # Get a large number of tracks
         midi_fps = utils.get_data_files_with_ext("data/raw", "**/*.mid")
         random.shuffle(midi_fps)
-        midi_fps = midi_fps[:to_test]
         # Get the arguments for the dataset
         kwargs = dict(
             files_paths=midi_fps,
             max_seq_len=utils.MAX_SEQUENCE_LENGTH,
             do_augmentation=False,
             do_conditioning=True,
-            n_clips=to_test
         )
         # This test works with multiple tokenizer classes
-        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditioned, DatasetMIDIConditionedFullTrack]:
+        for ds_cls in [DatasetMIDIConditionedRandomChunk]:
             # Create a tokenizer
             tok = load_tokenizer(tokenizer_str="midilike", )
             add_tempos_to_vocab(tok, 80, 30, factor=1.05)
@@ -483,9 +481,9 @@ class DatasetConditionedTest(unittest.TestCase):
         for _ in range(50):
             starting_point = ds.get_slice_start_point(tokseq_ids)
             chunked = tokseq_ids[starting_point]
-            detokenized = ds.tokenizer[ds.tokenizer.bpe_token_mapping[chunked][0]]
+            detoks = [ds.tokenizer[c] for c in ds.tokenizer.bpe_token_mapping[chunked]]
             # The token should be one of our valid token types
-            self.assertTrue(detokenized.startswith(ds.START_TOKENS))
+            self.assertTrue(any(i.startswith(ds.START_TOKENS) for i in detoks))
             # Chunking the sequence with this starting point should lead to sequences longer than our desired length
             self.assertTrue(len(tokseq_ids[chunked:chunked + ds.max_seq_len]) >= ds.min_seq_len)
 

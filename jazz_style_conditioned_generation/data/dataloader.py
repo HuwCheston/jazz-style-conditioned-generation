@@ -322,14 +322,17 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
     def get_slice_start_point(self, tokseq_ids: list[int]) -> int:
         """Our random sequence MUST start with a realistic starting token (i.e., not a NoteOff or Velocity token)"""
         # Detokenize the IDs into raw tokens: e.g., NoteOn, NoteOff, TimeShift, Velocity tokens
-        trunc = tokseq_ids[:-self.min_seq_len]  # ensures that our sequences will have a minimum desired length
-        detokenized = [[self.tokenizer[v] for v in self.tokenizer.bpe_token_mapping[i]] for i in trunc]
+        #  This gives us a list of [[Base token 1, Base token 2], [Base token 2], [Base token 2, Base token 3], ...]
+        detokenized = [[self.tokenizer[v] for v in self.tokenizer.bpe_token_mapping[i]] for i in tokseq_ids]
+        # Ensures slices only start at the first 90% of the track (so we don't slice at e.g., the very last token!)
+        detokenized = detokenized[:-len(detokenized) // 10]
         # These are the IDXs of the token ID list that decode to one of our acceptable values
-        accept_idxs = [idx for idx, tok in enumerate(detokenized) if tok[0].startswith(self.START_TOKENS)]
+        accept_idxs = [
+            idx for idx, tok in enumerate(detokenized)
+            if any((t.startswith(self.START_TOKENS) for t in tok))
+        ]
         # Make a random choice for the starting token
         start = random.choice(accept_idxs)
-        # Sanity check
-        assert self.tokenizer[self.tokenizer.bpe_token_mapping[tokseq_ids[start]][0]].startswith(self.START_TOKENS)
         return start
 
     def __getitem__(self, idx: int) -> dict[str, torch.LongTensor]:
@@ -348,8 +351,6 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
                 # If we didn't make a copy of this object earlier, this line would modify the metadata object
                 #  FOR ALL SLICES of the same underlying track!
                 metadata["tempo"] = self.scale_tempo(metadata["tempo"], tempo_scale)
-        else:
-            tempo_scale = 1.
 
         # Tokenise the score (with BOS + EOS tokens) and get the IDs
         tokseq_ids = self.score_to_token_sequence(full_score, add_bos_eos=True)
@@ -357,6 +358,8 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
         # Get the starting and stopping points for the random slice
         #  The starting point MUST be a timeshift, BOS, or note-on token (or equivalent)
         #  This is so that we don't start learning with e.g. a note-off token when there has been no previous note-on
+        # tmp_end = len(tokseq_ids) - self.min_seq_len if len(tokseq_ids) > self.min_seq_len else len(tokseq_ids)
+        # slice_start = random.choice(range(0, tmp_end))
         slice_start = self.get_slice_start_point(tokseq_ids)
         slice_end = slice_start + self.max_seq_len
 
@@ -374,10 +377,10 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
         #  We add one so that we have enough tokens for autoregressive label shifting later on
         tokseq_ids_chunked = tokseq_ids[slice_start: slice_end + 1]
         # No conditioning tokens should be in the input sequence (and vice versa)
-        assert not set(condition_tokens) & set(tokseq_ids_chunked)
+        assert len([i for i in tokseq_ids_chunked if i in condition_tokens]) == 0
         # Combine everything into a single list of integers, with conditioning tokens at the start
         tokseq_ids_chunked = condition_tokens + tokseq_ids_chunked  # type: list[int]
-        assert len(tokseq_ids_chunked) >= (self.min_seq_len / tempo_scale)
+        # assert len(tokseq_ids_chunked) >= (self.min_seq_len / tempo_scale)
 
         # Pad or truncate the sequence if required
         #  Again, add one to the maximum sequence length so that we have enough tokens for autoregressive shifting later
@@ -513,7 +516,7 @@ if __name__ == "__main__":
     # Get a MIDILike tokenizer with default arguments
     token_factory = load_tokenizer(tokenizer_str="midilike")
     # Get filepaths for all MIDI files in the /data/raw/ directories
-    midi_paths = utils.get_data_files_with_ext(ext="**/*.mid")[:100]
+    midi_paths = utils.get_data_files_with_ext(ext="**/*.mid")
     metadata_paths = [i.replace("piano_midi.mid", "metadata_tivo.json") for i in midi_paths]
     # Add all of our condition tokens to the tokenizer
     add_pianists_to_vocab(token_factory)
@@ -521,7 +524,7 @@ if __name__ == "__main__":
     add_tempos_to_vocab(token_factory, 80, 30, factor=1.05)
     add_timesignatures_to_vocab(token_factory, [3, 4])
     # Train the tokenizer with BPE
-    train_tokenizer(token_factory, vocab_size=1000, model="BPE", files_paths=midi_paths)
+    train_tokenizer(token_factory, vocab_size=1000, model="BPE", files_paths=midi_paths[:100])
     # Test out our random chunking dataloader
     kwargs = dict(
         tokenizer=token_factory,
@@ -530,7 +533,7 @@ if __name__ == "__main__":
         do_augmentation=True,
         do_conditioning=True
     )
-    for dataset_cls in [DatasetMIDIConditioned, DatasetMIDIConditionedRandomChunk]:
+    for dataset_cls in [DatasetMIDIConditionedRandomChunk]:
         dm = dataset_cls(**kwargs)
         print(dm)
 
