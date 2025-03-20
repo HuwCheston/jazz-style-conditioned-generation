@@ -171,6 +171,8 @@ def remove_punctuation(s: str) -> str:
 
 def write_json(metadata_dict: dict, filepath: str) -> None:
     """Dumps a dictionary as a JSON in provided location"""
+    if not filepath.endswith(".json"):
+        filepath += ".json"
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(metadata_dict, f, indent=4, ensure_ascii=False, sort_keys=False)
 
