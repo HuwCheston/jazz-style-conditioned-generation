@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Music Transformer module, taken from https://github.com/gwinndr/MusicTransformer-Pytorch"""
+"""Music Transformer module, adapted from https://github.com/gwinndr/MusicTransformer-Pytorch"""
 
 import math
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
+import numpy as np
 import torch
 import torch.nn as nn
 from transformers.utils import ModelOutput
 
-from jazz_style_conditioned_generation import utils, metrics
+from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.dataloader import create_padding_mask
 from jazz_style_conditioned_generation.encoders.rpr import TransformerEncoderRPR, TransformerEncoderLayerRPR
 
@@ -100,7 +101,7 @@ class MusicTransformer(nn.Module):
             d_model: int = 512,  # Sulun == 768
             dim_feedforward: int = 1024,  # Sulun == 3072
             dropout: float = 0.1,  # Sulun == 0.1
-            max_sequence: int = utils.MAX_SEQUENCE_LENGTH,
+            max_seq_len: int = utils.MAX_SEQUENCE_LENGTH,
             rpr: bool = False
     ):
         super(MusicTransformer, self).__init__()
@@ -113,13 +114,13 @@ class MusicTransformer(nn.Module):
         self.d_model = d_model
         self.d_ff = dim_feedforward
         self.dropout = dropout
-        self.max_seq = max_sequence
+        self.max_seq_len = max_seq_len
         self.rpr = rpr
 
         # Input embedding
         self.embedding = nn.Embedding(self.tokenizer.vocab_size, self.d_model)
         # Positional encoding
-        self.positional_encoding = PositionalEncoding(self.d_model, self.dropout, self.max_seq)
+        self.positional_encoding = PositionalEncoding(self.d_model, self.dropout, self.max_seq_len)
         # Base transformer
         if not self.rpr:
             # To make a decoder-only transformer we need to use masked encoder layers
@@ -142,7 +143,7 @@ class MusicTransformer(nn.Module):
                 self.nhead,
                 self.d_ff,
                 self.dropout,
-                er_len=self.max_seq
+                er_len=self.max_seq_len
             )
             encoder = TransformerEncoderRPR(encoder_layer, self.nlayers, encoder_norm)
             self.transformer = nn.Transformer(
@@ -162,34 +163,101 @@ class MusicTransformer(nn.Module):
 
     def forward(
             self,
-            input_ids: torch.tensor,
-            labels: torch.tensor,
-            attention_mask: torch.tensor
-    ) -> MusicTransformerOutput:
-        """Takes an input sequence and outputs predictions using a sequence to sequence method."""
+            input_ids: torch.Tensor,
+            labels: torch.Tensor,
+            attention_mask: torch.Tensor
+    ) -> torch.Tensor:
+        """Takes an input sequence and outputs predictions using a sequence to sequence method, returns raw logits."""
         # Create causal mask
-        mask = self.transformer.generate_square_subsequent_mask(input_ids.shape[1]).to(input_ids.device)
+        causal_mask = self.transformer.generate_square_subsequent_mask(input_ids.shape[1]).to(input_ids.device)
         x = self.embedding(input_ids)
         # Input shape is (max_seq, batch_size, d_model)
         x = x.permute(1, 0, 2)
         x = self.positional_encoding(x)
         # Since there are no true decoder layers, the tgt is unused
-        # Pytorch wants src and tgt to have some equal dims however
         x_out = self.transformer(
             src=x,
             tgt=x,
-            src_mask=mask,
+            src_mask=causal_mask,  # causal mask (i.e., to prevent us from attending to future tokens in the sequence)
             src_key_padding_mask=attention_mask  # masks PAD tokens (i.e., to ensure we have sequence length)
         )
         # Back to (batch_size, max_seq, d_model)
         x_out = x_out.permute(1, 0, 2)
         # Compute logits from FC layer: shape (batch_size, seq_len, vocab_size)
-        logits = self.Wout(x_out)  # No softmax as nn.CrossEntropyLoss computes it for us
-        # Compute loss: vanilla first (i.e., without decoding BPE tokens), then with decoding
-        vanilla_loss = metrics._cross_entropy_loss(logits, labels, self.tokenizer)
-        # decoded_loss = metrics.cross_entropy_loss(logits, labels, self.tokenizer, len(self.tokenizer._vocab_base))
-        # Returns output in the same format as transformers
-        return MusicTransformerOutput(loss=vanilla_loss, logits=logits)
+        return self.Wout(x_out)  # No softmax as nn.CrossEntropyLoss computes it for us
+
+    def evaluate(
+            self,
+            input_ids_full_track: torch.Tensor,
+            targets_full_track: torch.Tensor,
+            batch_size: int = 30
+    ) -> torch.Tensor:
+        """Performs evaluation for a FULL TRACK, returns sum(NLL) / len(raw_sequence_length)"""
+
+        def calculate_nll(inputs_: torch.Tensor, targets_: torch.Tensor, mask_: torch.Tensor) -> torch.Tensor:
+            # Through the model
+            with torch.no_grad():
+                out = self(inputs_, targets_, mask_)
+            # Log softmax then compute negative log likelihood
+            log_probs = nn.functional.log_softmax(out, dim=-1)  # (batch, seq_length, vocab_size)
+            # Gather the log probabilities corresponding to targets
+            return -log_probs.gather(dim=-1, index=targets_.unsqueeze(-1)).squeeze(-1)  # (batch, seq_len)
+
+        # Remove the batch dimension if we have it
+        #  Remember: this function should only be called with all tokens obtained from a SINGLE RECORDING
+        if len(input_ids_full_track.size()) == 2:
+            input_ids_full_track = input_ids_full_track.squeeze(0)
+            targets_full_track = targets_full_track.squeeze(0)
+
+        # Decode the sequence to get the non-BPE token sequence
+        bpe_decoded = [self.tokenizer.bpe_token_mapping[i.item()] for i in input_ids_full_track]
+        bpe_decoded = [x for xs in bpe_decoded for x in xs]  # flatten
+        # Compute the length of the decoded sequence: should be equal or larger than the initial sequence
+        decoded_seq_len = len(bpe_decoded)
+        assert decoded_seq_len >= input_ids_full_track.size(0)
+
+        # If the sequence length is of the full track is smaller than the maximum, we only need to forward pass once
+        if input_ids_full_track.size(0) <= self.max_seq_len:
+            # We need to pad the sequence
+            overlap = self.max_seq_len - input_ids_full_track.size(0)
+            inputs = nn.functional.pad(input_ids_full_track, (0, overlap)).unsqueeze(0)
+            targets = nn.functional.pad(targets_full_track, (0, overlap)).unsqueeze(0)
+            # Create the padding mask (causal mask handled in model)
+            mask = create_padding_mask(inputs, self.tokenizer.pad_token_id)
+            # Calculate the NLL for all items
+            all_nlls = calculate_nll(inputs, targets, mask)
+            # Remove the padding and convert to a list
+            all_nlls = all_nlls[~mask].flatten().tolist()
+
+        # Otherwise, we can make use of batching to speed things up
+        else:
+            # Unfold into (minibatch, max_seq_len)
+            targets = targets_full_track.unfold(0, self.max_seq_len, 1).detach()
+            inputs = input_ids_full_track.unfold(0, self.max_seq_len, 1).detach()
+            # Treat the first full window as a special case
+            window1_inputs, window1_targets = inputs[0, :].unsqueeze(0), targets[0, :].unsqueeze(0)
+            window1_mask = create_padding_mask(window1_inputs, self.tokenizer.pad_token_id)
+            # We want all the NLL values from the first window: subsequent windows, we only want the last NLL value
+            all_nlls = calculate_nll(window1_inputs, window1_targets, window1_mask)
+            # We don't have to worry about padding here as we know that the whole input is longer than max_seq_len
+            all_nlls = all_nlls.flatten().tolist()
+
+            # Split the remaining sliding windows into ((minibatch1, max_seq_len), (minibatch2, max_seq_len), ...)
+            inputs_batched = torch.split(inputs[1:, :], batch_size)
+            targets_batched = torch.split(targets[1:, :], batch_size)
+            # Process each (minibatch, max_seq_len) individually
+            for window_input, window_target in zip(inputs_batched, targets_batched):
+                # Create the padding mask (causal mask handled in model)
+                window_mask = create_padding_mask(window_input, self.tokenizer.pad_token_id)
+                # Compute the NLL for this batch of sliding windows
+                batched_nll = calculate_nll(window_input, window_target, window_mask)
+                # Extract the probability for the final item in every sliding window and extend the list
+                all_nlls.extend(batched_nll[:, -1].flatten().tolist())
+
+        # We should have one NLL value for every input ID in the sequence
+        assert len(all_nlls) == input_ids_full_track.size(0) == targets_full_track.size(0)
+        # Normalise the sum of all NLL values by the length of the decoded(/raw/non-BPE) sequence and return
+        return torch.tensor(sum(all_nlls) / decoded_seq_len)
 
     def generate(
             self,
@@ -227,7 +295,7 @@ class MusicTransformer(nn.Module):
             labels = gen_seq[:, 1: cur_i + 1]
             attention_mask = create_padding_mask(input_ids, self.tokenizer["PAD_None"])
             # Through the model to get the logits: shape (1, sequence_length, vocab_size)
-            logits = self.forward(input_ids, labels, attention_mask).logits
+            logits = self.forward(input_ids, labels, attention_mask)
             # This gets the probabilities for the next token: shape (1, vocab_size)
             token_probs = logits[:, cur_i - 1, :]
             # Filter to get the top-k and top-p
@@ -290,80 +358,40 @@ class PositionalEncoding(nn.Module):
 
 if __name__ == "__main__":
     from jazz_style_conditioned_generation.data.tokenizer import load_tokenizer, train_tokenizer
-    from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIConditioned
+    from jazz_style_conditioned_generation.data.scores import load_score, preprocess_score
 
+    import random
+
+    utils.seed_everything(utils.SEED)
+    n_midis = 20
+    seq_length = 2048
     # Create a tokenizer and train with a small number of tracks
-    midis = utils.get_data_files_with_ext("data/raw", "**/*.mid")[:50]
-    tokenizer = load_tokenizer()
-    train_tokenizer(tokenizer, midis, vocab_size=1000)
-
-    # Create the dataset + loader
-    dataset = DatasetMIDIConditioned(
-        tokenizer, midis, do_conditioning=False, do_augmentation=False, max_seq_len=utils.MAX_SEQUENCE_LENGTH
-    )
-    loader = torch.utils.data.DataLoader(dataset, shuffle=True, drop_last=False, batch_size=2)
-
-    # Create the model
-    mt = MusicTransformer(tokenizer=tokenizer, **DEFAULT_CONFIG).to(utils.DEVICE)
-
-    # Get an input batch
-    batch1 = next(iter(loader))
-    inp, targ = batch1["input_ids"].to(utils.DEVICE), batch1["labels"].to(utils.DEVICE)
-    padding_mask = create_padding_mask(inp, tokenizer.pad_token_id).to(utils.DEVICE)
-
-    # Pass through the model
-    out = mt(inp, targ, padding_mask)
-    print(f'Dummy loss: {out.loss.item()}')
-
-    # Do some generation with the dummy tensor
-    mt.eval()
-    gen = mt.generate(primer=inp[0, :10].squeeze(0))
-
-    # Convert back to a score
-    retok = tokenizer(gen)
-    print(f'Dummy generation: {retok}')
-
-# This converts the ID for a learned byte to a list of IDs of the actual tokens
-# token_mapping = {
-#     self.tokenizer.vocab_model[byt]: [self.tokenizer[t] for t in token_list]
-#     for byt, token_list in self.tokenizer._vocab_learned_bytes_to_tokens.items()
-# }
-# batch_results = []
-# for item in logits:
-#     item_results = []
-#     for step in item:
-#         logits_at_step = {id_: [] for id_ in self.tokenizer.vocab.values()}
-#         for learned_byte_id, logit in enumerate(step.tolist()):
-#             for nonbpe_byte_id in token_mapping[learned_byte_id]:
-#                 logits_at_step[nonbpe_byte_id].append(logit)
-#         logits_summed = torch.tensor([sum(v) for v in logits_at_step.values()])
-#         assert logits_summed.size(0) == len(self.tokenizer.vocab)
-#         item_results.append(logits_summed)
-#     batch_results.append(torch.stack(item_results))
-# logits_decoded = torch.stack(batch_results)
-# # Simply take the first token for each BPE index
-# labels_decoded = torch.tensor([[token_mapping[i.item()][0] for i in batch] for batch in labels])
-# # Flatten everything
-# y = logits_decoded.reshape(logits_decoded.shape[0] * logits_decoded.shape[1], -1).to(torch.float32)
-# t = labels_decoded.flatten().to(torch.int64)
-# loss1 = self.loss(y, t)
-# print(loss, loss1)
-
-
-# for item_logits, item_labels in zip(logits, labels):
-#     item_res = []
-#     for logit, label in zip(item_logits, item_labels):
-#         decoded_label = token_mapping[label.item()]
-#         res_at_label = [[[] for _ in range(len(self.tokenizer.vocab.values()))] for _ in range(len(decoded_label))]
-#         for log_byte_id, log in enumerate(logit.tolist()):
-#             log_token_ids = token_mapping[log_byte_id]
-#             if len(log_token_ids) < len(decoded_label):
-#                 log_token_ids.extend([log_token_ids[-1] for _ in range(len(decoded_label) - len(log_token-ids))])
-#             else:
-#                 log_token_ids = log_token_ids[:len(decoded_label)]
-#             assert len(log_token_ids) == len(decoded_label)
-#             for idx, id_ in enumerate(log_token_ids):
-#                 res_at_label[idx][id_].append(log)
-#
-#         break
-#     break
+    midis = utils.get_data_files_with_ext("data/raw", "**/*.mid")
+    random.shuffle(midis)
+    vs = [-1, 500, 1000, 1500, 2000, 2500, 5000, 7500, 10000, 15000, 20000, 30000, 40000, 50000]
+    print("Using vs", vs)
+    for vocab_size in vs:
+        res = []
+        # Create and train the tokenizer with the given vocabulary size
+        tokenizer = load_tokenizer(tokenizer_str="midilike")
+        train_tokenizer(tokenizer, midis, vocab_size=vocab_size)
+        # Create the model
+        mt = MusicTransformer(tokenizer=tokenizer, **DEFAULT_CONFIG).to(utils.DEVICE)
+        mt.eval()
+        # Iterate over multiple inputs
+        for midi_num, target_midi in enumerate(midis[:n_midis]):
+            loaded = preprocess_score(load_score(target_midi))
+            # Tokenize the input
+            tokens = tokenizer.encode(target_midi)[0].ids
+            # Add in the sequence tokens
+            tokens.insert(0, tokenizer["BOS_None"])
+            tokens.insert(len(tokens), tokenizer["EOS_None"])
+            tokens = torch.tensor(tokens).to(utils.DEVICE)
+            # Shift labels for autoregressive modelling
+            tokens_targets = tokens[1:]
+            tokens_inputs = tokens[:-1]
+            # Compute the loss as sum(NLL) / len(raw_sequence_length)
+            tokens_loss = mt.evaluate(tokens_inputs, tokens_targets)
+            print(f"MIDI {midi_num}, vocab size {vocab_size}, midi length {tokens.size(0)}: decoded loss {tokens_loss}")
+            res.append(tokens_loss)
+        print(f'Mean decoded loss for vocab size {vocab_size}: {np.mean(res)}')
