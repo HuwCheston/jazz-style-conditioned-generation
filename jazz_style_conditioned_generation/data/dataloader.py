@@ -314,10 +314,10 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
             # Apply our own preprocessing to the score
             preprocessed_score = preprocess_score(score)
             # Tokenise the score and get the token IDs
-            ids_with_bos_eos = self.score_to_token_sequence(preprocessed_score, add_bos_eos=True)
+            # ids_with_bos_eos = self.score_to_token_sequence(preprocessed_score, add_bos_eos=True)
 
             # Return the preprocessed score, the length of the track (we'll randomly sample in getitem) and the metadata
-            yield preprocessed_score, (0, len(ids_with_bos_eos)), metadata
+            yield preprocessed_score, (0, 0), metadata
 
     def get_slice_start_point(self, tokseq_ids: list[int]) -> int:
         """Our random sequence MUST start with a realistic starting token (i.e., not a NoteOff or Velocity token)"""
