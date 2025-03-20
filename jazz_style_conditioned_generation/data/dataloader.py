@@ -518,7 +518,7 @@ if __name__ == "__main__":
     # Add all of our condition tokens to the tokenizer
     add_pianists_to_vocab(token_factory)
     add_genres_to_vocab(token_factory)
-    add_tempos_to_vocab(token_factory, (80, 300), 32)
+    add_tempos_to_vocab(token_factory, 80, 30, factor=1.05)
     add_timesignatures_to_vocab(token_factory, [3, 4])
     # Train the tokenizer with BPE
     train_tokenizer(token_factory, vocab_size=1000, model="BPE", files_paths=midi_paths)

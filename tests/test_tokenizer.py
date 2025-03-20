@@ -104,10 +104,10 @@ class TokenizerTest(unittest.TestCase):
         tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
         prev_vocab = tok.vocab_size
         # Adding eleven tempo tokens -- [100, 110, 120, ..., 200]
-        add_tempos_to_vocab(tok, (100, 200), 11)
-        expected_vocab = prev_vocab + 11
+        add_tempos_to_vocab(tok, 80, 30, factor=1.05)
+        expected_vocab = prev_vocab + 30
         self.assertEqual(tok.vocab_size, expected_vocab)
-        expected = ["TEMPOCUSTOM_100", "TEMPOCUSTOM_150", "TEMPOCUSTOM_200"]
+        expected = ["TEMPOCUSTOM_80", "TEMPOCUSTOM_84", "TEMPOCUSTOM_330"]
         for expect in expected:
             self.assertTrue(expect in tok.vocab)
             # self.assertTrue(expect in tok.special_tokens)

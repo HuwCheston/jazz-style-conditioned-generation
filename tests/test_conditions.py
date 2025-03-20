@@ -171,15 +171,15 @@ class ConditionsTest(unittest.TestCase):
         # Should raise an error if we haven't added the time signature tokens in yet
         with self.assertRaises(AssertionError):
             _ = cond.get_tempo_token(100, tokenizer)
-        # Add in tempo tokens from [100, 110, 120, ..., 200]
-        add_tempos_to_vocab(tokenizer, (100, 200), 11)
-        # Test with 154 BPM, should be rounded to 150
-        expected = "TEMPOCUSTOM_150"
+        # Add in tempo tokens
+        add_tempos_to_vocab(tokenizer, 100, 20, 1.05)
+        # Test with 154 BPM, should be rounded to 155
+        expected = "TEMPOCUSTOM_155"
         actual = cond.get_tempo_token(154, tokenizer)
         self.assertEqual(expected, actual)
-        # Test with 156 BPM, should be rounded to 160
-        expected = "TEMPOCUSTOM_160"
-        actual = cond.get_tempo_token(156, tokenizer)
+        # Test with 150 BPM, should be rounded to 148
+        expected = "TEMPOCUSTOM_148"
+        actual = cond.get_tempo_token(150, tokenizer)
         self.assertEqual(expected, actual)
         # Raise an error if we try an out of range value
         with self.assertRaises(ValueError):

@@ -44,7 +44,7 @@ def prepare_conditioned_tokenizer():
     # Add in all of our tokens to the vocabulary
     add_genres_to_vocab(token_factory)
     add_pianists_to_vocab(token_factory)
-    add_tempos_to_vocab(token_factory, (80, 300), 32)
+    add_tempos_to_vocab(token_factory, 80, 30, factor=1.05)
     add_timesignatures_to_vocab(token_factory, [3, 4])
     return token_factory
 
@@ -107,7 +107,7 @@ class DatasetConditionedTest(unittest.TestCase):
         #  GENRE and PIANIST are sorted in DESCENDING weight order, with the track pianist always placed first
         expected_tokens = [
             "GENRES_Caribbean", "GENRES_HardBop", "GENRES_PostBop", "GENRES_StraightAheadJazz", "GENRES_Fusion",
-            "PIANIST_KennyBarron", "TEMPOCUSTOM_300", "TIMESIGNATURECUSTOM_44"
+            "PIANIST_KennyBarron", "TEMPOCUSTOM_299", "TIMESIGNATURECUSTOM_44"
         ]
         expected_token_ids = [token_factory[t] for t in expected_tokens]
         actual_token_ids = ds.get_conditioning_tokens(utils.read_json_cached(ds.metadata_paths[0]))
@@ -267,7 +267,7 @@ class DatasetConditionedTest(unittest.TestCase):
             self.assertEqual(input_ids[3], token_factory["GENRES_StraightAheadJazz"])
             self.assertEqual(input_ids[4], token_factory["GENRES_Fusion"])  # least strongly weighted genre, = 5
             self.assertEqual(input_ids[5], token_factory["PIANIST_KennyBarron"])
-            self.assertEqual(input_ids[6], token_factory["TEMPOCUSTOM_300"])  # closest match to our provided tempo
+            self.assertEqual(input_ids[6], token_factory["TEMPOCUSTOM_299"])  # closest match to our provided tempo
             self.assertEqual(input_ids[7], token_factory["TIMESIGNATURECUSTOM_44"])
 
         # These tests can only work with our exhaustive dataloader
@@ -430,7 +430,7 @@ class DatasetConditionedTest(unittest.TestCase):
         for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditioned, DatasetMIDIConditionedFullTrack]:
             # Create a tokenizer
             tok = load_tokenizer(tokenizer_str="midilike", )
-            add_tempos_to_vocab(tok, (80, 300), 32)
+            add_tempos_to_vocab(tok, 80, 30, factor=1.05)
             add_timesignatures_to_vocab(tok, [3, 4])
             add_pianists_to_vocab(tok)
             add_genres_to_vocab(tok)

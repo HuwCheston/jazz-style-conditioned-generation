@@ -18,6 +18,7 @@ from jazz_style_conditioned_generation import utils, metrics
 from jazz_style_conditioned_generation.data.dataloader import (
     DatasetMIDIConditioned,
     DatasetMIDIConditionedRandomChunk,
+    DatasetMIDIConditionedFullTrack,
     DATA_DIR
 )
 from jazz_style_conditioned_generation.data.tokenizer import (
@@ -124,7 +125,7 @@ class TrainingModule:
             add_pianists_to_vocab(self.tokenizer)
             # TODO: allow tempo range, number of tempos, and time signatures to be passed in as keywords
             #  this probably means having a new conditioning_cfg dictionary
-            add_tempos_to_vocab(self.tokenizer, (80, 300), 32)
+            add_tempos_to_vocab(self.tokenizer, 80, 30, factor=1.05)
             add_timesignatures_to_vocab(self.tokenizer, [3, 4])
             # Log the number of tokens we've added for each condition type to the console
             for condition in ["GENRES", "PIANIST", "TIMESIGNATURE", "TEMPO"]:
@@ -147,10 +148,10 @@ class TrainingModule:
 
         # DATALOADERS
         logger.debug(f'Initialising training loader with args {self.train_dataset_cfg}')
-        self.train_loader = self.create_dataloader("train", self.train_dataset_cfg)
+        self.train_loader = self.create_dataloaders("train", self.train_dataset_cfg)
         logger.debug(f'Initialising testing + validation loaders with args {self.test_dataset_cfg}')
-        self.test_loader = self.create_dataloader("test", self.test_dataset_cfg)
-        self.validation_loader = self.create_dataloader("validation", self.test_dataset_cfg)
+        self.test_loader = self.create_dataloaders("test", self.test_dataset_cfg)
+        self.validation_loader = self.create_dataloaders("validation", self.test_dataset_cfg)
 
         # MODEL
         model_type = self.model_cfg.get("model_type", "gpt2-lm")
@@ -181,12 +182,46 @@ class TrainingModule:
         if self.checkpoint_cfg.get("load_checkpoints", True):
             self.load_most_recent_checkpoint()
 
-    def create_dataloader(
+    def create_dataloaders(
             self,
             split: str,
             dataset_cfg: dict
     ) -> torch.utils.data.DataLoader:
         """Creates a dataloader for a given split and configuration"""
+        train_loader = torch.utils.data.DataLoader(
+            DatasetMIDIConditionedRandomChunk(
+                tokenizer=self.tokenizer,
+                files_paths=self.track_splits["train"],
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                **self.train_dataset_cfg
+            ),
+            batch_size=self.batch_size,
+            shuffle=True,
+            drop_last=False,
+        )
+        validation_loader = torch.utils.data.DataLoader(
+            DatasetMIDIConditionedRandomChunk(
+                tokenizer=self.tokenizer,
+                files_paths=self.track_splits["validation"],
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                **self.test_dataset_cfg
+            ),
+            batch_size=self.batch_size,
+            shuffle=True,
+            drop_last=False,
+        )
+        test_loader = torch.utils.data.DataLoader(
+            DatasetMIDIConditionedFullTrack(
+                tokenizer=self.tokenizer,
+                files_paths=self.track_splits["test"],
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                **self.test_dataset_cfg
+            ),
+            batch_size=1,  # have to use a batch size of one for this class
+            shuffle=False,
+            drop_last=False,
+        )
+
         if dataset_cfg.get("do_augmentation", False) and split != "train":
             raise AttributeError("Augmentation only allowed for training dataloader!")
 

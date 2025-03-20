@@ -138,9 +138,13 @@ def add_timesignatures_to_vocab(tokenizer: MusicTokenizer, time_signatures: list
             tokenizer.add_to_vocab(tok_id, special_token=False)
 
 
-def add_tempos_to_vocab(tokenizer: MusicTokenizer, tempo_range: tuple, n_tempos: int = 32) -> None:
-    """Given a range of tempos, add these to the vocabulary as custom tokens (shouldn't be used in decoding)"""
-    tempo_range = np.linspace(*tempo_range, n_tempos).round().astype(int)
+def add_tempos_to_vocab(tokenizer: MusicTokenizer, min_tempo: int, n_tempos: int = 30, factor: float = 1.05) -> None:
+    """Add tempo tokens to vocabulary using geometric distribution)"""
+    # Create the geometric distribution
+    tempo_range = [min_tempo]
+    for _ in range(n_tempos - 1):
+        tempo_range.append(round(tempo_range[-1] * factor))
+    # Add the tokens
     for tempo in tempo_range:
         tok_id = f'TEMPOCUSTOM_{tempo}'
         if tok_id not in tokenizer.vocab:
