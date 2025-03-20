@@ -9,8 +9,7 @@ import unittest
 import torch
 
 from jazz_style_conditioned_generation import utils, metrics
-from jazz_style_conditioned_generation.data.dataloader import create_padding_mask
-from jazz_style_conditioned_generation.data.scores import load_score, preprocess_score
+from jazz_style_conditioned_generation.data.dataloader import create_padding_mask, DatasetMIDIConditionedFullTrack
 from jazz_style_conditioned_generation.data.tokenizer import load_tokenizer, train_tokenizer
 from jazz_style_conditioned_generation.encoders.music_transformer import MusicTransformer
 
@@ -19,7 +18,8 @@ TOKENIZER = load_tokenizer()
 MODEL = MusicTransformer(tokenizer=TOKENIZER).to(utils.DEVICE)
 MODEL_RPR = MusicTransformer(tokenizer=TOKENIZER, rpr=True).to(utils.DEVICE)
 
-TEST_MIDI = os.path.join(utils.get_project_root(), "tests/test_resources/test_midi1/piano_midi.mid")
+TEST_MIDI_LONG = os.path.join(utils.get_project_root(), "tests/test_resources/test_midi1/piano_midi.mid")
+TEST_MIDI_SHORT = os.path.join(utils.get_project_root(), "tests/test_resources/test_midi_repeatnotes.mid")
 
 
 def handle_cuda_exceptions(f):
@@ -87,34 +87,39 @@ class MusicTransformerTest(unittest.TestCase):
         # This test is flaky!
         runner(MODEL_RPR)
 
+    @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
+    @handle_cuda_exceptions
     def test_evaluate(self):
         def runner(tokenizer):
             model = MusicTransformer(tokenizer=tokenizer).to(utils.DEVICE)
-            # Get the score as a Symusic object
-            score = preprocess_score(load_score(TEST_MIDI))
-            # Tokenize the input
-            tokens = tokenizer.encode(score)[0].ids
-            # Add in the sequence tokens
-            tokens.insert(0, tokenizer["BOS_None"])
-            tokens.insert(len(tokens), tokenizer["EOS_None"])
-            tokens = torch.tensor(tokens).to(utils.DEVICE)
-            # Test with different sequence lengths
-            #  The smaller sequence length only requires one forward pass,
-            #  the larger requires multiple (and will use batches to speed things up)
-            for sequence_end in [500, 2100]:
-                tok_loop = tokens.clone()[:sequence_end]
-                # Get the inputs and targets
-                inputs, targets = tok_loop[:-1], tok_loop[1:]
-                # Compute the loss as sum(NLL) / len(raw_sequence_length)
-                tokens_loss = model.evaluate(inputs, targets)
+            for track in ds:
+                # Unpack everything
+                inputs = track["input_ids"].to(utils.DEVICE)
+                targets = track["labels"].to(utils.DEVICE)
+                mask = track["attention_mask"].to(utils.DEVICE)
+                # Through the model
+                tokens_loss = model.evaluate(inputs, targets, mask)
                 # We'd expect the loss to be between 0 and an arbitrarily large value (the model hasn't been trained!)
                 self.assertTrue(0. <= tokens_loss.item() <= 10.)
 
         # First, test without a trained tokenizer
         toker = load_tokenizer(tokenizer_str="midilike")
+        # Create the dataset that returns full-length tracks
+        ds = torch.utils.data.DataLoader(
+            DatasetMIDIConditionedFullTrack(
+                tokenizer=toker,
+                files_paths=[TEST_MIDI_LONG, TEST_MIDI_SHORT],
+                do_conditioning=False,  # no conditioning for now
+                do_augmentation=False,
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+            ),
+            batch_size=1,  # batch size MUST be set to one with this dataloader as output sequences have different len
+            shuffle=False,
+            drop_last=False,
+        )
         runner(toker)
         # Second, test after training the tokenizer on the input track
-        train_tokenizer(toker, [TEST_MIDI], vocab_size=500)
+        train_tokenizer(toker, [TEST_MIDI_LONG], vocab_size=500)
         runner(toker)
 
     def test_sulun_configuration(self):

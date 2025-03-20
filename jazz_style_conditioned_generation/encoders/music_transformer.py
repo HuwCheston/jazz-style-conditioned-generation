@@ -7,7 +7,6 @@ import math
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
-import numpy as np
 import torch
 import torch.nn as nn
 from transformers.utils import ModelOutput
@@ -190,6 +189,7 @@ class MusicTransformer(nn.Module):
             self,
             input_ids_full_track: torch.Tensor,
             targets_full_track: torch.Tensor,
+            mask_full_track: torch.Tensor,
             batch_size: int = 30
     ) -> torch.Tensor:
         """Performs evaluation for a FULL TRACK, returns sum(NLL) / len(raw_sequence_length)"""
@@ -208,6 +208,7 @@ class MusicTransformer(nn.Module):
         if len(input_ids_full_track.size()) == 2:
             input_ids_full_track = input_ids_full_track.squeeze(0)
             targets_full_track = targets_full_track.squeeze(0)
+            mask_full_track = mask_full_track.squeeze(0)
 
         # Decode the sequence to get the non-BPE token sequence
         bpe_decoded = [self.tokenizer.bpe_token_mapping[i.item()] for i in input_ids_full_track]
@@ -216,46 +217,36 @@ class MusicTransformer(nn.Module):
         decoded_seq_len = len(bpe_decoded)
         assert decoded_seq_len >= input_ids_full_track.size(0)
 
-        # If the sequence length is of the full track is smaller than the maximum, we only need to forward pass once
-        if input_ids_full_track.size(0) <= self.max_seq_len:
-            # We need to pad the sequence
-            overlap = self.max_seq_len - input_ids_full_track.size(0)
-            inputs = nn.functional.pad(input_ids_full_track, (0, overlap)).unsqueeze(0)
-            targets = nn.functional.pad(targets_full_track, (0, overlap)).unsqueeze(0)
-            # Create the padding mask (causal mask handled in model)
-            mask = create_padding_mask(inputs, self.tokenizer.pad_token_id)
-            # Calculate the NLL for all items
-            all_nlls = calculate_nll(inputs, targets, mask)
-            # Remove the padding and convert to a list
-            all_nlls = all_nlls[~mask].flatten().tolist()
+        # Unfold inputs into (minibatch, max_seq_len)
+        targets = targets_full_track.unfold(0, self.max_seq_len, 1).detach()
+        inputs = input_ids_full_track.unfold(0, self.max_seq_len, 1).detach()
+        masks = mask_full_track.unfold(0, self.max_seq_len, 1).detach()
+        # Treat the first full window as a special case
+        window1_inputs = inputs[0, :].unsqueeze(0)
+        window1_targets = targets[0, :].unsqueeze(0)
+        window1_masks = masks[0, :].unsqueeze(0)
+        # We want all the NLL values from the first window: subsequent windows, we only want the last NLL value
+        all_nlls = calculate_nll(window1_inputs, window1_targets, window1_masks)
+        # We need to remove the padding here
+        all_nlls = all_nlls[~window1_masks].flatten().tolist()
 
-        # Otherwise, we can make use of batching to speed things up
-        else:
-            # Unfold into (minibatch, max_seq_len)
-            targets = targets_full_track.unfold(0, self.max_seq_len, 1).detach()
-            inputs = input_ids_full_track.unfold(0, self.max_seq_len, 1).detach()
-            # Treat the first full window as a special case
-            window1_inputs, window1_targets = inputs[0, :].unsqueeze(0), targets[0, :].unsqueeze(0)
-            window1_mask = create_padding_mask(window1_inputs, self.tokenizer.pad_token_id)
-            # We want all the NLL values from the first window: subsequent windows, we only want the last NLL value
-            all_nlls = calculate_nll(window1_inputs, window1_targets, window1_mask)
-            # We don't have to worry about padding here as we know that the whole input is longer than max_seq_len
-            all_nlls = all_nlls.flatten().tolist()
-
+        # If we need to start sliding the window across to get more than max_seq_len items
+        if input_ids_full_track.size(0) > self.max_seq_len:
             # Split the remaining sliding windows into ((minibatch1, max_seq_len), (minibatch2, max_seq_len), ...)
             inputs_batched = torch.split(inputs[1:, :], batch_size)
             targets_batched = torch.split(targets[1:, :], batch_size)
+            masks_batched = torch.split(masks[1:, :], batch_size)
             # Process each (minibatch, max_seq_len) individually
-            for window_input, window_target in zip(inputs_batched, targets_batched):
-                # Create the padding mask (causal mask handled in model)
-                window_mask = create_padding_mask(window_input, self.tokenizer.pad_token_id)
+            for window_input, window_target, window_mask in zip(inputs_batched, targets_batched, masks_batched):
                 # Compute the NLL for this batch of sliding windows
                 batched_nll = calculate_nll(window_input, window_target, window_mask)
-                # Extract the probability for the final item in every sliding window and extend the list
+                # We don't have to worry about padding here as we know that the whole input is longer than max_seq_len
                 all_nlls.extend(batched_nll[:, -1].flatten().tolist())
 
-        # We should have one NLL value for every input ID in the sequence
-        assert len(all_nlls) == input_ids_full_track.size(0) == targets_full_track.size(0)
+        # We should have one NLL value for every input ID in the sequence (after removing padding tokens)
+        input_nomask = input_ids_full_track[~mask_full_track]
+        target_nomask = targets_full_track[~mask_full_track]
+        assert len(all_nlls) == input_nomask.size(0) == target_nomask.size(0)
         # Normalise the sum of all NLL values by the length of the decoded(/raw/non-BPE) sequence and return
         return torch.tensor(sum(all_nlls) / decoded_seq_len)
 
@@ -358,40 +349,42 @@ class PositionalEncoding(nn.Module):
 
 if __name__ == "__main__":
     from jazz_style_conditioned_generation.data.tokenizer import load_tokenizer, train_tokenizer
-    from jazz_style_conditioned_generation.data.scores import load_score, preprocess_score
+    from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIConditionedFullTrack
 
     import random
 
     utils.seed_everything(utils.SEED)
     n_midis = 20
-    seq_length = 2048
-    # Create a tokenizer and train with a small number of tracks
+
+    # Get a small number of MIDI files
     midis = utils.get_data_files_with_ext("data/raw", "**/*.mid")
     random.shuffle(midis)
-    vs = [-1, 500, 1000, 1500, 2000, 2500, 5000, 7500, 10000, 15000, 20000, 30000, 40000, 50000]
-    print("Using vs", vs)
-    for vocab_size in vs:
-        res = []
-        # Create and train the tokenizer with the given vocabulary size
-        tokenizer = load_tokenizer(tokenizer_str="midilike")
-        train_tokenizer(tokenizer, midis, vocab_size=vocab_size)
-        # Create the model
-        mt = MusicTransformer(tokenizer=tokenizer, **DEFAULT_CONFIG).to(utils.DEVICE)
-        mt.eval()
-        # Iterate over multiple inputs
-        for midi_num, target_midi in enumerate(midis[:n_midis]):
-            loaded = preprocess_score(load_score(target_midi))
-            # Tokenize the input
-            tokens = tokenizer.encode(target_midi)[0].ids
-            # Add in the sequence tokens
-            tokens.insert(0, tokenizer["BOS_None"])
-            tokens.insert(len(tokens), tokenizer["EOS_None"])
-            tokens = torch.tensor(tokens).to(utils.DEVICE)
-            # Shift labels for autoregressive modelling
-            tokens_targets = tokens[1:]
-            tokens_inputs = tokens[:-1]
-            # Compute the loss as sum(NLL) / len(raw_sequence_length)
-            tokens_loss = mt.evaluate(tokens_inputs, tokens_targets)
-            print(f"MIDI {midi_num}, vocab size {vocab_size}, midi length {tokens.size(0)}: decoded loss {tokens_loss}")
-            res.append(tokens_loss)
-        print(f'Mean decoded loss for vocab size {vocab_size}: {np.mean(res)}')
+    midis = midis[:n_midis]
+    # Create and train the tokenizer with the given vocabulary size
+    toker = load_tokenizer(tokenizer_str="midilike")
+    train_tokenizer(toker, midis, vocab_size=2000)
+    # Create the dataset that returns full-length tracks
+    ds = torch.utils.data.DataLoader(
+        DatasetMIDIConditionedFullTrack(
+            tokenizer=toker,
+            files_paths=midis,
+            do_conditioning=False,  # no conditioning for now
+            do_augmentation=False,
+            max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+        ),
+        batch_size=1,  # batch size MUST be set to one with this dataloader as output sequences have different len
+        shuffle=False,
+        drop_last=False,
+    )
+    # Create the model and set to evaluation mode
+    mt = MusicTransformer(tokenizer=toker, max_seq_len=utils.MAX_SEQUENCE_LENGTH, **DEFAULT_CONFIG).to(utils.DEVICE)
+    mt.eval()
+    # Iterate over individual tracks
+    for track in ds:
+        # Compute the loss as sum(NLL) / len(raw_sequence_length)
+        tokens_loss = mt.evaluate(
+            track["input_ids"].to(utils.DEVICE),
+            track["labels"].to(utils.DEVICE),
+            track["attention_mask"].to(utils.DEVICE)
+        )
+        print(f"MIDI length {track['input_ids'].size(0)}: decoded loss {tokens_loss}")
