@@ -11,12 +11,12 @@ import numpy as np
 import torch
 import yaml
 from loguru import logger
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import GPT2Config, GPT2LMHeadModel
 
 from jazz_style_conditioned_generation import utils, metrics
 from jazz_style_conditioned_generation.data.dataloader import (
-    DatasetMIDIConditioned,
     DatasetMIDIConditionedRandomChunk,
     DatasetMIDIConditionedFullTrack,
     DATA_DIR
@@ -74,6 +74,8 @@ class TrainingModule:
             generate_cfg: dict,
             data_dir: str = None,
             split_dir: str = None,
+            full_validate_after_n_epochs: int = 25,
+            n_full_validation_tracks: int = 10
     ):
         # Set all keyword arguments to class parameters
         self.experiment = experiment
@@ -148,10 +150,17 @@ class TrainingModule:
 
         # DATALOADERS
         logger.debug(f'Initialising training loader with args {self.train_dataset_cfg}')
-        self.train_loader = self.create_dataloaders("train", self.train_dataset_cfg)
         logger.debug(f'Initialising testing + validation loaders with args {self.test_dataset_cfg}')
-        self.test_loader = self.create_dataloaders("test", self.test_dataset_cfg)
-        self.validation_loader = self.create_dataloaders("validation", self.test_dataset_cfg)
+        self.train_loader, self.validation_loader, self.test_loader = self.create_dataloaders()
+
+        # VALIDATION
+        # After M epochs, we do a "full" validation with N complete tracks
+        #  Note that we still validate with the full validation set after every epoch
+        #  This just denotes how often we'll try and predict an ENTIRE track (rather than just a chunk)
+        self.full_validate_after_n_epochs = full_validate_after_n_epochs
+        self.n_full_validation_tracks = n_full_validation_tracks
+        logger.debug(f"After completing {self.full_validate_after_n_epochs} epochs, "
+                     f"we'll validate with {self.n_full_validation_tracks} tracks")
 
         # MODEL
         model_type = self.model_cfg.get("model_type", "gpt2-lm")
@@ -182,16 +191,13 @@ class TrainingModule:
         if self.checkpoint_cfg.get("load_checkpoints", True):
             self.load_most_recent_checkpoint()
 
-    def create_dataloaders(
-            self,
-            split: str,
-            dataset_cfg: dict
-    ) -> torch.utils.data.DataLoader:
+    def create_dataloaders(self) -> tuple[DataLoader, DataLoader, DataLoader]:
         """Creates a dataloader for a given split and configuration"""
-        train_loader = torch.utils.data.DataLoader(
+        # Create test dataset loader: uses random chunks
+        train_loader = DataLoader(
             DatasetMIDIConditionedRandomChunk(
                 tokenizer=self.tokenizer,
-                files_paths=self.track_splits["train"],
+                files_paths=self.track_splits["train"][:100],
                 max_seq_len=utils.MAX_SEQUENCE_LENGTH,
                 **self.train_dataset_cfg
             ),
@@ -199,53 +205,33 @@ class TrainingModule:
             shuffle=True,
             drop_last=False,
         )
-        validation_loader = torch.utils.data.DataLoader(
+        # Create validation dataset loader: uses random chunks
+        if self.test_dataset_cfg.get("do_augmentation", False):
+            raise AttributeError("Augmentation only allowed for training dataloader!")
+        validation_loader = DataLoader(
             DatasetMIDIConditionedRandomChunk(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["validation"],
                 max_seq_len=utils.MAX_SEQUENCE_LENGTH,
-                **self.test_dataset_cfg
+                **self.test_dataset_cfg  # most arguments can be shared across test + validation loader
             ),
             batch_size=self.batch_size,
             shuffle=True,
             drop_last=False,
         )
-        test_loader = torch.utils.data.DataLoader(
+        # Create test dataset loader: uses FULL tracks!
+        test_loader = DataLoader(
             DatasetMIDIConditionedFullTrack(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["test"],
                 max_seq_len=utils.MAX_SEQUENCE_LENGTH,
-                **self.test_dataset_cfg
+                **self.test_dataset_cfg  # most arguments can be shared across test + validation loader
             ),
             batch_size=1,  # have to use a batch size of one for this class
-            shuffle=False,
+            shuffle=False,  # don't want to shuffle either for this one
             drop_last=False,
         )
-
-        if dataset_cfg.get("do_augmentation", False) and split != "train":
-            raise AttributeError("Augmentation only allowed for training dataloader!")
-
-        if split == "train":
-            dataset = DatasetMIDIConditionedRandomChunk(
-                tokenizer=self.tokenizer,
-                files_paths=self.track_splits[split],
-                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
-                **dataset_cfg
-            )
-        else:
-            dataset = DatasetMIDIConditioned(
-                tokenizer=self.tokenizer,
-                files_paths=self.track_splits[split],
-                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
-                **dataset_cfg
-            )
-        # We don't need a collate function here
-        return torch.utils.data.DataLoader(
-            dataset,
-            batch_size=self.batch_size,
-            shuffle=True,
-            drop_last=False,
-        )
+        return train_loader, validation_loader, test_loader
 
     def read_tracks_for_split(self, split_type: str) -> list[str]:
         """Reads a txt file containing a one line per string and returns as a list of strings"""
@@ -542,25 +528,30 @@ class TrainingModule:
         # Load the checkpoint with the best validation loss
         if self.checkpoint_cfg.get("load_checkpoints", True):
             self.load_checkpoint(os.path.join(self.checkpoint_dir, 'validation_best.pth'))
+        # Run the evaluate_full_tracks function on the ENTIRE test dataset
+        full_test_loss = self.evaluate_full_tracks(len(self.test_loader))
+        return full_test_loss
+
+    def evaluate_full_tracks(self, n_full_tracks: int = None):
+        """Tests on full dataset of N test tracks and computes loss that should be comparable across vocab sizes"""
+        if n_full_tracks is None:
+            n_full_tracks = self.n_full_validation_tracks
         self.model.eval()
-        epoch_loss, epoch_accuracy = [], []
-        # Iterate over every batch in the dataloader
-        for batch_idx, batch in tqdm(
-                enumerate(self.test_loader),
-                total=len(self.test_loader),
-                desc='Testing...'
-        ):
-            # Forwards pass
-            with torch.no_grad():
-                loss, accuracy = self.step(batch)
-            # No backwards pass
-            epoch_loss.append(loss.item())
-            epoch_accuracy.append(accuracy.item())
-            # Generate from this batch if required
-            if self.generate_cfg.get("do_generation", True):
-                if utils.random_probability() < self.generate_cfg.get("generation_probability", 0.01):
-                    self.generate_from_batch(batch, "testing")
-        return np.mean(epoch_loss), np.mean(epoch_accuracy)
+        full_track_losses = []
+        for batch_idx, batch in enumerate(self.test_loader):
+            # Break out once we've considered enough tracks
+            #  These tracks should always be identical between runs as we set shuffle=False in the dataloader
+            if batch_idx > n_full_tracks:
+                break
+            logger.info(f'Processing track {batch_idx + 1} / {n_full_tracks} ...')
+            full_track_loss = self.model.evaluate(
+                batch["input_ids"].to(utils.DEVICE),
+                batch["labels"].to(utils.DEVICE),
+                batch["attention_mask"].to(utils.DEVICE),
+                batch_size=15
+            )
+            full_track_losses.append(full_track_loss.item())
+        return np.mean(full_track_losses)
 
     def log_run_params_to_mlflow(self):
         """If we're using MLFlow, log all run parameters to the dashboard"""
@@ -618,6 +609,12 @@ class TrainingModule:
                 validation_accuracy=validation_accuracy,
                 lr=self.get_scheduler_lr()
             )
+            # Run evaluation on 10 full tracks every few epochs
+            if epoch % self.full_validate_after_n_epochs == 0:
+                logger.debug(f"Doing a partial validation with {self.n_full_validation_tracks} complete tracks...")
+                valid_loss_full_track = self.evaluate_full_tracks(self.n_full_validation_tracks)
+                logger.info(f"Epoch {epoch} / {self.epochs}: full-track validation loss {valid_loss_full_track:.3f}")
+                epoch_metrics["validation_loss_full_track"] = valid_loss_full_track
             # Checkpoint the run, if we need to
             if self.checkpoint_cfg["save_checkpoints"]:
                 # How many epochs before we need to checkpoint (10 by default)
@@ -641,16 +638,13 @@ class TrainingModule:
             logger.debug(f'LR for epoch {epoch + 1} will be {self.get_scheduler_lr()}')
         # Run testing after training completes
         logger.info('Training complete!')
-        test_loss, test_accuracy = self.testing()
+        test_loss_full_track = self.testing()
         # Report results to MLFlow, if we're using this
         if self.mlflow_cfg.get("use", False):
-            test_metrics = dict(
-                test_accuracy=test_accuracy,
-                test_loss=test_loss
-            )
+            test_metrics = dict(test_loss_full_track=test_loss_full_track)
             mlflow.log_metrics(test_metrics, step=self.current_epoch)
         # Log everything to the console
-        logger.info(f"Testing finished: loss {test_loss:.3f}, accuracy {test_accuracy:.3f}")
+        logger.info(f"Testing finished: full-track loss {test_loss_full_track:.3f}")
         logger.info(f'Finished in {(time() - training_start) // 60} minutes!')
 
 

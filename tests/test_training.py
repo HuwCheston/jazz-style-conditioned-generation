@@ -67,8 +67,8 @@ class TrainingTest(unittest.TestCase):
         # Testing training dataloader
         # self.assertEqual(len(TRAINER.train_loader.dataset), 1)  # uses random chunks
         self.assertFalse(TRAINER.train_loader.dataset.do_augmentation)  # no augmentation as specified in config
-        self.assertGreater(len(TRAINER.test_loader.dataset), 1)  # exhaustive, uses all possible chunks from a track
-        self.assertGreater(len(TRAINER.validation_loader.dataset), 1)  # as with test loader
+        self.assertEqual(len(TRAINER.test_loader.dataset), 1)  # random chunks
+        self.assertEqual(len(TRAINER.validation_loader.dataset), 1)  # random chunks
         # Testing model
         self.assertTrue(isinstance(TRAINER.model, MusicTransformer))
         self.assertTrue(TRAINER.model.rpr)  # config specifies to use RPR
