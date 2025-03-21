@@ -47,35 +47,8 @@ DEFAULT_CONFIG = dict(
     dropout=0.1,
 )
 
-
-def top_k_top_p_filtering(
-        logits: torch.Tensor,
-        top_k: int = 0,
-        top_p: float = 1.0,
-        filter_value: float = -float("Inf"),
-        min_tokens_to_keep: int = 1,
-) -> torch.Tensor:
-    """ Copied from transformers"""
-    if top_k > 0:
-        top_k = min(max(top_k, min_tokens_to_keep), logits.size(-1))  # Safety check
-        # Remove all tokens with a probability less than the last token of the top-k
-        indices_to_remove = logits < torch.topk(logits, top_k)[0][:, -1, None]
-        logits[indices_to_remove] = filter_value
-    if top_p < 1.0:
-        sorted_logits, sorted_indices = torch.sort(logits, descending=True)
-        cumulative_probs = torch.cumsum(torch.nn.functional.softmax(sorted_logits, dim=-1), dim=-1)
-        # Remove tokens with cumulative probability above the threshold (token with 0 are kept)
-        sorted_indices_to_remove = cumulative_probs > top_p
-        if min_tokens_to_keep > 1:
-            # Keep at least min_tokens_to_keep (set to min_tokens_to_keep-1 because we add the first one below)
-            sorted_indices_to_remove[:, :min_tokens_to_keep] = 0
-        # Shift the indices to the right to keep also the first token above the threshold
-        sorted_indices_to_remove[:, 1:] = sorted_indices_to_remove[:, :-1].clone()
-        sorted_indices_to_remove[:, 0] = 0
-        # scatter sorted tensors to original indexing
-        indices_to_remove = sorted_indices_to_remove.scatter(1, sorted_indices, sorted_indices_to_remove)
-        logits[indices_to_remove] = filter_value
-    return logits
+DEFAULT_TOP_P = 0.7
+DEFAULT_TEMPERATURE = 1.2
 
 
 @dataclass
@@ -102,13 +75,15 @@ class MusicTransformer(nn.Module):
             dim_feedforward: int = 1024,  # Sulun == 3072
             dropout: float = 0.1,  # Sulun == 0.1
             max_seq_len: int = utils.MAX_SEQUENCE_LENGTH,
-            rpr: bool = False
+            rpr: bool = False,
+            dim_condition: int = 0
     ):
         super(MusicTransformer, self).__init__()
 
         self.tokenizer = tokenizer
         self.dummy = DummyDecoder()
 
+        self.dim_condition = dim_condition
         self.nlayers = n_layers
         self.nhead = num_heads
         self.d_model = d_model
@@ -117,8 +92,14 @@ class MusicTransformer(nn.Module):
         self.max_seq_len = max_seq_len
         self.rpr = rpr
 
+        # Condition embeddings
+        # if self.dim_condition > 0:
+        #     self.pianist_embedding = nn.Embedding(
+        #         25, self.dim_condition, padding_idx=self.tokenizer.pad_token_id
+        #     )
+
         # Input embedding
-        self.embedding = nn.Embedding(self.tokenizer.vocab_size, self.d_model)
+        self.embedding = nn.Embedding(self.tokenizer.vocab_size, self.d_model - self.dim_condition)
         # Positional encoding
         self.positional_encoding = PositionalEncoding(self.d_model, self.dropout, self.max_seq_len)
         # Base transformer
@@ -165,12 +146,21 @@ class MusicTransformer(nn.Module):
             self,
             input_ids: torch.Tensor,
             labels: torch.Tensor,
-            attention_mask: torch.Tensor
+            attention_mask: torch.Tensor,
+            condition_tokens: torch.Tensor = None
     ) -> torch.Tensor:
         """Takes an input sequence and outputs predictions using a sequence to sequence method, returns raw logits."""
         # Create causal mask
         causal_mask = self.transformer.generate_square_subsequent_mask(input_ids.shape[1]).to(input_ids.device)
         x = self.embedding(input_ids)
+        # if self.dim_condition > 0:
+        #     assert condition_tokens is not None, "Must pass condition tokens to forward when `dim_condition > 0`"
+        #     pianist_embedding = self.pianist_embedding(condition_tokens)
+        #     # Tile to match sequence length
+        #     pianist_embedding = pianist_embedding.expand(-1, x.size(1), -1)
+        #     # Concatenate with input embedding
+        #     x = torch.cat([x, pianist_embedding], dim=-1)
+
         # Input shape is (max_seq, batch_size, d_model)
         x = x.permute(1, 0, 2)
         x = self.positional_encoding(x)
@@ -191,7 +181,7 @@ class MusicTransformer(nn.Module):
             input_ids_full_track: torch.Tensor,
             targets_full_track: torch.Tensor,
             mask_full_track: torch.Tensor,
-            batch_size: int = 30
+            batch_size: int = 2
     ) -> torch.Tensor:
         """Performs evaluation for a FULL TRACK, returns sum(NLL) / len(raw_sequence_length)"""
 
@@ -256,12 +246,55 @@ class MusicTransformer(nn.Module):
         # Normalise the sum of all NLL values by the length of the decoded(/raw/non-BPE) sequence and return
         return torch.tensor(sum(all_nlls) / decoded_seq_len)
 
+    @staticmethod
+    def _temperature_top_p(
+            logits: torch.Tensor,
+            top_p: float = DEFAULT_TOP_P,
+            temperature: float = DEFAULT_TEMPERATURE,
+    ) -> torch.Tensor:
+        """Applies temperature and top-p to a tensor of logits (non-normalised)"""
+        # Apply temperature scaling
+        temp_logits = logits / temperature
+        # Compute probabilities
+        probs = torch.nn.functional.softmax(temp_logits, dim=-1)
+        # Apply top-p (nucleus) filtering
+        sorted_probs, sorted_indices = torch.sort(probs, descending=True)
+        cumulative_probs = torch.cumsum(sorted_probs, dim=-1)
+        # Remove tokens outside top-p nucleus
+        sorted_indices_to_remove = cumulative_probs > top_p
+        sorted_indices_to_remove[:, 1:] = sorted_indices_to_remove[:, :-1].clone()
+        sorted_indices_to_remove[:, 0] = False  # Always keep the most probable token
+        # Scatter back to original order
+        indices_to_remove = sorted_indices_to_remove.scatter(1, sorted_indices, sorted_indices_to_remove)
+        probs[indices_to_remove] = 0.  # Assign zero probability to removed tokens
+        # Scale such that the sum of the probabilities equals 1
+        return probs / probs.sum(dim=-1, keepdim=True)
+
+    def sampling(
+            self,
+            logits: torch.Tensor,
+            top_p: float = DEFAULT_TOP_P,
+            temperature: float = DEFAULT_TEMPERATURE,
+    ) -> int:
+        """Temperature and nucleus sampling: increases temperature when tokens in nucleus < (vocab_size) / 100"""
+        # Apply temperature and top-p to the logits and count how many unique tokens are in the nuclues
+        sampled = self._temperature_top_p(logits, top_p=top_p, temperature=temperature)
+        in_nucleus = (sampled > 0).sum(dim=-1).item()  # Count per batch
+        # We want at least 1% of the vocabulary size to be included in the nucleus
+        while in_nucleus < self.tokenizer.vocab_size // 100:
+            # Increase temperature by 1% and re-sample
+            temperature *= 1.01
+            sampled = self._temperature_top_p(logits, top_p=top_p, temperature=temperature)
+            in_nucleus = (sampled > 0).sum(dim=-1).item()
+        # Create the probability distribution and sample a single item from it
+        return torch.multinomial(sampled, num_samples=1, replacement=False)[0]
+
     def generate(
             self,
             primer: torch.tensor = None,
             target_seq_length: int = utils.MAX_SEQUENCE_LENGTH,
-            top_p: float = 1.,
-            top_k: int = 0
+            top_p: float = DEFAULT_TOP_P,
+            temperature: float = DEFAULT_TEMPERATURE,
     ):
         """Generates midi given a primer sample with nucleus sampling."""
         assert not self.training, "Cannot generate while in training mode"
@@ -292,22 +325,11 @@ class MusicTransformer(nn.Module):
             labels = gen_seq[:, 1: cur_i + 1]
             attention_mask = create_padding_mask(input_ids, self.tokenizer["PAD_None"])
             # Through the model to get the logits: shape (1, sequence_length, vocab_size)
-            logits = self.forward(input_ids, labels, attention_mask)
+            logits = self(input_ids, labels, attention_mask)
             # This gets the probabilities for the next token: shape (1, vocab_size)
-            token_probs = logits[:, cur_i - 1, :]
-            # Filter to get the top-k and top-p
-            # Elements not in top-k/top-p are replaced with 0
-            topk_topp = top_k_top_p_filtering(token_probs, top_k, top_p, filter_value=0.)
-            # Apply the softmax
-            smaxed = self.softmax(topk_topp)
-            # Create the distribution
-            # TODO: somehow this can end up all NaNs?
-            dist = torch.distributions.Categorical(probs=smaxed)
-            # Get the next token by sampling from the distribution
-            # Elements not in top-k/top-p have probability 0
-            next_token = dist.sample()
-            # Sanity check, we shouldn't predict an element with probability of 0.
-            assert smaxed[:, next_token].item() != 0.
+            token_probs = logits[:, -1, :]
+            # Get the next token after applying top-p + temperature sampling
+            next_token = self.sampling(token_probs, top_p=top_p, temperature=temperature)
             # Add the next token into the sequence
             gen_seq[:, cur_i] = next_token
             # Increment the counter
