@@ -357,12 +357,42 @@ class TrainingModule:
 
         # Get all the checkpoints for the current experiment/run combination, not including the "best" checkpoints
         checkpoints = [i for i in os.listdir(self.checkpoint_dir) if i.endswith(".pth") and "best" not in i]
-        if len(checkpoints) == 0:
+        # Get the best validation loss checkpoint
+        best_checkpoint = [i for i in os.listdir(self.checkpoint_dir) if i.endswith(".pth") and "best" in i]
+
+        # We have no checkpoints, so we don't need to do anything
+        if len(checkpoints) + len(best_checkpoint) == 0:
             logger.warning('No checkpoints have been created yet for this experiment/run, skipping load!')
             return
-        # Sort the checkpoints and load the latest one
-        latest_checkpoint = sorted(checkpoints)[-1]
-        checkpoint_path = os.path.join(self.checkpoint_dir, latest_checkpoint)
+
+        # Otherwise, we need to compare the checkpoints
+        # We have epoch checkpoints, but no best checkpoint
+        elif len(checkpoints) > 0 and len(best_checkpoint) == 0:
+            # Sort the checkpoints and load the latest one
+            latest_checkpoint = sorted(checkpoints)[-1]
+            checkpoint_path = os.path.join(self.checkpoint_dir, latest_checkpoint)
+
+        # We only have a single, best checkpoint, so we'll just use this
+        elif len(checkpoints) == 0 and len(best_checkpoint) > 0:
+            checkpoint_path = os.path.join(self.checkpoint_dir, best_checkpoint[0])
+
+        # We have both best checkpoint and most recent checkpoints
+        else:
+            # Sort the epoch checkpoints and load the most recent one
+            latest_checkpoint = sorted(checkpoints)[-1]
+            latest_check_path = os.path.join(self.checkpoint_dir, latest_checkpoint)
+            latest_check_loaded = torch.load(latest_check_path, map_location=utils.DEVICE, weights_only=False)
+            # Load the best checkpoint
+            best_checkpoint_path = os.path.join(self.checkpoint_dir, best_checkpoint[0])
+            best_checkpoint_loaded = torch.load(best_checkpoint_path, map_location=utils.DEVICE, weights_only=False)
+            # If the best checkpoint is later than the most recent checkpoint, use this one
+            if int(best_checkpoint_loaded["epoch"]) > int(latest_check_loaded["epoch"]):
+                checkpoint_path = best_checkpoint_path
+            # Otherwise, use the most recent checkpoint
+            else:
+                checkpoint_path = latest_check_path
+
+        # Load the desired checkpoint
         self.load_checkpoint(os.path.join(self.checkpoint_dir, checkpoint_path))
         # Set a NEW random seed according to the epoch, otherwise we'll just use the same randomisations as epoch 1
         utils.seed_everything(utils.SEED * self.current_epoch)
