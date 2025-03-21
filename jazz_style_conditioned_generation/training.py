@@ -190,10 +190,14 @@ class TrainingModule:
         self.optimizer = self.get_optimizer(optimizer_type)(self.model.parameters(), **optimizer_kws)
 
         # SCHEDULER
-        sched_type = self.scheduler_cfg.get("scheduler_type", None)
+        self.sched_type = self.scheduler_cfg.get("scheduler_type", None)
         sched_kws = self.scheduler_cfg.get("scheduler_kws", dict())
-        logger.debug(f'Initialising LR scheduler {sched_type} with parameters {sched_kws}...')
-        self.scheduler = self.get_scheduler(sched_type, sched_kws)
+        logger.debug(f'Initialising LR scheduler {self.sched_type} with parameters {sched_kws}...')
+        self.scheduler = self.get_scheduler(self.sched_type, sched_kws)
+
+        # EARLY STOPPING
+        self.do_early_stopping = self.scheduler_cfg.get("do_early_stopping", False)
+        self.min_lr = self.scheduler_cfg.get("min_lr", 1e-100)  # should never be reached by default
 
         # CHECKPOINTS
         if self.checkpoint_cfg.get("load_checkpoints", True):
@@ -646,7 +650,16 @@ class TrainingModule:
             if self.mlflow_cfg.get("use", False):
                 mlflow.log_metrics(epoch_metrics, step=epoch)
             # Step forward in the LR scheduler
-            self.scheduler.step()
+            # ReduceLROnPlateau needs the current validation loss passed in
+            if self.sched_type == "reduce":
+                self.scheduler.step(self.current_validation_loss)
+            # Other schedulers don't require anything
+            else:
+                self.scheduler.step()
+            # If required, stop early once we've reached the minimum LR
+            if self.do_early_stopping and self.scheduler.get_last_lr() <= self.min_lr:
+                logger.warning(f"Early stopping! LR {self.scheduler.get_last_lr()} reached {self.min_lr}")
+                break
             logger.debug(f'LR for epoch {epoch + 1} will be {self.get_scheduler_lr()}')
         # Run testing after training completes
         logger.info('Training complete!')
