@@ -75,7 +75,8 @@ class TrainingModule:
             data_dir: str = None,
             split_dir: str = None,
             full_validate_after_n_epochs: int = 25,
-            n_full_validation_tracks: int = 10
+            n_full_validation_tracks: int = 10,
+            _generate_only: bool = False
     ):
         # Set all keyword arguments to class parameters
         self.experiment = experiment
@@ -93,6 +94,7 @@ class TrainingModule:
         self.generate_cfg = generate_cfg
         self._data_dir = data_dir
         self._split_dir = split_dir
+        self._generate_only = _generate_only  # should only be set to True when running generate.py
 
         # Initialise the current epoch at 0
         self.current_epoch = 0
@@ -199,32 +201,9 @@ class TrainingModule:
 
     def create_dataloaders(self) -> tuple[DataLoader, DataLoader, DataLoader]:
         """Creates a dataloader for a given split and configuration"""
-        # Create test dataset loader: uses random chunks
-        train_loader = DataLoader(
-            DatasetMIDIConditionedRandomChunk(
-                tokenizer=self.tokenizer,
-                files_paths=self.track_splits["train"],
-                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
-                **self.train_dataset_cfg
-            ),
-            batch_size=self.batch_size,
-            shuffle=True,
-            drop_last=False,
-        )
         # Create validation dataset loader: uses random chunks
         if self.test_dataset_cfg.get("do_augmentation", False):
             raise AttributeError("Augmentation only allowed for training dataloader!")
-        validation_loader = DataLoader(
-            DatasetMIDIConditionedRandomChunk(
-                tokenizer=self.tokenizer,
-                files_paths=self.track_splits["validation"],
-                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
-                **self.test_dataset_cfg  # most arguments can be shared across test + validation loader
-            ),
-            batch_size=self.batch_size,
-            shuffle=True,
-            drop_last=False,
-        )
         # Create test dataset loader: uses FULL tracks!
         test_loader = DataLoader(
             DatasetMIDIConditionedFullTrack(
@@ -237,6 +216,33 @@ class TrainingModule:
             shuffle=False,  # don't want to shuffle either for this one
             drop_last=False,
         )
+        if self._generate_only:
+            return None, None, test_loader  # hack to avoid creating other dataloaders when we don't want them
+
+        validation_loader = DataLoader(
+            DatasetMIDIConditionedRandomChunk(
+                tokenizer=self.tokenizer,
+                files_paths=self.track_splits["validation"],
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                **self.test_dataset_cfg  # most arguments can be shared across test + validation loader
+            ),
+            batch_size=self.batch_size,
+            shuffle=True,
+            drop_last=False,
+        )
+        # Create test dataset loader: uses random chunks
+        train_loader = DataLoader(
+            DatasetMIDIConditionedRandomChunk(
+                tokenizer=self.tokenizer,
+                files_paths=self.track_splits["train"],
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                **self.train_dataset_cfg
+            ),
+            batch_size=self.batch_size,
+            shuffle=True,
+            drop_last=False,
+        )
+
         return train_loader, validation_loader, test_loader
 
     def read_tracks_for_split(self, split_type: str) -> list[str]:
@@ -554,7 +560,7 @@ class TrainingModule:
                 batch["input_ids"].to(utils.DEVICE),
                 batch["labels"].to(utils.DEVICE),
                 batch["attention_mask"].to(utils.DEVICE),
-                batch_size=15
+                batch_size=2
             )
             full_track_losses.append(full_track_loss.item())
         return np.mean(full_track_losses)
@@ -716,6 +722,7 @@ if __name__ == "__main__":
     if not args:
         raise ValueError("No config file specified")
     training_kws = parse_config_yaml(args['config'])
+    training_kws["_generate_only"] = False  # should only be set to True when running generate.py
 
     # Running training with logging on MLFlow
     if training_kws["mlflow_cfg"]["use"]:

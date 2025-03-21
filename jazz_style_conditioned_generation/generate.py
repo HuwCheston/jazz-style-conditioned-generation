@@ -9,7 +9,8 @@ import torch
 from loguru import logger
 
 from jazz_style_conditioned_generation import utils
-from jazz_style_conditioned_generation.data.scores import load_score, preprocess_score
+from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIConditionedFullTrack
+from jazz_style_conditioned_generation.encoders.music_transformer import DEFAULT_TEMPERATURE, DEFAULT_TOP_P
 from jazz_style_conditioned_generation.training import TrainingModule, parse_config_yaml
 
 OUTPUT_DIR = os.path.join(utils.get_project_root(), "outputs/generation")
@@ -17,10 +18,10 @@ OUTPUT_DIR = os.path.join(utils.get_project_root(), "outputs/generation")
 
 def main(
         primer: str = None,
-        primer_tokens: int = 128,
-        sequence_len: int = 1024,
-        top_p: float = 0.92,
-        top_k: int = 5,
+        primer_tokens: int = utils.MAX_SEQUENCE_LENGTH // 4,
+        sequence_len: int = utils.MAX_SEQUENCE_LENGTH,
+        top_p: float = DEFAULT_TOP_P,
+        temperature: float = DEFAULT_TEMPERATURE,
         output_dir: str = OUTPUT_DIR,
         save_wav: bool = True,
         **generate_kwargs
@@ -28,7 +29,6 @@ def main(
     # Sanity checks
     assert primer_tokens < sequence_len, "Primer tokens must be smaller than desired sequence length"
     assert 0. < top_p <= 1., "Top-p must be between 0 and 1"
-    assert 0 <= top_k, "Top-k must be positive"
 
     tm = TrainingModule(**generate_kwargs)
     # Model must be in evaluation mode
@@ -39,18 +39,19 @@ def main(
     if primer is not None:
         primer_fp = os.path.join(utils.get_project_root(), primer)
         logger.info(f"Generating using primer MIDI at {primer_fp}")
-        # Load the primer file
-        assert os.path.isfile(primer_fp), f"Could not find MIDI file at {primer_fp}!"
-        # TODO: this doesn't seem to be getting BOS/EOS/Condition tokens
-        #  Should probably pass through the dataloader functions instead
-        # Convert to a symusic object
-        sc = load_score(primer_fp)
-        # Do our preprocessing
-        sc = preprocess_score(sc)
-        # Pass the score through the tokenizer
-        tokseq = tm.tokenizer(sc)[0].ids
-        # Subset the tokens to get the required number and convert to a tensor
-        tokseq = torch.tensor(tokseq[:primer_tokens])
+        # Load the primer file with our dataloader class
+        utils.validate_paths([primer_fp], ".mid")
+        # TODO: allow for custom condition tokens to be passed here
+        #  Currently we just use whatever is associated with the track by default
+        ds = DatasetMIDIConditionedFullTrack(
+            tokenizer=tm.tokenizer,
+            files_paths=[primer_fp],
+            max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+            do_augmentation=False,
+            do_conditioning=True,
+        )
+        # Pass the score through the tokenizer and get the required number of tokens
+        tokseq = ds.__getitem__(0)["input_ids"][:primer_tokens]
     # Otherwise, we can draw a random file from the test dataset
     else:
         logger.info("Generating using a random item from test split")
@@ -62,12 +63,10 @@ def main(
     # Finally, we can pass through the model to get the output
     logger.info("Starting generation...")
     with torch.no_grad():
-        gen_out = tm.model.generate(tokseq, target_seq_length=sequence_len, top_p=top_p, top_k=top_k)
+        gen_out = tm.model.generate(tokseq, target_seq_length=sequence_len, top_p=top_p, temperature=temperature)
     logger.info(f"Generation finished with length {gen_out.size(1)}, saving output...")
     # Convert the generated token indices back to a Score
-    tok_out = tm.tokenizer(gen_out.to("cpu"))
-    # (post)-process the generated score
-    # tok_out = preprocess_score(tok_out)
+    tok_out = tm.tokenizer(gen_out.cpu())
     # Get the filepaths to save the generation to
     out_fp = os.path.join(output_dir, f"generation_{utils.now()}")
     # Save the midi + wav file (if required)
@@ -115,16 +114,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "-p",
         "--top-p",
-        default=0.7,
+        default=DEFAULT_TOP_P,
         type=float,
-        help="Top-p value to use in nucleus sampling (defaults to 0.92). Must be between 0 and 1."
+        help=f"Top-p value to use in nucleus sampling (defaults to {DEFAULT_TOP_P}). Must be between 0 and 1."
     )
     parser.add_argument(
-        "-k",
-        "--top-k",
-        default=5,
-        type=int,
-        help="Top-k value to use in nucleus sampling (defaults to 5). Must be positive."
+        "-t",
+        "--temperature",
+        default=DEFAULT_TEMPERATURE,
+        type=float,
+        help=f"Temperature value to use in scaling the probability distribution (defaults to {DEFAULT_TEMPERATURE})."
     )
     parser.add_argument(
         "-o",
@@ -147,6 +146,7 @@ if __name__ == "__main__":
     generate_kws = parse_config_yaml(args['config'])
     # No MLFlow required for generation
     generate_kws["mlflow_cfg"]["use"] = False
+    generate_kws["_generate_only"] = True  # avoids running our preprocessing for training + validation data
     # Prevents us from having to create the dataset from scratch
     generate_kws["test_dataset_cfg"]["n_clips"] = 1
     main(
@@ -154,7 +154,7 @@ if __name__ == "__main__":
         primer_tokens=args["n_primer_tokens"],
         sequence_len=args["sequence_len"],
         top_p=args["top_p"],
-        top_k=args["top_k"],
+        temperature=args["temperature"],
         output_dir=args["output_dir"],
         save_wav=args["save_wav"],
         **generate_kws
