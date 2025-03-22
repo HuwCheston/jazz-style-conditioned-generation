@@ -7,7 +7,7 @@ import os
 import random
 import unittest
 
-from miditok import MIDILike, TokenizerConfig
+from miditok import MIDILike, TokenizerConfig, TSD
 from pretty_midi import Note as PMNote
 from pretty_midi import PrettyMIDI, Instrument
 from pretty_midi import TimeSignature as PMTimeSignature
@@ -120,7 +120,73 @@ class PreProcessingScoreTest(unittest.TestCase):
 
 
 class LoadScoreTest(unittest.TestCase):
-    def test_load_score_dummy(self):
+    def test_load_score_tsd(self):
+        # Create the tokenizer
+        TOKENIZER = TSD(
+            TokenizerConfig(
+                # This means that we will have exactly 100 evenly-spaced tokens per "bar"
+                beat_res={(0, utils.TIME_SIGNATURE): 100 // utils.TIME_SIGNATURE}
+            )
+        )
+        # The tokenizer vocab is a dictionary: we just want to get the TimeShift and duration tokens
+        timeshifts = [m for m in TOKENIZER.vocab.keys() if "TimeShift" in m]
+        n_timeshifts = len(timeshifts)  # 100 tokens at evenly-spaced 10ms increments between 0 - 1 second
+        durations = [m for m in TOKENIZER.vocab.keys() if "Duration" in m]
+        n_durations = len(durations)  # 100 tokens at evenly-spaced 10ms increments between 0 - 1 second
+        assert n_timeshifts == 100 == n_durations
+        # Get tokens corresponding to particular time values
+        ts_token_100ms = timeshifts[9]
+        ts_token_1000ms = timeshifts[-1]
+        dur_token_10ms = durations[0]
+        dur_token_100ms = durations[9]
+        dur_token_1000ms = durations[-1]
+        # Create some dummy pretty MIDI notes with standard durations
+        dummy_notes = [
+            PMNote(start=0., end=1., pitch=80, velocity=50),  # 1 second duration
+            PMNote(start=1., end=1.1, pitch=81, velocity=50),  # 100 millisecond duration
+            PMNote(start=1.1, end=1.11, pitch=82, velocity=50),  # 10 millisecond duration
+        ]
+        # Convert our dummy note stream into the expected tokens
+        expected_tokens = [
+            'Pitch_80', 'Velocity_51', dur_token_1000ms, ts_token_1000ms,
+            'Pitch_81', 'Velocity_51', dur_token_100ms, ts_token_100ms,
+            'Pitch_82', 'Velocity_51', dur_token_10ms,
+        ]
+        # Create a fake MIDI file
+        # Get a random tempo and time signature
+        tempo = random.randint(100, 300)
+        ts = random.randint(1, 8)
+        tpq = random.randint(100, 1000)
+        # Create a PrettyMIDI object at the desired resolution with a random tempo
+        pm = PrettyMIDI(resolution=tpq, initial_tempo=tempo)
+        pm.instruments = [Instrument(program=0)]
+        # Add some notes in
+        pm.instruments[0].notes = dummy_notes
+        # Add some random time signature and tempo changes
+        pm.time_signature_changes = [PMTimeSignature(ts, 4, 0)]
+        # Sanity check the input
+        self.assertEqual(pm.resolution, tpq)
+        self.assertEqual(pm.time_signature_changes[0].numerator, ts)
+        self.assertEqual(round(pm.get_tempo_changes()[1][0]), tempo)
+        # Write our random midi file
+        out_path = "temp_pm.mid"
+        pm.write(out_path)
+        # Load in as a symusic score object and apply our preprocessing to standardise tempo, time signature, & TPQ
+        score = load_score(out_path)
+        # Sanity check that the score is correct
+        self.assertTrue(score.ticks_per_quarter == utils.TICKS_PER_QUARTER)
+        self.assertTrue(len(score.tempos) == 1)
+        self.assertTrue(score.tempos[0].qpm == utils.TEMPO)
+        self.assertTrue(len(score.time_signatures) == 1)
+        self.assertTrue(score.time_signatures[0].numerator == utils.TIME_SIGNATURE)
+        # Tokenize the output
+        toks = TOKENIZER.encode(score)[0].tokens
+        # Sanity check that the tokens are correct
+        self.assertTrue(toks == expected_tokens)
+        # Clean up
+        os.remove(out_path)
+
+    def test_load_score_midilike(self):
         # Create the tokenizer
         TOKENIZER = MIDILike(
             TokenizerConfig(
