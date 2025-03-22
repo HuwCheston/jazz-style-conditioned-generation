@@ -687,8 +687,8 @@ class TrainingModule:
             else:
                 self.scheduler.step()
             # If required, stop early once we've reached the minimum LR
-            if self.do_early_stopping and self.scheduler.get_last_lr() <= self.min_lr:
-                logger.warning(f"Early stopping! LR {self.scheduler.get_last_lr()} reached {self.min_lr}")
+            if self.do_early_stopping and self.scheduler.get_last_lr()[-1] <= self.min_lr:
+                logger.warning(f"Early stopping! LR {self.scheduler.get_last_lr()[-1]} reached {self.min_lr}")
                 break
             logger.debug(f'LR for epoch {epoch + 1} will be {self.get_scheduler_lr()}')
         # Run testing after training completes
