@@ -345,8 +345,11 @@ class TrainingModule:
             self.current_epoch = loaded["epoch"] + 1
             self.scheduler.last_epoch = self.current_epoch
             # Set the current and best validation loss accordingly
-            self.current_validation_loss = loaded["current_validation_loss"]
-            self.best_validation_loss = loaded["best_validation_loss"]
+            try:
+                self.current_validation_loss = loaded["current_validation_loss"]
+                self.best_validation_loss = loaded["best_validation_loss"]
+            except KeyError:
+                pass
             # For some reason, we need to do a step in the scheduler here so that we have the correct LR
             if self.sched_type == "reduce":
                 self.scheduler.step(self.current_validation_loss)
