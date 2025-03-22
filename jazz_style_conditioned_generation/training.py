@@ -344,8 +344,14 @@ class TrainingModule:
             # Increment epoch by 1
             self.current_epoch = loaded["epoch"] + 1
             self.scheduler.last_epoch = self.current_epoch
+            # Set the current and best validation loss accordingly
+            self.current_validation_loss = loaded["current_validation_loss"]
+            self.best_validation_loss = loaded["best_validation_loss"]
             # For some reason, we need to do a step in the scheduler here so that we have the correct LR
-            self.scheduler.step()
+            if self.sched_type == "reduce":
+                self.scheduler.step(self.current_validation_loss)
+            else:
+                self.scheduler.step()
             logger.debug(f'Loaded the checkpoint at {checkpoint_path}!')
 
     def load_most_recent_checkpoint(self) -> None:
