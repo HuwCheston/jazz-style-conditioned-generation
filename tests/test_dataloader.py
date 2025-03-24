@@ -18,6 +18,7 @@ from jazz_style_conditioned_generation.data.tokenizer import (
     add_genres_to_vocab,
     add_pianists_to_vocab,
     add_timesignatures_to_vocab,
+    add_recording_years_to_vocab,
     train_tokenizer,
     load_tokenizer
 )
@@ -36,7 +37,7 @@ DUMMY_DATASET = DatasetMIDIConditioned(
     do_augmentation=False
 )
 
-CONDITION_TOKEN_STARTS = ["GENRES", "PIANIST", "TEMPO", "TIMESIGNATURE"]
+CONDITION_TOKEN_STARTS = ["GENRES", "PIANIST", "TEMPO", "TIMESIGNATURE", "RECORDINGYEAR"]
 
 
 def prepare_conditioned_tokenizer():
@@ -44,6 +45,7 @@ def prepare_conditioned_tokenizer():
     # Add in all of our tokens to the vocabulary
     add_genres_to_vocab(token_factory)
     add_pianists_to_vocab(token_factory)
+    add_recording_years_to_vocab(token_factory)
     add_tempos_to_vocab(token_factory, 80, 30, factor=1.05)
     add_timesignatures_to_vocab(token_factory, [3, 4])
     return token_factory
@@ -107,14 +109,14 @@ class DatasetConditionedTest(unittest.TestCase):
         #  GENRE and PIANIST are sorted in DESCENDING weight order, with the track pianist always placed first
         expected_tokens = [
             "GENRES_Caribbean", "GENRES_HardBop", "GENRES_PostBop", "GENRES_StraightAheadJazz", "GENRES_Fusion",
-            "PIANIST_KennyBarron", "TEMPOCUSTOM_299", "TIMESIGNATURECUSTOM_44"
+            "PIANIST_KennyBarron", "RECORDINGYEAR_1990", "TEMPOCUSTOM_299", "TIMESIGNATURECUSTOM_44"
         ]
         expected_token_ids = [token_factory[t] for t in expected_tokens]
         actual_token_ids = ds.get_conditioning_tokens(utils.read_json_cached(ds.metadata_paths[0]))
         self.assertTrue(expected_token_ids == actual_token_ids)
         # Test with metadata from second track
         # This track has one GENRE token, associated with the pianist, and two SIMILAR PIANISTS
-        expected_tokens = ["GENRES_StraightAheadJazz", "PIANIST_BradMehldau", "PIANIST_KennyDrew"]
+        expected_tokens = ["GENRES_StraightAheadJazz", "PIANIST_BradMehldau", "PIANIST_KennyDrew", "RECORDINGYEAR_2020"]
         expected_token_ids = [token_factory[t] for t in expected_tokens]
         actual_token_ids = ds.get_conditioning_tokens(utils.read_json_cached(ds.metadata_paths[1]))
         self.assertTrue(expected_token_ids == actual_token_ids)
@@ -267,15 +269,16 @@ class DatasetConditionedTest(unittest.TestCase):
             self.assertEqual(input_ids[3], token_factory["GENRES_StraightAheadJazz"])
             self.assertEqual(input_ids[4], token_factory["GENRES_Fusion"])  # least strongly weighted genre, = 5
             self.assertEqual(input_ids[5], token_factory["PIANIST_KennyBarron"])
-            self.assertEqual(input_ids[6], token_factory["TEMPOCUSTOM_299"])  # closest match to our provided tempo
-            self.assertEqual(input_ids[7], token_factory["TIMESIGNATURECUSTOM_44"])
+            self.assertEqual(input_ids[6], token_factory["RECORDINGYEAR_1990"])
+            self.assertEqual(input_ids[7], token_factory["TEMPOCUSTOM_299"])  # closest match to our provided tempo
+            self.assertEqual(input_ids[8], token_factory["TIMESIGNATURECUSTOM_44"])
 
         # These tests can only work with our exhaustive dataloader
         ds = DatasetMIDIConditioned(**kwargs)
         # Test the first slice of the first item
         item = ds.__getitem__(0)
         input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
-        self.assertEqual(input_ids[8], token_factory["BOS_None"])  # after condition tokens, we should get BOS
+        self.assertEqual(input_ids[9], token_factory["BOS_None"])  # after condition tokens, we should get BOS
 
         # Test the last "slice" of the first item
         item = ds.__getitem__(-1)
@@ -285,8 +288,8 @@ class DatasetConditionedTest(unittest.TestCase):
         self.assertEqual(len(targets), 100)
         # Should have all the desired condition tokens, but not followed by BOS
         self.assertEqual(input_ids[0], token_factory["GENRES_Caribbean"])  # most strongly weighted genre, = 10
-        self.assertEqual(input_ids[7], token_factory["TIMESIGNATURECUSTOM_44"])
-        self.assertNotEqual(input_ids[8], token_factory["BOS_None"])  # after condition tokens, NO BOS
+        self.assertEqual(input_ids[8], token_factory["TIMESIGNATURECUSTOM_44"])
+        self.assertNotEqual(input_ids[9], token_factory["BOS_None"])  # after condition tokens, NO BOS
         # Should have the EOS token in the last chunk
         no_pad = [i_ for i_ in input_ids if i_ != token_factory["PAD_None"]]
         self.assertTrue(no_pad[-1] == token_factory["EOS_None"])
@@ -317,8 +320,10 @@ class DatasetConditionedTest(unittest.TestCase):
             self.assertEqual(input_ids[0], token_factory["GENRES_StraightAheadJazz"])
             self.assertEqual(input_ids[1], token_factory["PIANIST_BradMehldau"])  # similar to Beegie Adair
             self.assertEqual(input_ids[2], token_factory["PIANIST_KennyDrew"])
+            self.assertEqual(input_ids[3], token_factory["RECORDINGYEAR_2020"])
             self.assertEqual(targets[0], token_factory["PIANIST_BradMehldau"])
             self.assertEqual(targets[1], token_factory["PIANIST_KennyDrew"])
+            self.assertEqual(targets[2], token_factory["RECORDINGYEAR_2020"])
             # We should not have any tempo or time signature tokens for this track
             for tok in input_ids:
                 for t in ["TEMPO", "TIMESIGNATURE"]:
@@ -329,7 +334,7 @@ class DatasetConditionedTest(unittest.TestCase):
         # Test the first slice of the first item
         item = ds.__getitem__(0)
         input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
-        self.assertEqual(input_ids[3], token_factory["BOS_None"])
+        self.assertEqual(input_ids[4], token_factory["BOS_None"])
         # Get the last slice
         item = ds.__getitem__(-1)
         input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
@@ -339,7 +344,8 @@ class DatasetConditionedTest(unittest.TestCase):
         # Test conditioning tokens in correct place
         self.assertEqual(input_ids[0], token_factory["GENRES_StraightAheadJazz"])
         self.assertEqual(input_ids[2], token_factory["PIANIST_KennyDrew"])
-        self.assertNotEqual(input_ids[3], token_factory["BOS_None"])  # no BOS for chunks other than first
+        self.assertEqual(input_ids[3], token_factory["RECORDINGYEAR_2020"])
+        self.assertNotEqual(input_ids[4], token_factory["BOS_None"])  # no BOS for chunks other than first
         # Should have the EOS token in the last chunk
         no_pad = [i_ for i_ in input_ids if i_ != token_factory["PAD_None"]]
         self.assertTrue(no_pad[-1] == token_factory["EOS_None"])
@@ -432,6 +438,7 @@ class DatasetConditionedTest(unittest.TestCase):
             add_timesignatures_to_vocab(tok, [3, 4])
             add_pianists_to_vocab(tok)
             add_genres_to_vocab(tok)
+            add_recording_years_to_vocab(tok)
             # FIRST: we test without training the tokenizer
             dataset = ds_cls(tokenizer=tok, **kwargs)
             runner(dataset)

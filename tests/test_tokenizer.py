@@ -15,6 +15,7 @@ from jazz_style_conditioned_generation.data.tokenizer import (
     add_timesignatures_to_vocab,
     add_pianists_to_vocab,
     add_genres_to_vocab,
+    add_recording_years_to_vocab,
     get_tokenizer_class_from_string,
     load_tokenizer,
     train_tokenizer,
@@ -168,6 +169,17 @@ class TokenizerTest(unittest.TestCase):
         ]
         for not_expected in not_expected_genres:
             self.assertFalse(not_expected in tok.vocab)
+
+    def test_add_years(self):
+        tok = TSD(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
+        prev_vocab = tok.vocab_size
+        # Adding 17 years from 1945 -> 2025 in 5 year steps
+        add_recording_years_to_vocab(tok, 1945, 2025, 5)
+        expected_vocab = prev_vocab + 17
+        self.assertEqual(tok.vocab_size, expected_vocab)
+        expected = ["RECORDINGYEAR_1945", "RECORDINGYEAR_1970", "RECORDINGYEAR_2025"]
+        for expect in expected:
+            self.assertTrue(expect in tok.vocab)
 
     @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
     def test_add_all_genres(self):

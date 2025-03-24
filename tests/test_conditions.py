@@ -14,7 +14,8 @@ from jazz_style_conditioned_generation.data.tokenizer import (
     add_pianists_to_vocab,
     add_genres_to_vocab,
     add_timesignatures_to_vocab,
-    add_tempos_to_vocab
+    add_tempos_to_vocab,
+    add_recording_years_to_vocab
 )
 
 
@@ -184,6 +185,25 @@ class ConditionsTest(unittest.TestCase):
         # Raise an error if we try an out of range value
         with self.assertRaises(ValueError):
             _ = cond.get_tempo_token(20000, tokenizer)
+
+    def test_get_year_token(self):
+        tokenizer = REMI()
+        # Should raise an error if we haven't added the tokens in yet
+        with self.assertRaises(AssertionError):
+            _ = cond.get_recording_year_token(1950, tokenizer)
+        # Add in tempo tokens
+        add_recording_years_to_vocab(tokenizer, 1945, 2025, 5)
+        # Test with 1954, should become 1955
+        expected = "RECORDINGYEAR_1955"
+        actual = cond.get_recording_year_token(1954, tokenizer)
+        self.assertEqual(expected, actual)
+        # Test with 1968, should be rounded to 1970
+        expected = "RECORDINGYEAR_1970"
+        actual = cond.get_recording_year_token(1968, tokenizer)
+        self.assertEqual(expected, actual)
+        # Raise an error if we try an out of range value
+        with self.assertRaises(ValueError):
+            _ = cond.get_recording_year_token(20000, tokenizer)
 
     @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
     def test_genre_tokens_with_full_dataset(self):
