@@ -122,19 +122,19 @@ class TrainingModule:
         # CONDITIONS
         if self.train_dataset_cfg.get("do_conditioning", True) != self.test_dataset_cfg.get("do_conditioning", True):
             raise AttributeError('Got conflicting options for `do_conditioning` for test and train dataloaders!')
-        if self.train_dataset_cfg.get("do_conditioning", True):
-            logger.debug("Adding condition tokens...")
-            # These functions add all the required condition tokens into the tokenizer's vocabulary
-            add_genres_to_vocab(self.tokenizer)
-            add_pianists_to_vocab(self.tokenizer)
-            # TODO: allow tempo range, number of tempos, and time signatures to be passed in as keywords
-            #  this probably means having a new conditioning_cfg dictionary
-            add_tempos_to_vocab(self.tokenizer, 80, 30, factor=1.05)
-            add_timesignatures_to_vocab(self.tokenizer, [3, 4])
-            # Log the number of tokens we've added for each condition type to the console
-            for condition in ["GENRES", "PIANIST", "TIMESIGNATURE", "TEMPO"]:
-                n_conditions = [i for i in self.tokenizer.vocab if i.startswith(condition)]
-                logger.debug(f'... added {len(n_conditions)} {condition} tokens!')
+        # We want the conditioning tokens to always be part of the vocabulary
+        # TODO: we probably don't want to do this when using a different condition type,
+        #  e.g. concatenating along the sequence dimension
+        logger.debug("Adding condition tokens...")
+        # These functions add all the required condition tokens into the tokenizer's vocabulary
+        add_genres_to_vocab(self.tokenizer)
+        add_pianists_to_vocab(self.tokenizer)
+        add_tempos_to_vocab(self.tokenizer, 80, 30, factor=1.05)
+        add_timesignatures_to_vocab(self.tokenizer, [3, 4])
+        # Log the number of tokens we've added for each condition type to the console
+        for condition in ["GENRES", "PIANIST", "TIMESIGNATURE", "TEMPO"]:
+            n_conditions = [i for i in self.tokenizer.vocab if i.startswith(condition)]
+            logger.debug(f'... added {len(n_conditions)} {condition} tokens!')
 
         # TRAIN THE TOKENIZER
         if self.tokenizer_cfg.get("do_training", False):
@@ -603,7 +603,7 @@ class TrainingModule:
                 batch["input_ids"].to(utils.DEVICE),
                 batch["labels"].to(utils.DEVICE),
                 batch["attention_mask"].to(utils.DEVICE),
-                batch_size=2
+                batch_size=self.batch_size
             )
             full_track_losses.append(full_track_loss.item())
         return np.mean(full_track_losses)
@@ -760,21 +760,14 @@ def add_run_id_to_config_yaml(config_fname: str, mlflow_run_id: str) -> None:
         yaml.safe_dump(cur_yaml, yamlfile, sort_keys=False)
 
 
-if __name__ == "__main__":
-    import argparse
+def main(training_kws: dict, trainer_cls: type = TrainingModule, config_fpath: str = None) -> None:
+    """
+    Runs training with given kwargs.
 
-    # Seed everything for reproducible results
-    utils.seed_everything(utils.SEED)
+    trainer_cls should be a class that implements e.g .start, .step methods. config_fpath should be a path towards
+    a config .yaml file that will be parsed
 
-    # Parsing arguments from the command line interface
-    parser = argparse.ArgumentParser(description="Run model training")
-    parser.add_argument("-c", "--config", default=None, type=str, help="Path to config YAML file")
-    # Parse all arguments from the provided YAML file
-    args = vars(parser.parse_args())
-    if not args:
-        raise ValueError("No config file specified")
-    training_kws = parse_config_yaml(args['config'])
-    training_kws["_generate_only"] = False  # should only be set to True when running generate.py
+    """
 
     # Running training with logging on MLFlow
     if training_kws["mlflow_cfg"]["use"]:
@@ -797,7 +790,7 @@ if __name__ == "__main__":
                 training_kws["mlflow_cfg"]["use"] = False
             else:
                 # Otherwise, start training with the arguments we've passed in
-                tm = TrainingModule(**training_kws)
+                tm = trainer_cls(**training_kws)
                 # Either run is being resumed with a run ID passed in with our config file
                 if run_id is not None:
                     logger.debug(f'Resuming run with name {training_kws["run"]}, ID {run_id}!')
@@ -807,13 +800,32 @@ if __name__ == "__main__":
                 # Start the run!
                 with mlflow.start_run(run_name=training_kws["run"], run_id=run_id):
                     # If this is a new run, append the newly-created run ID to our yaml config file (if we passed this)
-                    if args['config'] is not None and 'run_id' not in training_kws['mlflow_cfg'].keys():
+                    if config_fpath is not None and 'run_id' not in training_kws['mlflow_cfg'].keys():
                         new_run_id = mlflow.active_run().info.run_id
-                        add_run_id_to_config_yaml(args["config"], new_run_id)
-                        logger.debug(f'Added run id {new_run_id} to {args["config"]}!')
+                        add_run_id_to_config_yaml(config_fpath, new_run_id)
+                        logger.debug(f'Added run id {new_run_id} to {config_fpath}!')
                     tm.start()
 
     # Running training locally
     else:
-        tm = TrainingModule(**training_kws)
+        tm = trainer_cls(**training_kws)
         tm.start()
+
+
+if __name__ == "__main__":
+    import argparse
+
+    # Seed everything for reproducible results
+    utils.seed_everything(utils.SEED)
+
+    # Parsing arguments from the command line interface
+    parser = argparse.ArgumentParser(description="Run model training")
+    parser.add_argument("-c", "--config", default=None, type=str, help="Path to config YAML file")
+    # Parse all arguments from the provided YAML file
+    parser_args = vars(parser.parse_args())
+    if not parser_args:
+        raise ValueError("No config file specified")
+    training_kwargs = parse_config_yaml(parser_args['config'])
+    training_kwargs["_generate_only"] = False  # should only be set to True when running generate.py
+    # Start training!
+    main(training_kwargs, config_fpath=parser_args["config"])
