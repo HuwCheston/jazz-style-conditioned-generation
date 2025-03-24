@@ -350,11 +350,11 @@ class TrainingModule:
                 self.best_validation_loss = loaded["best_validation_loss"]
             except KeyError:
                 pass
-            # For some reason, we need to do a step in the scheduler here so that we have the correct LR
-            if self.sched_type == "reduce":
-                self.scheduler.step(self.current_validation_loss)
-            else:
-                self.scheduler.step()
+            # We've moved saving a checkpoint to the end of the training loop, so we shouldn't need to do a step here
+            # if self.sched_type == "reduce":
+            #     self.scheduler.step(self.current_validation_loss)
+            # else:
+            #     self.scheduler.step()
             logger.debug(f'Loaded the checkpoint at {checkpoint_path}!')
 
     def load_most_recent_checkpoint(self) -> None:
@@ -642,6 +642,10 @@ class TrainingModule:
         for epoch in range(self.current_epoch, self.epochs):
             self.current_epoch = epoch
             epoch_start = time()
+            # If required, stop early once we've reached the minimum LR
+            if self.do_early_stopping and self.scheduler.get_last_lr()[-1] <= self.min_lr:
+                logger.warning(f"Early stopping! LR {self.scheduler.get_last_lr()[-1]} reached {self.min_lr}")
+                break
             # Training
             train_loss, train_accuracy = self.training(epoch)
             logger.debug(f'Epoch {epoch} / {self.epochs}, training finished: '
@@ -670,6 +674,17 @@ class TrainingModule:
                 valid_loss_full_track = self.evaluate_full_tracks(self.n_full_validation_tracks)
                 logger.info(f"Epoch {epoch} / {self.epochs}: full-track validation loss {valid_loss_full_track:.3f}")
                 epoch_metrics["validation_loss_full_track"] = valid_loss_full_track
+            # Report results to MLFlow, if we're using this
+            if self.mlflow_cfg.get("use", False):
+                mlflow.log_metrics(epoch_metrics, step=epoch)
+            # Step forward in the LR scheduler
+            # ReduceLROnPlateau needs the current validation loss passed in
+            if self.sched_type == "reduce":
+                self.scheduler.step(self.current_validation_loss)
+            # Other schedulers don't require anything
+            else:
+                self.scheduler.step()
+            logger.debug(f'LR for epoch {epoch + 1} will be {self.get_scheduler_lr()}')
             # Checkpoint the run, if we need to
             if self.checkpoint_cfg["save_checkpoints"]:
                 # How many epochs before we need to checkpoint (10 by default)
@@ -685,21 +700,6 @@ class TrainingModule:
                 # Save an additional checkpoint for the run if this is the best epoch
                 if self.current_validation_loss == self.best_validation_loss:
                     self.save_checkpoint(epoch_metrics, os.path.join(self.checkpoint_dir, 'validation_best.pth'))
-            # Report results to MLFlow, if we're using this
-            if self.mlflow_cfg.get("use", False):
-                mlflow.log_metrics(epoch_metrics, step=epoch)
-            # Step forward in the LR scheduler
-            # ReduceLROnPlateau needs the current validation loss passed in
-            if self.sched_type == "reduce":
-                self.scheduler.step(self.current_validation_loss)
-            # Other schedulers don't require anything
-            else:
-                self.scheduler.step()
-            # If required, stop early once we've reached the minimum LR
-            if self.do_early_stopping and self.scheduler.get_last_lr()[-1] <= self.min_lr:
-                logger.warning(f"Early stopping! LR {self.scheduler.get_last_lr()[-1]} reached {self.min_lr}")
-                break
-            logger.debug(f'LR for epoch {epoch + 1} will be {self.get_scheduler_lr()}')
         # Run testing after training completes
         logger.info('Training complete!')
         test_loss_full_track = self.testing()
