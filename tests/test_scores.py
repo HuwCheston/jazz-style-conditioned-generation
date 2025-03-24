@@ -12,6 +12,7 @@ from pretty_midi import Note as PMNote
 from pretty_midi import PrettyMIDI, Instrument
 from pretty_midi import TimeSignature as PMTimeSignature
 from symusic import Score, Note
+from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.scores import (
@@ -296,6 +297,46 @@ class LoadScoreTest(unittest.TestCase):
             for pm, sm in zip(pm_notes, sm_notes):
                 self.assertTrue(utils.base_round(pm.start * 1000, 10) == sm.time)  # make sure to round!
                 self.assertTrue(utils.base_round(pm.duration * 1000, 10) == sm.duration)
+
+    @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
+    def test_load_score_full_dataset(self):
+        """Tests our load_score function on the entire dataset. Only runs locally"""
+        datasets = [
+            "raw/pijama",
+            "raw/jtd",
+            "raw/jja",
+            "raw/bushgrafts",
+            "raw/pianist8",
+            "pretraining/atepp"
+        ]
+        # Iterate over all datasets
+        for ds in datasets:
+            # Add the beginning of the filepath
+            ds = os.path.join(utils.get_project_root(), "data", ds)
+            for t in tqdm(os.listdir(ds), desc="Testing dataset {}".format(ds)):
+                # Skip over e.g. .gitkeep files
+                if not os.path.isdir(os.path.join(ds, t)):
+                    continue
+                # Check MIDI and metadata paths
+                midi_fp = os.path.join(ds, t, "piano_midi.mid")
+                # Load with Symusic and ttype=="Second" to get actual times
+                pm_load = Score(midi_fp, ttype="Second")
+                # Load with our custom symusic function
+                sm_load = load_score(midi_fp)
+                self.assertTrue(sm_load.ticks_per_quarter == utils.TICKS_PER_QUARTER)
+                self.assertTrue(len(sm_load.tempos) == 1)
+                self.assertTrue(sm_load.tempos[0].qpm == utils.TEMPO)
+                self.assertTrue(len(sm_load.time_signatures) == 1)
+                self.assertTrue(sm_load.time_signatures[0].numerator == utils.TIME_SIGNATURE)
+                # Get the notes from both files and sort by onset time (not sure if this is necessary)
+                pm_notes = sorted(pm_load.tracks[0].notes, key=lambda x: x.start)
+                sm_notes = sorted(sm_load.tracks[0].notes, key=lambda x: x.start)
+                # Number of notes should be the same
+                self.assertTrue(len(pm_notes) == len(sm_notes))
+                # Start times for notes should be directly equivalent
+                for pm, sm in zip(pm_notes, sm_notes):
+                    self.assertTrue(utils.base_round(pm.start * 1000, 10) == sm.time)  # make sure to round!
+                    self.assertTrue(utils.base_round(pm.duration * 1000, 10) == sm.duration)
 
 
 if __name__ == '__main__':
