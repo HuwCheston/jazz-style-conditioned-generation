@@ -135,7 +135,7 @@ def create_data_splits(track_metadatas: list[dict]):
     check_all_splits_unique(train_perfs, test_perfs, valid_perfs)
 
     # Dump the data splits
-    for name, df in zip(["train", "test", "valid"], [train_perfs, test_perfs, valid_perfs]):
+    for name, df in zip(["train", "test", "validation"], [train_perfs, test_perfs, valid_perfs]):
         split_fpath = os.path.join(PRETRAIN_SPLIT_DIR, f'{name}_pretraining_split.txt')
         with open(split_fpath, 'w') as f:
             for line in df:
