@@ -13,6 +13,7 @@ from jazz_style_conditioned_generation import utils
 
 DATA_ROOT = os.path.join(utils.get_project_root(), "data/raw")
 DATASETS = ["bushgrafts", "jja", "jtd", "pianist8", "pijama"]
+ATEPP_ROOT = os.path.join(utils.get_project_root(), "data/pretraining/atepp")
 
 
 @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
@@ -113,6 +114,33 @@ class DatasetTester(unittest.TestCase):
                 _ = Score(midi_file)
             except SCORE_LOADING_EXCEPTION as e:
                 self.fail(f'{midi_file} raised error {e} when loading')
+
+    def test_atepp_dataset(self):
+        """Test the ATEPP dataset of classical piano transcriptions we use for pretraining"""
+        for t in os.listdir(ATEPP_ROOT):
+            # Check MIDI and metadata paths
+            midi_fp = os.path.join(ATEPP_ROOT, t, "piano_midi.mid")
+            self.assertTrue(os.path.exists(midi_fp))
+            meta_fp = os.path.join(ATEPP_ROOT, t, "metadata_tivo.json")
+            self.assertTrue(os.path.exists(meta_fp))
+            # Check the MIDI file properties
+            try:
+                sc = Score(midi_fp)
+            except SCORE_LOADING_EXCEPTION as e:
+                self.fail(f"ATEPP file {midi_fp} raised error {e} when loading")
+            else:
+                # Check we only have one tempo, at 120 BPM
+                self.assertTrue(len(sc.tempos) == 1)
+                self.assertTrue(sc.tempos[0].qpm == utils.TEMPO)
+                # Check we only have one time signature, at 4/4
+                self.assertTrue(len(sc.time_signatures) == 1)
+                self.assertTrue(sc.time_signatures[0].numerator == 4)
+                # Check we only have one track
+                self.assertTrue(len(sc.tracks) == 1)
+                # Check the notes are all within the ranges of the piano keyboard
+                min_pitch, max_pitch = utils.get_pitch_range(sc)
+                self.assertTrue(min_pitch >= utils.MIDI_OFFSET)
+                self.assertTrue(max_pitch <= utils.MIDI_OFFSET + utils.PIANO_KEYS)
 
 
 if __name__ == '__main__':
