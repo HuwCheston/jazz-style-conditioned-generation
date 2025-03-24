@@ -106,7 +106,7 @@ class MusicTransformerTest(unittest.TestCase):
             self.skipTest("Skipping test on GitHub Actions")
 
         # First, test without a trained tokenizer
-        toker = load_tokenizer(tokenizer_str="midilike")
+        toker = load_tokenizer(tokenizer_str="tsd")
         # Create the dataset that returns full-length tracks
         ds = torch.utils.data.DataLoader(
             DatasetMIDIConditionedFullTrack(

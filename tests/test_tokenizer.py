@@ -32,7 +32,7 @@ class TokenizerTest(unittest.TestCase):
 
     def test_load_tokenizer(self):
         # Test with all defaults
-        tok = load_tokenizer()
+        tok = load_tokenizer(tokenizer_str="tsd")
         self.assertTrue(isinstance(tok, TSD))
         self.assertFalse(tok.config.use_tempos)
         self.assertFalse(tok.config.use_pitch_bends)
@@ -60,7 +60,7 @@ class TokenizerTest(unittest.TestCase):
         ]
         midi_files = [os.path.join(utils.get_project_root(), "tests/test_resources", mf) for mf in midi_files]
         # Get the tokenizer
-        tok = load_tokenizer(tokenizer_str="midilike")
+        tok = load_tokenizer(tokenizer_str="tsd")
         # Train with 1000 vocab size and our three midi files
         train_tokenizer(tok, midi_files, vocab_size=1000)
         self.assertTrue(tok.is_trained)
@@ -83,25 +83,27 @@ class TokenizerTest(unittest.TestCase):
             for k in tok.bpe_token_mapping.keys():
                 _ = tok[k]
         # If we try to train a tokenizer with a vocabulary size smaller than what it currently has
-        tok = load_tokenizer(tokenizer_str="midilike")
+        tok = load_tokenizer(tokenizer_str="tsd")
         tok_bpe_mapping = deepcopy(tok.bpe_token_mapping)
         train_tokenizer(tok, midi_files, vocab_size=-1)
         # We shouldn't update our BPE token mapping from the base
         self.assertEqual(tok_bpe_mapping, tok.bpe_token_mapping)
 
     def test_default_tokenizer_config(self):
-        tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
-        # Expecting exactly 100 evenly-spaced timeshift tokens
+        tok = TSD(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
+        # Expecting exactly 100 evenly-spaced timeshift and duration tokens
         tshift_toks = [i for i in tok.vocab.keys() if "TimeShift" in i]
         self.assertTrue(len(tshift_toks) == 100)
-        # Expecting 88 note-on/note-off tokens
-        noteon_toks = [i for i in tok.vocab.keys() if "NoteOn" in i]
+        dur_toks = [i for i in tok.vocab.keys() if "Duration" in i]
+        self.assertTrue(len(dur_toks) == 100)
+        # Expecting 88 pitch tokens
+        noteon_toks = [i for i in tok.vocab.keys() if "Pitch" in i]
         self.assertTrue(len(noteon_toks) == utils.PIANO_KEYS)
-        noteoff_toks = [i for i in tok.vocab.keys() if "NoteOff" in i]
-        self.assertTrue(len(noteoff_toks) == utils.PIANO_KEYS)
+        # noteoff_toks = [i for i in tok.vocab.keys() if "NoteOff" in i]
+        # self.assertTrue(len(noteoff_toks) == utils.PIANO_KEYS)
 
     def test_add_tempos(self):
-        tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
+        tok = TSD(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
         prev_vocab = tok.vocab_size
         # Adding eleven tempo tokens -- [100, 110, 120, ..., 200]
         add_tempos_to_vocab(tok, 80, 30, factor=1.05)
@@ -113,7 +115,7 @@ class TokenizerTest(unittest.TestCase):
             # self.assertTrue(expect in tok.special_tokens)
 
     def test_add_timesignatures(self):
-        tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
+        tok = TSD(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
         prev_vocab = tok.vocab_size
         # Adding three time signature tokens
         add_timesignatures_to_vocab(tok, [3, 4, 5])
@@ -125,7 +127,7 @@ class TokenizerTest(unittest.TestCase):
             # self.assertTrue(expect in tok.special_tokens)
 
     def test_add_pianists(self):
-        tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
+        tok = TSD(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
         prev_vocab = tok.vocab_size
         # Add to the vocabulary using the metadata files we've defined
         add_pianists_to_vocab(tok)
@@ -144,7 +146,7 @@ class TokenizerTest(unittest.TestCase):
             self.assertFalse(not_expect in tok.vocab)
 
     def test_add_genres(self):
-        tok = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
+        tok = TSD(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
         prev_vocab = tok.vocab_size
         # Add to the vocabulary using the metadata files we've defined
         add_genres_to_vocab(tok)

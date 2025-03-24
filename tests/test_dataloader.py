@@ -27,7 +27,7 @@ TEST_MIDI1 = os.path.join(TEST_RESOURCES, "test_midi1/piano_midi.mid")
 TEST_MIDI2 = os.path.join(TEST_RESOURCES, "test_midi2/piano_midi.mid")
 TEST_MIDI3 = os.path.join(TEST_RESOURCES, "test_midi_bushgrafts1/piano_midi.mid")
 
-TOKENIZER = load_tokenizer(tokenizer_str="midilike")
+TOKENIZER = load_tokenizer(tokenizer_str="tsd")
 DUMMY_DATASET = DatasetMIDIConditioned(
     tokenizer=TOKENIZER,
     files_paths=[TEST_MIDI1],
@@ -427,7 +427,7 @@ class DatasetConditionedTest(unittest.TestCase):
         # This test works with multiple tokenizer classes
         for ds_cls in [DatasetMIDIConditionedRandomChunk]:
             # Create a tokenizer
-            tok = load_tokenizer(tokenizer_str="midilike", )
+            tok = load_tokenizer(tokenizer_str="tsd", )
             add_tempos_to_vocab(tok, 80, 30, factor=1.05)
             add_timesignatures_to_vocab(tok, [3, 4])
             add_pianists_to_vocab(tok)
@@ -489,7 +489,7 @@ class DatasetConditionedTest(unittest.TestCase):
 
     def test_fulltrack_dataloader(self):
         # Create the dataset
-        tok = load_tokenizer(tokenizer_str="midilike")  # no conditioning here
+        tok = load_tokenizer(tokenizer_str="tsd")  # no conditioning here
         train_tokenizer(tok, [TEST_MIDI1, TEST_MIDI2, TEST_MIDI3])
         ds = DatasetMIDIConditionedFullTrack(
             tokenizer=tok,
@@ -536,7 +536,7 @@ class DatasetConditionedTest(unittest.TestCase):
 
     def test_fulltrack_dataloader_shift_labels(self):
         # Create the dataset
-        tok = load_tokenizer(tokenizer_str="midilike")
+        tok = load_tokenizer(tokenizer_str="tsd")
         ds = DatasetMIDIConditionedFullTrack(
             tokenizer=tok,
             files_paths=[TEST_MIDI1],
