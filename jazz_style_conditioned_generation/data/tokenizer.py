@@ -139,8 +139,19 @@ def add_timesignatures_to_vocab(tokenizer: MusicTokenizer, time_signatures: list
             tokenizer.add_to_vocab(tok_id, special_token=False)
 
 
+def add_recording_years_to_vocab(
+        tokenizer: MusicTokenizer, min_year: int = 1945, max_year: int = 2025, step: int = 5
+) -> None:
+    """Adds year tokens to vocabulary: linearly spaced between min and max years according to step"""
+    year_range = range(min_year, max_year + 1, step)
+    for year in year_range:
+        tok_id = f'RECORDINGYEAR_{year}'
+        if tok_id not in tokenizer.vocab:
+            tokenizer.add_to_vocab(tok_id, special_token=False)
+
+
 def add_tempos_to_vocab(tokenizer: MusicTokenizer, min_tempo: int, n_tempos: int = 30, factor: float = 1.05) -> None:
-    """Add tempo tokens to vocabulary using geometric distribution)"""
+    """Add tempo tokens to vocabulary using geometric distribution"""
     # Create the geometric distribution
     tempo_range = [min_tempo]
     for _ in range(n_tempos - 1):

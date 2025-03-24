@@ -20,6 +20,7 @@ from jazz_style_conditioned_generation.data.conditions import (
     get_genre_tokens,
     get_tempo_token,
     get_time_signature_token,
+    get_recording_year_token
 )
 from jazz_style_conditioned_generation.data.scores import (
     load_score,
@@ -156,7 +157,9 @@ class DatasetMIDIConditioned:
             *get_genre_tokens(metadata, self.tokenizer),
             *get_pianist_tokens(metadata, self.tokenizer)
         ]
-        # Also grab the tempo and time signature tokens, if we have them
+        # Also grab the tempo, time signature, and year tokens, if we have them
+        if "recording_year" in metadata.keys() and metadata["recording_year"] is not None:
+            extra_tokens.append(get_recording_year_token(metadata["recording_year"], self.tokenizer))
         if "tempo" in metadata.keys():
             extra_tokens.append(get_tempo_token(metadata["tempo"], self.tokenizer))
         if "time_signature" in metadata.keys():
@@ -509,6 +512,7 @@ if __name__ == "__main__":
         add_pianists_to_vocab,
         add_tempos_to_vocab,
         add_timesignatures_to_vocab,
+        add_recording_years_to_vocab,
         load_tokenizer,
         train_tokenizer
     )
@@ -521,6 +525,7 @@ if __name__ == "__main__":
     # Add all of our condition tokens to the tokenizer
     add_pianists_to_vocab(token_factory)
     add_genres_to_vocab(token_factory)
+    add_recording_years_to_vocab(token_factory)
     add_tempos_to_vocab(token_factory, 80, 30, factor=1.05)
     add_timesignatures_to_vocab(token_factory, [3, 4])
     # Train the tokenizer with BPE
@@ -528,7 +533,7 @@ if __name__ == "__main__":
     # Test out our random chunking dataloader
     kwargs = dict(
         tokenizer=token_factory,
-        files_paths=midi_paths,
+        files_paths=midi_paths[:100],
         max_seq_len=utils.MAX_SEQUENCE_LENGTH,
         do_augmentation=True,
         do_conditioning=True

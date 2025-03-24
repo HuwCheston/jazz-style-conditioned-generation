@@ -541,6 +541,30 @@ def get_pianist_tokens(
     return prefixed
 
 
+def get_recording_year_token(recording_year: int, tokenizer: MusicTokenizer, _raise_on_exceeding: int = 10) -> str:
+    """Given a recording year for a track, get the closest year token from the tokenizer"""
+    # Coerce string to int if necessary
+    if isinstance(recording_year, str):
+        recording_year = int(recording_year)
+    # Get all the recording year tokens from the tokenizer
+    year_tokens = [i for i in tokenizer.vocab.keys() if "RECORDINGYEAR" in i]
+    assert len(year_tokens) > 0, f"Year tokens not added to tokenizer!"
+    # Get year values as integers, rather than strings
+    year_stripped = np.array([int(i.replace("RECORDINGYEAR_", "")) for i in year_tokens])
+    # Get the difference between the passed year and the year tokens used by the tokenizer
+    sub = np.abs(recording_year - year_stripped)
+    # Raise an error if the closest year token is too far away from the actual token
+    if np.min(sub) > _raise_on_exceeding:
+        raise ValueError(f"Closest year token is too far from passed year! "
+                         f"Got year {recording_year}, smallest difference with passed array is {np.min(sub)}")
+    # Get the actual year token
+    year_token = year_tokens[np.argmin(sub)]
+    # Sanity check
+    assert "RECORDINGYEAR" in year_token
+    # Return the idx of the token, ready to be added to the sequence
+    return year_token
+
+
 def get_tempo_token(tempo: float, tokenizer: MusicTokenizer, _raise_on_difference_exceeding: int = 50) -> str:
     """Given a tempo for a track, get the closest tempo token from the tokenizer"""
     # Get the tempo tokens from the tokenizer

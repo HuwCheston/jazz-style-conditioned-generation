@@ -25,6 +25,7 @@ from .tokenizer import (
     add_pianists_to_vocab,
     add_tempos_to_vocab,
     add_timesignatures_to_vocab,
+    add_recording_years_to_vocab,
     load_tokenizer,
     train_tokenizer
 )
