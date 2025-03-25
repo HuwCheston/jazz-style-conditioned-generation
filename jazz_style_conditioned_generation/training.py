@@ -126,17 +126,18 @@ class TrainingModule:
         # We want the conditioning tokens to always be part of the vocabulary
         # TODO: we probably don't want to do this when using a different condition type,
         #  e.g. concatenating along the sequence dimension
-        logger.debug("Adding condition tokens...")
-        # These functions add all the required condition tokens into the tokenizer's vocabulary
-        add_genres_to_vocab(self.tokenizer)
-        add_pianists_to_vocab(self.tokenizer)
-        add_recording_years_to_vocab(self.tokenizer, 1945, 2025, step=5)  # [1945, 1950, ..., 2025]
-        add_tempos_to_vocab(self.tokenizer, 80, 30, factor=1.05)
-        add_timesignatures_to_vocab(self.tokenizer, [3, 4])
-        # Log the number of tokens we've added for each condition type to the console
-        for condition in ["GENRES", "PIANIST", "TIMESIGNATURE", "TEMPO", "RECORDINGYEAR"]:
-            n_conditions = [i for i in self.tokenizer.vocab if i.startswith(condition)]
-            logger.debug(f'... added {len(n_conditions)} {condition} tokens!')
+        if self.train_dataset_cfg.get("do_conditioning", True):
+            logger.debug("Adding condition tokens...")
+            # These functions add all the required condition tokens into the tokenizer's vocabulary
+            add_genres_to_vocab(self.tokenizer)
+            add_pianists_to_vocab(self.tokenizer)
+            add_recording_years_to_vocab(self.tokenizer, 1945, 2025, step=5)  # [1945, 1950, ..., 2025]
+            add_tempos_to_vocab(self.tokenizer, 80, 30, factor=1.05)
+            add_timesignatures_to_vocab(self.tokenizer, [3, 4])
+            # Log the number of tokens we've added for each condition type to the console
+            for condition in ["GENRES", "PIANIST", "TIMESIGNATURE", "TEMPO", "RECORDINGYEAR"]:
+                n_conditions = [i for i in self.tokenizer.vocab if i.startswith(condition)]
+                logger.debug(f'... added {len(n_conditions)} {condition} tokens!')
 
         # TRAIN THE TOKENIZER
         if self.tokenizer_cfg.get("do_training", False):
