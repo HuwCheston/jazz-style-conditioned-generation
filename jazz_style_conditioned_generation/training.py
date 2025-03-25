@@ -180,6 +180,8 @@ class TrainingModule:
         logger.debug(f"Training on device {utils.DEVICE}")
         self.model = self.get_model(model_type, model_kws).to(utils.DEVICE)
         logger.debug(f"Initialised model with {utils.total_parameters(self.model)} parameters")
+        # Gradient clipping
+        self.clip_grad_norm = self.model_cfg.get("clip_grad_norm", 0.)
 
         # LOSS & METRICS
         self.current_validation_loss = 0.
@@ -514,6 +516,8 @@ class TrainingModule:
             # Backwards pass
             self.optimizer.zero_grad()
             loss.backward()
+            if self.clip_grad_norm > 0.:  # Clip gradients if required
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clip_grad_norm)
             self.optimizer.step()
             # Append metrics to the list
             epoch_loss.append(loss.item())
