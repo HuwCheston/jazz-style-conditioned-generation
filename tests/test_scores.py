@@ -20,7 +20,8 @@ from jazz_style_conditioned_generation.data.scores import (
     load_score,
     merge_repeated_notes,
     note_list_to_score,
-    remove_out_of_range_notes
+    remove_out_of_range_notes,
+    get_notes_from_score
 )
 
 TEST_RESOURCES = os.path.join(utils.get_project_root(), "tests/test_resources")
@@ -306,7 +307,7 @@ class LoadScoreTest(unittest.TestCase):
             self.assertTrue(len(sm_load.time_signatures) == 1)
             self.assertTrue(sm_load.time_signatures[0].numerator == utils.TIME_SIGNATURE)
             # Get the notes from both files and sort by onset time (not sure if this is necessary)
-            pm_notes = sorted(pm_load.tracks[0].notes, key=lambda x: x.start)
+            pm_notes = sorted(get_notes_from_score(pm_load), key=lambda x: x.start)  # handles multiple tracks
             sm_notes = sorted(sm_load.tracks[0].notes, key=lambda x: x.start)
             # Number of notes should be the same
             self.assertTrue(len(pm_notes) == len(sm_notes))
@@ -319,10 +320,10 @@ class LoadScoreTest(unittest.TestCase):
     def test_load_score_full_dataset(self):
         """Tests our load_score function on the entire dataset. Only runs locally"""
         datasets = [
+            "raw/bushgrafts",
             "raw/pijama",
             "raw/jtd",
             "raw/jja",
-            "raw/bushgrafts",
             "raw/pianist8",
             "pretraining/atepp"
         ]
@@ -346,10 +347,10 @@ class LoadScoreTest(unittest.TestCase):
                 self.assertTrue(len(sm_load.time_signatures) == 1)
                 self.assertTrue(sm_load.time_signatures[0].numerator == utils.TIME_SIGNATURE)
                 # Get the notes from both files and sort by onset time (not sure if this is necessary)
-                pm_notes = sorted(pm_load.tracks[0].notes, key=lambda x: x.start)
+                pm_notes = sorted(get_notes_from_score(pm_load), key=lambda x: x.start)  # handles multiple tracks
                 sm_notes = sorted(sm_load.tracks[0].notes, key=lambda x: x.start)
                 # Number of notes should be the same
-                # self.assertTrue(len(pm_notes) == len(sm_notes))
+                self.assertTrue(len(pm_notes) == len(sm_notes))
                 # Start times for notes should be directly equivalent
                 for pm, sm in zip(pm_notes, sm_notes):
                     self.assertTrue(utils.base_round(pm.start * 1000, 10) == sm.time)  # make sure to round!
