@@ -30,7 +30,12 @@ from jazz_style_conditioned_generation.data.tokenizer import (
     add_timesignatures_to_vocab,
     add_recording_years_to_vocab
 )
-from jazz_style_conditioned_generation.encoders import MusicTransformer, MusicTransformerScheduler
+from jazz_style_conditioned_generation.encoders import (
+    MusicTransformer,
+    MusicTransformerScheduler,
+    DummyScheduler,
+    WarmupScheduler
+)
 from jazz_style_conditioned_generation.preprocessing.splits import SPLIT_TYPES, SPLIT_DIR, check_all_splits_unique
 
 
@@ -44,17 +49,6 @@ class DummyModule(torch.nn.Module):
 
     def forward(self, x: torch.tensor) -> torch.Tensor:
         return x
-
-
-class DummyScheduler(torch.optim.lr_scheduler.LRScheduler):
-    """An LR scheduler that does not modify anything but has the same API as all other schedulers."""
-
-    def __init__(self, optimizer, last_epoch=-1):
-        super(DummyScheduler, self).__init__(optimizer, last_epoch)
-
-    def get_lr(self):
-        """Just returns the current learning rates without modification"""
-        return [group['lr'] for group in self.optimizer.param_groups]
 
 
 class TrainingModule:
@@ -322,20 +316,7 @@ class TrainingModule:
         elif sched_type == "linear":
             return torch.optim.lr_scheduler.LinearLR(self.optimizer, **sched_kws)
         elif sched_type == "warmup":
-            # Warmup scheduler: parameter is number of steps to reach maximum LR
-            warmup_steps = sched_kws.get("warmup_steps", 8000)
-            init_lr = self.optimizer_cfg.get("lr", self.optimizer.param_groups[0]["lr"])
-            warm_sched = torch.optim.lr_scheduler.LambdaLR(
-                self.optimizer,
-                lambda st: st / warmup_steps if st < warmup_steps else init_lr
-            )
-            # Decay scheduler: parameter is the amount to decay LR by every step
-            decay_gamma = sched_kws.get("decay_gamma", 0.9999)
-            decay_sched = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, decay_gamma)
-            # Combine them together
-            return torch.optim.lr_scheduler.SequentialLR(
-                self.optimizer, schedulers=[warm_sched, decay_sched], milestones=[warmup_steps]
-            )
+            return WarmupScheduler(self.optimizer, **sched_kws)
         elif sched_type == "music-transformer":
             sched = MusicTransformerScheduler(**sched_kws)
             # This possibly won't work when resuming from a checkpoint?

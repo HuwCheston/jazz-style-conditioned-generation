@@ -10,7 +10,7 @@ import torch
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.encoders.music_transformer import MusicTransformer
-from jazz_style_conditioned_generation.training import TrainingModule, parse_config_yaml, DummyScheduler, DummyModule
+from jazz_style_conditioned_generation.training import TrainingModule, parse_config_yaml, DummyModule
 
 yaml_path = os.path.join(utils.get_project_root(), "tests/test_resources/train_config.yaml")
 CONFIG = parse_config_yaml(yaml_path)
@@ -30,24 +30,6 @@ def handle_cuda_exceptions(f):
 
 
 class TrainingTest(unittest.TestCase):
-    def test_no_op_scheduler(self):
-        # Define a simple model and optimizer
-        model = torch.nn.Linear(in_features=1, out_features=32)
-        optim = torch.optim.Adam(model.parameters(), lr=0.001)
-        # Define our custom scheduler
-        scheduler = DummyScheduler(optimizer=optim)
-        # Iterate over some `epochs`
-        for i in range(100):
-            optim.zero_grad()
-            # model would train here
-            optim.step()
-            # After stepping in the scheduler, the LR should not have changed from the initial value
-            scheduler.step()
-            for lr in scheduler.get_lr():
-                self.assertEqual(lr, 0.001)
-        # Check that we have a state dict
-        self.assertTrue(hasattr(scheduler, 'state_dict'))
-
     def test_dummy_module(self):
         dummy = DummyModule()
         self.assertEqual(utils.total_parameters(dummy), 1)

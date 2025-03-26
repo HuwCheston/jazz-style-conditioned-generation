@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Custom LR scheduler, taken from https://github.com/gwinndr/MusicTransformer-Pytorch"""
+"""Custom LR scheduler classes"""
 
 import math
+
+import torch
 
 
 class MusicTransformerScheduler:
@@ -30,3 +32,39 @@ class MusicTransformerScheduler:
         else:
             invsqrt_step = (1 / math.sqrt(step))
             return self.invsqrt_dim * invsqrt_step
+
+
+class WarmupScheduler(torch.optim.lr_scheduler.LRScheduler):
+    """Warmup scheduler that increases linearly to max_lr over warmup_steps, then decreases expoenentially to min_lr"""
+
+    def __init__(self, optimizer, min_lr: float, max_lr: float, warmup_steps: int, gamma: float):
+        self.min_lr = min_lr
+        self.max_lr = max_lr
+        self.warmup_steps = warmup_steps
+        self.gamma = gamma
+        assert optimizer.param_groups[0]['lr'] == 1.0, "Must set initial learning rate to 1.0 for warmup scheduler!"
+        super(WarmupScheduler, self).__init__(optimizer)
+
+    def get_lr(self):
+        # We're in the warmup phase
+        if self.last_epoch < self.warmup_steps:
+            mult = self.min_lr + (self.max_lr - self.min_lr) * (self.last_epoch / self.warmup_steps)
+        # We're inbetween the warmup and decay phases
+        elif self.last_epoch == self.warmup_steps:
+            mult = self.max_lr
+        # We're in the decay phase
+        else:
+            # This clamps to the minimum desired learning rate
+            mult = max(self.min_lr, self.max_lr * (self.gamma ** (self.last_epoch - self.warmup_steps)))
+        return [mult for _ in self.optimizer.param_groups]
+
+
+class DummyScheduler(torch.optim.lr_scheduler.LRScheduler):
+    """An LR scheduler that does not modify anything but has the same API as all other schedulers."""
+
+    def __init__(self, optimizer, last_epoch=-1):
+        super(DummyScheduler, self).__init__(optimizer, last_epoch)
+
+    def get_lr(self):
+        """Just returns the current learning rates without modification"""
+        return [group['lr'] for group in self.optimizer.param_groups]
