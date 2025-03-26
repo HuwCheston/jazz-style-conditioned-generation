@@ -37,12 +37,12 @@ class MusicTransformerScheduler:
 class WarmupScheduler(torch.optim.lr_scheduler.LRScheduler):
     """Warmup scheduler that increases linearly to max_lr over warmup_steps, then decreases expoenentially to min_lr"""
 
-    def __init__(self, optimizer, min_lr: float, max_lr: float, warmup_steps: int, gamma: float):
-        self.min_lr = min_lr
+    def __init__(self, optimizer, max_lr: float, warmup_steps: int, gamma: float):
+        self.min_lr = optimizer.param_groups[0]['lr']  # treat the optimizer learning rate as our minimum
         self.max_lr = max_lr
+        assert max_lr > self.min_lr, f"`lr` must be smaller than `max_lr`, but got {self.min_lr} and {self.max_lr}"
         self.warmup_steps = warmup_steps
         self.gamma = gamma
-        assert optimizer.param_groups[0]['lr'] == 1.0, "Must set initial learning rate to 1.0 for warmup scheduler!"
         super(WarmupScheduler, self).__init__(optimizer)
 
     def get_lr(self):

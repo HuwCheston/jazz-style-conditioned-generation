@@ -30,11 +30,16 @@ class SchedulerTest(unittest.TestCase):
         self.assertTrue(hasattr(scheduler, 'state_dict'))
 
     def test_warmup_scheduler(self):
+        # Define parameters for the test
+        min_lr = 2e-6
+        max_lr = 1e-2
+        warmup_steps = 100
+        gamma = 0.9999
         # Define a simple model and optimizer
         model = torch.nn.Linear(in_features=1, out_features=32)
-        optim = torch.optim.Adam(model.parameters(), lr=1.0)  # have to set LR = 1.0 for this to work
+        optim = torch.optim.Adam(model.parameters(), lr=min_lr)
         # Define our warmup scheduler
-        warmup = WarmupScheduler(optim, min_lr=2e-6, max_lr=2e-3, warmup_steps=100, gamma=0.9999)
+        warmup = WarmupScheduler(optim, max_lr=max_lr, warmup_steps=warmup_steps, gamma=gamma)
         all_lrs = []
         # Iterate over some "batches"
         for _ in range(1000):
@@ -43,11 +48,11 @@ class SchedulerTest(unittest.TestCase):
             optim.step()
             warmup.step()
         # Test all LRs, should be within expected boundaries
-        self.assertTrue(min(all_lrs) == 2e-6)
-        self.assertTrue(max(all_lrs) == 2e-3)
+        self.assertTrue(min(all_lrs) == min_lr)
+        self.assertTrue(max(all_lrs) == max_lr)
         # Test first and last results for warmup period
-        self.assertTrue(all_lrs[0] == 2e-6)
-        self.assertTrue(all_lrs[100] == 2e-3)
+        self.assertTrue(all_lrs[0] == min_lr)
+        self.assertTrue(all_lrs[warmup_steps] == max_lr)
 
 
 if __name__ == '__main__':
