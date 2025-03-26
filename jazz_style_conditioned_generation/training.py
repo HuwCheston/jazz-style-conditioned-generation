@@ -321,6 +321,21 @@ class TrainingModule:
             return torch.optim.lr_scheduler.StepLR(self.optimizer, **sched_kws)
         elif sched_type == "linear":
             return torch.optim.lr_scheduler.LinearLR(self.optimizer, **sched_kws)
+        elif sched_type == "warmup":
+            # Warmup scheduler: parameter is number of steps to reach maximum LR
+            warmup_steps = sched_kws.get("warmup_steps", 8000)
+            init_lr = self.optimizer_cfg.get("lr", self.optimizer.param_groups[0]["lr"])
+            warm_sched = torch.optim.lr_scheduler.LambdaLR(
+                self.optimizer,
+                lambda st: st / warmup_steps if st < warmup_steps else init_lr
+            )
+            # Decay scheduler: parameter is the amount to decay LR by every step
+            decay_gamma = sched_kws.get("decay_gamma", 0.9999)
+            decay_sched = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, decay_gamma)
+            # Combine them together
+            return torch.optim.lr_scheduler.SequentialLR(
+                self.optimizer, schedulers=[warm_sched, decay_sched], milestones=[warmup_steps]
+            )
         elif sched_type == "music-transformer":
             sched = MusicTransformerScheduler(**sched_kws)
             # This possibly won't work when resuming from a checkpoint?
@@ -519,6 +534,9 @@ class TrainingModule:
             if self.clip_grad_norm > 0.:  # Clip gradients if required
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clip_grad_norm)
             self.optimizer.step()
+            # We need to step forward in the scheduler during the BATCH with a warmup scheduler
+            if self.sched_type == "warmup":
+                self.scheduler.step()
             # Append metrics to the list
             epoch_loss.append(loss.item())
             epoch_accuracy.append(accuracy.item())
@@ -689,7 +707,8 @@ class TrainingModule:
             if self.sched_type == "reduce":
                 self.scheduler.step(self.current_validation_loss)
             # Other schedulers don't require anything
-            else:
+            #  The warmup scheduler steps during batches, not after an epoch
+            elif self.sched_type != "warmup":
                 self.scheduler.step()
             logger.debug(f'LR for epoch {epoch + 1} will be {self.get_scheduler_lr()}')
             # Checkpoint the run, if we need to
