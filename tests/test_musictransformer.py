@@ -13,14 +13,6 @@ from jazz_style_conditioned_generation.data.dataloader import create_padding_mas
 from jazz_style_conditioned_generation.data.tokenizer import load_tokenizer, train_tokenizer
 from jazz_style_conditioned_generation.encoders.music_transformer import MusicTransformer
 
-# Create the model with default parameters
-TOKENIZER = load_tokenizer()
-MODEL = MusicTransformer(tokenizer=TOKENIZER).to(utils.DEVICE)
-MODEL_RPR = MusicTransformer(tokenizer=TOKENIZER, rpr=True).to(utils.DEVICE)
-
-TEST_MIDI_LONG = os.path.join(utils.get_project_root(), "tests/test_resources/test_midi1/piano_midi.mid")
-TEST_MIDI_SHORT = os.path.join(utils.get_project_root(), "tests/test_resources/test_midi_repeatnotes.mid")
-
 
 def handle_cuda_exceptions(f):
     """Skips a test when we get a CUDA out-of-memory error, allowing tests to run parallel with training runs."""
@@ -36,6 +28,17 @@ def handle_cuda_exceptions(f):
 
 class MusicTransformerTest(unittest.TestCase):
 
+    def setUp(self):
+        # Create the model with default parameters
+        self.TEST_MIDI_LONG = os.path.join(utils.get_project_root(), "tests/test_resources/test_midi1/piano_midi.mid")
+        self.TEST_MIDI_SHORT = os.path.join(utils.get_project_root(), "tests/test_resources/test_midi_repeatnotes.mid")
+        try:
+            self.TOKENIZER = load_tokenizer()
+            self.MODEL = MusicTransformer(tokenizer=self.TOKENIZER).to(utils.DEVICE)
+            self.MODEL_RPR = MusicTransformer(tokenizer=self.TOKENIZER, rpr=True).to(utils.DEVICE)
+        except (torch.cuda.OutOfMemoryError, RuntimeError):
+            raise unittest.SkipTest("Ignoring CUDA out of memory error!")
+
     @handle_cuda_exceptions
     def test_forward(self):
         def runner(model):
@@ -49,15 +52,15 @@ class MusicTransformerTest(unittest.TestCase):
             dummy_tensor = torch.randint(0, 100, (1, utils.MAX_SEQUENCE_LENGTH + 1)).to(utils.DEVICE)
             inp = dummy_tensor[:, :-1].to(utils.DEVICE)
             targ = dummy_tensor[:, 1:].to(utils.DEVICE)
-            padding_mask = create_padding_mask(dummy_tensor, TOKENIZER.pad_token_id)[:, :-1].to(utils.DEVICE)
+            padding_mask = create_padding_mask(dummy_tensor, self.TOKENIZER.pad_token_id)[:, :-1].to(utils.DEVICE)
             # Forwards and backwards pass through the model
             logits = model(inp, targ, padding_mask)
-            loss = metrics.cross_entropy_loss(logits, targ, TOKENIZER)
+            loss = metrics.cross_entropy_loss(logits, targ, self.TOKENIZER)
             opt.zero_grad()
             loss.backward()
             opt.step()
             # Expected shape of the logits should be (batch_size, sequence_length, vocab_size)
-            expected = (1, utils.MAX_SEQUENCE_LENGTH, TOKENIZER.vocab_size)
+            expected = (1, utils.MAX_SEQUENCE_LENGTH, self.TOKENIZER.vocab_size)
             actual = tuple(logits.size())
             self.assertEqual(expected, actual)
             # Iterate through all the parameters in the model: they should have updated
@@ -66,8 +69,8 @@ class MusicTransformerTest(unittest.TestCase):
                 self.assertTrue(not torch.equal(p0.to(utils.DEVICE), p1.to(utils.DEVICE)))
 
         # We should do the same function for both RPR=True, RPR=False
-        runner(MODEL)
-        runner(MODEL_RPR)
+        runner(self.MODEL)
+        runner(self.MODEL_RPR)
 
     @handle_cuda_exceptions
     def test_generate(self):
@@ -83,9 +86,9 @@ class MusicTransformerTest(unittest.TestCase):
             self.assertGreater(generation.size(1), dummy_size)
 
         # We should do the same function for both RPR=True, RPR=False
-        runner(MODEL)
+        runner(self.MODEL)
         # This test is flaky!
-        runner(MODEL_RPR)
+        runner(self.MODEL_RPR)
 
     @handle_cuda_exceptions
     @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
@@ -111,7 +114,7 @@ class MusicTransformerTest(unittest.TestCase):
         ds = torch.utils.data.DataLoader(
             DatasetMIDIConditionedFullTrack(
                 tokenizer=toker,
-                files_paths=[TEST_MIDI_LONG, TEST_MIDI_SHORT],
+                files_paths=[self.TEST_MIDI_LONG, self.TEST_MIDI_SHORT],
                 do_conditioning=False,  # no conditioning for now
                 do_augmentation=False,
                 max_seq_len=utils.MAX_SEQUENCE_LENGTH,
@@ -122,7 +125,7 @@ class MusicTransformerTest(unittest.TestCase):
         )
         runner(toker)
         # Second, test after training the tokenizer on the input track
-        train_tokenizer(toker, [TEST_MIDI_LONG], vocab_size=500)
+        train_tokenizer(toker, [self.TEST_MIDI_LONG], vocab_size=500)
         runner(toker)
 
     def test_sulun_configuration(self):
