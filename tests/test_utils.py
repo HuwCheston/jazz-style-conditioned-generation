@@ -113,6 +113,20 @@ class TestUtils(unittest.TestCase):
             # We also shouldn't have any padding tokens as we've only passed in a batch of one item
             self.assertTrue(i != dummy_tokenizer.pad_token_id)
 
+    def test_weighted_sample(self):
+        dummy_genres = ["genre_1", "genre_2", "genre_3"]
+        dummy_weights = [5, 9, 6]
+        # Sample three elements: should just return original list in original order
+        weighted_sample = utils.weighted_sample(dummy_genres, dummy_weights, n_to_sample=3)
+        self.assertEqual(dummy_genres, weighted_sample)
+        # Sample two elements
+        weighted_sample = utils.weighted_sample(dummy_genres, dummy_weights, n_to_sample=2)
+        self.assertTrue(len(weighted_sample) == 2)
+        # Try sampling four elements, should be the same as sampling 3 (as list only has three elements)
+        weighted_sample = utils.weighted_sample(dummy_genres, dummy_weights, n_to_sample=4)
+        self.assertEqual(dummy_genres, weighted_sample)
+        self.assertTrue(len(weighted_sample) == 3)
+
 
 if __name__ == '__main__':
     unittest.main()

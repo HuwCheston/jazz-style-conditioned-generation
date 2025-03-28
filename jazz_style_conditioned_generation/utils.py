@@ -220,7 +220,10 @@ def weighted_sample(to_sample: list[str], probabilities: list[int], n_to_sample:
     # If we're trying to sample too many elements, reduce the number we're trying to sample
     if n_to_sample > len(to_sample):
         n_to_sample = len(to_sample)
-    return np.random.choice(to_sample, n_to_sample, p=probabilities, replace=False)
+    # Make the random sample
+    sampled = np.random.choice(to_sample, n_to_sample, p=probabilities, replace=False)
+    # Sort to maintain the same order as the original input
+    return sorted(sampled, key=to_sample.index)
 
 
 def validate_paths(filepaths: list[str], expected_extension: str = ".mid"):
