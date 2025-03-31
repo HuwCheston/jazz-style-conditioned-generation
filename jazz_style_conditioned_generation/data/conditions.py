@@ -11,10 +11,11 @@ from miditok import MusicTokenizer
 from jazz_style_conditioned_generation import utils
 
 MAX_GENRE_TOKENS_PER_TRACK = 5  # This is the maximum number of genre tokens we'll consider per track
-MAX_SIMILAR_PIANISTS = 5  # This is the maximum number of "similar pianists" we'll get per track
+MAX_PIANIST_TOKENS_PER_TRACK = 1  # This is the maximum number of pianists (incl. similar pianists) we'll get per track
 
 # These are the only conditions we'll accept values for
 ACCEPT_CONDITIONS = ["moods", "genres", "pianist", "themes"]
+CONDITION_TOKENS = ("PIANIST", "GENRE", "RECORDINGYEAR", "TEMPO", "TIMESIGNATURE")
 # Each list should be populated with values for a condition that we don't want to use
 # TODO: now we've defined "INCLUDE", maybe we can remove this?
 EXCLUDE = {
@@ -481,11 +482,13 @@ def get_genre_tokens(
         return []
     # Run validation: this will remove duplicates and sort depending on weight
     validated_genres = validate_condition_values(genres, "genres")
-    # Remove the weight term from each tuple to get a single list
-    finalised_genres = [g[0] for g in validated_genres]
-    # Subset to only get the top-N genres, if required
-    if n_genres is not None:
-        finalised_genres = finalised_genres[:n_genres]
+    # Take a sample of N genres based on assigned weights
+    if len(validated_genres) > 0:
+        genres, weights = zip(*validated_genres)
+        finalised_genres = utils.weighted_sample(genres, weights, n_genres)
+    # Otherwise, if we don't have enough genres, just return an empty list
+    else:
+        return []
     # Add the prefix to the token
     prefixed = [f'GENRES_{utils.remove_punctuation(g).replace(" ", "")}' for g in finalised_genres]
     # Sanity checks
@@ -518,21 +521,26 @@ def _get_similar_pianists(pianist_name: str) -> list[tuple[str, int]]:
 def get_pianist_tokens(
         track_metadata_dict: dict,
         tokenizer: MusicTokenizer,
-        n_pianists: int = MAX_SIMILAR_PIANISTS
+        n_pianists: int = MAX_PIANIST_TOKENS_PER_TRACK
 ) -> list[str]:
     # Check that we've added pianist tokens to our tokenizer
     assert len([i for i in tokenizer.vocab.keys() if "PIANIST" in i]) > 0, "Pianist tokens not added to tokenizer!"
     # Get the pianist FROM THIS TRACK
     track_pianist = track_metadata_dict["pianist"]
-    # If we want to use this pianist
+    # If this pianist is one of our tokens, we'll just use this pianist
     if track_pianist not in EXCLUDE["pianist"]:
         finalised_pianists = [track_pianist]
+    # Otherwise, we want to grab N similar pianists to this one
     else:
         similar_pianists = _get_similar_pianists(track_pianist)
-        if n_pianists is not None:
-            similar_pianists = similar_pianists[:n_pianists]
-        # Subset to remove weight
-        finalised_pianists = [i[0] for i in similar_pianists]
+        # If we have no similar pianists to the one on the current track
+        if len(similar_pianists) == 0:
+            # We'll just not use any performer tokens
+            return []
+        # Otherwise, take a weighted sample of the required number of performers
+        else:
+            pianists, weights = zip(*similar_pianists)
+            finalised_pianists = utils.weighted_sample(pianists, weights, n_pianists)
     # Add the prefix to the token
     prefixed = [f'PIANIST_{utils.remove_punctuation(g).replace(" ", "")}' for g in finalised_pianists]
     # Sanity check that the tokens are part of the vocabulary for the tokenizer

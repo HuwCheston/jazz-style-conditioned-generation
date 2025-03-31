@@ -127,21 +127,16 @@ class ConditionsTest(unittest.TestCase):
         actual_tokens = sorted(cond.get_genre_tokens(track, tokenizer, n_genres=5))
         self.assertEqual(expected_token, actual_tokens)
         self.assertTrue(len(actual_tokens) == 5)
-        # Now, we can test by getting the 1 token with the strongest weighting
-        expected_token = sorted(["GENRES_Caribbean"])
-        actual_tokens = cond.get_genre_tokens(track, tokenizer, n_genres=1)
-        self.assertEqual(expected_token, actual_tokens)
-        self.assertTrue(len(actual_tokens) == 1)
         # This track does not have genres associated with it, so we'll grab those associated with the pianist instead
         track = utils.read_json_cached(files[1])
         expected_token = ["GENRES_StraightAheadJazz"]  # Associated with Beegie Adair the artist, not this track
-        actual_tokens = cond.get_genre_tokens(track, tokenizer)
+        actual_tokens = cond.get_genre_tokens(track, tokenizer, n_genres=1)
         self.assertEqual(expected_token, actual_tokens)
         self.assertTrue(len(actual_tokens) == 1)
         # This track does not have any genres associated with it at all, so we should get an empty list
         track = utils.read_json_cached(files[-1])
         expected_token = []
-        actual_tokens = cond.get_genre_tokens(track, tokenizer)
+        actual_tokens = cond.get_genre_tokens(track, tokenizer, n_genres=10)
         self.assertEqual(expected_token, actual_tokens)
 
     def test_get_timesignature_token(self):

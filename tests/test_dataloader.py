@@ -103,7 +103,9 @@ class DatasetConditionedTest(unittest.TestCase):
             files_paths=[TEST_MIDI1, TEST_MIDI2, TEST_MIDI3],
             max_seq_len=512,
             do_conditioning=True,
-            do_augmentation=False
+            do_augmentation=False,
+            max_pianist_tokens=5,
+            max_genre_tokens=5
         )
         # Test with metadata from first track
         #  GENRE and PIANIST are sorted in DESCENDING weight order, with the track pianist always placed first
@@ -303,12 +305,13 @@ class DatasetConditionedTest(unittest.TestCase):
             do_augmentation=False,
             max_seq_len=100,
             do_conditioning=True,
+            max_pianist_tokens=5,
+            max_genre_tokens=5
         )
         # We can run this test with multiple dataset types
         for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditioned]:
             # Create the dataset with MIDI file 2
             ds = ds_cls(**kwargs)
-
             # Get the first slice
             item = ds.__getitem__(0)
             input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
@@ -557,6 +560,56 @@ class DatasetConditionedTest(unittest.TestCase):
         self.assertTrue(len(t) == len(inp) - 1)
         self.assertTrue(len(x) == len(t))
         self.assertTrue(x[1:] == t[:-1])
+
+    def test_n_genre_tokens(self):
+        # Create the dataset with MIDI file 1
+        token_factory = prepare_conditioned_tokenizer()
+        kwargs = dict(
+            tokenizer=token_factory,
+            files_paths=[TEST_MIDI1],  # this track has a bpm of 297-ish and a time signature of 4/4
+            do_augmentation=False,
+            max_seq_len=100,
+            do_conditioning=True,
+        )
+        # Run through multiple different values of N
+        for n in range(1, 6):
+            # Create the dataset with this value of N
+            kwargs_copy = deepcopy(kwargs)
+            kwargs_copy["max_genre_tokens"] = n
+            ds = DatasetMIDIConditioned(**kwargs_copy)
+            # Get the condition tokens
+            actual_token_ids = ds.get_conditioning_tokens(utils.read_json_cached(ds.metadata_paths[0]))
+            # Decode the tokens
+            actual_tokens = [ds.tokenizer[i] for i in actual_token_ids]
+            # Get the genre tokens
+            actual_genre_tokens = [i for i in actual_tokens if i.startswith("GENRE")]
+            # Should be no more than N genre tokens
+            self.assertEqual(len(actual_genre_tokens), n)
+
+    def test_n_pianist_tokens(self):
+        # Create the dataset with MIDI file 2
+        token_factory = prepare_conditioned_tokenizer()
+        kwargs = dict(
+            tokenizer=token_factory,
+            files_paths=[TEST_MIDI2],  # this track has a bpm of 297-ish and a time signature of 4/4
+            do_augmentation=False,
+            max_seq_len=100,
+            do_conditioning=True,
+        )
+        # Run through multiple different values of N
+        for n in range(1, 3):
+            # Create the dataset with this value of N
+            kwargs_copy = deepcopy(kwargs)
+            kwargs_copy["max_pianist_tokens"] = n
+            ds = DatasetMIDIConditioned(**kwargs_copy)
+            # Get the condition tokens
+            actual_token_ids = ds.get_conditioning_tokens(utils.read_json_cached(ds.metadata_paths[0]))
+            # Decode the tokens
+            actual_tokens = [ds.tokenizer[i] for i in actual_token_ids]
+            # Get the genre tokens
+            actual_pianist_tokens = [i for i in actual_tokens if i.startswith("PIANIST")]
+            # Should be no more than N genre tokens
+            self.assertEqual(len(actual_pianist_tokens), n)
 
 
 if __name__ == '__main__':

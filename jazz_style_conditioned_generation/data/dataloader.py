@@ -20,7 +20,9 @@ from jazz_style_conditioned_generation.data.conditions import (
     get_genre_tokens,
     get_tempo_token,
     get_time_signature_token,
-    get_recording_year_token
+    get_recording_year_token,
+    MAX_GENRE_TOKENS_PER_TRACK,
+    MAX_PIANIST_TOKENS_PER_TRACK
 )
 from jazz_style_conditioned_generation.data.scores import (
     load_score,
@@ -59,11 +61,15 @@ class DatasetMIDIConditioned:
             do_augmentation: bool = False,
             do_conditioning: bool = True,
             n_clips: int = None,
+            max_pianist_tokens: int = MAX_PIANIST_TOKENS_PER_TRACK,
+            max_genre_tokens: int = MAX_GENRE_TOKENS_PER_TRACK,
     ):
         # Set attributes
         self.tokenizer = tokenizer
         self.do_augmentation = do_augmentation
         self.do_conditioning = do_conditioning
+        self.max_pianist_tokens = max_pianist_tokens
+        self.max_genre_tokens = max_genre_tokens
 
         # The size of the maximum sequence
         self.max_seq_len = max_seq_len
@@ -154,8 +160,8 @@ class DatasetMIDIConditioned:
         """Get conditioning tokens from a metadata JSON."""
         # Grab the condition tokens for this track (genre, pianist)
         extra_tokens = [
-            *get_genre_tokens(metadata, self.tokenizer),
-            *get_pianist_tokens(metadata, self.tokenizer)
+            *get_genre_tokens(metadata, self.tokenizer, n_genres=self.max_genre_tokens),
+            *get_pianist_tokens(metadata, self.tokenizer, n_pianists=self.max_pianist_tokens)
         ]
         # Also grab the tempo, time signature, and year tokens, if we have them
         if "recording_year" in metadata.keys() and metadata["recording_year"] is not None:
@@ -295,8 +301,19 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
             do_augmentation: bool = False,
             do_conditioning: bool = True,
             n_clips: int = None,
+            max_pianist_tokens: int = MAX_PIANIST_TOKENS_PER_TRACK,
+            max_genre_tokens: int = MAX_GENRE_TOKENS_PER_TRACK,
     ):
-        super().__init__(tokenizer, files_paths, max_seq_len, do_augmentation, do_conditioning, n_clips)
+        super().__init__(
+            tokenizer,
+            files_paths,
+            max_seq_len,
+            do_augmentation,
+            do_conditioning,
+            n_clips,
+            max_pianist_tokens,
+            max_genre_tokens
+        )
 
     def preload_data(self) -> tuple[Score, [int, int], dict]:
         # Iterate over every file
@@ -427,10 +444,21 @@ class DatasetMIDIConditionedFullTrack(DatasetMIDIConditioned):
             do_augmentation: bool = False,
             do_conditioning: bool = True,
             n_clips: int = None,
+            max_pianist_tokens: int = MAX_PIANIST_TOKENS_PER_TRACK,
+            max_genre_tokens: int = MAX_GENRE_TOKENS_PER_TRACK,
     ):
         if do_augmentation:
             raise AttributeError("Cannot use augmentation in a dataset that returns full length tracks")
-        super().__init__(tokenizer, files_paths, max_seq_len, do_augmentation, do_conditioning, n_clips)
+        super().__init__(
+            tokenizer,
+            files_paths,
+            max_seq_len,
+            do_augmentation,
+            do_conditioning,
+            n_clips,
+            max_pianist_tokens,
+            max_genre_tokens
+        )
 
     def preload_data(self) -> tuple[Score, [int, int], dict]:
         # Iterate over every file
