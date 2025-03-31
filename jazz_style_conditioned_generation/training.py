@@ -188,7 +188,8 @@ class TrainingModule:
         optimizer_type = self.optimizer_cfg.get("optimizer_type", "adam")
         optimizer_kws = self.optimizer_cfg.get("optimizer_kws", dict(lr=0.0001))
         logger.debug(f'Initialising optimiser {optimizer_type} with parameters {optimizer_kws}...')
-        self.optimizer = self.get_optimizer(optimizer_type)(self.model.parameters(), **optimizer_kws)
+        betas = tuple(optimizer_kws.pop("betas", (0.9, 0.999)))
+        self.optimizer = self.get_optimizer(optimizer_type)(self.model.parameters(), betas=betas, **optimizer_kws)
 
         # SCHEDULER
         self.sched_type = self.scheduler_cfg.get("scheduler_type", None)
