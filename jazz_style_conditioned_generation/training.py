@@ -295,9 +295,11 @@ class TrainingModule:
     @staticmethod
     def get_optimizer(optim_type: str):
         """Given a string, returns the correct optimizer"""
-        valids = ["adam", "sgd"]
+        valids = ["adam", "sgd", "adamw"]
         if optim_type == "adam":
             return torch.optim.Adam
+        elif optim_type == "adamw":
+            return torch.optim.AdamW
         elif optim_type == "sgd":
             return torch.optim.SGD
         else:
