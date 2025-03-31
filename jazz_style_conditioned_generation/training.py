@@ -836,7 +836,7 @@ class FineTuningModule(TrainingModule):
         # Get all the checkpoints we've already made for the CURRENT run
         checkpoints_current_run = [i for i in os.listdir(self.checkpoint_dir) if i.endswith(".pth")]
         # If we have already made checkpoints for the CURRENT finetune run, load these instead of the pretrained model
-        if len(checkpoints_current_run) == 0:
+        if len(checkpoints_current_run) > 0:
             logger.debug("... found finetuned checkpoints, resuming from these!")
             self.load_most_recent_checkpoint()
         # Otherwise, load the pretrained checkpoint (i.e., this is the START of the current finetuning job)
