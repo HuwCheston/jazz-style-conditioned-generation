@@ -817,11 +817,16 @@ class FineTuningModule(TrainingModule):
     """Used when fine-tuning a pre-trained model on jazz piano"""
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        if "pretrained_checkpoint_path" not in kwargs.keys():
+        # Get the pretrained checkpoint path and remove from the kwargs dictionary
+        try:
+            self.pretrained_checkpoint_path = kwargs.pop("pretrained_checkpoint_path")
+        # Raise a nicer looking error if we haven't passed the checkpoint path in
+        except KeyError:
             raise KeyError("Must pass `pretrained_checkpoint_path` when fine-tuning a pre-trained model")
+        # Initialise the training module: this will grab our model, dataloaders, etc.
+        super().__init__(**kwargs)
         logger.info("----FINETUNING ON JAZZ DATASET----")
-        self.pretrained_checkpoint_path = kwargs.get("pretrained_checkpoint_path")
+        # Load the pretrained checkpoint
         self.load_pretrained_checkpoint()
 
     def load_pretrained_checkpoint(self) -> None:
