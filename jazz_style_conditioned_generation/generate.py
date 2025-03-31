@@ -135,6 +135,7 @@ class GenerateModule(TrainingModule):
         # Sanity checks
         assert self.primer_tokens < self.sequence_len, "Primer tokens must be smaller than desired sequence length"
         assert 0. < self.top_p <= 1., "Top-p must be between 0 and 1"
+        kwargs.pop("pretrained_checkpoint_path", None)  # remove from pretrained models
 
         # Initialise the training module: this will SKIP creating dataloaders
         super().__init__(**kwargs)
