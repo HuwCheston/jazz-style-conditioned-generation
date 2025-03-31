@@ -4,6 +4,7 @@
 """Training module"""
 
 import os
+from copy import deepcopy
 from time import time
 
 import mlflow
@@ -73,6 +74,7 @@ class TrainingModule:
             n_full_validation_tracks: int = 10,
             _generate_only: bool = False
     ):
+        logger.info("----TRAINING----")
         # Set all keyword arguments to class parameters
         self.experiment = experiment
         self.run = run
@@ -719,6 +721,135 @@ class TrainingModule:
         logger.info(f'Finished in {(time() - training_start) // 60} minutes!')
 
 
+class PreTrainingModule(TrainingModule):
+    """Used when pretraining a model on ATEPP"""
+
+    def __init__(self, *args, **kwargs):
+        if "do_early_stopping" in kwargs["scheduler_cfg"]:
+            kwargs["scheduler_cfg"]["do_early_stopping"] = False  # no early stopping during pretraining
+        super().__init__(*args, **kwargs)
+        logger.info("----PRETRAINING ON ATEPP----")
+
+    def create_dataloaders(self) -> tuple[DataLoader, DataLoader, DataLoader]:
+        """Overrides base methods to force creating dataloaders without conditioning"""
+        # Create validation dataset loader: uses random chunks
+        if self.test_dataset_cfg.get("do_augmentation", False):
+            raise AttributeError("Augmentation only allowed for training dataloader!")
+
+        # Copy the configuration dictionary and remove the `do_conditioning` argument
+        test_kws = deepcopy(self.test_dataset_cfg)
+        test_kws.pop("do_conditioning", None)
+        # Create test dataset loader: uses FULL tracks!
+        test_loader = DataLoader(
+            DatasetMIDIConditionedFullTrack(
+                tokenizer=self.tokenizer,
+                files_paths=self.track_splits["test"],
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                do_conditioning=False,
+                **test_kws  # most arguments can be shared across test + validation loader
+            ),
+            batch_size=1,  # have to use a batch size of one for this class
+            shuffle=False,  # don't want to shuffle either for this one
+            drop_last=False,
+        )
+        if self._generate_only:
+            return None, None, test_loader  # hack to avoid creating other dataloaders when we don't want them
+
+        validation_loader = DataLoader(
+            DatasetMIDIConditionedRandomChunk(
+                tokenizer=self.tokenizer,
+                files_paths=self.track_splits["validation"],
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                do_conditioning=False,
+                **test_kws  # most arguments can be shared across test + validation loader
+            ),
+            batch_size=self.batch_size,
+            shuffle=True,
+            drop_last=False,
+        )
+        # Copy the configuration dictionary and remove the `do_conditioning` argument
+        train_kws = deepcopy(self.train_dataset_cfg)
+        train_kws.pop("do_conditioning", None)
+        # Create test dataset loader: uses random chunks
+        train_loader = DataLoader(
+            DatasetMIDIConditionedRandomChunk(
+                tokenizer=self.tokenizer,
+                files_paths=self.track_splits["train"],
+                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                do_conditioning=False,
+                **train_kws
+            ),
+            batch_size=self.batch_size,
+            shuffle=True,
+            drop_last=False,
+        )
+
+        return train_loader, validation_loader, test_loader
+
+    def read_tracks_for_split(self, split_type: str) -> list[str]:
+        """Reads a txt file containing a one line per string and returns as a list of strings"""
+        split_fp = os.path.join(self.split_dir, split_type + '_pretraining_split.txt')
+        with open(split_fp, 'r') as fp:
+            all_paths = fp.read().strip().split('\n')
+            # Check that the path exists on the local file structure
+            for path in all_paths:
+                track_path = os.path.join(self.data_dir, path, "piano_midi.mid")
+                if not os.path.isfile(track_path):
+                    raise FileNotFoundError(f'Could not find MIDI for track at {track_path}')
+                # No need for metadata for the pretraining dataset
+                yield track_path
+
+    def save_checkpoint(self, epoch_metrics: dict, path: str) -> None:
+        epoch_metrics["pretraining"] = True  # add a flag to the checkpoint
+        # path = path.replace(".pth", "_pretraining.pth")     # add to the filename
+        super().save_checkpoint(epoch_metrics, path)  # save the checkpoint as normal
+
+    @property
+    def data_dir(self) -> str:
+        return os.path.join(utils.get_project_root(), "data/pretraining")
+
+    @property
+    def split_dir(self) -> str:
+        return os.path.join(utils.get_project_root(), "references/data_splits/pretraining")
+
+
+class FineTuningModule(TrainingModule):
+    """Used when fine-tuning a pre-trained model on jazz piano"""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if "pretrained_checkpoint_path" not in kwargs.keys():
+            raise KeyError("Must pass `pretrained_checkpoint_path` when fine-tuning a pre-trained model")
+        logger.info("----FINETUNING ON JAZZ DATASET----")
+        self.pretrained_checkpoint_path = kwargs.get("pretrained_checkpoint_path")
+        self.load_pretrained_checkpoint()
+
+    def load_pretrained_checkpoint(self) -> None:
+        # Raise an error if the pretrained checkpoint does not exist on the disk
+        if not os.path.isfile(self.pretrained_checkpoint_path):
+            raise FileNotFoundError(f"Could not find pretrained checkpoint at {self.pretrained_checkpoint_path}!")
+        # Get all the checkpoints we've already made for the CURRENT run
+        checkpoints_current_run = [i for i in os.listdir(self.checkpoint_dir) if i.endswith(".pth")]
+        # If we have already made checkpoints for the CURRENT finetune run, load these instead of the pretrained model
+        if len(checkpoints_current_run) == 0:
+            logger.debug("... found finetuned checkpoints, resuming from these!")
+            self.load_most_recent_checkpoint()
+        # Otherwise, load the pretrained checkpoint (i.e., this is the START of the current finetuning job)
+        else:
+            logger.debug(f"... loading pretrained model at {self.pretrained_checkpoint_path}")
+            self.load_checkpoint(self.pretrained_checkpoint_path)
+            # We need to set some things back to their defaults as they will be loaded by the checkpoint
+            # Set current & best loss to defaults, we don't want to use the values from ATEPP
+            self.current_validation_loss = 0.
+            self.best_validation_loss = 1e4  # should always be beaten...
+            # Set current epoch to 0, will be set to 100 if pretraining on ATEPP has completed
+            self.current_epoch = 0
+
+    def save_checkpoint(self, epoch_metrics: dict, path: str) -> None:
+        epoch_metrics["finetuning"] = True  # add a flag to the checkpoint
+        super().save_checkpoint(epoch_metrics, path)  # save the checkpoint as normal
+
+
 def parse_config_yaml(fpath: str) -> dict:
     """Parses a configuration YAML file at `fpath`"""
     full_fpath = os.path.join(utils.get_project_root(), 'config', fpath)
@@ -819,20 +950,40 @@ def main(training_kws: dict, trainer_cls: type = TrainingModule, config_fpath: s
         tm.start()
 
 
+def get_training_class_from_str(method: str):
+    """Returns the desired training module from a string"""
+    accepts = ["training", "pretraining", "finetuning"]
+    if method == "training":
+        return TrainingModule
+    elif method == "pretraining":
+        return PreTrainingModule
+    elif method == "finetuning":
+        return FineTuningModule
+    else:
+        raise ValueError(f"Command line argument `--method` must be one of {', '.join(accepts)} but got {method}")
+
+
 if __name__ == "__main__":
     import argparse
 
     # Seed everything for reproducible results
     utils.seed_everything(utils.SEED)
-
     # Parsing arguments from the command line interface
     parser = argparse.ArgumentParser(description="Run model training")
     parser.add_argument("-c", "--config", default=None, type=str, help="Path to config YAML file")
-    # Parse all arguments from the provided YAML file
+    parser.add_argument(
+        "-m", "--method", type=str,
+        help="Training method. Must be either `training` to train from scratch on the jazz dataset, `pretraining` to "
+             "pretrain a model on ATEPP, or `finetuning` to finetune a pretrained ATEPP model on the jazz dataset."
+    )
+    # Parse all arguments from the command line
     parser_args = vars(parser.parse_args())
     if not parser_args:
         raise ValueError("No config file specified")
+    # Parse all keyword arguments from the config YAML file
     training_kwargs = parse_config_yaml(parser_args['config'])
     training_kwargs["_generate_only"] = False  # should only be set to True when running generate.py
+    # Get the required training class from the command line
+    training_method = get_training_class_from_str(parser_args['method'])
     # Start training!
-    main(training_kwargs, config_fpath=parser_args["config"])
+    main(training_kwargs, trainer_cls=training_method, config_fpath=parser_args["config"])
