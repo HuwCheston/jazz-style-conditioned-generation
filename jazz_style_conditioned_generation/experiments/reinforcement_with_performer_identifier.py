@@ -56,13 +56,13 @@ class ReinforcementEnvironment(gym.Env):
     def __init__(
             self,
             generator: MusicTransformer,
-            min_duration: int = 1.,  # TODO: change this
+            min_duration: int = 10.,
             alpha: float = 0.9
     ):
         self.tokenizer = generator.tokenizer
         self.generator = generator
         self.min_duration = min_duration  # amount of time sequence should last for before we calculate reward
-        self.max_seq_len = 100  # TODO: change this
+        self.max_seq_len = generator.max_seq_len
 
         # Grab conditioning tokens from tokenizer
         self.tempo_tokens = [i for i in self.tokenizer.vocab.keys() if i.startswith("TEMPOCUSTOM")]
@@ -210,30 +210,22 @@ class ReinforcementRunner(training.FineTuningModule):
             gamma: float = 0.99,
             training_kwargs: dict = None
     ):
-        # Set a few parameters
-        # TODO: disable these
-        training_kwargs["mlflow_cfg"]["use"] = False  # no mlflow
-        training_kwargs["checkpoint_cfg"]["checkpoint_dir"] = os.path.join(utils.get_project_root(), "checkpoints")
-        training_kwargs["pretrained_checkpoint_path"] = os.path.join(
-            utils.get_project_root(),
-            "checkpoints/pretraining-tsd/"
-            "music_transformer_rpr_tsd_nobpe_conditionsmall_augment_schedule_10l8h_pretraining_2e5/validation_best.pth"
-        )
-
         # Initialise the training module, load checkpoints, get the tokenizer etc.
         super().__init__(**training_kwargs)
 
+        logger.info("----REINFORCEMENT LEARNING FINE-TUNING----")
+        self.alpha = alpha
+        self.episodes = episodes  # number of episodes to perform before validating
+        self.gamma = gamma  # discount factor
+
         # Initialise environment
-        self.env = ReinforcementEnvironment(self.model, alpha=alpha)
+        self.env = ReinforcementEnvironment(self.model, alpha=self.alpha)
 
         # Initialise metrics from scratch
         self.current_epoch = 0
         self.current_validation_loss = 0.
         self.best_validation_loss = 1e4
         self.best_training_reward = -1e10
-
-        self.episodes = episodes  # number of episodes to perform before validating
-        self.gamma = gamma  # discount factor
 
         self.rewards = []
         self.saved_log_probs = []
@@ -380,8 +372,37 @@ class ReinforcementRunner(training.FineTuningModule):
 
 
 if __name__ == "__main__":
-    utils.seed_everything(utils.SEED)
+    import argparse
 
-    cfg = training.parse_config_yaml(GENERATIVE_MODEL_CFG)
-    rm = ReinforcementRunner(training_kwargs=cfg)
+    utils.seed_everything(utils.SEED)
+    # Parsing arguments from the command line interface
+    parser = argparse.ArgumentParser(description="Experiment with reinforcement learning for finetuning")
+    parser.add_argument(
+        "-c", "--config", default=GENERATIVE_MODEL_CFG, type=str,
+        help="Path to config YAML file, relative to root folder of the project"
+    )
+    parser.add_argument(
+        "-e", "--episodes", type=int, default=10,
+        help="Number of episodes to compute before validation"
+    )
+    parser.add_argument(
+        "-a", "--alpha", type=float, default=0.9,
+        help="Alpha to use when calculating exponential moving average of previous reward values"
+    )
+    parser.add_argument(
+        "-g", "--gamma", type=float, default=0.99,
+        help="Gamma to use when calculating REINFORCE loss"
+    )
+    # Parse all arguments from the command line
+    parser_args = vars(parser.parse_args())
+    if not parser_args["config"]:
+        raise ValueError("No config file specified")
+    # Parse the config file
+    cfg = training.parse_config_yaml(parser_args["config"])
+    rm = ReinforcementRunner(
+        episodes=parser_args["episodes"],
+        alpha=parser_args["alpha"],
+        gamma=parser_args["gamma"],
+        training_kwargs=cfg
+    )
     rm.start()
