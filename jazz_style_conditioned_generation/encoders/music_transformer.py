@@ -83,7 +83,6 @@ class MusicTransformer(nn.Module):
         self.tokenizer = tokenizer
         self.dummy = DummyDecoder()
 
-        self.dim_condition = dim_condition
         self.nlayers = n_layers
         self.nhead = num_heads
         self.d_model = d_model
@@ -92,14 +91,8 @@ class MusicTransformer(nn.Module):
         self.max_seq_len = max_seq_len
         self.rpr = rpr
 
-        # Condition embeddings
-        # if self.dim_condition > 0:
-        #     self.pianist_embedding = nn.Embedding(
-        #         25, self.dim_condition, padding_idx=self.tokenizer.pad_token_id
-        #     )
-
         # Input embedding
-        self.embedding = nn.Embedding(self.tokenizer.vocab_size, self.d_model - self.dim_condition)
+        self.embedding = nn.Embedding(self.tokenizer.vocab_size, self.d_model)
         # Positional encoding
         self.positional_encoding = PositionalEncoding(self.d_model, self.dropout, self.max_seq_len)
         # Base transformer
@@ -153,13 +146,6 @@ class MusicTransformer(nn.Module):
         # Create causal mask
         causal_mask = self.transformer.generate_square_subsequent_mask(input_ids.shape[1]).to(input_ids.device)
         x = self.embedding(input_ids)
-        # if self.dim_condition > 0:
-        #     assert condition_tokens is not None, "Must pass condition tokens to forward when `dim_condition > 0`"
-        #     pianist_embedding = self.pianist_embedding(condition_tokens)
-        #     # Tile to match sequence length
-        #     pianist_embedding = pianist_embedding.expand(-1, x.size(1), -1)
-        #     # Concatenate with input embedding
-        #     x = torch.cat([x, pianist_embedding], dim=-1)
 
         # Input shape is (max_seq, batch_size, d_model)
         x = x.permute(1, 0, 2)
@@ -262,20 +248,25 @@ class MusicTransformer(nn.Module):
         cumulative_probs = torch.cumsum(sorted_probs, dim=-1)
         # Remove tokens outside top-p nucleus
         sorted_indices_to_remove = cumulative_probs > top_p
-        sorted_indices_to_remove[:, 1:] = sorted_indices_to_remove[:, :-1].clone()
-        sorted_indices_to_remove[:, 0] = False  # Always keep the most probable token
-        # Scatter back to original order
+        # Shift the removal mask right to always keep at least the top token
+        sorted_indices_to_remove = torch.cat(
+            [torch.zeros_like(sorted_indices_to_remove[:, :1], dtype=torch.bool),
+             sorted_indices_to_remove[:, :-1]],
+            dim=-1
+        )
+        # Scatter the mask back to the original order
         indices_to_remove = sorted_indices_to_remove.scatter(1, sorted_indices, sorted_indices_to_remove)
-        probs[indices_to_remove] = 0.  # Assign zero probability to removed tokens
-        # Scale such that the sum of the probabilities equals 1
-        return probs / probs.sum(dim=-1, keepdim=True)
+        # Use an out-of-place masked_fill to zero out the unwanted probabilities
+        filtered_probs = probs.masked_fill(indices_to_remove, 0.0)
+        # Renormalize the probabilities so they sum to 1
+        return filtered_probs / filtered_probs.sum(dim=-1, keepdim=True)
 
     def sampling(
             self,
             logits: torch.Tensor,
             top_p: float = DEFAULT_TOP_P,
             temperature: float = DEFAULT_TEMPERATURE,
-    ) -> int:
+    ):
         """Temperature and nucleus sampling: increases temperature when tokens in nucleus < (vocab_size) / 100"""
         # Apply temperature and top-p to the logits and count how many unique tokens are in the nuclues
         sampled = self._temperature_top_p(logits, top_p=top_p, temperature=temperature)
@@ -286,8 +277,8 @@ class MusicTransformer(nn.Module):
             temperature *= 1.01
             sampled = self._temperature_top_p(logits, top_p=top_p, temperature=temperature)
             in_nucleus = (sampled > 0).sum(dim=-1).item()
-        # Create the probability distribution and sample a single item from it
-        return torch.multinomial(sampled, num_samples=1, replacement=False)[0]
+        # Return the probability distribution
+        return torch.distributions.Categorical(probs=sampled)
 
     def generate(
             self,
@@ -310,26 +301,16 @@ class MusicTransformer(nn.Module):
         )
         # This counter keeps track of where we are in the sequence
         cur_i = 1
-        # Add the BOS token at the start of the sequence, if it is not present already
-        if gen_seq[:, 0] != self.tokenizer["BOS_None"]:
-            gen_seq[:, 0] = self.tokenizer["BOS_None"]
         # Fill in the empty array with our primer sequence if we've provided this
         if primer is not None:
-            num_primer = len(primer) + 1
-            gen_seq[:, 1: num_primer] = primer.type(torch.long).to(utils.DEVICE)
-            cur_i = num_primer
+            gen_seq[:, :len(primer)] = primer.type(torch.long).to(utils.DEVICE)
+            cur_i = len(primer)
         # Keep iterating until we hit the desired sequence length
         while cur_i < target_seq_length:
             # Unpack everything from the currently generated sequence
             input_ids = gen_seq[:, :cur_i]
-            labels = gen_seq[:, 1: cur_i + 1]
-            attention_mask = create_padding_mask(input_ids, self.tokenizer["PAD_None"])
-            # Through the model to get the logits: shape (1, sequence_length, vocab_size)
-            logits = self(input_ids, labels, attention_mask)
-            # This gets the probabilities for the next token: shape (1, vocab_size)
-            token_probs = logits[:, -1, :]
-            # Get the next token after applying top-p + temperature sampling
-            next_token = self.sampling(token_probs, top_p=top_p, temperature=temperature)
+            # Predict the next token in the sequence
+            next_token, _ = self.predict_next_token(input_ids, top_p, temperature)
             # Add the next token into the sequence
             gen_seq[:, cur_i] = next_token
             # Increment the counter
@@ -338,6 +319,24 @@ class MusicTransformer(nn.Module):
             if next_token == self.tokenizer["EOS_None"] or cur_i >= target_seq_length:
                 break
         return gen_seq[:, :cur_i]
+
+    def predict_next_token(
+            self,
+            inputs: torch.Tensor,
+            top_p: float = DEFAULT_TOP_P,
+            temperature: float = DEFAULT_TEMPERATURE,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Given the current inputs, sample the next token: returns the token itself + associated log probabilities"""
+        attention_mask = create_padding_mask(inputs, self.tokenizer.pad_token_id)
+        # Through the model to get the logits: shape (1, sequence_length, vocab_size)
+        logits = self(inputs, None, attention_mask)
+        # This gets the probabilities for the next token: shape (1, vocab_size)
+        token_probs = logits[:, -1, :]  # no need to softmax, we do this in _temperature_top_p
+        # Get the next token after applying top-p + temperature sampling
+        m = self.sampling(token_probs, top_p, temperature)
+        action = m.sample()
+        # Return the predicted next token and the log probabilities
+        return action, m.log_prob(action)
 
 
 class DummyDecoder(nn.Module):
@@ -376,27 +375,38 @@ class PositionalEncoding(nn.Module):
 
 
 if __name__ == "__main__":
-    from jazz_style_conditioned_generation.data.tokenizer import load_tokenizer, train_tokenizer
-    from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIConditionedFullTrack
-
-    import random
+    from jazz_style_conditioned_generation.data.tokenizer import (
+        load_tokenizer,
+        # train_tokenizer,
+        add_genres_to_vocab,
+        add_pianists_to_vocab,
+        add_tempos_to_vocab,
+        add_timesignatures_to_vocab,
+        add_recording_years_to_vocab
+    )
+    from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIConditionedRandomChunk
 
     utils.seed_everything(utils.SEED)
     n_midis = 20
 
     # Get a small number of MIDI files
     midis = utils.get_data_files_with_ext("data/raw", "**/*.mid")
-    random.shuffle(midis)
+    # random.shuffle(midis)
     midis = midis[:n_midis]
     # Create and train the tokenizer with the given vocabulary size
     toker = load_tokenizer(tokenizer_str="midilike")
-    train_tokenizer(toker, midis, vocab_size=2000)
+    add_tempos_to_vocab(toker, 80)
+    add_timesignatures_to_vocab(toker, [3, 4])
+    add_pianists_to_vocab(toker)
+    add_genres_to_vocab(toker)
+    add_recording_years_to_vocab(toker)
+    # train_tokenizer(toker, midis, vocab_size=2000)
     # Create the dataset that returns full-length tracks
     ds = torch.utils.data.DataLoader(
-        DatasetMIDIConditionedFullTrack(
+        DatasetMIDIConditionedRandomChunk(
             tokenizer=toker,
             files_paths=midis,
-            do_conditioning=False,  # no conditioning for now
+            do_conditioning=True,  # no conditioning for now
             do_augmentation=False,
             max_seq_len=utils.MAX_SEQUENCE_LENGTH,
         ),
@@ -405,14 +415,22 @@ if __name__ == "__main__":
         drop_last=False,
     )
     # Create the model and set to evaluation mode
-    mt = MusicTransformer(tokenizer=toker, max_seq_len=utils.MAX_SEQUENCE_LENGTH, **DEFAULT_CONFIG).to(utils.DEVICE)
-    mt.eval()
-    # Iterate over individual tracks
-    for track in ds:
-        # Compute the loss as sum(NLL) / len(raw_sequence_length)
-        tokens_loss = mt.evaluate(
-            track["input_ids"].to(utils.DEVICE),
-            track["labels"].to(utils.DEVICE),
-            track["attention_mask"].to(utils.DEVICE)
-        )
-        print(f"MIDI length {track['input_ids'].size(0)}: decoded loss {tokens_loss}")
+    mt = MusicTransformer(tokenizer=toker, max_seq_len=utils.MAX_SEQUENCE_LENGTH, dim_condition=128,
+                          **DEFAULT_CONFIG).to("cpu")
+    batch = next(iter(ds))
+    iids = batch["input_ids"].to("cpu")
+    targets = batch["labels"].to("cpu")
+    ctoks = batch["condition_ids"].to("cpu")
+    amask = batch["attention_mask"].to("cpu")
+    out = mt(iids, targets, amask, ctoks, )
+
+    # mt.eval()
+    # # Iterate over individual tracks
+    # for track in ds:
+    #     # Compute the loss as sum(NLL) / len(raw_sequence_length)
+    #     tokens_loss = mt.evaluate(
+    #         track["input_ids"].to(utils.DEVICE),
+    #         track["labels"].to(utils.DEVICE),
+    #         track["attention_mask"].to(utils.DEVICE)
+    #     )
+    #     print(f"MIDI length {track['input_ids'].size(0)}: decoded loss {tokens_loss}")
