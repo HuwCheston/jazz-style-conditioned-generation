@@ -25,3 +25,4 @@ pretty-midi
 torchmetrics
 muspy
 gdown
+gymnasium
