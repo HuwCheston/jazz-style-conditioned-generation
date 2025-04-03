@@ -361,7 +361,10 @@ class TrainingModule:
             #     self.scheduler.step(self.current_validation_loss)
             # else:
             #     self.scheduler.step()
-            logger.debug(f'Loaded the checkpoint at {checkpoint_path}!')
+            logger.debug(f'Loaded the checkpoint at {checkpoint_path} with '
+                         f'best validation loss {self.best_validation_loss:.3f}, '
+                         f'current validation loss {self.current_validation_loss:.3f}, '
+                         f'epoch {self.current_epoch - 1}')
 
     def load_most_recent_checkpoint(self) -> None:
         """Load the latest checkpoint for the current experiment and run"""
