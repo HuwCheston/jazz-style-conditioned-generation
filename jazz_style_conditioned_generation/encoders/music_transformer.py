@@ -329,7 +329,8 @@ class MusicTransformer(nn.Module):
         """Given the current inputs, sample the next token: returns the token itself + associated log probabilities"""
         attention_mask = create_padding_mask(inputs, self.tokenizer.pad_token_id)
         # Through the model to get the logits: shape (1, sequence_length, vocab_size)
-        logits = self(inputs, None, attention_mask)
+        with torch.no_grad():
+            logits = self(inputs, None, attention_mask)
         # This gets the probabilities for the next token: shape (1, vocab_size)
         token_probs = logits[:, -1, :]  # no need to softmax, we do this in _temperature_top_p
         # Get the next token after applying top-p + temperature sampling
