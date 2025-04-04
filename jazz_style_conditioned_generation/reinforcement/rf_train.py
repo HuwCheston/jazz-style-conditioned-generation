@@ -278,7 +278,10 @@ class ClampReinforcerModule(training.FineTuningModule):
         # Make N generations from the condition tokens
         for _ in tqdm(range(self.n_generations), desc="Generating..."):
             # Do the generation and extract features with clamp
+            # TODO: profile what takes a long time here: the generation of the feature extraction?
             gen_i, gen_i_features = self.do_generation(batch["condition_ids"])
+            # TODO: we should probably cache the generation here, and pull from the cache on a restart?
+            #  We can also then use this cache in evaluation e.g. with the performer ID model
             # Compute the cosine similarity between generated and reference track
             gen_i_sim = torch.nn.functional.cosine_similarity(track_clamp_features, gen_i_features, dim=-1).item()
             self.all_similarities.append(gen_i_sim)  # keep track of all similarities scores for current ground truth
@@ -396,6 +399,7 @@ class ClampReinforcerModule(training.FineTuningModule):
             # Append everything to the lists
             all_losses_mean.append(avg_loss)
             all_losses_sum.append(summed_loss)
+            # TODO: checkpointing etc. goes here
         return np.mean(all_losses_mean), np.mean(all_losses_sum)
 
     def start(self):
