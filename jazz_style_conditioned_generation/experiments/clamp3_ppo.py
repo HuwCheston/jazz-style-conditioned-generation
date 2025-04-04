@@ -6,8 +6,12 @@
 import heapq
 import os
 import random
+import sys
 from copy import deepcopy
+from time import time
 
+import mlflow
+import numpy as np
 import requests
 import torch
 from loguru import logger
@@ -15,17 +19,21 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import BertConfig
 
-from clamp3.code.config import *
-from clamp3.code.utils import CLaMP3Model, M3Patchilizer
-from clamp3.preprocessing.midi.batch_midi2mtf import load_midi as clamp_load_midi
 from jazz_style_conditioned_generation import utils, training
 from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIConditionedFullTrack, create_padding_mask
 
+sys.path.insert(0, os.path.join(utils.get_project_root()))
+
+from clamp3.code.config import *
+from clamp3.code.utils import CLaMP3Model, M3Patchilizer
+from clamp3.preprocessing.midi.batch_midi2mtf import load_midi as clamp_load_midi
+
+
 # Config file for the generator
 GENERATIVE_MODEL_CFG = (
-    "reinforcement-clamp-ppo/music_transformer_rpr_tsd_nobpe_conditionsmall_augment_schedule_10l8h_clampppo_2e5.yaml"
+    "reinforcement-clamp-ppo/music_transformer_rpr_tsd_nobpe_conditionsmall_augment_schedule_10l8h_clampppo_2e6_TEST.yaml"
 )
-# Clamp3 checkpoints
+# Clamp3 checkpoints: need to use the C2 version as this is optimised for symbolic music
 CLAMP3_CHECKPOINT_NAME = (
     "weights_clamp3_c2_h_size_768_t_model_FacebookAI_xlm-roberta-base_t_length_128_a_size_768_"
     "a_layers_12_a_length_128_s_size_768_s_layers_12_p_size_64_p_length_512.pth"
@@ -99,19 +107,24 @@ class ClampGenerationLoader(DatasetMIDIConditionedFullTrack):
 
 class ClampReinforcerModule(training.FineTuningModule):
     def __init__(self, **training_kwargs):
+        # Need to grab this and remove from kwargs before passing to the training module
+        self.reinforce_cfg = training_kwargs.pop("reinforce_cfg", dict())
+
         # This initialises our dataloaders, generative model, loads checkpoints, etc.
         super().__init__(**training_kwargs)
 
-        # Reinitialise the optimizer from scratch
-        self.optimizer_clamp = torch.optim.AdamW(self.model.parameters(), **self.optimizer_cfg["optimizer_kws"])
+        logger.info("----REINFORCEMENT LEARNING WITH CLAMP3----")
 
         # Make a deepcopy of the trained transformer, this is our reference model
         self.model_ref = deepcopy(self.model)
+        logger.debug(f"Initialising reference model with {utils.total_parameters(self.model_ref)} parameters...")
 
-        # Raise an error if we haven't `git pull`ed CLaMP3
-        if not os.path.isdir(os.path.join(utils.get_project_root(), "clamp3")):
-            raise FileNotFoundError("Cannot find `clamp3` directory inside project root. "
-                                    "Run `git clone https://github.com/sanderwood/clamp3.git` from root directory.")
+        # Reinitialise the optimizer from scratch
+        optimizer_type = self.optimizer_cfg.get("optimizer_type", "adam")
+        optimizer_kws = self.optimizer_cfg.get("optimizer_kws", dict(lr=0.0001))
+        logger.debug(f'Initialising clamp optimiser {optimizer_type} with parameters {optimizer_kws}...')
+        betas = tuple(optimizer_kws.pop("betas", (0.9, 0.999)))
+        self.optimizer_clamp = self.get_optimizer(optimizer_type)(self.model.parameters(), betas=betas, **optimizer_kws)
 
         # Download the checkpoint if we haven't done this already
         if not os.path.exists(CLAMP3_CHECKPOINT_PATH):
@@ -126,23 +139,31 @@ class ClampReinforcerModule(training.FineTuningModule):
             hidden_size=CLAMP3_HIDDEN_SIZE,
             load_m3=CLAMP3_LOAD_M3
         ).to(utils.DEVICE)
+        self.CLAMP3.eval()  # never train the feature extractor
         self.CLAMP3_PATCHILIZER = M3Patchilizer()
 
         # Load the checkpoint
         checkpoint = torch.load(CLAMP3_CHECKPOINT_PATH, map_location="cpu", weights_only=True)
-        logger.info(
+        logger.debug(
             f"Successfully Loaded CLaMP 3 Checkpoint from Epoch {checkpoint['epoch']} "
             f"with loss {checkpoint['min_eval_loss']}"
         )
         self.CLAMP3.load_state_dict(checkpoint['model'])
 
+        # Set parameters for reinforcement learning
+        self.generated_sequence_length = self.reinforce_cfg.get("generated_sequence_length", utils.MAX_SEQUENCE_LENGTH)
         self.worst_heap, self.best_heap = [], []  # Heaps to keep track of the top and bottom 10% of generations
-        self.n_generations = 5  # number of generations to make per ground truth
-        self.generation_keep = 0.2  # fraction of best and worst generations to keep
-        self.generations_completed = 0  # number of generatios we've completed so far
+        self.all_similarities = []  # keep track of all similarity scores
+        self.n_generations = self.reinforce_cfg.get("n_generations", 1000)  # number of generations to make per track
+        self.generation_keep_proportion = self.reinforce_cfg.get("generation_keep_proportion", .1)  # % best/worst gens
+        self.generations_completed = 0  # number of generations we've completed so far
+        self.beta_ = self.reinforce_cfg.get("beta", .1)  # same as notagen
+        self.lambda_ = self.reinforce_cfg.get("lambda", 10)  # same as notagen
 
-        self.beta_ = 0.1
-        self.lambda_ = 10
+        logger.debug(f"For each of our {len(self.train_loader)} training tracks, "
+                     f"we'll generate {self.n_generations} tracks of {self.generated_sequence_length} tokens "
+                     f"and keep the top/bottom {self.generation_keep_proportion * 100:.0f}%. ")
+        logger.debug(f"We'll compute the loss with beta {self.beta_}, lambda {self.lambda_}.")
 
     def create_dataloaders(self) -> tuple[DataLoader, DataLoader, DataLoader]:
         """We only want to create a single full-track dataloader"""
@@ -150,31 +171,32 @@ class ClampReinforcerModule(training.FineTuningModule):
         train_loader = DataLoader(
             ClampGenerationLoader(
                 tokenizer=self.tokenizer,
-                files_paths=self.track_splits["train"][:10],
+                files_paths=self.track_splits["train"],
                 max_seq_len=utils.MAX_SEQUENCE_LENGTH,
                 **self.test_dataset_cfg
             ),
             batch_size=1,  # have to use a batch size of one for this class
             shuffle=False,  # don't want to shuffle either for this one
             drop_last=False,
-            collate_fn=lambda x: x[0]  # just gives us a dictionary of one item
+            collate_fn=lambda x: {k: v.to(utils.DEVICE) for k, v in x[0].items()}  # gives us a dictionary of one item
         )
         return train_loader, None, None
 
     def tokens_to_clamp(self, tokseq: torch.Tensor) -> torch.Tensor:
         """Converts a midi (either filename or symusic.Score) object to the format required for clamp"""
         # Convert the tokens into a score with the desired sampling rate
-        midi = self.tokenizer.decode(tokseq).resample(utils.TICKS_PER_QUARTER)
+        midi = self.tokenizer.decode(tokseq.cpu()).resample(utils.TICKS_PER_QUARTER)
         # Dump then load with the specialist CLaMP function
         midi.dump_midi("tmp.mid")
         clamp_midi = clamp_load_midi("tmp.mid", m3_compatible=True)
         # Encode with the patchilizer
-        clamp_patches = torch.tensor(self.CLAMP3_PATCHILIZER.encode(clamp_midi, add_special_patches=True))
+        encoded = self.CLAMP3_PATCHILIZER.encode(clamp_midi, add_special_patches=True)
+        clamp_patches = torch.tensor(encoded).to(utils.DEVICE)
         # Cleanup
         os.remove("tmp.mid")
         return clamp_patches
 
-    def extract_feature(self, patches: torch.Tensor) -> torch.Tensor:
+    def extract_clamp_features(self, patches: torch.Tensor) -> torch.Tensor:
         """Extracts features using CLaMP3. Ported from clamp3.code.extract_clamp3.extract_feature"""
         segment_list = []
         for i in range(0, len(patches), PATCH_LENGTH):
@@ -184,14 +206,17 @@ class ClampReinforcerModule(training.FineTuningModule):
         # This code just copies what we get when we pass `filename.endswith(".mtf")` into extract_feature
         last_hidden_states_list = []
         for input_segment in segment_list:
-            input_masks = torch.tensor([1] * input_segment.size(0))
+            input_masks = torch.tensor([1] * input_segment.size(0), device=utils.DEVICE)
             pad_indices = torch.ones(
-                (PATCH_LENGTH - input_segment.size(0), PATCH_SIZE)
+                (PATCH_LENGTH - input_segment.size(0), PATCH_SIZE), device=utils.DEVICE
             ).long() * self.CLAMP3_PATCHILIZER.pad_token_id
-            input_masks = torch.cat((input_masks, torch.zeros(PATCH_LENGTH - input_segment.size(0))), 0)
+            input_masks = torch.cat((
+                input_masks,
+                torch.zeros(PATCH_LENGTH - input_segment.size(0), device=utils.DEVICE)
+            ), dim=0)
             input_segment = torch.cat((input_segment, pad_indices), 0)
             # Through the model
-            with torch.zero_grad():
+            with torch.no_grad():
                 last_hidden_states = self.CLAMP3.get_symbolic_features(
                     symbolic_inputs=input_segment.unsqueeze(0).to(utils.DEVICE),
                     symbolic_masks=input_masks.unsqueeze(0).to(utils.DEVICE),
@@ -215,7 +240,8 @@ class ClampReinforcerModule(training.FineTuningModule):
 
     def add_to_heap(self, generation: torch.Tensor, similarity: float):
         """Update our best + worst heaps with tuples of (generated tokens, similarity with ground truth)"""
-        top_size = max(1, int(self.generations_completed * self.generation_keep))  # Ensure at least 1 element is kept
+        # Ensure at least 1 element is always kept inside the heap
+        top_size = max(1, int(self.generations_completed * self.generation_keep_proportion))
         # Maintain the best (largest scores) 10% elements
         if len(self.best_heap) < top_size:
             heapq.heappush(self.best_heap, (similarity, generation))  # Normal min-heap
@@ -228,20 +254,44 @@ class ClampReinforcerModule(training.FineTuningModule):
             heapq.heappushpop(self.worst_heap, (-similarity, generation))
 
     def do_generation(self, condition_tokens: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        """Given a tensor of condition tokens, generate a track with `max_sequence_length`"""
         # Generate with just the conditioning tokens
-        gen_i = self.model.generate(condition_tokens, target_seq_length=256 - condition_tokens.size(0))
+        gen_i = self.model.generate(condition_tokens, target_seq_length=self.generated_sequence_length)
         # Extract features from the generated track
         gen_i_clamp_data = self.tokens_to_clamp(gen_i)
-        gen_i_clamp_features = self.extract_feature(gen_i_clamp_data)
+        gen_i_clamp_features = self.extract_clamp_features(gen_i_clamp_data)
+        # Pad the generation to the desired length
+        if gen_i.size(1) < self.generated_sequence_length:
+            gen_i = torch.nn.functional.pad(
+                gen_i,
+                (0, self.generated_sequence_length - gen_i.size(1)),
+                value=self.tokenizer.pad_token_id
+            )
+        # Return the generated token indices and the extracted clamp features
         return gen_i, gen_i_clamp_features
 
-    def step(self, batch):
-        pass
-
-    def training(self, epoch_num: int):
-        pass
+    def step_generation(self, batch: dict[str, torch.Tensor]) -> tuple[list[torch.Tensor], list[torch.Tensor]]:
+        """Given a track, generate N tracks, compute similarity with ground truth, and return most/least similar"""
+        # Extract features from the ground truth track: we use the entire track and then aggregate across chunks
+        track_clamp_data = self.tokens_to_clamp(batch["input_ids"])
+        track_clamp_features = self.extract_clamp_features(track_clamp_data)
+        # Make N generations from the condition tokens
+        for _ in tqdm(range(self.n_generations), desc="Generating..."):
+            # Do the generation and extract features with clamp
+            gen_i, gen_i_features = self.do_generation(batch["condition_ids"])
+            # Compute the cosine similarity between generated and reference track
+            gen_i_sim = torch.nn.functional.cosine_similarity(track_clamp_features, gen_i_features, dim=-1).item()
+            self.all_similarities.append(gen_i_sim)  # keep track of all similarities scores for current ground truth
+            self.generations_completed += 1
+            # Add the generation and similarity scores to the heap if required
+            self.add_to_heap(gen_i, gen_i_sim)
+        # TODO: at this point, we should also discard tracks that have > 0.95 similarity to any training tracks
+        #  as well as tracks that have other inherent problems (e.g., overt repetition?)
+        # Remove the similarity score and return
+        return [t for _, t in self.best_heap], [t for _, t in self.worst_heap]
 
     def compute_log_probs(self, model, tokseq: torch.Tensor, no_grad: bool = False) -> torch.Tensor:
+        """Given a sequence of tokens, compute the log probabilities for the predicted token at every step and sum"""
         # Autoregressive label shifting
         tokseq_ = tokseq.clone()
         input_ids, labels = tokseq_[:, :-1], tokseq_[:, 1:]
@@ -256,119 +306,123 @@ class ClampReinforcerModule(training.FineTuningModule):
         log_probs = torch.nn.functional.log_softmax(logits, dim=-1)
         # Subset to get probabilities for target token only: shape (batch, seq)
         log_probs_sub = torch.gather(log_probs, dim=-1, index=labels.unsqueeze(-1)).squeeze(-1)
+        # Zero out probabilities for mask tokens
+        log_probs_sub *= ~mask
         # Sum everything together: shape (batch)
-        return log_probs_sub.sum()
+        return log_probs_sub.sum(dim=1)
 
-    def start(self):
-        batch = next(iter(self.train_loader))
-        # Evaluation mode for now
-        self.model.eval()
+    def step_loss(self, best: torch.Tensor, worst: torch.Tensor) -> torch.Tensor:
+        """Given a pair of best and worst generations, compute the DPO loss"""
+        # Compute log probabilities with the policy model
+        policy_pos_logps = self.compute_log_probs(self.model, best)
+        policy_neg_logps = self.compute_log_probs(self.model, worst)
+        # Compute log probabilities with the reference model
+        ref_pos_logps = self.compute_log_probs(self.model_ref, best, no_grad=True)
+        ref_neg_logps = self.compute_log_probs(self.model_ref, worst, no_grad=True)
+        # Loss computation
+        logits = (policy_pos_logps - policy_neg_logps) - (ref_pos_logps - ref_neg_logps)
+        # Use relu(ref_+ - policy_+) rather than max(0, ref_+ - policy_+) for tensor compatibility
+        # Loss will be within the range [0, inf] with shape (batch)
+        loss = -torch.nn.functional.logsigmoid(
+            self.beta_ * (logits - self.lambda_ * torch.nn.functional.relu(ref_pos_logps - policy_pos_logps))
+        )
+        # Average loss over all elements in the batch
+        return loss.mean()
+
+    def reset(self) -> None:
+        """Resets everything for a new track"""
         self.CLAMP3.eval()
-        # Reset number of generations completed and heaps
+        self.model.eval()
+        self.model_ref.eval()
         self.generations_completed = 0
         self.best_heap = []
         self.worst_heap = []
-        # Extract features from the ground truth track
-        track_clamp_data = self.tokens_to_clamp(batch["input_ids"])
-        track_clamp_features = self.extract_feature(track_clamp_data)
+        self.all_similarities = []
 
-        # Make N generations from the condition tokens
-        for _ in tqdm(range(self.n_generations)):
-            # Do the generation and extract features with clamp
-            gen_i, gen_i_features = self.do_generation(batch["condition_ids"])
-            # Compute the cosine similarity between generated and reference track
-            gen_i_sim = torch.nn.functional.cosine_similarity(track_clamp_features, gen_i_features, dim=-1).item()
-            self.generations_completed += 1
-            # Add the generation and similarity scores to the heap if required
-            self.add_to_heap(gen_i, gen_i_sim)
-
-        logger.debug(f"Finished generating: {len(self.best_heap)} best items, {len(self.worst_heap)} worst items, "
-                     f"best similarity {max(self.best_heap, key=lambda x: x[0])[0]:.3f}, "
-                     f"worst similarity {max(self.worst_heap, key=lambda x: x[0])[0]:.3f}")
-        # Shuffle both the best and worst generations
-        random.shuffle(self.best_heap)
-        random.shuffle(self.worst_heap)
-        # Zip together (best generation, worst_generation), (best_generation, worst_generation)
-        zipped = [(t1, t2) for (_, t1), (_, t2) in zip(self.best_heap, self.worst_heap)]
-
-        # Now we're training
-        self.model.train()
-        for best, worst in tqdm(zipped):
-            # # Compute log probabilities with the policy model
-            # best_log_ps_policy_sum = self.compute_log_probs(self.model, best)
-            # worst_log_ps_policy_sum = self.compute_log_probs(self.model, worst)
-            # # Compute log probabilities with the reference model
-            # best_log_ps_ref_sum = self.compute_log_probs(self.model_ref, best, no_grad=True)
-            # worst_log_ps_ref_sum = self.compute_log_probs(self.model_ref, worst, no_grad=True)
-
-            # Autoregressive label shifting
-            best_input_ids, best_labels = best[:, :-1], best[:, :1]
-            worst_input_ids, worst_labels = worst[:, :-1], worst[:, :1]
-            # Create masks for padding tokens
-            best_mask = create_padding_mask(best_input_ids, self.tokenizer.pad_token_id)
-            worst_mask = create_padding_mask(worst_input_ids, self.tokenizer.pad_token_id)
-            # Through the model to get logits for the policy model
-            best_logits_policy = self.model(best_input_ids, best_labels, best_mask)
-            worst_logits_policy = self.model(worst_input_ids, worst_labels, worst_mask)
-            # Compute log probabilities
-            best_log_ps_policy = torch.nn.functional.log_softmax(best_logits_policy, dim=-1)  # (batch, seq, vocab)
-            worst_log_ps_policy = torch.nn.functional.log_softmax(worst_logits_policy, dim=-1)  # (batch, seq, vocab)
-            # Subset to get only target token
-            best_log_ps_policy_sub = torch.gather(
-                best_log_ps_policy,
-                dim=-1,
-                index=best_labels.unsqueeze(-1)
-            ).squeeze(-1)  # (batch, seq)
-            worst_log_ps_policy_sub = torch.gather(
-                worst_log_ps_policy,
-                dim=-1,
-                index=worst_labels.unsqueeze(-1)
-            ).squeeze(-1)  # (batch, seq)
-            # Sum everything
-            best_log_ps_policy_sum = best_log_ps_policy_sub.sum()
-            worst_log_ps_policy_sum = worst_log_ps_policy_sub.sum()
-            # Clone everything
-            best_input_ids_ref, best_labels_ref = best_input_ids.clone(), best_labels.clone()
-            worst_input_ids_ref, worst_labels_ref = worst_input_ids.clone(), worst_labels.clone()
-            best_mask_ref = best_mask.clone()
-            worst_mask_ref = worst_mask.clone()
-            # Same as above, but for the reference model: no need for us to keep track of computation graph here
-            with torch.no_grad():
-                best_logits_ref = self.model_ref(best_input_ids_ref, best_labels_ref, best_mask_ref).detach()
-                worst_logits_ref = self.model_ref(worst_input_ids_ref, worst_labels_ref, worst_mask_ref).detach()
-                # Log probabilities
-                best_log_ps_ref = torch.nn.functional.log_softmax(best_logits_ref, dim=-1)  # (batch, seq, vocab)
-                worst_log_ps_ref = torch.nn.functional.log_softmax(worst_logits_ref, dim=-1)
-                # Subset for target tokens
-                best_log_ps_ref_sub = torch.gather(
-                    best_log_ps_ref,
-                    dim=-1,
-                    index=best_labels_ref.unsqueeze(-1)
-                ).squeeze(-1)  # (batch, seq)
-                worst_log_ps_ref_sub = torch.gather(
-                    worst_log_ps_ref,
-                    dim=-1,
-                    index=worst_labels_ref.unsqueeze(-1)
-                ).squeeze(-1)  # (batch, seq)
-                # Sum everything
-                best_log_ps_ref_sum = best_log_ps_ref_sub.sum()
-                worst_log_ps_ref_sum = worst_log_ps_ref_sub.sum()
-
-            # Loss computation
-            logits = (best_log_ps_policy_sum - worst_log_ps_policy_sum) - (best_log_ps_ref_sum - worst_log_ps_ref_sum)
-            loss = -torch.nn.functional.logsigmoid(
-                self.beta_ * (logits - self.lambda_ * max(0, best_log_ps_ref_sum - best_log_ps_policy_sum))
+    def reinforcement(self, ) -> tuple[float, float]:
+        all_losses_mean, all_losses_sum = [], []
+        # Each batch is a single track in the training dataset
+        for batch_num, batch in enumerate(self.train_loader):
+            self.reset()
+            # Do generations and return lists of most and least similar to the ground truth track
+            best_generations, worst_generations = self.step_generation(batch)
+            # Compute summary statistics from all of our generations
+            best_similarity = max(self.best_heap, key=lambda x: x[0])[0]
+            worst_similarity = max(self.worst_heap, key=lambda x: x[0])[0]
+            mean_similarity = np.mean(self.all_similarities)
+            logger.debug(f"Finished generating for track {batch_num + 1}: "
+                         f"generated {len(self.best_heap)} best items, {len(self.worst_heap)} worst items, "
+                         f"best similarity {best_similarity:.3f}, "
+                         f"worst similarity {worst_similarity:.3f}, "
+                         f"average similarity {mean_similarity:.3f}")
+            # Randomise the lists independently of each other
+            random.shuffle(best_generations)
+            random.shuffle(worst_generations)
+            # Assemble the best and worst generations from this track into a tensor dataset
+            temp_loader = DataLoader(
+                torch.utils.data.TensorDataset(torch.cat(best_generations), torch.cat(worst_generations)),
+                batch_size=self.batch_size,
+                shuffle=True,
+                drop_last=False,
             )
-            logger.info(f"Loss: {loss.item():.3f}")
-            # Backwards pass
-            self.optimizer_clamp.zero_grad()
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
-            self.optimizer_clamp.step()
+            # Now we're training
+            self.model.train()
+            total_loss = []
+            # Iterate over randomised pairs of best and worst generations
+            for best, worst in tqdm(temp_loader, desc="Computing loss..."):
+                # Forwards
+                loss = self.step_loss(best, worst)
+                total_loss.append(loss.item())
+                # Backwards
+                self.optimizer_clamp.zero_grad()
+                loss.backward()
+                if self.clip_grad_norm > 0.:  # Clip gradients if required
+                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clip_grad_norm)
+                self.optimizer_clamp.step()
+            # Report metrics
+            summed_loss, avg_loss = np.sum(total_loss), np.mean(total_loss)
+            logger.debug(f"Finished computing loss for track {batch_num + 1}: "
+                         f"summed loss is {summed_loss:.3f}, average is {avg_loss:.3f}")
+            batch_metrics = dict(
+                summed_reinforcement_loss=summed_loss,
+                avg_reinforcement_loss=avg_loss,
+                best_similarity=best_similarity,
+                worst_similarity=worst_similarity,
+                avg_similarity=mean_similarity
+            )
+            # Report results to MLFlow, if we're using this
+            if self.mlflow_cfg.get("use", False):
+                mlflow.log_metrics(batch_metrics, step=batch_num)
+            # Append everything to the lists
+            all_losses_mean.append(avg_loss)
+            all_losses_sum.append(summed_loss)
+        return np.mean(all_losses_mean), np.mean(all_losses_sum)
+
+    def start(self):
+        """Runs training for this module"""
+        training_start = time()
+        # Log parameters for the run to MLflow if required
+        if self.mlflow_cfg.get("use", False):
+            self.log_run_params_to_mlflow()
+        # No epochs: this file just runs one iteration
+        train_loss_mean, train_loss_sum = self.reinforcement()
+        # Save the checkpoint
+        iteration_metrics = dict(
+            summed_reinforcement_loss_end=train_loss_sum,
+            avg_reinforcement_loss_end=train_loss_mean,
+            reinforcement_time=time() - training_start
+        )
+        checkpoint_path = os.path.join(self.checkpoint_dir, "reinforcement_iteration_1.pth")
+        self.save_checkpoint(iteration_metrics, checkpoint_path)
 
 
 if __name__ == "__main__":
     import argparse
+
+    # Raise an error if we haven't `git pull`ed CLaMP3
+    if not os.path.isdir(os.path.join(utils.get_project_root(), "clamp3")):
+        raise FileNotFoundError("Cannot find `clamp3` directory inside project root directory. "
+                                "Run `git clone https://github.com/sanderwood/clamp3.git` from root directory.")
 
     utils.seed_everything(utils.SEED)
     # Parsing arguments from the command line interface
@@ -383,5 +437,5 @@ if __name__ == "__main__":
         raise ValueError("No config file specified")
     # Parse the config file
     cfg = training.parse_config_yaml(parser_args["config"])
-    rm = ClampReinforcerModule(**cfg)
-    rm.start()
+    # Run training
+    training.main(training_kws=cfg, trainer_cls=ClampReinforcerModule, config_fpath=parser_args["config"])
