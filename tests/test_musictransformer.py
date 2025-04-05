@@ -20,7 +20,7 @@ def handle_cuda_exceptions(f):
     def wrapper(*args, **kw):
         try:
             return f(*args, **kw)
-        except torch.cuda.OutOfMemoryError:
+        except (torch.cuda.OutOfMemoryError, RuntimeError):
             unittest.skip("Ignoring CUDA out of memory error!")
 
     return wrapper

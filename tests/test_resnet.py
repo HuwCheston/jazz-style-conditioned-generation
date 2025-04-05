@@ -43,7 +43,7 @@ class ResNet50Test(unittest.TestCase):
 
     @handle_cuda_exceptions
     def test_forward_features(self):
-        x = torch.rand(4, 1, 88, 3000)  # fake input: batch = 4
+        x = torch.rand(4, 1, 88, 3000).to(utils.DEVICE)  # fake input: batch = 4
         actual = self.MODEL.forward_features(x).size()
         self.assertEqual(actual, (4, 2048))
 

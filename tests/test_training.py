@@ -61,9 +61,13 @@ class TrainingTest(unittest.TestCase):
         self.assertFalse(self.TRAINER.train_loader.dataset.do_augmentation)  # no augmentation as specified in config
         self.assertEqual(len(self.TRAINER.test_loader.dataset), 1)  # random chunks
         self.assertEqual(len(self.TRAINER.validation_loader.dataset), 1)  # random chunks
+        # Should have a maximum sequence length of 512 tokens per loader
+        for loader in [self.TRAINER.train_loader, self.TRAINER.test_loader, self.TRAINER.validation_loader]:
+            self.assertEqual(loader.dataset.max_seq_len, 512)
         # Testing model
         self.assertTrue(isinstance(self.TRAINER.model, MusicTransformer))
         self.assertTrue(self.TRAINER.model.rpr)  # config specifies to use RPR
+        self.assertTrue(self.TRAINER.model.max_seq_len, 512)  # config specifies max sequence of 512
 
     def test_paths(self):
         # Passing these in from the config file

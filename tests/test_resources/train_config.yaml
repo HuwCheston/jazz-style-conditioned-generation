@@ -2,6 +2,7 @@ experiment: tester
 run: tester_config
 batch_size: 2
 epochs: 1
+max_seq_len: 512
 data_dir: tests/test_resources
 split_dir: tests/test_resources/splits
 train_dataset_cfg:
