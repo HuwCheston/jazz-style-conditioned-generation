@@ -283,7 +283,7 @@ class MusicTransformer(nn.Module):
     def generate(
             self,
             primer: torch.tensor = None,
-            target_seq_length: int = utils.MAX_SEQUENCE_LENGTH,
+            target_seq_length: int = None,
             top_p: float = DEFAULT_TOP_P,
             temperature: float = DEFAULT_TEMPERATURE,
     ):
@@ -291,6 +291,9 @@ class MusicTransformer(nn.Module):
         assert not self.training, "Cannot generate while in training mode"
         if primer.dim() > 1:
             raise ValueError(f"Expected a tensor with 1 dimension for generation, but got {primer.dim()} dimensions!")
+        # Use default max sequence length if not provided
+        if target_seq_length is None:
+            target_seq_length = self.max_seq_len
 
         # Create an empty array with the target sequence length
         gen_seq = torch.full(

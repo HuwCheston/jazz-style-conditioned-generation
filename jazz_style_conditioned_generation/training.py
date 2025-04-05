@@ -14,7 +14,7 @@ import yaml
 from loguru import logger
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from transformers import GPT2Config, GPT2LMHeadModel
+from transformers import GPT2Config, GPT2LMHeadModel, get_cosine_schedule_with_warmup, get_linear_schedule_with_warmup
 
 from jazz_style_conditioned_generation import utils, metrics
 from jazz_style_conditioned_generation.data.dataloader import (
@@ -72,6 +72,7 @@ class TrainingModule:
             split_dir: str = None,
             full_validate_after_n_epochs: int = 25,
             n_full_validation_tracks: int = 10,
+            max_seq_len: int = utils.MAX_SEQUENCE_LENGTH,
             _generate_only: bool = False
     ):
         logger.info("----TRAINING----")
@@ -92,6 +93,7 @@ class TrainingModule:
         self._data_dir = data_dir
         self._split_dir = split_dir
         self._generate_only = _generate_only  # should only be set to True when running generate.py
+        self.max_seq_len = max_seq_len
 
         # Initialise the current epoch at 0
         self.current_epoch = 0
@@ -215,7 +217,7 @@ class TrainingModule:
             DatasetMIDIConditionedFullTrack(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["test"],
-                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                max_seq_len=self.max_seq_len,
                 **self.test_dataset_cfg  # most arguments can be shared across test + validation loader
             ),
             batch_size=1,  # have to use a batch size of one for this class
@@ -229,7 +231,7 @@ class TrainingModule:
             DatasetMIDIConditionedRandomChunk(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["validation"],
-                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                max_seq_len=self.max_seq_len,
                 **self.test_dataset_cfg  # most arguments can be shared across test + validation loader
             ),
             batch_size=self.batch_size,
@@ -241,7 +243,7 @@ class TrainingModule:
             DatasetMIDIConditionedRandomChunk(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["train"],
-                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                max_seq_len=self.max_seq_len,
                 **self.train_dataset_cfg
             ),
             batch_size=self.batch_size,
@@ -273,7 +275,7 @@ class TrainingModule:
         if model_type == "gpt2-lm":
             cfg = GPT2Config(
                 vocab_size=self.tokenizer.vocab_size,
-                n_positions=utils.MAX_SEQUENCE_LENGTH,
+                n_positions=self.max_seq_len,
                 bos_token_id=self.tokenizer["BOS_None"],
                 eos_token_id=self.tokenizer["EOS_None"],
                 **model_cfg
@@ -283,7 +285,7 @@ class TrainingModule:
         elif model_type == "music-transformer":
             return MusicTransformer(
                 tokenizer=self.tokenizer,
-                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                max_seq_len=self.max_seq_len,
                 **model_cfg
             )
         # For debug purposes
@@ -315,11 +317,11 @@ class TrainingModule:
         elif sched_type == "reduce":
             return torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, **sched_kws)
         elif sched_type == "cosine":
-            return torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, **sched_kws)
+            return get_cosine_schedule_with_warmup(self.optimizer, **sched_kws)
         elif sched_type == "step":
             return torch.optim.lr_scheduler.StepLR(self.optimizer, **sched_kws)
         elif sched_type == "linear":
-            return torch.optim.lr_scheduler.LinearLR(self.optimizer, **sched_kws)
+            return get_linear_schedule_with_warmup(self.optimizer, **sched_kws)
         elif sched_type == "warmup":
             return WarmupScheduler(self.optimizer, **sched_kws)
         elif sched_type == "music-transformer":
@@ -750,7 +752,7 @@ class PreTrainingModule(TrainingModule):
             DatasetMIDIConditionedFullTrack(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["test"],
-                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                max_seq_len=self.max_seq_len,
                 do_conditioning=False,
                 **test_kws  # most arguments can be shared across test + validation loader
             ),
@@ -765,7 +767,7 @@ class PreTrainingModule(TrainingModule):
             DatasetMIDIConditionedRandomChunk(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["validation"],
-                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                max_seq_len=self.max_seq_len,
                 do_conditioning=False,
                 **test_kws  # most arguments can be shared across test + validation loader
             ),
@@ -781,7 +783,7 @@ class PreTrainingModule(TrainingModule):
             DatasetMIDIConditionedRandomChunk(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["train"],
-                max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+                max_seq_len=self.max_seq_len,
                 do_conditioning=False,
                 **train_kws
             ),
