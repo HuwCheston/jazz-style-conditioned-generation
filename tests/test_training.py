@@ -155,7 +155,7 @@ class PreTrainTests(unittest.TestCase):
         self.CONFIG["tokenizer_cfg"]["do_training"] = False  # skip training the tokenizer, for simplicity
         self.CONDITION_TOKENS = ("PIANIST", "GENRES", "RECORDINGYEAR", "TEMPO", "TIMESIGNATURE")
         try:
-            self.PRETRAINER = TrainingModule(**self.CONFIG)
+            self.PRETRAINER = PreTrainingModule(**self.CONFIG)
         except (torch.cuda.OutOfMemoryError, RuntimeError):
             raise unittest.SkipTest("Ignoring CUDA out of memory error!")
 

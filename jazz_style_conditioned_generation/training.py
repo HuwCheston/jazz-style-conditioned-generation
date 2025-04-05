@@ -160,6 +160,7 @@ class TrainingModule:
         # DATALOADERS
         logger.debug(f'Initialising training loader with args {self.train_dataset_cfg}')
         logger.debug(f'Initialising testing + validation loaders with args {self.test_dataset_cfg}')
+        logger.debug(f'Using sequences of {self.max_seq_len} tokens')
         self.train_loader, self.validation_loader, self.test_loader = self.create_dataloaders()
 
         # VALIDATION
