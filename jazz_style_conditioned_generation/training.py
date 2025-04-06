@@ -527,7 +527,7 @@ class TrainingModule:
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clip_grad_norm)
             self.optimizer.step()
             # We need to step forward in the scheduler during the BATCH with a warmup scheduler
-            if self.sched_type == "warmup":
+            if self.sched_type == "warmup" or self.sched_type == "cosine" or self.sched_type == "linear":
                 self.scheduler.step()
             # Append metrics to the list
             epoch_loss.append(loss.item())
