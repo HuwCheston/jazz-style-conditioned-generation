@@ -359,7 +359,8 @@ class TrainingModule:
                 logger.warning("Could not find scheduler state dictionary in checkpoint, scheduler will be restarted!")
             # Increment epoch by 1
             self.current_epoch = loaded["epoch"] + 1
-            self.scheduler.last_epoch = self.current_epoch
+            # TODO: this will break on warmup schedulers
+            # self.scheduler.last_epoch = self.current_epoch
             # Set the current and best validation loss accordingly
             try:
                 self.current_validation_loss = loaded["current_validation_loss"]
