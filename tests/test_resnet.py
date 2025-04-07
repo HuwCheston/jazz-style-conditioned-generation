@@ -36,7 +36,7 @@ class ResNet50Test(unittest.TestCase):
         self.assertEquals(self.MODEL.fc.out_features, 20)
         self.assertIsInstance(self.MODEL.layer1[0].bn1, torch.nn.BatchNorm2d)
         # Test forward
-        x = torch.rand(4, 1, 88, 3000)
+        x = torch.rand(4, 1, 88, 3000).to(utils.DEVICE)
         expected = (4, 20)
         actual = self.MODEL(x)
         self.assertEqual(actual.size(), expected)
