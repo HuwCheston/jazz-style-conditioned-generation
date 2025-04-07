@@ -30,13 +30,15 @@ class ClampGenerationLoader:
         self.genres = [i for i in tokenizer.vocab.keys() if i.startswith("GENRES")]
         self.time_signatures = [i for i in tokenizer.vocab.keys() if i.startswith("TIMESIGNATURECUSTOM")]
         self.tempos = [i for i in tokenizer.vocab.keys() if i.startswith("TEMPOCUSTOM")]
+        # We want to generate from every pianist and every genre
+        self.to_gen_from = self.pianists + self.genres
 
     def __len__(self):
         return len(self.pianists) + len(self.genres)
 
     def __getitem__(self, idx: int):
         # Make a random choice of either a genre or a pianist
-        to_gen = random.choice(self.pianists + self.genres)
+        to_gen = self.to_gen_from[idx]
         # Make a random choice of tempo or time-signature
         ts = random.choice(self.time_signatures)
         temp = random.choice(self.tempos)
