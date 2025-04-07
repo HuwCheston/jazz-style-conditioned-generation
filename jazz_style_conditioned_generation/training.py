@@ -309,20 +309,27 @@ class TrainingModule:
         else:
             raise ValueError(f'`optim_type` must be one of {", ".join(valids)} but got {optim_type}')
 
+    @property
+    def num_training_steps(self) -> int:
+        """Returns `(N_training_items * N_epochs) - N_warmup_steps`, ensures training lasts for all epochs"""
+        num_warmup_steps = self.optimizer_cfg["optimizer_kws"].get("num_warmup_steps", 10000)
+        return (len(self.train_loader) * self.epochs) - num_warmup_steps
+
     def get_scheduler(self, sched_type: str | None, sched_kws: dict):
         """Given a string, returns the correct optimizer"""
         valids = ["plateau", "cosine", "step", "linear", "music-transformer", None]
         # This scheduler won't modify anything, but provides the same API for simplicity
+        num_training_steps = sched_kws.pop("num_training_steps", self.num_training_steps)
         if sched_type is None:
             return DummyScheduler(self.optimizer, **sched_kws)
         elif sched_type == "reduce":
             return torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, **sched_kws)
         elif sched_type == "cosine":
-            return get_cosine_schedule_with_warmup(self.optimizer, **sched_kws)
+            return get_cosine_schedule_with_warmup(self.optimizer, num_training_steps=num_training_steps, **sched_kws)
         elif sched_type == "step":
             return torch.optim.lr_scheduler.StepLR(self.optimizer, **sched_kws)
         elif sched_type == "linear":
-            return get_linear_schedule_with_warmup(self.optimizer, **sched_kws)
+            return get_linear_schedule_with_warmup(self.optimizer, num_training_steps=num_training_steps, **sched_kws)
         elif sched_type == "warmup":
             return WarmupScheduler(self.optimizer, **sched_kws)
         elif sched_type == "music-transformer":
