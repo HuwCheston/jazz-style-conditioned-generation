@@ -14,7 +14,11 @@ from symusic import Score
 from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
-from jazz_style_conditioned_generation.data.augmentation import data_augmentation
+from jazz_style_conditioned_generation.data.augmentation import (
+    data_augmentation,
+    DURATION_AUGMENT_RANGE,
+    PITCH_AUGMENT_RANGE
+)
 from jazz_style_conditioned_generation.data.conditions import (
     get_pianist_tokens,
     get_genre_tokens,
@@ -63,6 +67,8 @@ class DatasetMIDIConditioned:
             n_clips: int = None,
             max_pianist_tokens: int = MAX_PIANIST_TOKENS_PER_TRACK,
             max_genre_tokens: int = MAX_GENRE_TOKENS_PER_TRACK,
+            duration_augment_range: tuple = DURATION_AUGMENT_RANGE,
+            pitch_augment_range: tuple = PITCH_AUGMENT_RANGE,
     ):
         # Set attributes
         self.tokenizer = tokenizer
@@ -70,6 +76,8 @@ class DatasetMIDIConditioned:
         self.do_conditioning = do_conditioning
         self.max_pianist_tokens = max_pianist_tokens
         self.max_genre_tokens = max_genre_tokens
+        self.duration_augment_range = duration_augment_range
+        self.pitch_augment_range = pitch_augment_range
 
         # The size of the maximum sequence
         self.max_seq_len = max_seq_len
@@ -225,7 +233,11 @@ class DatasetMIDIConditioned:
 
         # Perform data augmentation on the score object if required
         if self.do_augmentation:
-            full_score, tempo_scale = data_augmentation(full_score)
+            full_score, tempo_scale = data_augmentation(
+                full_score,
+                pitch_augmentation_range=self.pitch_augment_range,
+                duration_augmentation_range=self.duration_augment_range
+            )
 
             # Scale the slice start and ending points by the tempo modulation so we start in the correct place
             slice_start, slice_end = self.scale_slice_indices(slice_start, slice_end, tempo_scale)
@@ -303,6 +315,8 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
             n_clips: int = None,
             max_pianist_tokens: int = MAX_PIANIST_TOKENS_PER_TRACK,
             max_genre_tokens: int = MAX_GENRE_TOKENS_PER_TRACK,
+            duration_augment_range: tuple = DURATION_AUGMENT_RANGE,
+            pitch_augment_range: tuple = PITCH_AUGMENT_RANGE,
     ):
         super().__init__(
             tokenizer,
@@ -312,7 +326,9 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
             do_conditioning,
             n_clips,
             max_pianist_tokens,
-            max_genre_tokens
+            max_genre_tokens,
+            duration_augment_range,
+            pitch_augment_range,
         )
 
     def preload_data(self) -> tuple[Score, [int, int], dict]:
@@ -364,7 +380,11 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
 
         # Perform data augmentation on the score object if required
         if self.do_augmentation:
-            full_score, tempo_scale = data_augmentation(full_score)
+            full_score, tempo_scale = data_augmentation(
+                full_score,
+                pitch_augmentation_range=self.pitch_augment_range,
+                duration_augmentation_range=self.duration_augment_range
+            )
             # No need to adjust any of the slice starting/stopping points as we'll sample these later
             # Adjust track tempo in metadata if required
             if "tempo" in metadata.keys():
@@ -446,6 +466,8 @@ class DatasetMIDIConditionedFullTrack(DatasetMIDIConditioned):
             n_clips: int = None,
             max_pianist_tokens: int = MAX_PIANIST_TOKENS_PER_TRACK,
             max_genre_tokens: int = MAX_GENRE_TOKENS_PER_TRACK,
+            duration_augment_range: tuple = DURATION_AUGMENT_RANGE,
+            pitch_augment_range: tuple = PITCH_AUGMENT_RANGE,
     ):
         if do_augmentation:
             raise AttributeError("Cannot use augmentation in a dataset that returns full length tracks")
@@ -457,7 +479,9 @@ class DatasetMIDIConditionedFullTrack(DatasetMIDIConditioned):
             do_conditioning,
             n_clips,
             max_pianist_tokens,
-            max_genre_tokens
+            max_genre_tokens,
+            duration_augment_range,
+            pitch_augment_range
         )
 
     def preload_data(self) -> tuple[Score, [int, int], dict]:
