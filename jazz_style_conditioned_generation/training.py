@@ -340,7 +340,7 @@ class TrainingModule:
             valid_types = ", ".join([i if i is not None else "None" for i in valids])
             raise ValueError(f'`sched_type` must be one of {valid_types} but got {sched_type}')
 
-    def load_checkpoint(self, checkpoint_path: str) -> None:
+    def load_checkpoint(self, checkpoint_path: str, weights_only: bool = False) -> None:
         """Load the checkpoint at the given fpath"""
         # This will raise a warning about possible ACE exploits, but we don't care
         try:
@@ -351,33 +351,31 @@ class TrainingModule:
         else:
             # Set state dictionary for all torch objects
             self.model.load_state_dict(loaded["model_state_dict"], strict=True)
-            self.optimizer.load_state_dict(loaded["optimizer_state_dict"])
-            # For backwards compatibility with no LR scheduler runs: don't worry if we can't load the LR scheduler dict
-            try:
-                self.scheduler.load_state_dict(loaded['scheduler_state_dict'])
-            except KeyError:
-                logger.warning("Could not find scheduler state dictionary in checkpoint, scheduler will be restarted!")
+            # If we don't want to load the optimizer and scheduler dictionaries (i.e., we're fine-tuning the model)
+            if weights_only:
+                logger.warning("Skipped loading optimizer and scheduler state dictionaries, they will restart!")
+            # Otherwise, load the optimizer and scheduler state up
+            else:
+                self.optimizer.load_state_dict(loaded["optimizer_state_dict"])
+                # For backwards compatibility with no LR scheduler runs: don't worry if we can't load the scheduler
+                try:
+                    self.scheduler.load_state_dict(loaded['scheduler_state_dict'])
+                except KeyError:
+                    logger.warning("Could not find scheduler state dictionary in checkpoint, will be restarted!")
             # Increment epoch by 1
             self.current_epoch = loaded["epoch"] + 1
-            # TODO: this will break on warmup schedulers
-            # self.scheduler.last_epoch = self.current_epoch
             # Set the current and best validation loss accordingly
             try:
                 self.current_validation_loss = loaded["current_validation_loss"]
                 self.best_validation_loss = loaded["best_validation_loss"]
             except KeyError:
-                pass
-            # We've moved saving a checkpoint to the end of the training loop, so we shouldn't need to do a step here
-            # if self.sched_type == "reduce":
-            #     self.scheduler.step(self.current_validation_loss)
-            # else:
-            #     self.scheduler.step()
+                logger.error("Could not get validation loss from checkpoint!")
             logger.debug(f'Loaded the checkpoint at {checkpoint_path} with '
                          f'best validation loss {self.best_validation_loss:.3f}, '
                          f'current validation loss {self.current_validation_loss:.3f}, '
                          f'epoch {self.current_epoch - 1}')
 
-    def load_most_recent_checkpoint(self) -> None:
+    def load_most_recent_checkpoint(self, weights_only: bool = True) -> None:
         """Load the latest checkpoint for the current experiment and run"""
         # If we haven't created a checkpoint for this run, skip loading and train from scratch
         if not os.path.exists(self.checkpoint_dir):
@@ -422,7 +420,7 @@ class TrainingModule:
                 checkpoint_path = latest_check_path
 
         # Load the desired checkpoint
-        self.load_checkpoint(os.path.join(self.checkpoint_dir, checkpoint_path))
+        self.load_checkpoint(os.path.join(self.checkpoint_dir, checkpoint_path), weights_only=weights_only)
         # Set a NEW random seed according to the epoch, otherwise we'll just use the same randomisations as epoch 1
         utils.seed_everything(utils.SEED * self.current_epoch)
 
@@ -855,11 +853,13 @@ class FineTuningModule(TrainingModule):
         # If we have already made checkpoints for the CURRENT finetune run, load these instead of the pretrained model
         if len(checkpoints_current_run) > 0:
             logger.debug("... found finetuned checkpoints, resuming from these!")
-            self.load_most_recent_checkpoint()
+            # This will also load the optimizer and scheduler dictionaries
+            self.load_most_recent_checkpoint(weights_only=False)
         # Otherwise, load the pretrained checkpoint (i.e., this is the START of the current finetuning job)
         else:
             logger.debug(f"... loading pretrained model at {self.pretrained_checkpoint_path}")
-            self.load_checkpoint(self.pretrained_checkpoint_path)
+            # This will NOT load the optimizer and scheduler dictionaries (we want these to start from scratch)
+            self.load_checkpoint(self.pretrained_checkpoint_path, weights_only=True)
             # We need to set some things back to their defaults as they will be loaded by the checkpoint
             # Set current & best loss to defaults, we don't want to use the values from ATEPP
             self.current_validation_loss = 0.
