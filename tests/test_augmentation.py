@@ -42,7 +42,10 @@ class AugmentationTest(unittest.TestCase):
         prev_min_pitch, prev_max_pitch = 34, 98
         # Test with transposition up one semitone
         augmented, duration_augment_val = data_augmentation(
-            score, pitch_augmentation_range=[1], duration_augmentation_range=[1.]
+            score,
+            pitch_augmentation_range=[1],
+            duration_augmentation_range=[1.],
+            velocity_augmentation_range=[0]
         )
         new_min_pitch, new_max_pitch = utils.get_pitch_range(augmented)
         self.assertEqual(new_min_pitch, prev_min_pitch + 1)
@@ -50,7 +53,10 @@ class AugmentationTest(unittest.TestCase):
         self.assertEqual(duration_augment_val, 1)
         # Test with transposition down two semitones
         augmented, duration_augment_val = data_augmentation(
-            score, pitch_augmentation_range=[-2], duration_augmentation_range=[1.]
+            score,
+            pitch_augmentation_range=[-2],
+            duration_augmentation_range=[1.],
+            velocity_augmentation_range=[0]
         )
         new_min_pitch, new_max_pitch = utils.get_pitch_range(augmented)
         self.assertEqual(new_min_pitch, prev_min_pitch - 2)
@@ -58,16 +64,50 @@ class AugmentationTest(unittest.TestCase):
         self.assertEqual(duration_augment_val, 1)
         # Test with shortening duration
         augmented, duration_augment_val = data_augmentation(
-            score, pitch_augmentation_range=[0], duration_augmentation_range=[0.9]
+            score,
+            pitch_augmentation_range=[0],
+            duration_augmentation_range=[0.9],
+            velocity_augmentation_range=[0]
         )
         self.assertLess(augmented.end(), score.end())
         self.assertEqual(duration_augment_val, 0.9)
         # Test with increasing duration
         augmented, duration_augment_val = data_augmentation(
-            score, pitch_augmentation_range=[0], duration_augmentation_range=[1.1]
+            score,
+            pitch_augmentation_range=[0],
+            duration_augmentation_range=[1.1],
+            velocity_augmentation_range=[0]
         )
         self.assertGreater(augmented.end(), score.end())
         self.assertEqual(duration_augment_val, 1.1)
+        # Test with increasing velocity
+        augmented, duration_augment_val = data_augmentation(
+            score,
+            pitch_augmentation_range=[0],
+            duration_augmentation_range=[1.],
+            velocity_augmentation_range=[4]
+        )
+        # Iterate over all the notes
+        for i in range(len(score.tracks[0].notes)):
+            orig_vel = score.tracks[0].notes[i].velocity
+            new_vel = augmented.tracks[0].notes[i].velocity
+            # New velocity should be greater than the original one but smaller/equal to maximum velocity
+            self.assertGreaterEqual(new_vel, orig_vel)
+            self.assertLessEqual(new_vel, utils.MAX_VELOCITY)
+        # Test with decreasing velocity
+        augmented, duration_augment_val = data_augmentation(
+            score,
+            pitch_augmentation_range=[0],
+            duration_augmentation_range=[1.],
+            velocity_augmentation_range=[-8]
+        )
+        # Iterate over all the notes
+        for i in range(len(score.tracks[0].notes)):
+            orig_vel = score.tracks[0].notes[i].velocity
+            new_vel = augmented.tracks[0].notes[i].velocity
+            # New velocity should be smaller than the original one but larger/equal to minimum velocity
+            self.assertLessEqual(new_vel, orig_vel)
+            self.assertGreaterEqual(new_vel, 1)
 
     def test_deterministic_augmentation(self):
         # Test pitch augmentation: up five semitones
@@ -75,7 +115,7 @@ class AugmentationTest(unittest.TestCase):
             Note(pitch=50, duration=10, time=1000, velocity=50, ttype="tick")
         ]
         sc = note_list_to_score(notes, 100)
-        augment = _data_augmentation_deterministic(sc, 5, 1.0)
+        augment = _data_augmentation_deterministic(sc, 5, 1.0, 0)
         expected_pitch = 55
         actual_pitch = augment.tracks[0].notes[0].pitch
         self.assertEqual(expected_pitch, actual_pitch)
@@ -85,7 +125,7 @@ class AugmentationTest(unittest.TestCase):
             Note(pitch=40, duration=10, time=1000, velocity=50, ttype="tick")
         ]
         sc = note_list_to_score(notes, 100)
-        augment = _data_augmentation_deterministic(sc, -3, 0.9)
+        augment = _data_augmentation_deterministic(sc, -3, 0.9, 0)
         expected_pitch = [47, 37]
         actual_pitch = [n.pitch for n in augment.tracks[0].notes]
         self.assertEqual(expected_pitch, actual_pitch)
@@ -94,13 +134,22 @@ class AugmentationTest(unittest.TestCase):
             Note(pitch=50, duration=100, time=1000, velocity=50, ttype="tick")
         ]
         sc = note_list_to_score(notes, 100)
-        augment = _data_augmentation_deterministic(sc, 0, 0.5)
+        augment = _data_augmentation_deterministic(sc, 0, 0.5, 0)
         expected_duration = 50
         actual_duration = augment.tracks[0].notes[0].duration
         self.assertEqual(expected_duration, actual_duration)
         expected_start = 500
         actual_start = augment.tracks[0].notes[0].time
         self.assertEqual(expected_start, actual_start)
+        # Test velocity augmentation: up 12 values
+        notes = [
+            Note(pitch=50, duration=100, time=1000, velocity=50, ttype="tick")
+        ]
+        sc = note_list_to_score(notes, 100)
+        augment = _data_augmentation_deterministic(sc, 0, 0.5, 12)
+        expected_velocity = 62
+        actual_velocity = augment.tracks[0].notes[0].velocity
+        self.assertEqual(expected_velocity, actual_velocity)
 
 
 if __name__ == '__main__':

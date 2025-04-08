@@ -17,7 +17,8 @@ from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data.augmentation import (
     data_augmentation,
     DURATION_AUGMENT_RANGE,
-    PITCH_AUGMENT_RANGE
+    PITCH_AUGMENT_RANGE,
+    VELOCITY_AUGMENT_RANGE
 )
 from jazz_style_conditioned_generation.data.conditions import (
     get_pianist_tokens,
@@ -67,8 +68,9 @@ class DatasetMIDIConditioned:
             n_clips: int = None,
             max_pianist_tokens: int = MAX_PIANIST_TOKENS_PER_TRACK,
             max_genre_tokens: int = MAX_GENRE_TOKENS_PER_TRACK,
-            duration_augment_range: tuple = DURATION_AUGMENT_RANGE,
-            pitch_augment_range: tuple = PITCH_AUGMENT_RANGE,
+            duration_augment_range: list = DURATION_AUGMENT_RANGE,
+            pitch_augment_range: list = PITCH_AUGMENT_RANGE,
+            velocity_augment_range: list = VELOCITY_AUGMENT_RANGE
     ):
         # Set attributes
         self.tokenizer = tokenizer
@@ -76,8 +78,10 @@ class DatasetMIDIConditioned:
         self.do_conditioning = do_conditioning
         self.max_pianist_tokens = max_pianist_tokens
         self.max_genre_tokens = max_genre_tokens
+        # Range of values used for velocity augmentation across duration, pitch, and velocity
         self.duration_augment_range = duration_augment_range
         self.pitch_augment_range = pitch_augment_range
+        self.velocity_augment_range = velocity_augment_range
 
         # The size of the maximum sequence
         self.max_seq_len = max_seq_len
@@ -236,7 +240,8 @@ class DatasetMIDIConditioned:
             full_score, tempo_scale = data_augmentation(
                 full_score,
                 pitch_augmentation_range=self.pitch_augment_range,
-                duration_augmentation_range=self.duration_augment_range
+                duration_augmentation_range=self.duration_augment_range,
+                velocity_augmentation_range=self.velocity_augment_range
             )
 
             # Scale the slice start and ending points by the tempo modulation so we start in the correct place
@@ -315,8 +320,9 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
             n_clips: int = None,
             max_pianist_tokens: int = MAX_PIANIST_TOKENS_PER_TRACK,
             max_genre_tokens: int = MAX_GENRE_TOKENS_PER_TRACK,
-            duration_augment_range: tuple = DURATION_AUGMENT_RANGE,
-            pitch_augment_range: tuple = PITCH_AUGMENT_RANGE,
+            duration_augment_range: list = DURATION_AUGMENT_RANGE,
+            pitch_augment_range: list = PITCH_AUGMENT_RANGE,
+            velocity_augment_range: list = VELOCITY_AUGMENT_RANGE
     ):
         super().__init__(
             tokenizer,
@@ -329,6 +335,7 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
             max_genre_tokens,
             duration_augment_range,
             pitch_augment_range,
+            velocity_augment_range
         )
 
     def preload_data(self) -> tuple[Score, [int, int], dict]:
@@ -383,7 +390,8 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
             full_score, tempo_scale = data_augmentation(
                 full_score,
                 pitch_augmentation_range=self.pitch_augment_range,
-                duration_augmentation_range=self.duration_augment_range
+                duration_augmentation_range=self.duration_augment_range,
+                velocity_augmentation_range=self.velocity_augment_range
             )
             # No need to adjust any of the slice starting/stopping points as we'll sample these later
             # Adjust track tempo in metadata if required
@@ -466,8 +474,9 @@ class DatasetMIDIConditionedFullTrack(DatasetMIDIConditioned):
             n_clips: int = None,
             max_pianist_tokens: int = MAX_PIANIST_TOKENS_PER_TRACK,
             max_genre_tokens: int = MAX_GENRE_TOKENS_PER_TRACK,
-            duration_augment_range: tuple = DURATION_AUGMENT_RANGE,
-            pitch_augment_range: tuple = PITCH_AUGMENT_RANGE,
+            duration_augment_range: list = DURATION_AUGMENT_RANGE,
+            pitch_augment_range: list = PITCH_AUGMENT_RANGE,
+            velocity_augment_range: list = VELOCITY_AUGMENT_RANGE
     ):
         if do_augmentation:
             raise AttributeError("Cannot use augmentation in a dataset that returns full length tracks")
@@ -481,7 +490,8 @@ class DatasetMIDIConditionedFullTrack(DatasetMIDIConditioned):
             max_pianist_tokens,
             max_genre_tokens,
             duration_augment_range,
-            pitch_augment_range
+            pitch_augment_range,
+            velocity_augment_range
         )
 
     def preload_data(self) -> tuple[Score, [int, int], dict]:
@@ -565,12 +575,11 @@ if __name__ == "__main__":
         add_tempos_to_vocab,
         add_timesignatures_to_vocab,
         add_recording_years_to_vocab,
-        load_tokenizer,
-        train_tokenizer
+        load_tokenizer
     )
 
     # Get a MIDILike tokenizer with default arguments
-    token_factory = load_tokenizer(tokenizer_str="midilike")
+    token_factory = load_tokenizer(tokenizer_str="tsd")
     # Get filepaths for all MIDI files in the /data/raw/ directories
     midi_paths = utils.get_data_files_with_ext(ext="**/*.mid")
     metadata_paths = [i.replace("piano_midi.mid", "metadata_tivo.json") for i in midi_paths]
@@ -581,7 +590,7 @@ if __name__ == "__main__":
     add_tempos_to_vocab(token_factory, 80, 30, factor=1.05)
     add_timesignatures_to_vocab(token_factory, [3, 4])
     # Train the tokenizer with BPE
-    train_tokenizer(token_factory, vocab_size=1000, model="BPE", files_paths=midi_paths[:100])
+    # train_tokenizer(token_factory, vocab_size=1000, model="BPE", files_paths=midi_paths[:100])
     # Test out our random chunking dataloader
     kwargs = dict(
         tokenizer=token_factory,
