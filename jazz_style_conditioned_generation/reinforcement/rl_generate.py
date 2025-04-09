@@ -4,7 +4,6 @@
 """Generate MIDI for CLaMP-DPO"""
 
 import os
-import random
 
 import torch
 from loguru import logger
@@ -28,8 +27,6 @@ class ClampGenerationLoader:
         self.tokenizer = tokenizer
         self.pianists = [i for i in tokenizer.vocab.keys() if i.startswith("PIANIST")]
         self.genres = [i for i in tokenizer.vocab.keys() if i.startswith("GENRES")]
-        self.time_signatures = [i for i in tokenizer.vocab.keys() if i.startswith("TIMESIGNATURECUSTOM")]
-        self.tempos = [i for i in tokenizer.vocab.keys() if i.startswith("TEMPOCUSTOM")]
         # We want to generate from every pianist and every genre
         self.to_gen_from = self.pianists + self.genres
 
@@ -39,11 +36,8 @@ class ClampGenerationLoader:
     def __getitem__(self, idx: int):
         # Make a random choice of either a genre or a pianist
         to_gen = self.to_gen_from[idx]
-        # Make a random choice of tempo or time-signature
-        ts = random.choice(self.time_signatures)
-        temp = random.choice(self.tempos)
-        # Assemble everything into a dictionary
-        assembled = [self.tokenizer[to_gen], self.tokenizer[ts], self.tokenizer[temp]]
+        # Assemble everything into a single list and add the BOS token after the selected condition token
+        assembled = [self.tokenizer[to_gen], self.tokenizer["BOS_None"]]
         return dict(
             condition_ids=torch.tensor(assembled),
             generate_id=to_gen.split("_")[1].lower(),
