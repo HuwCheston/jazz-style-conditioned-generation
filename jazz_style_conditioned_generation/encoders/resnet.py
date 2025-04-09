@@ -11,7 +11,7 @@ import torch.nn as nn
 from jazz_style_conditioned_generation import utils
 
 # This maps classes used to train the performer identification model onto unique indices
-_CLASS_MAPPING = {
+CLASS_MAPPING = {
     "Abdullah Ibrahim": 0,
     "Ahmad Jamal": 1,
     "Bill Evans": 2,
@@ -196,7 +196,7 @@ def load_performer_identifier(
 ) -> ResNet50:
     """Loads the pretrained performer identification model + pretrained weights"""
     # Initialise the model: this model was trained with 20 classes initially
-    ident = ResNet50(num_classes=len(list(_CLASS_MAPPING.keys()))).to(utils.DEVICE)
+    ident = ResNet50(num_classes=len(list(CLASS_MAPPING.keys()))).to(utils.DEVICE)
     # Load the checkpoint and model state dictionary
     chkpt = torch.load(path, map_location=utils.DEVICE, weights_only=False)
     ident.load_state_dict(chkpt["model_state_dict"])
