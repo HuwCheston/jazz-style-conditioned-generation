@@ -105,37 +105,36 @@ def create_data_splits(track_metadatas: list[dict]):
     nunique_compositions = len(unique_compositions)
 
     # Get the number of compositions that should be in each split
-    n_train_comp = round(nunique_compositions * 0.8)
-    n_test_comp = round(nunique_compositions * 0.1)
+    n_train_comp = round(nunique_compositions * 0.9)
+    # n_test_comp = round(nunique_compositions * 0.1)
     n_valid_comp = round(nunique_compositions * 0.1)
 
     # Add any leftover compositions into the training set
-    n_train_comp = max(n_train_comp, nunique_compositions - n_valid_comp - n_test_comp)
-    assert n_train_comp + n_test_comp + n_valid_comp == nunique_compositions
+    n_train_comp = max(n_train_comp, nunique_compositions - n_valid_comp)
+    assert n_train_comp + n_valid_comp == nunique_compositions
 
     # Shuffle the list for randomisation
     random.shuffle(unique_compositions)
 
     # Subset the list
     train_comps = unique_compositions[:n_train_comp]
-    test_comps = unique_compositions[n_train_comp: n_train_comp + n_test_comp]
-    valid_comps = unique_compositions[n_train_comp + n_test_comp:]
+    valid_comps = unique_compositions[n_train_comp:]
 
     # Sanity checks: should have desired number of compositions, and no composition should be shared between splits
-    assert len(train_comps) + len(test_comps) + len(valid_comps) == nunique_compositions
-    check_all_splits_unique(train_comps, test_comps, valid_comps)
+    assert len(train_comps) + len(valid_comps) == nunique_compositions
+    check_all_splits_unique(train_comps, valid_comps)
 
     # Subset the dataframe to get the name of the actual performances
     train_perfs = metadata_df[metadata_df["_composition_id"].isin(train_comps)]["fname"].tolist()
-    test_perfs = metadata_df[metadata_df["_composition_id"].isin(test_comps)]["fname"].tolist()
+    # test_perfs = metadata_df[metadata_df["_composition_id"].isin(test_comps)]["fname"].tolist()
     valid_perfs = metadata_df[metadata_df["_composition_id"].isin(valid_comps)]["fname"].tolist()
 
     # Sanity check: should have used all performances, and all should be unique
-    assert len(train_perfs) + len(test_perfs) + len(valid_perfs) == len(metadata_df)
-    check_all_splits_unique(train_perfs, test_perfs, valid_perfs)
+    assert len(train_perfs) + len(valid_perfs) == len(metadata_df)
+    check_all_splits_unique(train_perfs, valid_perfs)
 
     # Dump the data splits
-    for name, df in zip(["train", "test", "validation"], [train_perfs, test_perfs, valid_perfs]):
+    for name, df in zip(["train", "validation"], [train_perfs, valid_perfs]):
         split_fpath = os.path.join(PRETRAIN_SPLIT_DIR, f'{name}_pretraining_split.txt')
         with open(split_fpath, 'w') as f:
             for line in df:
