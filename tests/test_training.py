@@ -147,10 +147,9 @@ class TrainingTest(unittest.TestCase):
         self.TRAINER.current_epoch = 0
 
 
-@unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
 class PreTrainTests(unittest.TestCase):
     def setUp(self):
-        yaml_path = os.path.join(utils.get_project_root(), "tests/test_resources/train_config.yaml")
+        yaml_path = os.path.join(utils.get_project_root(), "tests/test_resources/pretrain_config.yaml")
         self.CONFIG = parse_config_yaml(yaml_path)
         self.CONFIG["tokenizer_cfg"]["do_training"] = False  # skip training the tokenizer, for simplicity
         self.CONDITION_TOKENS = ("PIANIST", "GENRES", "RECORDINGYEAR", "TEMPO", "TIMESIGNATURE")
@@ -181,16 +180,18 @@ class PreTrainTests(unittest.TestCase):
         self.assertTrue(tm.model.Wout.out_features == tm.tokenizer.vocab_size)
         # Internally within our dataloaders, do_conditioning should be set to false
         self.assertFalse(tm.train_loader.dataset.do_conditioning)
-        self.assertFalse(tm.test_loader.dataset.do_conditioning)
         self.assertFalse(tm.validation_loader.dataset.do_conditioning)
         # Calling __getitem__ on the dataloaders, we shouldn't have any condition tokens
-        for dataloader in [tm.train_loader, tm.test_loader, tm.validation_loader]:
-            for batch_idx in range(10):
+        for dataloader in [tm.train_loader, tm.validation_loader]:
+            for batch_idx in range(len(dataloader)):
                 batch = dataloader.dataset.__getitem__(batch_idx)
                 iids = batch["input_ids"].tolist()
                 decoded = [tm.tokenizer[i] for i in iids]
                 for tok in decoded:
                     self.assertFalse(tok.startswith(self.CONDITION_TOKENS))
+        # Should not have a test dataloader
+        self.assertTrue(tm.test_loader is None)
+        self.assertTrue(len(self.PRETRAINER.track_splits["test"]) == 0)
 
     @handle_cuda_exceptions
     def test_without_conditioning(self):
@@ -206,12 +207,10 @@ class PreTrainTests(unittest.TestCase):
         self.assertTrue(self.PRETRAINER.model.Wout.out_features == self.PRETRAINER.tokenizer.vocab_size)
         # Internally within our dataloaders, do_conditioning should be set to false
         self.assertFalse(self.PRETRAINER.train_loader.dataset.do_conditioning)
-        self.assertFalse(self.PRETRAINER.test_loader.dataset.do_conditioning)
         self.assertFalse(self.PRETRAINER.validation_loader.dataset.do_conditioning)
-
-    def test_dataset_items(self):
-        for item in self.PRETRAINER.track_paths:
-            self.assertTrue("atepp" in item)
+        # No test split
+        self.assertTrue(self.PRETRAINER.test_loader is None)
+        self.assertTrue(len(self.PRETRAINER.track_splits["test"]) == 0)
 
 
 if __name__ == '__main__':

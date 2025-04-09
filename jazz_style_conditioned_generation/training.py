@@ -602,7 +602,7 @@ class TrainingModule:
                     self.generate_from_batch(batch, "validation")
         return np.mean(epoch_loss), np.mean(epoch_accuracy)
 
-    def testing(self) -> tuple[float, float]:
+    def testing(self) -> float:
         # Load the checkpoint with the best validation loss
         if self.checkpoint_cfg.get("load_checkpoints", True):
             self.load_checkpoint(os.path.join(self.checkpoint_dir, 'validation_best.pth'))
@@ -754,22 +754,8 @@ class PreTrainingModule(TrainingModule):
         # Copy the configuration dictionary and remove the `do_conditioning` argument
         test_kws = deepcopy(self.test_dataset_cfg)
         test_kws.pop("do_conditioning", None)
-        # Create test dataset loader: uses FULL tracks!
-        test_loader = DataLoader(
-            DatasetMIDIConditionedFullTrack(
-                tokenizer=self.tokenizer,
-                files_paths=self.track_splits["test"],
-                max_seq_len=self.max_seq_len,
-                do_conditioning=False,
-                **test_kws  # most arguments can be shared across test + validation loader
-            ),
-            batch_size=1,  # have to use a batch size of one for this class
-            shuffle=False,  # don't want to shuffle either for this one
-            drop_last=False,
-        )
-        if self._generate_only:
-            return None, None, test_loader  # hack to avoid creating other dataloaders when we don't want them
 
+        # No test set for pretraining, only validation
         validation_loader = DataLoader(
             DatasetMIDIConditionedRandomChunk(
                 tokenizer=self.tokenizer,
@@ -798,8 +784,7 @@ class PreTrainingModule(TrainingModule):
             shuffle=True,
             drop_last=False,
         )
-
-        return train_loader, validation_loader, test_loader
+        return train_loader, validation_loader, None
 
     def read_tracks_for_split(self, split_type: str) -> list[str]:
         """Reads a txt file containing a one line per string and returns as a list of strings"""
@@ -808,11 +793,22 @@ class PreTrainingModule(TrainingModule):
             all_paths = fp.read().strip().split('\n')
             # Check that the path exists on the local file structure
             for path in all_paths:
+                # Skip over empty lines
+                if path == "":
+                    continue
                 track_path = os.path.join(self.data_dir, path, "piano_midi.mid")
                 if not os.path.isfile(track_path):
                     raise FileNotFoundError(f'Could not find MIDI for track at {track_path}')
                 # No need for metadata for the pretraining dataset
                 yield track_path
+
+    def evaluate_full_tracks(self, n_full_tracks: int = None) -> float:
+        """No testing during pretrain"""
+        return 0.
+
+    def testing(self) -> float:
+        """No testing during pretrain"""
+        return 0.
 
     def save_checkpoint(self, epoch_metrics: dict, path: str) -> None:
         epoch_metrics["pretraining"] = True  # add a flag to the checkpoint
@@ -821,11 +817,23 @@ class PreTrainingModule(TrainingModule):
 
     @property
     def data_dir(self) -> str:
-        return os.path.join(utils.get_project_root(), "data/pretraining")
+        if self._data_dir is not None:
+            if utils.get_project_root() not in self._data_dir:
+                self._data_dir = os.path.join(utils.get_project_root(), self._data_dir)
+            assert os.path.isdir(self._data_dir), f"Data directory {self._data_dir} does not exist!"
+            return self._data_dir
+        else:
+            return os.path.join(DATA_DIR, "pretraining")
 
     @property
     def split_dir(self) -> str:
-        return os.path.join(utils.get_project_root(), "references/data_splits/pretraining")
+        if self._split_dir is not None:
+            if utils.get_project_root() not in self._split_dir:
+                self._split_dir = os.path.join(utils.get_project_root(), self._split_dir)
+            assert os.path.isdir(self._split_dir), f"Data directory {self._split_dir} does not exist!"
+            return self._split_dir
+        else:
+            return os.path.join(utils.get_project_root(), "references/data_splits/pretraining")
 
 
 class FineTuningModule(TrainingModule):
