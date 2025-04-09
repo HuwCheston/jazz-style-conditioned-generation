@@ -3,7 +3,8 @@ run: tester_config_pretrain
 batch_size: 2
 epochs: 1
 max_seq_len: 512
-split_dir: tests/test_resources/splits
+data_dir: tests/test_resources
+split_dir: tests/test_resources/splits/pretraining
 train_dataset_cfg:
   do_augmentation: false
   do_conditioning: false
