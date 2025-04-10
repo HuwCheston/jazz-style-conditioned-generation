@@ -108,7 +108,7 @@ class MusicTransformer(nn.Module):
                 # activation=self.ff_activ,
                 dim_feedforward=self.d_ff,
                 custom_decoder=self.dummy,
-                batch_first=True
+                batch_first=False
             )
         # RPR Transformer
         else:
@@ -131,7 +131,7 @@ class MusicTransformer(nn.Module):
                 dim_feedforward=self.d_ff,
                 custom_decoder=self.dummy,
                 custom_encoder=encoder,
-                batch_first=True
+                batch_first=False
             )
         # Final output is a softmaxed linear layer
         self.Wout = nn.Linear(self.d_model, self.tokenizer.vocab_size)
@@ -151,8 +151,6 @@ class MusicTransformer(nn.Module):
         # Input shape is (max_seq, batch_size, d_model)
         x = x.permute(1, 0, 2)
         x = self.positional_encoding(x)
-        # Back to (batch_size, max_seq, d_model)
-        x = x.permute(1, 0, 2)
         # Since there are no true decoder layers, the tgt is unused
         x_out = self.transformer(
             src=x,
@@ -160,6 +158,8 @@ class MusicTransformer(nn.Module):
             src_mask=causal_mask,  # causal mask (i.e., to prevent us from attending to future tokens in the sequence)
             src_key_padding_mask=torch.where(~attention_mask, 0, -torch.inf)  # masks PAD tokens
         )
+        # Back to (batch_size, max_seq, d_model)
+        x_out = x_out.permute(1, 0, 2)
         # Compute logits from FC layer: shape (batch_size, seq_len, vocab_size)
         return self.Wout(x_out)  # No softmax as nn.CrossEntropyLoss computes it for us
 
@@ -407,6 +407,7 @@ if __name__ == "__main__":
     parser.add_argument("-e", "--num-heads", type=int, help="Number of attention heads", default=8)
     parser.add_argument("-l", "--num-layers", type=int, help="Number of transformer layers", default=12)
     parser.add_argument("-d", "--dropout", type=float, help="Dropout fraction on feedforward layer", default=0.1)
+    parser.add_argument("-r", "--rpr", type=utils.string_to_bool, nargs='?', const=True, default=False, help="Use RPR")
     # Parse all arguments from the command line
     parser_args = vars(parser.parse_args())
     logger.info(f"Creating music transformer with kwargs: {parser_args}", )
@@ -443,6 +444,7 @@ if __name__ == "__main__":
             num_heads=parser_args["num_heads"],
             dropout=parser_args["dropout"],
             n_layers=parser_args["num_layers"],
+            rpr=parser_args
         ).to(utils.DEVICE)
         # Create the optimizer
         opt = torch.optim.Adam(mt.parameters(), lr=1e-4, )
