@@ -148,7 +148,6 @@ class MusicTransformer(nn.Module):
         # Create causal mask
         causal_mask = self.transformer.generate_square_subsequent_mask(input_ids.shape[1]).to(input_ids.device)
         x = self.embedding(input_ids)
-
         # Input shape is (max_seq, batch_size, d_model)
         x = x.permute(1, 0, 2)
         x = self.positional_encoding(x)
@@ -159,7 +158,7 @@ class MusicTransformer(nn.Module):
             src=x,
             tgt=x,
             src_mask=causal_mask,  # causal mask (i.e., to prevent us from attending to future tokens in the sequence)
-            src_key_padding_mask=attention_mask  # masks PAD tokens (i.e., to ensure we have sequence length)
+            src_key_padding_mask=torch.where(~attention_mask, 0, -torch.inf)  # masks PAD tokens
         )
         # Compute logits from FC layer: shape (batch_size, seq_len, vocab_size)
         return self.Wout(x_out)  # No softmax as nn.CrossEntropyLoss computes it for us
@@ -426,9 +425,9 @@ if __name__ == "__main__":
         DatasetMIDIConditionedRandomChunk(
             tokenizer=toker,
             files_paths=midis,
-            do_conditioning=True,  # no conditioning for now
+            do_conditioning=False,  # no conditioning for now
             do_augmentation=False,
-            max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+            max_seq_len=parser_args["max_seq_len"],
         ),
         batch_size=parser_args["batch_size"],
         shuffle=False,
@@ -461,6 +460,6 @@ if __name__ == "__main__":
         loss.backward()
         opt.step()
     except (torch.OutOfMemoryError, RuntimeError) as e:
-        logger.warning("... oof, getting OOMs with those settings!")
+        logger.warning(f"... oof, getting OOMs with those settings! error: {e}")
     else:
         logger.info("... completed backwards pass of a single batch with no OOMs, good to go with those settings!")
