@@ -19,7 +19,7 @@ from transformers import GPT2Config, GPT2LMHeadModel, get_cosine_schedule_with_w
 from jazz_style_conditioned_generation import utils, metrics
 from jazz_style_conditioned_generation.data.dataloader import (
     DatasetMIDIConditionedRandomChunk,
-    DatasetMIDIConditioned,
+    DatasetMIDIConditionedNoOverlapChunks,
     DATA_DIR
 )
 from jazz_style_conditioned_generation.data.tokenizer import (
@@ -212,7 +212,7 @@ class TrainingModule:
         # Create test dataset loader: uses FULL tracks, with no overlap between chunks
         # i.e., we go 0 - 100, 101 - 201, 202 - 302, etc., then average the loss over all chunks
         test_loader = DataLoader(
-            DatasetMIDIConditioned(
+            DatasetMIDIConditionedNoOverlapChunks(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["test"],
                 max_seq_len=self.max_seq_len,
@@ -227,7 +227,7 @@ class TrainingModule:
         # Create validation dataset loader: uses FULL tracks, with no overlap between chunks
         # i.e., we go 0 - 100, 101 - 201, 202 - 302, etc., then average the loss over all chunks
         validation_loader = DataLoader(
-            DatasetMIDIConditioned(
+            DatasetMIDIConditionedNoOverlapChunks(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["validation"],
                 max_seq_len=self.max_seq_len,
@@ -762,7 +762,7 @@ class PreTrainingModule(TrainingModule):
 
         # No test set for pretraining, only validation
         validation_loader = DataLoader(
-            DatasetMIDIConditioned(
+            DatasetMIDIConditionedNoOverlapChunks(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["validation"],
                 max_seq_len=self.max_seq_len,

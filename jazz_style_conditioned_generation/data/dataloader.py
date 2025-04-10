@@ -1,7 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Data loader and collator modules"""
+"""
+Data loader and collator modules.
+
+There are three data loaders contained here:
+- DatasetMIDIConditionedNoOverlapChunks:
+    This returns every possible chunk of N tokens from a single track, with no overlap between consecutive chunks.
+    So, for a track with 500 tokens, we would expect tokens (0, 99), (100, 199), (200, 299), (300, 399), (400, 499)...
+    Chunks smaller than 10% the desired sequence length are dropped. This dataset is used during validation and
+    testing: note that, during pretraining, there is no testing stage.
+
+- DatasetMIDIConditionedRandomChunk
+    This returns a single random chunk from a track, with a different chunk sampled every epoch. Chunks are sampled
+    from the beginning 90% of a track to ensure that they are not too small (e.g., not starting on the last token).
+    So, on epoch 1 for a track with 500 tokens, we might get (55, 154), then epoch 2 we get (350, 449), etc.
+    This dataset is used during training.
+
+- DatasetMIDIConditionedFullTrack
+    This returns an entire track of N tokens, where N may be larger or smaller than the transformer maximum sequence
+    length. We then process this in MusicTransformer.evaluate using a sliding window, where we go e.g. from tokens
+    (0, 99), (1, 100), (2, 101), (3, 102), etc., in order to get an estimate of the loss for every single token
+    in every single track. This dataset is currently not used.
+
+"""
 
 import os
 import random
@@ -37,7 +59,7 @@ from jazz_style_conditioned_generation.data.scores import (
 __all__ = [
     "DATA_DIR",
     "create_padding_mask",
-    "DatasetMIDIConditioned",
+    "DatasetMIDIConditionedNoOverlapChunks",
     "DatasetMIDIConditionedRandomChunk",
     "DatasetMIDIConditionedFullTrack"
 ]
@@ -55,7 +77,7 @@ def create_padding_mask(x, pad_token_id: int) -> torch.tensor:
     return x == pad_token_id
 
 
-class DatasetMIDIConditioned:
+class DatasetMIDIConditionedNoOverlapChunks:
     """Dataset class: slices a track into N MAX_SEQ_LEN chunks (no overlap), applies augmentation and conditioning"""
 
     def __init__(
@@ -297,7 +319,6 @@ class DatasetMIDIConditioned:
             "labels": torch.tensor(targets, dtype=torch.long),
             # Mask is for padding only: causal mask is handled by models
             "attention_mask": create_padding_mask(input_ids, self.tokenizer.pad_token_id),
-            # TODO: maybe we want to append these in a data collator (for different types of conditioning)
             # We have to pad the condition IDs or else we get an error when creating the dataloader
             "condition_ids": torch.tensor(
                 utils.pad_sequence(condition_tokens, len(input_ids), self.tokenizer.pad_token_id), dtype=torch.long
@@ -305,7 +326,7 @@ class DatasetMIDIConditioned:
         }
 
 
-class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
+class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditionedNoOverlapChunks):
     """Training dataloader: slices a track into a different random chunk of MAX_SEQ_LEN tokens every epoch"""
 
     START_TOKENS = ("BOS", "TimeShift", "NoteOn", "Pitch", "Chord", "Bar")
@@ -453,7 +474,6 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
             "labels": torch.tensor(targets, dtype=torch.long),
             # Mask is for padding only: causal mask is handled by models
             "attention_mask": create_padding_mask(input_ids, self.tokenizer.pad_token_id),
-            # TODO: maybe we want to append these in a data collator (for different types of conditioning)
             # We have to pad the condition IDs or else we get an error when creating the dataloader
             "condition_ids": torch.tensor(
                 utils.pad_sequence(condition_tokens, len(input_ids), self.tokenizer.pad_token_id), dtype=torch.long
@@ -461,7 +481,7 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditioned):
         }
 
 
-class DatasetMIDIConditionedFullTrack(DatasetMIDIConditioned):
+class DatasetMIDIConditionedFullTrack(DatasetMIDIConditionedNoOverlapChunks):
     """Returns FULL LENGTH tracks. Should be used with batch_size=1 in dataloader as sequence lengths are ragged"""
 
     def __init__(

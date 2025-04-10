@@ -13,7 +13,7 @@ from .conditions import (
 )
 from .dataloader import (
     DATA_DIR,
-    DatasetMIDIConditioned,
+    DatasetMIDIConditionedNoOverlapChunks,
     create_padding_mask
 )
 from .tokenizer import (

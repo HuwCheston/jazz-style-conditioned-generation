@@ -29,7 +29,7 @@ TEST_MIDI2 = os.path.join(TEST_RESOURCES, "test_midi2/piano_midi.mid")
 TEST_MIDI3 = os.path.join(TEST_RESOURCES, "test_midi_bushgrafts1/piano_midi.mid")
 
 TOKENIZER = load_tokenizer(tokenizer_str="tsd")
-DUMMY_DATASET = DatasetMIDIConditioned(
+DUMMY_DATASET = DatasetMIDIConditionedNoOverlapChunks(
     tokenizer=TOKENIZER,
     files_paths=[TEST_MIDI1],
     max_seq_len=512,
@@ -98,7 +98,7 @@ class DatasetConditionedTest(unittest.TestCase):
 
     def test_get_conditioning_tokens(self):
         token_factory = prepare_conditioned_tokenizer()
-        ds = DatasetMIDIConditioned(
+        ds = DatasetMIDIConditionedNoOverlapChunks(
             tokenizer=token_factory,
             files_paths=[TEST_MIDI1, TEST_MIDI2, TEST_MIDI3],
             max_seq_len=512,
@@ -176,7 +176,8 @@ class DatasetConditionedTest(unittest.TestCase):
             do_augmentation=False
         )
         # This test will work with multiple dataset types
-        for ds_cls in [DatasetMIDIConditioned, DatasetMIDIConditionedRandomChunk, DatasetMIDIConditionedFullTrack]:
+        for ds_cls in [DatasetMIDIConditionedNoOverlapChunks, DatasetMIDIConditionedRandomChunk,
+                       DatasetMIDIConditionedFullTrack]:
             ds = ds_cls(**kwargs)
             # Iterate over every item
             for i in ds:
@@ -234,7 +235,7 @@ class DatasetConditionedTest(unittest.TestCase):
             do_conditioning=False,
             max_seq_len=100,
         )
-        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditioned]:
+        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditionedNoOverlapChunks]:
             ds = ds_cls(**kwargs)
             # Test the first "slice" of the first item
             item = ds.__getitem__(0)
@@ -254,7 +255,7 @@ class DatasetConditionedTest(unittest.TestCase):
             do_conditioning=True,
         )
         # We can run this test with multiple dataset types
-        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditioned]:
+        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditionedNoOverlapChunks]:
             ds = ds_cls(**kwargs)
             # Test the first "slice" of the first item
             item = ds.__getitem__(0)
@@ -276,7 +277,7 @@ class DatasetConditionedTest(unittest.TestCase):
             self.assertEqual(input_ids[8], token_factory["TIMESIGNATURECUSTOM_44"])
 
         # These tests can only work with our exhaustive dataloader
-        ds = DatasetMIDIConditioned(**kwargs)
+        ds = DatasetMIDIConditionedNoOverlapChunks(**kwargs)
         # Test the first slice of the first item
         item = ds.__getitem__(0)
         input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
@@ -309,7 +310,7 @@ class DatasetConditionedTest(unittest.TestCase):
             max_genre_tokens=5
         )
         # We can run this test with multiple dataset types
-        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditioned]:
+        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditionedNoOverlapChunks]:
             # Create the dataset with MIDI file 2
             ds = ds_cls(**kwargs)
             # Get the first slice
@@ -333,7 +334,7 @@ class DatasetConditionedTest(unittest.TestCase):
                     self.assertFalse(token_factory[tok].startswith(t))
 
         # These tests can only work with our exhaustive dataloader
-        ds = DatasetMIDIConditioned(**kwargs)
+        ds = DatasetMIDIConditionedNoOverlapChunks(**kwargs)
         # Test the first slice of the first item
         item = ds.__getitem__(0)
         input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
@@ -363,7 +364,7 @@ class DatasetConditionedTest(unittest.TestCase):
             do_conditioning=True,
         )
         # We can run this test with multiple dataset types
-        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditioned]:
+        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditionedNoOverlapChunks]:
             # Create the dataset with MIDI file 3
             ds = ds_cls(**kwargs)
             # Test the first slice
@@ -462,7 +463,7 @@ class DatasetConditionedTest(unittest.TestCase):
             do_conditioning=True
         )
         # We can run this test with multiple dataset types
-        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditioned]:
+        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditionedNoOverlapChunks]:
             ds = ds_cls(**kwargs)
             before_augment = deepcopy(ds.preloaded_data[0])
             # Create the item a few times: this will apply augmentation to the item in .track_slices[0]
@@ -576,7 +577,7 @@ class DatasetConditionedTest(unittest.TestCase):
             # Create the dataset with this value of N
             kwargs_copy = deepcopy(kwargs)
             kwargs_copy["max_genre_tokens"] = n
-            ds = DatasetMIDIConditioned(**kwargs_copy)
+            ds = DatasetMIDIConditionedNoOverlapChunks(**kwargs_copy)
             # Get the condition tokens
             actual_token_ids = ds.get_conditioning_tokens(utils.read_json_cached(ds.metadata_paths[0]))
             # Decode the tokens
@@ -601,7 +602,7 @@ class DatasetConditionedTest(unittest.TestCase):
             # Create the dataset with this value of N
             kwargs_copy = deepcopy(kwargs)
             kwargs_copy["max_pianist_tokens"] = n
-            ds = DatasetMIDIConditioned(**kwargs_copy)
+            ds = DatasetMIDIConditionedNoOverlapChunks(**kwargs_copy)
             # Get the condition tokens
             actual_token_ids = ds.get_conditioning_tokens(utils.read_json_cached(ds.metadata_paths[0]))
             # Decode the tokens
