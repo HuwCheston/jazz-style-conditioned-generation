@@ -156,7 +156,7 @@ class MusicTransformer(nn.Module):
             src=x,
             tgt=x,
             src_mask=causal_mask,  # causal mask (i.e., to prevent us from attending to future tokens in the sequence)
-            src_key_padding_mask=torch.where(~attention_mask, 0, -torch.inf)  # masks PAD tokens
+            src_key_padding_mask=attention_mask
         )
         # Back to (batch_size, max_seq, d_model)
         x_out = x_out.permute(1, 0, 2)
