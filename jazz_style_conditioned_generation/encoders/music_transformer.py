@@ -446,6 +446,7 @@ if __name__ == "__main__":
             n_layers=parser_args["num_layers"],
             rpr=parser_args
         ).to(utils.DEVICE)
+        logger.info(f"... model has {utils.total_parameters(mt)} parameters!")
         # Create the optimizer
         opt = torch.optim.Adam(mt.parameters(), lr=1e-4, )
         # Get a single batch
