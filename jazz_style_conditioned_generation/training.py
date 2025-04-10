@@ -19,7 +19,7 @@ from transformers import GPT2Config, GPT2LMHeadModel, get_cosine_schedule_with_w
 from jazz_style_conditioned_generation import utils, metrics
 from jazz_style_conditioned_generation.data.dataloader import (
     DatasetMIDIConditionedRandomChunk,
-    DatasetMIDIConditionedFullTrack,
+    DatasetMIDIConditioned,
     DATA_DIR
 )
 from jazz_style_conditioned_generation.data.tokenizer import (
@@ -122,8 +122,6 @@ class TrainingModule:
         if self.train_dataset_cfg.get("do_conditioning", True) != self.test_dataset_cfg.get("do_conditioning", True):
             raise AttributeError('Got conflicting options for `do_conditioning` for test and train dataloaders!')
         # We want the conditioning tokens to always be part of the vocabulary
-        # TODO: we probably don't want to do this when using a different condition type,
-        #  e.g. concatenating along the sequence dimension
         if self.train_dataset_cfg.get("do_conditioning", True):
             logger.debug("Adding condition tokens...")
             # These functions add all the required condition tokens into the tokenizer's vocabulary
@@ -185,7 +183,6 @@ class TrainingModule:
         # LOSS & METRICS
         self.current_validation_loss = 0.
         self.best_validation_loss = 1e4  # should always be beaten...
-        # TODO: consider multiple losses? what about a GAN loss too?
 
         # OPTIMISER
         optimizer_type = self.optimizer_cfg.get("optimizer_type", "adam")
@@ -210,36 +207,38 @@ class TrainingModule:
 
     def create_dataloaders(self) -> tuple[DataLoader, DataLoader, DataLoader]:
         """Creates a dataloader for a given split and configuration"""
-        # Create validation dataset loader: uses random chunks
         if self.test_dataset_cfg.get("do_augmentation", False):
             raise AttributeError("Augmentation only allowed for training dataloader!")
-        # Create test dataset loader: uses FULL tracks!
+        # Create test dataset loader: uses FULL tracks, with no overlap between chunks
+        # i.e., we go 0 - 100, 101 - 201, 202 - 302, etc., then average the loss over all chunks
         test_loader = DataLoader(
-            DatasetMIDIConditionedFullTrack(
+            DatasetMIDIConditioned(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["test"],
                 max_seq_len=self.max_seq_len,
                 **self.test_dataset_cfg  # most arguments can be shared across test + validation loader
             ),
-            batch_size=1,  # have to use a batch size of one for this class
-            shuffle=False,  # don't want to shuffle either for this one
+            batch_size=self.batch_size,
+            shuffle=False,  # don't want to shuffle for this one
             drop_last=False,
         )
         if self._generate_only:
             return None, None, test_loader  # hack to avoid creating other dataloaders when we don't want them
-
+        # Create validation dataset loader: uses FULL tracks, with no overlap between chunks
+        # i.e., we go 0 - 100, 101 - 201, 202 - 302, etc., then average the loss over all chunks
         validation_loader = DataLoader(
-            DatasetMIDIConditionedRandomChunk(
+            DatasetMIDIConditioned(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["validation"],
                 max_seq_len=self.max_seq_len,
                 **self.test_dataset_cfg  # most arguments can be shared across test + validation loader
             ),
             batch_size=self.batch_size,
-            shuffle=True,
+            shuffle=False,  # don't want to shuffle either for this one,
             drop_last=False,
         )
-        # Create test dataset loader: uses random chunks
+        # Create training dataset loader: uses random chunks
+        # i.e., from one track we might have tokens 0 - 100, then another 50 - 150... these chunks differ every epoch
         train_loader = DataLoader(
             DatasetMIDIConditionedRandomChunk(
                 tokenizer=self.tokenizer,
@@ -248,7 +247,7 @@ class TrainingModule:
                 **self.train_dataset_cfg
             ),
             batch_size=self.batch_size,
-            shuffle=True,
+            shuffle=True,  # shuffling is good during training
             drop_last=False,
         )
 
@@ -602,13 +601,25 @@ class TrainingModule:
                     self.generate_from_batch(batch, "validation")
         return np.mean(epoch_loss), np.mean(epoch_accuracy)
 
-    def testing(self) -> float:
+    def testing(self) -> tuple[float, float]:
         # Load the checkpoint with the best validation loss
         if self.checkpoint_cfg.get("load_checkpoints", True):
             self.load_checkpoint(os.path.join(self.checkpoint_dir, 'validation_best.pth'))
         # Run the evaluate_full_tracks function on the ENTIRE test dataset
-        full_test_loss = self.evaluate_full_tracks(len(self.test_loader))
-        return full_test_loss
+        test_loss, test_accuracy = [], []
+        # Iterate over every batch in the dataloader
+        for batch_idx, batch in tqdm(
+                enumerate(self.test_loader),
+                total=len(self.test_loader),
+                desc='Testing...'
+        ):
+            # Forwards pass
+            with torch.no_grad():
+                loss, accuracy = self.step(batch)
+            # No backwards pass
+            test_loss.append(loss.item())
+            test_accuracy.append(accuracy.item())
+        return np.mean(test_loss), np.mean(test_accuracy)
 
     def evaluate_full_tracks(self, n_full_tracks: int = None):
         """Tests on full dataset of N test tracks and computes loss that should be comparable across vocab sizes"""
@@ -691,12 +702,6 @@ class TrainingModule:
                 validation_accuracy=validation_accuracy,
                 lr=self.get_scheduler_lr()
             )
-            # Run evaluation on 10 full tracks every few epochs
-            if epoch % self.full_validate_after_n_epochs == 0:
-                logger.debug(f"Doing a partial validation with {self.n_full_validation_tracks} complete tracks...")
-                valid_loss_full_track = self.evaluate_full_tracks(self.n_full_validation_tracks)
-                logger.info(f"Epoch {epoch} / {self.epochs}: full-track validation loss {valid_loss_full_track:.3f}")
-                epoch_metrics["validation_loss_full_track"] = valid_loss_full_track
             # Report results to MLFlow, if we're using this
             if self.mlflow_cfg.get("use", False):
                 mlflow.log_metrics(epoch_metrics, step=epoch)
@@ -726,13 +731,13 @@ class TrainingModule:
                     self.save_checkpoint(epoch_metrics, os.path.join(self.checkpoint_dir, 'validation_best.pth'))
         # Run testing after training completes
         logger.info('Training complete!')
-        test_loss_full_track = self.testing()
+        test_loss, test_accuracy = self.testing()
         # Report results to MLFlow, if we're using this
         if self.mlflow_cfg.get("use", False):
-            test_metrics = dict(test_loss_full_track=test_loss_full_track)
+            test_metrics = dict(test_loss=test_loss, test_accuracy=test_accuracy)
             mlflow.log_metrics(test_metrics, step=self.current_epoch)
         # Log everything to the console
-        logger.info(f"Testing finished: full-track loss {test_loss_full_track:.3f}")
+        logger.info(f"Testing finished: loss {test_loss:.3f}, accuracy {test_accuracy:.3f}")
         logger.info(f'Finished in {(time() - training_start) // 60} minutes!')
 
 
@@ -757,27 +762,27 @@ class PreTrainingModule(TrainingModule):
 
         # No test set for pretraining, only validation
         validation_loader = DataLoader(
-            DatasetMIDIConditionedRandomChunk(
+            DatasetMIDIConditioned(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["validation"],
                 max_seq_len=self.max_seq_len,
-                do_conditioning=False,
+                do_conditioning=False,  # never any conditioning during pretraining on non-jazz music
                 **test_kws  # most arguments can be shared across test + validation loader
             ),
             batch_size=self.batch_size,
-            shuffle=True,
+            shuffle=False,
             drop_last=False,
         )
         # Copy the configuration dictionary and remove the `do_conditioning` argument
         train_kws = deepcopy(self.train_dataset_cfg)
         train_kws.pop("do_conditioning", None)
-        # Create test dataset loader: uses random chunks
+        # Create train dataset loader: uses random chunks
         train_loader = DataLoader(
             DatasetMIDIConditionedRandomChunk(
                 tokenizer=self.tokenizer,
                 files_paths=self.track_splits["train"],
                 max_seq_len=self.max_seq_len,
-                do_conditioning=False,
+                do_conditioning=False,  # never any conditioning during pretraining on non-jazz music
                 **train_kws
             ),
             batch_size=self.batch_size,
@@ -806,9 +811,9 @@ class PreTrainingModule(TrainingModule):
         """No testing during pretrain"""
         return 0.
 
-    def testing(self) -> float:
+    def testing(self) -> tuple[float, float]:
         """No testing during pretrain"""
-        return 0.
+        return 0., 0.
 
     def save_checkpoint(self, epoch_metrics: dict, path: str) -> None:
         epoch_metrics["pretraining"] = True  # add a flag to the checkpoint

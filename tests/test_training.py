@@ -57,10 +57,10 @@ class TrainingTest(unittest.TestCase):
         # Testing tokenizer
         self.assertFalse(self.TRAINER.tokenizer.is_trained)  # config is specifying no training
         # Testing training dataloader
-        # self.assertEqual(len(self.TRAINER.train_loader.dataset), 1)  # uses random chunks
         self.assertFalse(self.TRAINER.train_loader.dataset.do_augmentation)  # no augmentation as specified in config
-        self.assertEqual(len(self.TRAINER.test_loader.dataset), 1)  # random chunks
-        self.assertEqual(len(self.TRAINER.validation_loader.dataset), 1)  # random chunks
+        self.assertGreater(len(self.TRAINER.test_loader), 1)  # multiple chunks from every track
+        self.assertGreater(len(self.TRAINER.validation_loader), 1)  # multiple chunks from every track
+        self.assertEqual(len(self.TRAINER.train_loader), 1)  # one chunk from the track
         # Should have a maximum sequence length of 512 tokens per loader
         for loader in [self.TRAINER.train_loader, self.TRAINER.test_loader, self.TRAINER.validation_loader]:
             self.assertEqual(loader.dataset.max_seq_len, 512)
