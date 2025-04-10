@@ -379,9 +379,12 @@ class PositionalEncoding(nn.Module):
 
 
 if __name__ == "__main__":
+    import argparse
+
+    from loguru import logger
+
     from jazz_style_conditioned_generation.data.tokenizer import (
         load_tokenizer,
-        # train_tokenizer,
         add_genres_to_vocab,
         add_pianists_to_vocab,
         add_tempos_to_vocab,
@@ -389,22 +392,33 @@ if __name__ == "__main__":
         add_recording_years_to_vocab
     )
     from jazz_style_conditioned_generation.data.dataloader import DatasetMIDIConditionedRandomChunk
+    from jazz_style_conditioned_generation.metrics import cross_entropy_loss
 
     utils.seed_everything(utils.SEED)
     n_midis = 20
 
+    # Parsing arguments from the command line interface
+    parser = argparse.ArgumentParser(description="Test out model configuration by forwards/backwards passing one batch")
+    parser.add_argument("-b", "--batch-size", type=int, help="Batch size to use", default=6)
+    parser.add_argument("-s", "--max-seq-len", type=int, help="Maximum sequence length", default=1024)
+    parser.add_argument("-m", "--dim-model", type=int, help="Model hidden dimension", default=768)
+    parser.add_argument("-f", "--dim-feedforward", type=int, help="Feed hidden dimension", default=2048)
+    parser.add_argument("-e", "--num-heads", type=int, help="Number of attention heads", default=8)
+    parser.add_argument("-l", "--num-layers", type=int, help="Number of transformer layers", default=12)
+    parser.add_argument("-d", "--dropout", type=float, help="Dropout fraction on feedforward layer", default=0.1)
+    # Parse all arguments from the command line
+    parser_args = vars(parser.parse_args())
+    logger.info(f"Creating music transformer with kwargs: {parser_args}", )
     # Get a small number of MIDI files
-    midis = utils.get_data_files_with_ext("data/raw", "**/*.mid")
-    # random.shuffle(midis)
+    midis = utils.get_data_files_with_ext("data/pretraining", "**/*.mid")
     midis = midis[:n_midis]
     # Create and train the tokenizer with the given vocabulary size
-    toker = load_tokenizer(tokenizer_str="midilike")
+    toker = load_tokenizer(tokenizer_str="tsd")
     add_tempos_to_vocab(toker, 80)
     add_timesignatures_to_vocab(toker, [3, 4])
     add_pianists_to_vocab(toker)
     add_genres_to_vocab(toker)
     add_recording_years_to_vocab(toker)
-    # train_tokenizer(toker, midis, vocab_size=2000)
     # Create the dataset that returns full-length tracks
     ds = torch.utils.data.DataLoader(
         DatasetMIDIConditionedRandomChunk(
@@ -414,27 +428,37 @@ if __name__ == "__main__":
             do_augmentation=False,
             max_seq_len=utils.MAX_SEQUENCE_LENGTH,
         ),
-        batch_size=1,  # batch size MUST be set to one with this dataloader as output sequences have different len
+        batch_size=parser_args["batch_size"],
         shuffle=False,
         drop_last=False,
     )
-    # Create the model and set to evaluation mode
-    mt = MusicTransformer(tokenizer=toker, max_seq_len=utils.MAX_SEQUENCE_LENGTH, dim_condition=128,
-                          **DEFAULT_CONFIG).to("cpu")
-    batch = next(iter(ds))
-    iids = batch["input_ids"].to("cpu")
-    targets = batch["labels"].to("cpu")
-    ctoks = batch["condition_ids"].to("cpu")
-    amask = batch["attention_mask"].to("cpu")
-    out = mt(iids, targets, amask, ctoks, )
-
-    # mt.eval()
-    # # Iterate over individual tracks
-    # for track in ds:
-    #     # Compute the loss as sum(NLL) / len(raw_sequence_length)
-    #     tokens_loss = mt.evaluate(
-    #         track["input_ids"].to(utils.DEVICE),
-    #         track["labels"].to(utils.DEVICE),
-    #         track["attention_mask"].to(utils.DEVICE)
-    #     )
-    #     print(f"MIDI length {track['input_ids'].size(0)}: decoded loss {tokens_loss}")
+    # Create the model and set to training mode
+    try:
+        mt = MusicTransformer(
+            tokenizer=toker,
+            max_seq_len=parser_args["max_seq_len"],
+            d_model=parser_args["dim_model"],
+            dim_feedforward=parser_args["dim_feedforward"],
+            num_heads=parser_args["num_heads"],
+            dropout=parser_args["dropout"],
+            n_layers=parser_args["num_layers"],
+        ).to(utils.DEVICE)
+        # Create the optimizer
+        opt = torch.optim.Adam(mt.parameters(), lr=1e-4, )
+        # Get a single batch
+        batch = next(iter(ds))
+        iids = batch["input_ids"].to(utils.DEVICE)
+        targets = batch["labels"].to(utils.DEVICE)
+        ctoks = batch["condition_ids"].to(utils.DEVICE)
+        amask = batch["attention_mask"].to(utils.DEVICE)
+        # Forwards pass
+        out = mt(iids, targets, amask, ctoks, )
+        loss = cross_entropy_loss(out, targets, toker)
+        # Backwards pass
+        opt.zero_grad()
+        loss.backward()
+        opt.step()
+    except (torch.OutOfMemoryError, RuntimeError) as e:
+        logger.warning("... oof, getting OOMs with those settings!")
+    else:
+        logger.info("... completed backwards pass of a single batch with no OOMs, good to go with those settings!")
