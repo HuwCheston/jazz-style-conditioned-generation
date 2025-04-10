@@ -107,7 +107,8 @@ class MusicTransformer(nn.Module):
                 dropout=self.dropout,
                 # activation=self.ff_activ,
                 dim_feedforward=self.d_ff,
-                custom_decoder=self.dummy
+                custom_decoder=self.dummy,
+                batch_first=True
             )
         # RPR Transformer
         else:
@@ -129,7 +130,8 @@ class MusicTransformer(nn.Module):
                 # activation=self.ff_activ,
                 dim_feedforward=self.d_ff,
                 custom_decoder=self.dummy,
-                custom_encoder=encoder
+                custom_encoder=encoder,
+                batch_first=True
             )
         # Final output is a softmaxed linear layer
         self.Wout = nn.Linear(self.d_model, self.tokenizer.vocab_size)
@@ -150,6 +152,8 @@ class MusicTransformer(nn.Module):
         # Input shape is (max_seq, batch_size, d_model)
         x = x.permute(1, 0, 2)
         x = self.positional_encoding(x)
+        # Back to (batch_size, max_seq, d_model)
+        x = x.permute(1, 0, 2)
         # Since there are no true decoder layers, the tgt is unused
         x_out = self.transformer(
             src=x,
@@ -157,8 +161,6 @@ class MusicTransformer(nn.Module):
             src_mask=causal_mask,  # causal mask (i.e., to prevent us from attending to future tokens in the sequence)
             src_key_padding_mask=attention_mask  # masks PAD tokens (i.e., to ensure we have sequence length)
         )
-        # Back to (batch_size, max_seq, d_model)
-        x_out = x_out.permute(1, 0, 2)
         # Compute logits from FC layer: shape (batch_size, seq_len, vocab_size)
         return self.Wout(x_out)  # No softmax as nn.CrossEntropyLoss computes it for us
 
