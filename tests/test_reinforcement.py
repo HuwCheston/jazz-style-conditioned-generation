@@ -10,8 +10,6 @@ import torch
 from symusic import Score
 
 from jazz_style_conditioned_generation import utils, training
-from jazz_style_conditioned_generation.reinforcement.rl_generate import ReinforceGenerateModule
-from jazz_style_conditioned_generation.reinforcement.rl_train import ReinforceTrainModule, GroundTruthDataset
 
 # Config file for the generator
 GENERATIVE_MODEL_CFG = os.path.join(
@@ -25,6 +23,8 @@ GENERATIVE_MODEL_CFG = os.path.join(
 # Need to skip on GitHub actions because of CLaMP requirement
 @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
 class ReinforceTrainTest(unittest.TestCase):
+    from jazz_style_conditioned_generation.reinforcement.rl_train import ReinforceTrainModule
+
     cfg_parsed = training.parse_config_yaml(GENERATIVE_MODEL_CFG)
     RT = ReinforceTrainModule(**cfg_parsed)
 
@@ -75,6 +75,8 @@ class ReinforceTrainTest(unittest.TestCase):
         self.assertTrue(loss.requires_grad)
 
     def test_ground_truth_dataset(self):
+        from jazz_style_conditioned_generation.reinforcement.rl_train import GroundTruthDataset
+
         resources_root = os.path.join(utils.get_project_root(), "tests/test_resources")
         gt = torch.utils.data.DataLoader(
             GroundTruthDataset(
@@ -96,7 +98,11 @@ class ReinforceTrainTest(unittest.TestCase):
             self.assertTrue(b.size(1) == 768)
 
 
+# Need to skip on GitHub actions because of CLaMP requirement
+@unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
 class ReinforceGenerateTest(unittest.TestCase):
+    from jazz_style_conditioned_generation.reinforcement.rl_generate import ReinforceGenerateModule
+
     cfg_parsed = training.parse_config_yaml(GENERATIVE_MODEL_CFG)
     cfg_parsed["reinforce_cfg"]["generated_sequence_length"] = 10  # short sequences for speed
     RG = ReinforceGenerateModule(**cfg_parsed)
