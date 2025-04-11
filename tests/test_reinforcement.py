@@ -20,6 +20,7 @@ GENERATIVE_MODEL_CFG = os.path.join(
 )
 
 
+@unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
 class ReinforceTrainTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -102,6 +103,7 @@ class ReinforceTrainTest(unittest.TestCase):
             self.assertTrue(b.size(1) == 768)
 
 
+@unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
 class ReinforceGenerateTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
