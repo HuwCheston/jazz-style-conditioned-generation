@@ -396,7 +396,7 @@ if __name__ == "__main__":
     from jazz_style_conditioned_generation.metrics import cross_entropy_loss
 
     utils.seed_everything(utils.SEED)
-    n_midis = 20
+    n_midis = 500
 
     # Parsing arguments from the command line interface
     parser = argparse.ArgumentParser(description="Test out model configuration by forwards/backwards passing one batch")
@@ -449,20 +449,24 @@ if __name__ == "__main__":
         logger.info(f"... model has {utils.total_parameters(mt)} parameters!")
         # Create the optimizer
         opt = torch.optim.Adam(mt.parameters(), lr=1e-4, )
-        # Get a single batch
-        batch = next(iter(ds))
-        iids = batch["input_ids"].to(utils.DEVICE)
-        targets = batch["labels"].to(utils.DEVICE)
-        ctoks = batch["condition_ids"].to(utils.DEVICE)
-        amask = batch["attention_mask"].to(utils.DEVICE)
-        # Forwards pass
-        out = mt(iids, targets, amask, ctoks, )
-        loss = cross_entropy_loss(out, targets, toker)
-        # Backwards pass
-        opt.zero_grad()
-        loss.backward()
-        opt.step()
+        # Process a few batches
+        for batch in tqdm(ds, total=len(ds), desc=f"Processing {len(ds)} batches, total {n_midis} MIDI files..."):
+            iids = batch["input_ids"].to(utils.DEVICE)
+            targets = batch["labels"].to(utils.DEVICE)
+            ctoks = batch["condition_ids"].to(utils.DEVICE)
+            amask = batch["attention_mask"].to(utils.DEVICE)
+            f, t = torch.cuda.mem_get_info()
+            logger.info(f"Loaded batch: {(f / t) * 100:.3f}% of memory free")
+            # Forwards pass
+            out = mt(iids, targets, amask, ctoks, )
+            loss = cross_entropy_loss(out, targets, toker)
+            logger.info(f"Forward pass: {(f / t) * 100:.3f}% of memory free")
+            # Backwards pass
+            opt.zero_grad()
+            loss.backward()
+            opt.step()
+            logger.info(f"Backward pass: {(f / t) * 100:.3f}% of memory free")
     except (torch.OutOfMemoryError, RuntimeError) as e:
         logger.warning(f"... oof, getting OOMs with those settings! error: {e}")
     else:
-        logger.info("... completed backwards pass of a single batch with no OOMs, good to go with those settings!")
+        logger.info(f"... completed backwards passes for {len(ds)} batches with no OOMs, OK!")
