@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Experiment with using CLaMP3-PPO for reinforcement learning"""
+"""Train a finetuned model with CLaMP3-DPO"""
 
-import heapq
 import os
 import random
 import sys
@@ -11,7 +10,6 @@ from copy import deepcopy
 from time import time
 from typing import Union
 
-import mlflow
 import numpy as np
 import requests
 import torch
@@ -25,7 +23,7 @@ from transformers import BertConfig
 
 from jazz_style_conditioned_generation import utils, training
 from jazz_style_conditioned_generation.data.conditions import validate_condition_values, INCLUDE
-from jazz_style_conditioned_generation.data.dataloader import create_padding_mask
+from jazz_style_conditioned_generation.data.dataloader import create_padding_mask, DatasetMIDIConditionedNoOverlapChunks
 from jazz_style_conditioned_generation.data.scores import load_score, preprocess_score
 
 sys.path.insert(0, os.path.join(utils.get_project_root()))
@@ -80,6 +78,8 @@ CLAMP3 = (
     .eval()
 )
 CLAMP3_PATCHILIZER = M3Patchilizer()
+EPS = 1e-3
+MAX_COS_SIM = 0.95
 
 
 def download_clamp3_checkpoints():
@@ -168,7 +168,7 @@ def extract_clamp_features(patches: torch.Tensor) -> torch.Tensor:
 
 
 class GroundTruthDataset(Dataset):
-    """Extracts features using CLaMP for all tracks associated with a given condition token"""
+    """Extracts features using CLaMP3 for all tracks associated with a given condition token"""
 
     def __init__(
             self,
@@ -216,7 +216,9 @@ class GroundTruthDataset(Dataset):
         return gt_features
 
 
-class ClampReinforcerModule(training.FineTuningModule):
+class ReinforceTrainModule(training.FineTuningModule):
+    """Module used to train a finetuned model with CLaMP3-DPO"""
+
     def __init__(self, **training_kwargs):
         # Need to grab this and remove from kwargs before passing to the training module
         self.reinforce_cfg = training_kwargs.pop("reinforce_cfg", dict())
@@ -240,7 +242,7 @@ class ClampReinforcerModule(training.FineTuningModule):
 
         # Reinitialise the optimizer from scratch
         optimizer_type = self.optimizer_cfg.get("optimizer_type", "adam")
-        optimizer_kws = self.optimizer_cfg.get("optimizer_kws", dict(lr=0.0001))
+        optimizer_kws = self.optimizer_cfg.get("optimizer_kws", dict(lr=0.0001))  # TODO: notagen used 1e-7/1e-6
         logger.debug(f'Initialising clamp optimiser {optimizer_type} with parameters {optimizer_kws}...')
         betas = tuple(optimizer_kws.pop("betas", (0.9, 0.999)))
         self.optimizer_clamp = self.get_optimizer(optimizer_type)(self.model.parameters(), betas=betas, **optimizer_kws)
@@ -260,15 +262,22 @@ class ClampReinforcerModule(training.FineTuningModule):
 
         # Set parameters for reinforcement learning
         self.generated_sequence_length = self.reinforce_cfg.get("generated_sequence_length", utils.MAX_SEQUENCE_LENGTH)
-        self.worst_heap, self.best_heap = [], []  # Heaps to keep track of the top and bottom 10% of generations
-        self.batch_scores = []  # keep track of generation scores for a single batch (one condition token(
-        self.all_cosine_sims = []  # keep track of ALL generation cosine similarities
-        self.all_repetition_rates = []  # keep track of ALL generation repetition rates
-        self.n_generations = self.reinforce_cfg.get("n_generations", 1000)  # number of generations to make per track
+        self.n_generations = self.reinforce_cfg.get("n_generations", 1000)  # number of generations to use per track
         self.generation_keep_proportion = self.reinforce_cfg.get("generation_keep_proportion", .1)  # % best/worst gens
-        self.generations_completed = 0  # number of generations we've completed so far
+
+        # Values used in calculating the loss
         self.beta_ = self.reinforce_cfg.get("beta", .1)  # same as notagen
         self.lambda_ = self.reinforce_cfg.get("lambda", 10)  # same as notagen
+
+        # Values used in ranking generations from worst -> best
+        self.gamma_ = self.reinforce_cfg.get("gamma", .6)
+        self.theta_ = self.reinforce_cfg.get("theta", .4)
+        # When mean(abs(LL)) of a generation < thresh, we start penalising the model
+        self.ll_threshold = self.reinforce_cfg.get("ll_threshold", 1.7)
+
+        self.all_cosine_sims = []  # keep track of ALL generation cosine similarities
+        self.all_loglikelihoods = []  # keep track of ALL generation repetition rates
+
         self.current_iteration = self.reinforce_cfg.get("current_iteration", 0)
 
         logger.debug(f"For each of our {len(self.train_loader)} training tracks, "
@@ -277,8 +286,22 @@ class ClampReinforcerModule(training.FineTuningModule):
         logger.debug(f"We'll compute the loss with beta {self.beta_}, lambda {self.lambda_}.")
 
     def create_dataloaders(self) -> tuple[DataLoader, DataLoader, DataLoader]:
-        """Skip over creating dataloaders"""
-        return [], None, None
+        """Skip over creating training and validation dataloader, just create test"""
+        # Create test dataset loader: uses FULL tracks, with no overlap between chunks
+        # i.e., we go 0 - 100, 101 - 201, 202 - 302, etc., then average the loss over all chunks
+        test_loader = DataLoader(
+            DatasetMIDIConditionedNoOverlapChunks(
+                tokenizer=self.tokenizer,
+                files_paths=self.track_splits["test"],
+                max_seq_len=self.max_seq_len,
+                **self.test_dataset_cfg  # most arguments can be shared across test + validation loader
+            ),
+            batch_size=self.batch_size,
+            shuffle=False,  # don't want to shuffle for this one
+            drop_last=False,
+        )
+        # Dummy training + validation loaders, real test loader
+        return [], [], test_loader
 
     @property
     def generation_output_dir(self):
@@ -291,71 +314,26 @@ class ClampReinforcerModule(training.FineTuningModule):
             os.makedirs(fpath)
         return fpath
 
-    def add_to_heap(self, generation: torch.Tensor, similarity: float):
-        """Update our best + worst heaps with tuples of (generated tokens, similarity with ground truth)"""
-        # Ensure at least 1 element is always kept inside the heap
-        top_size = max(1, int(self.generations_completed * self.generation_keep_proportion))
-        # Maintain the best (largest scores) 10% elements
-        if len(self.best_heap) < top_size:
-            heapq.heappush(self.best_heap, (similarity, generation))  # Normal min-heap
-        else:
-            heapq.heappushpop(self.best_heap, (similarity, generation))
-        # Maintain the worst (smallest scores) 10% elements
-        if len(self.worst_heap) < top_size:
-            heapq.heappush(self.worst_heap, (-similarity, generation))  # Store negative to simulate max-heap
-        else:
-            heapq.heappushpop(self.worst_heap, (-similarity, generation))
-
-    def do_generation(self, token: str, generation_number: int) -> torch.Tensor:
-        """Given a tensor of condition tokens, generate a track with `max_sequence_length`"""
+    def get_generation(self, token: str, generation_number: int) -> tuple[torch.Tensor, torch.Tensor]:
+        """Given a condition token and generation number, get the associated MIDI and return token + CLaMP features"""
         # Format the condition token into the form used by the tokenizer: I.e., `Hard-Bop` -> `GENRES_HardBop`
         # This is the filepath where we'll load/save the current MIDI
-        midi_fname = (f"{utils.remove_punctuation(token).replace(' ', '')}_"
-                      f"iter{str(self.current_iteration).zfill(3)}_"
-                      f"gen{str(generation_number).zfill(3)}.mid")
-        midi_fpath = os.path.join(self.generation_output_dir, midi_fname)
-        # Try and load the MIDI from disk
+        fname = (f"{utils.remove_punctuation(token).replace(' ', '').lower()}_"
+                 f"iter{str(self.current_iteration).zfill(3)}_"
+                 f"gen{str(generation_number).zfill(3)}")
+        midi_fpath = os.path.join(self.generation_output_dir, fname + ".mid")
+        pt_fpath = os.path.join(self.generation_output_dir, fname + ".pt")
+        # Try and load the MIDI and tensor from disk
         try:
-            gen_i = load_score(midi_fpath)
-            gen_i_toks = torch.tensor([self.tokenizer.encode(gen_i)[0].ids]).to(utils.DEVICE)
+            gen_i_midi = midi_to_clamp(midi_fpath)
+            gen_i_toks = torch.load(pt_fpath, map_location=utils.DEVICE)
         # If we don't have the MIDI or there's a problem
         except (FileNotFoundError, IndexError) as e:
-            logger.warning(f"Could not load file at {midi_fpath}, raised error {e}")
-            return None
-        # Pad the generation to the desired length if required
-        if gen_i_toks.size(1) < self.generated_sequence_length:
-            gen_i_toks = F.pad(
-                gen_i_toks,
-                (0, self.generated_sequence_length - gen_i_toks.size(1)),
-                value=self.tokenizer.pad_token_id
-            )
-        # Return the generated tokens
-        return gen_i_toks
-
-    def score_generated_output(
-            self,
-            generated_tokens: torch.Tensor,
-            ground_truth_features: torch.Tensor,
-            max_cos_sim: float = 0.95
-    ) -> float:
-        # Extract features from the generated track using CLaMP
-        generated_data = midi_to_clamp(generated_tokens, tokenizer=self.tokenizer)
-        generated_features = extract_clamp_features(generated_data).unsqueeze(0)
-        # Compute the cosine similarity vs. every ground truth element and average
-        gen_cos = F.cosine_similarity(generated_features, ground_truth_features, dim=-1).mean(dim=-1).item()
-        self.all_cosine_sims.append(gen_cos)
-        # Shift the cosine similarity to be in the range [0, 1], as opposed to [-1, 1]
-        gen_cos = (gen_cos + 1) / 2
-        # Compute the diversity bonus
-        no_pad = generated_tokens[generated_tokens != self.tokenizer.pad_token_id]
-        gen_rr = (no_pad.unique().numel() - 1) / (len(self.music_tokens) - 1)
-        self.all_repetition_rates.append(gen_rr)
-        # If the cosine similarity is TOO close to the ground truth, it might be plagiarism
-        if gen_cos >= max_cos_sim:
-            return None  # we'll skip over this generation
-        # Otherwise, final score is cosine similarity * diversity bonus
+            raise FileNotFoundError(f"Could not load file at {midi_fpath}, raised error {e}")
         else:
-            return gen_cos * gen_rr
+            gen_i_features = extract_clamp_features(gen_i_midi)
+            # Return the generated tokens and extracted CLaMP features
+            return gen_i_toks, gen_i_features
 
     def compute_log_probs(self, model, tokseq: torch.Tensor, no_grad: bool = False) -> torch.Tensor:
         """Given a sequence of tokens, compute the log probabilities for the predicted token at every step and sum"""
@@ -399,49 +377,78 @@ class ClampReinforcerModule(training.FineTuningModule):
         CLAMP3.eval()
         self.model.eval()
         self.model_ref.eval()
-        self.generations_completed = 0
-        self.best_heap = []
-        self.worst_heap = []
-        self.batch_scores = []
+
+    def sort_generations(self, all_generations: list[tuple[torch.Tensor, float]]) -> tuple[torch.Tensor, torch.Tensor]:
+        """Given a list of [(generated tokens, score), (generated tokens, score)], sort into best + worst generations"""
+        # Sort the list from lowest (worst) -> highest (best)
+        all_res = sorted(all_generations, key=lambda x: x[1], reverse=False)
+        # Remove the score values from the list, just keep the tokens
+        all_gens = [ts for ts, _ in all_res]
+        # Get the N best and worst generations
+        n_generations = int(len(all_res) * self.generation_keep_proportion)
+        worst_generations, best_generations = all_gens[:n_generations], all_gens[-n_generations:]
+        # Randomise the lists independently of each other
+        random.shuffle(best_generations)
+        random.shuffle(worst_generations)
+        # Return as tensors
+        return torch.cat(best_generations), torch.cat(worst_generations)
 
     def step_generate(self, token: str, gt_features: torch.Tensor) -> DataLoader:
         """Scores generations and returns a dataloader of shuffled best + worst generations"""
         self.model.eval()
         # Start doing the generations
+        all_cos_sim, all_log_likelihood = [], []
+        all_res = []
         for gen_idx in tqdm(range(self.n_generations), desc="Scoring generations..."):
-            self.generations_completed += 1
-            # Pull the generated MIDI from disk and return the token sequence
-            gen_i_toks = self.do_generation(token, gen_idx)
-            # If there was a problem loading the generated MIDI
-            if gen_i_toks is None:
+            # Pull the generated MIDI from disk and return the token sequence + CLaMP features
+            gen_i_toks, gen_i_features = self.get_generation(token, gen_idx)
+            # Compute the cosine similarity vs. every ground truth element
+            cos_sim_all = F.cosine_similarity(gen_i_features, gt_features, dim=-1)
+            # If we potentially have plagiarism (similarity > 0.95 for any track in ground truth), skip over
+            if any(cos_sim_all > MAX_COS_SIM):
                 continue
-            # Compute the score as cosine similarity * repetition rate
-            gen_score = self.score_generated_output(gen_i_toks, gt_features)
-            # Skip over cases where there are errors with the generated output (e.g. possible plagiarism)
-            if gen_score is None:
-                continue
-            # Add to the heap to keep track of the best and worst generations
-            self.add_to_heap(gen_i_toks, gen_score)
-            self.batch_scores.append(gen_score)
+            # Otherwise, average the cosine similarity across all ground truth tracks
+            gen_i_cos_sim = cos_sim_all.mean().item()
+            all_cos_sim.append(gen_i_cos_sim)
+            # Compute the average log probability for the token sequence (ignoring pad tokens)
+            gen_i_avg_ll = (self.compute_log_probs(self.model, gen_i_toks, no_grad=True) /
+                            len(gen_i_toks[gen_i_toks != self.tokenizer.pad_token_id])).item()
+            all_log_likelihood.append(gen_i_avg_ll)
+            # Compute the score as (GAMMA * cos) - (THETA * max(0, LL_THRESH - |ll|)
+            score = (self.gamma_ * gen_i_cos_sim) - (self.theta_ * max(0, self.ll_threshold - abs(gen_i_avg_ll)))
+            all_res.append((gen_i_toks, score))
+        # Extend the lists
+        self.all_cosine_sims.extend(all_cos_sim)
+        self.all_loglikelihoods.extend(all_log_likelihood)
+        # Compute summary statistics from all of our generations
+        logger.debug(f"Finished generating for token {token}: "
+                     f"best cosine similarity {max(all_cos_sim):.3f}, "
+                     f"worst cosine similarity {min(all_cos_sim):.3f}, "
+                     f"average cosine similarity {np.mean(all_cos_sim):.3f}, "
+                     f"best log-likelihood {max(all_log_likelihood):.3f}, "
+                     f"worst log-likelihood {min(all_log_likelihood):.3f}, "
+                     f"average log-likelihood {np.mean(all_log_likelihood):.3f}")
         # Get the best and worst generations
-        best_generations = [t for _, t in self.best_heap]
-        worst_generations = [t for _, t in self.worst_heap]
-        # Randomise the lists independently of each other
-        random.shuffle(best_generations)
-        random.shuffle(worst_generations)
-        # Assemble the best and worst generations from this track into a tensor dataloader
+        best_gen, worst_gen = self.sort_generations(all_res)
+        # Assemble the shuffled best and worst generations from this track into a tensor dataloader and return
         return DataLoader(
-            TensorDataset(
-                torch.cat(best_generations),
-                torch.cat(worst_generations)
-            ),
+            TensorDataset(best_gen, worst_gen),
             batch_size=self.batch_size,
             shuffle=True,
             drop_last=False,
         )
 
-    def step_loss(self, best_generation: torch.Tensor, worst_generation: torch.Tensor):
-        pass
+    def step_loss(self, best: torch.Tensor, worst: torch.Tensor) -> torch.Tensor:
+        self.model.train()
+        # Forwards
+        loss = self.compute_dpo_loss(best, worst)
+        # Backwards
+        self.optimizer_clamp.zero_grad()
+        loss.backward()
+        if self.clip_grad_norm > 0.:  # Clip gradients if required
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clip_grad_norm)
+        self.optimizer_clamp.step()
+        return loss.item()
 
     def reinforcement(self, ) -> tuple[float, float]:
         all_losses_mean, all_losses_sum = [], []
@@ -462,53 +469,34 @@ class ClampReinforcerModule(training.FineTuningModule):
             gt_features = torch.cat([i for i in tqdm(gt_loader, desc="Extracting ground-truth features...")], dim=0)
             # Compute all of our generations, score versus the ground truth, and zip into (best, worst) pairs
             bw_loader = self.step_generate(token, gt_features)
-            # Compute summary statistics from all of our generations
-            best_score = max(self.best_heap, key=lambda x: x[0])[0]
-            worst_score = -max(self.worst_heap, key=lambda x: x[0])[0]  # need to negate the sign here
-            mean_score = np.mean(self.batch_scores)
-            logger.debug(f"Finished generating for token {token}: "
-                         f"generated {len(self.best_heap)} best items, {len(self.worst_heap)} worst items, "
-                         f"best score {best_score:.3f}, "
-                         f"worst score {worst_score:.3f}, "
-                         f"average score {mean_score:.3f}")
-            # Cleaning up?
-            del gt_features
-            torch.cuda.empty_cache()
-            # Now we're training the model
-            self.model.train()
-            total_loss = []
-            # Iterate over randomised pairs of best and worst generations
-            for best, worst in tqdm(bw_loader, desc=f"Computing loss for token {token}..."):
-                # TODO: REMOVE THIS!
-                best = best[:, :1024]
-                worst = worst[:, :1024]
-                # Forwards
-                loss = self.compute_dpo_loss(best, worst)
-                total_loss.append(loss.item())
-                # Backwards
-                self.optimizer_clamp.zero_grad()
-                loss.backward()
-                if self.clip_grad_norm > 0.:  # Clip gradients if required
-                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clip_grad_norm)
-                self.optimizer_clamp.step()
+            # Iterate over randomised pairs of best and worst generations and compute loss
+            total_loss = [self.step_loss(b, w) for b, w in tqdm(bw_loader, f"Computing loss for token {token}...")]
             # Report metrics
             summed_loss, avg_loss = np.sum(total_loss), np.mean(total_loss)
-            logger.debug(f"Finished computing loss for token {token}: "
-                         f"summed loss is {summed_loss:.3f}, average is {avg_loss:.3f}")
-            batch_metrics = dict(
-                summed_reinforcement_loss=summed_loss,
-                avg_reinforcement_loss=avg_loss,
-                best_score=best_score,
-                worst_score=worst_score,
-                avg_score=mean_score
-            )
-            # Report results to MLFlow, if we're using this
-            if self.mlflow_cfg.get("use", False):
-                mlflow.log_metrics(batch_metrics, step=step)
+            logger.debug(f"Finished for token {token}: "
+                         f"summed loss is {summed_loss:.3f}, "
+                         f"average is {avg_loss:.3f}")
             # Append everything to the lists
             all_losses_mean.append(avg_loss)
             all_losses_sum.append(summed_loss)
         return np.mean(all_losses_mean), np.mean(all_losses_sum)
+
+    def testing(self) -> tuple[float, float]:
+        # Don't load a checkpoint up here, keep the model as it is following the reinforcement
+        test_loss, test_accuracy = [], []
+        # Iterate over every batch in the dataloader
+        for batch_idx, batch in tqdm(
+                enumerate(self.test_loader),
+                total=len(self.test_loader),
+                desc='Testing...'
+        ):
+            # Forwards pass
+            with torch.no_grad():
+                loss, accuracy = self.step(batch)
+            # No backwards pass
+            test_loss.append(loss.item())
+            test_accuracy.append(accuracy.item())
+        return np.mean(test_loss), np.mean(test_accuracy)
 
     def start(self):
         """Runs training for this module"""
@@ -518,17 +506,21 @@ class ClampReinforcerModule(training.FineTuningModule):
             self.log_run_params_to_mlflow()
         # No epochs: this file just runs one iteration
         train_loss_mean, train_loss_sum = self.reinforcement()
-        mean_cosine_sim = np.mean(self.all_cosine_sims)
-        mean_repetition_rate = np.mean(self.all_repetition_rates)
-        logger.debug(f"Finished: "
+        mean_cosine_sim, mean_log_likelihood = np.mean(self.all_cosine_sims), np.mean(self.all_loglikelihoods)
+        logger.debug(f"Finished reinforcement iteration {self.current_iteration}: "
                      f"mean cosine similarity {mean_cosine_sim:.3f}, "
-                     f"mean repetition rate {mean_repetition_rate:.3f}")
+                     f"mean repetition rate {mean_log_likelihood:.3f}")
+        # Do testing
+        test_loss, test_acc = self.testing()
+        logger.debug(f"Finished testing: loss {test_loss:.3f}, accuracy {test_acc:.3f}")
         # Save the checkpoint
         iteration_metrics = dict(
-            summed_reinforcement_loss_end=train_loss_sum,
-            avg_reinforcement_loss_end=train_loss_mean,
-            avg_repetition_rate=mean_repetition_rate,
-            avg_cosine_similarity=mean_cosine_sim,
+            summed_reinforcement_loss=train_loss_sum,
+            mean_reinforcement_loss=train_loss_mean,
+            mean_log_likelihood=mean_log_likelihood,
+            mean_cosine_similarity=mean_cosine_sim,
+            test_loss=test_loss,
+            test_accuracy=test_acc,
             reinforcement_time=time() - training_start
         )
         checkpoint_path = os.path.join(self.checkpoint_dir, f"reinforcement_iteration_{self.current_iteration}.pth")
@@ -557,4 +549,4 @@ if __name__ == "__main__":
     # Parse the config file
     cfg = training.parse_config_yaml(parser_args["config"])
     # Run training
-    training.main(training_kws=cfg, trainer_cls=ClampReinforcerModule, config_fpath=parser_args["config"])
+    training.main(training_kws=cfg, trainer_cls=ReinforceTrainModule, config_fpath=parser_args["config"])
