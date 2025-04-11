@@ -20,13 +20,17 @@ GENERATIVE_MODEL_CFG = os.path.join(
 )
 
 
-# Need to skip on GitHub actions because of CLaMP requirement
-@unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
 class ReinforceTrainTest(unittest.TestCase):
-    from jazz_style_conditioned_generation.reinforcement.rl_train import ReinforceTrainModule
+    @classmethod
+    def setUpClass(cls):
+        # Need to skip on GitHub actions because of CLaMP requirement
+        if os.getenv("REMOTE") == "true":
+            unittest.skip("Skipping test on GitHub Actions")
+        else:
+            from jazz_style_conditioned_generation.reinforcement.rl_train import ReinforceTrainModule
 
-    cfg_parsed = training.parse_config_yaml(GENERATIVE_MODEL_CFG)
-    RT = ReinforceTrainModule(**cfg_parsed)
+            cfg_parsed = training.parse_config_yaml(GENERATIVE_MODEL_CFG)
+            cls.RT = ReinforceTrainModule(**cfg_parsed)
 
     def test_sort_generations(self):
         # Create some simple "generations"
@@ -98,14 +102,18 @@ class ReinforceTrainTest(unittest.TestCase):
             self.assertTrue(b.size(1) == 768)
 
 
-# Need to skip on GitHub actions because of CLaMP requirement
-@unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
 class ReinforceGenerateTest(unittest.TestCase):
-    from jazz_style_conditioned_generation.reinforcement.rl_generate import ReinforceGenerateModule
+    @classmethod
+    def setUpClass(cls):
+        # Need to skip on GitHub actions because of CLaMP requirement
+        if os.getenv("REMOTE") == "true":
+            unittest.skip("Skipping test on GitHub Actions")
+        else:
+            from jazz_style_conditioned_generation.reinforcement.rl_generate import ReinforceGenerateModule
 
-    cfg_parsed = training.parse_config_yaml(GENERATIVE_MODEL_CFG)
-    cfg_parsed["reinforce_cfg"]["generated_sequence_length"] = 10  # short sequences for speed
-    RG = ReinforceGenerateModule(**cfg_parsed)
+            cfg_parsed = training.parse_config_yaml(GENERATIVE_MODEL_CFG)
+            cfg_parsed["reinforce_cfg"]["generated_sequence_length"] = 10  # short sequences for speed
+            cls.RG = ReinforceGenerateModule(**cfg_parsed)
 
     def test_condition_token_loader(self):
         # Dataset should contain 25 pianists, 20 genres
