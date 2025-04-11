@@ -312,13 +312,14 @@ class TrainingModule:
     def num_training_steps(self) -> int:
         """Returns `(N_training_items * N_epochs) - N_warmup_steps`, ensures training lasts for all epochs"""
         num_warmup_steps = self.optimizer_cfg["optimizer_kws"].get("num_warmup_steps", 10000)
-        return (len(self.train_loader) * self.epochs) - num_warmup_steps
+        return (len(self.train_loader) * self.epochs) + num_warmup_steps
 
     def get_scheduler(self, sched_type: str | None, sched_kws: dict):
         """Given a string, returns the correct optimizer"""
         valids = ["plateau", "cosine", "step", "linear", "music-transformer", None]
-        # This scheduler won't modify anything, but provides the same API for simplicity
+        # Num training steps = len(training_loader) * num_epochs: used in warmup schedulers only
         num_training_steps = sched_kws.pop("num_training_steps", self.num_training_steps)
+        # This scheduler won't modify anything, but provides the same API for simplicity
         if sched_type is None:
             return DummyScheduler(self.optimizer, **sched_kws)
         elif sched_type == "reduce":
@@ -531,8 +532,8 @@ class TrainingModule:
             if self.clip_grad_norm > 0.:  # Clip gradients if required
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clip_grad_norm)
             self.optimizer.step()
-            # We need to step forward in the scheduler during the BATCH with a warmup scheduler
-            if self.sched_type == "warmup" or self.sched_type == "cosine" or self.sched_type == "linear":
+            # For some scheduler types, we need to step forwards every batch
+            if self.sched_type in utils.SCHEDULER_STEP_PER_BATCH:
                 self.scheduler.step()
             # Append metrics to the list
             epoch_loss.append(loss.item())
@@ -705,14 +706,9 @@ class TrainingModule:
             # Report results to MLFlow, if we're using this
             if self.mlflow_cfg.get("use", False):
                 mlflow.log_metrics(epoch_metrics, step=epoch)
-            # Step forward in the LR scheduler
-            # ReduceLROnPlateau needs the current validation loss passed in
-            if self.sched_type == "reduce":
+            # Step forward in the LR scheduler, if we have to do this every epoch (as opposed to every batch)
+            if self.sched_type not in utils.SCHEDULER_STEP_PER_BATCH:
                 self.scheduler.step(self.current_validation_loss)
-            # Other schedulers don't require anything
-            #  The warmup scheduler steps during batches, not after an epoch
-            elif self.sched_type != "warmup":
-                self.scheduler.step()
             logger.debug(f'LR for epoch {epoch + 1} will be {self.get_scheduler_lr()}')
             # Checkpoint the run, if we need to
             if self.checkpoint_cfg["save_checkpoints"]:

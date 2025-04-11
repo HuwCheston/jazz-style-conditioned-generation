@@ -65,6 +65,6 @@ class DummyScheduler(torch.optim.lr_scheduler.LRScheduler):
     def __init__(self, optimizer, last_epoch=-1):
         super(DummyScheduler, self).__init__(optimizer, last_epoch)
 
-    def get_lr(self):
+    def get_lr(self, *_, **__):
         """Just returns the current learning rates without modification"""
         return [group['lr'] for group in self.optimizer.param_groups]

@@ -41,6 +41,8 @@ MAX_SEQUENCE_LENGTH = 2048  # close to Music Transformer
 #  end of one chunk and the beginning of the next. The MIDITok default is 1: increasing this seems to work better
 CHUNK_OVERLAP_BARS = 8
 
+SCHEDULER_STEP_PER_BATCH = ["warmup", "music-transformer", "linear", "cosine", "step"]
+
 
 def get_project_root() -> str:
     """Returns the root directory of the project"""
