@@ -165,6 +165,11 @@ class GenerateModule(TrainingModule):
             drop_last=False,
         )
 
+    @property
+    def num_training_steps(self) -> int:
+        """Little hack when we don't need a scheduler"""
+        return 1
+
     def create_dataloaders(self) -> tuple[DataLoader, DataLoader, DataLoader]:
         """Little hack that avoids needing to do costly preloading of all dataloaders inside __init__"""
         return None, None, None

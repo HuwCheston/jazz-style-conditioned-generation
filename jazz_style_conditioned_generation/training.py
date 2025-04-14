@@ -114,7 +114,6 @@ class TrainingModule:
         logger.debug(f"Loaded {len(self.metadata_paths)} metadata JSONs from {self.data_dir}")
 
         # TOKENIZER
-        self.tokenizer_path = os.path.join(self.checkpoint_dir, "tokenizer.json")
         self.tokenizer = load_tokenizer(tokenizer_path=self.tokenizer_path, **self.tokenizer_cfg)
         logger.debug(f'... tokenizer initialised: {self.tokenizer}')
 
@@ -309,6 +308,10 @@ class TrainingModule:
             raise ValueError(f'`optim_type` must be one of {", ".join(valids)} but got {optim_type}')
 
     @property
+    def tokenizer_path(self):
+        return os.path.join(self.checkpoint_dir, "tokenizer.json")
+
+    @property
     def num_training_steps(self) -> int:
         """Returns `(N_training_items * N_epochs) - N_warmup_steps`, ensures training lasts for all epochs"""
         num_warmup_steps = self.optimizer_cfg["optimizer_kws"].get("num_warmup_steps", 10000)
@@ -471,7 +474,10 @@ class TrainingModule:
             "checkpoint_dir",
             os.path.join(utils.get_project_root(), 'checkpoints')
         )
-        return os.path.join(checkpoint_dir, self.experiment, self.run)
+        checkpoint_dir_for_run = os.path.join(checkpoint_dir, self.experiment, self.run)
+        if not os.path.isdir(checkpoint_dir_for_run):
+            os.makedirs(checkpoint_dir_for_run)
+        return checkpoint_dir_for_run
 
     @property
     def output_midi_dir(self) -> str:
@@ -852,6 +858,11 @@ class FineTuningModule(TrainingModule):
         logger.info("----FINETUNING ON JAZZ DATASET----")
         # Load the pretrained checkpoint
         self.load_pretrained_checkpoint()
+
+    @property
+    def tokenizer_path(self) -> str:
+        """We want to return the tokenizer of the pretrained model"""
+        return os.path.join(os.path.dirname(self.pretrained_checkpoint_path), "tokenizer.json")
 
     def load_pretrained_checkpoint(self) -> None:
         # Raise an error if the pretrained checkpoint does not exist on the disk
