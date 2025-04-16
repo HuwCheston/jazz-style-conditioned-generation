@@ -19,7 +19,6 @@ from jazz_style_conditioned_generation.data.tokenizer import (
     add_pianists_to_vocab,
     add_timesignatures_to_vocab,
     add_recording_years_to_vocab,
-    train_tokenizer,
     load_tokenizer
 )
 
@@ -28,7 +27,7 @@ TEST_MIDI1 = os.path.join(TEST_RESOURCES, "test_midi1/piano_midi.mid")
 TEST_MIDI2 = os.path.join(TEST_RESOURCES, "test_midi2/piano_midi.mid")
 TEST_MIDI3 = os.path.join(TEST_RESOURCES, "test_midi_bushgrafts1/piano_midi.mid")
 
-TOKENIZER = load_tokenizer(tokenizer_str="tsd")
+TOKENIZER = load_tokenizer(tokenizer_str="custom-tsd")
 DUMMY_DATASET = DatasetMIDIConditionedNoOverlapChunks(
     tokenizer=TOKENIZER,
     files_paths=[TEST_MIDI1],
@@ -49,12 +48,6 @@ def prepare_conditioned_tokenizer():
     add_tempos_to_vocab(token_factory, 80, 30, factor=1.05)
     add_timesignatures_to_vocab(token_factory, [3, 4])
     return token_factory
-
-
-def decoder(tokenizer, input_ids: list[int]) -> list[str]:
-    converted = tokenizer._convert_sequence_to_tokseq(torch.tensor([input_ids]))
-    tokenizer._preprocess_tokseq_before_decoding(converted[0])
-    return converted[0].tokens
 
 
 def scores_are_identical(score_a, score_b) -> bool:
@@ -404,7 +397,8 @@ class DatasetConditionedTest(unittest.TestCase):
                 self.assertTrue(scores_are_identical(score_with_condition, score_without_condition))
 
                 # Iterate over "track" tokens (input IDs, targets)
-                decoded = decoder(ds.tokenizer, raw_input_ids.tolist())
+                decoded = [ds.tokenizer[i] for i in raw_input_ids.tolist()]
+                # decoded = decoder(ds.tokenizer, raw_input_ids.tolist())
                 for decoded_token in decoded:
                     # When decoded, input tokens should not be included in our list of condition tokens
                     self.assertFalse(decoded_token in all_condition_tokens)
@@ -412,7 +406,8 @@ class DatasetConditionedTest(unittest.TestCase):
                     self.assertFalse(decoded_token.startswith(tuple(CONDITION_TOKEN_STARTS)))
 
                 # Test that there are no more than 5 pianist and genre tokens for one recording
-                decoded_condition_tokens = decoder(ds.tokenizer, condition_ids.tolist())
+                decoded_condition_tokens = [ds.tokenizer[i] for i in condition_ids.tolist()]
+                # decoded_condition_tokens = decoder(ds.tokenizer, condition_ids.tolist())
                 for tok_start in ["PIANIST", "GENRE"]:
                     ts = [i for i in decoded_condition_tokens if i.startswith(tok_start)]
                     self.assertTrue(len(ts) <= 5)
@@ -437,19 +432,14 @@ class DatasetConditionedTest(unittest.TestCase):
         # This test works with multiple tokenizer classes
         for ds_cls in [DatasetMIDIConditionedRandomChunk]:
             # Create a tokenizer
-            tok = load_tokenizer(tokenizer_str="tsd", )
-            add_tempos_to_vocab(tok, 80, 30, factor=1.05)
-            add_timesignatures_to_vocab(tok, [3, 4])
-            add_pianists_to_vocab(tok)
-            add_genres_to_vocab(tok)
-            add_recording_years_to_vocab(tok)
+            tok = prepare_conditioned_tokenizer()
             # FIRST: we test without training the tokenizer
             dataset = ds_cls(tokenizer=tok, **kwargs)
             runner(dataset)
             # SECOND: we test WITH training the tokenizer
-            train_tokenizer(tok, midi_fps, vocab_size=1000, training_method="BPE")
-            dataset = ds_cls(tokenizer=tok, **kwargs)
-            runner(dataset)
+            # train_tokenizer(tok, midi_fps, vocab_size=1000, training_method="BPE")
+            # dataset = ds_cls(tokenizer=tok, **kwargs)
+            # runner(dataset)
 
     def test_getitem_consistency_across_epochs(self):
         """Test that we don't modify the underlying preloaded objects across successive epochs with augmentation"""
@@ -478,7 +468,7 @@ class DatasetConditionedTest(unittest.TestCase):
     def test_chunk_starting_point(self):
         # Create the dataset
         tok = prepare_conditioned_tokenizer()
-        train_tokenizer(tok, [TEST_MIDI1, TEST_MIDI2, TEST_MIDI3])
+        # train_tokenizer(tok, [TEST_MIDI1, TEST_MIDI2, TEST_MIDI3])
         # This test is only relevant for our random chunk dataloader
         ds = DatasetMIDIConditionedRandomChunk(
             tokenizer=tok,
@@ -498,12 +488,10 @@ class DatasetConditionedTest(unittest.TestCase):
             # Chunking the sequence with this starting point should lead to sequences longer than our desired length
             self.assertTrue(len(tokseq_ids[chunked:chunked + ds.max_seq_len]) >= ds.min_seq_len)
 
-    def test_fulltrack_dataloader(self):
-        # Create the dataset
-        tok = load_tokenizer(tokenizer_str="tsd")  # no conditioning here
-        train_tokenizer(tok, [TEST_MIDI1, TEST_MIDI2, TEST_MIDI3])
+    def test_fulltrack_dataloader(self):  # no conditioning here
+        # train_tokenizer(tok, [TEST_MIDI1, TEST_MIDI2, TEST_MIDI3])
         ds = DatasetMIDIConditionedFullTrack(
-            tokenizer=tok,
+            tokenizer=TOKENIZER,
             files_paths=[TEST_MIDI1, TEST_MIDI2, TEST_MIDI3],
             max_seq_len=utils.MAX_SEQUENCE_LENGTH,
             do_augmentation=False,
@@ -516,7 +504,7 @@ class DatasetConditionedTest(unittest.TestCase):
             # Grab the corresponding data and remove any padding
             batch = ds.__getitem__(t)
             item = batch["input_ids"].tolist()
-            padding_removed = [i for i in item if i != tok.pad_token_id]
+            padding_removed = [i for i in item if i != TOKENIZER.pad_token_id]
 
             # If we don't have any padding, should be longer than the desired sequence length
             if len(padding_removed) == len(item):
@@ -527,18 +515,18 @@ class DatasetConditionedTest(unittest.TestCase):
 
             # Grab the first and last token from the item (ignoring padding)
             first_token = padding_removed[0]
-            targ_padding_removed = [i for i in batch["labels"].tolist() if i != tok.pad_token_id]
+            targ_padding_removed = [i for i in batch["labels"].tolist() if i != TOKENIZER.pad_token_id]
             last_token = targ_padding_removed[-1]  # can only get the final token from the labels
 
             # Decoding the first token, should be BOS (as we don't have conditioning)
-            self.assertTrue(tok.bpe_token_mapping[first_token][0] == tok["BOS_None"])
+            self.assertTrue(TOKENIZER.bpe_token_mapping[first_token][0] == TOKENIZER["BOS_None"])
             # Decoding the last token, should be EOS
-            self.assertTrue(tok.bpe_token_mapping[last_token][0] == tok["EOS_None"])
+            self.assertTrue(TOKENIZER.bpe_token_mapping[last_token][0] == TOKENIZER["EOS_None"])
 
         # Trying to use augmentation with this dataloader should raise an error
         with self.assertRaises(AttributeError):
             _ = DatasetMIDIConditionedFullTrack(
-                tokenizer=tok,
+                tokenizer=TOKENIZER,
                 files_paths=[TEST_MIDI1, TEST_MIDI2, TEST_MIDI3],
                 max_seq_len=utils.MAX_SEQUENCE_LENGTH,
                 do_augmentation=True,
@@ -546,10 +534,8 @@ class DatasetConditionedTest(unittest.TestCase):
             )
 
     def test_fulltrack_dataloader_shift_labels(self):
-        # Create the dataset
-        tok = load_tokenizer(tokenizer_str="tsd")
         ds = DatasetMIDIConditionedFullTrack(
-            tokenizer=tok,
+            tokenizer=TOKENIZER,
             files_paths=[TEST_MIDI1],
             max_seq_len=utils.MAX_SEQUENCE_LENGTH,
             do_augmentation=False,

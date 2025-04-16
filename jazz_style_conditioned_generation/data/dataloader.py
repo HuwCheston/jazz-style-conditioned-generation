@@ -105,6 +105,9 @@ class DatasetMIDIConditionedNoOverlapChunks:
         self.pitch_augment_range = pitch_augment_range
         self.velocity_augment_range = velocity_augment_range
 
+        # Whether we're tokenizing as seconds or ticks
+        self.tokenizing_seconds = self.tokenizer.__class__.__name__ == "CustomTSD"
+
         # The size of the maximum sequence
         self.max_seq_len = max_seq_len
         # The size of the smallest sequence we'll consider during training
@@ -154,7 +157,7 @@ class DatasetMIDIConditionedNoOverlapChunks:
                 n_condition_tokens = 0
 
             # Open MIDI file as a symusic score object
-            score = load_score(midi_file)
+            score = load_score(midi_file, as_seconds=self.tokenizing_seconds)
             # Apply our own preprocessing to the score
             preprocessed_score = preprocess_score(score)
             # Tokenise the score and get the token IDs
@@ -374,7 +377,7 @@ class DatasetMIDIConditionedRandomChunk(DatasetMIDIConditionedNoOverlapChunks):
                 metadata = dict()
 
             # Open MIDI file as a symusic score object
-            score = load_score(midi_file)
+            score = load_score(midi_file, as_seconds=self.tokenizing_seconds)
             # Apply our own preprocessing to the score
             preprocessed_score = preprocess_score(score)
             # Tokenise the score and get the token IDs
@@ -529,7 +532,7 @@ class DatasetMIDIConditionedFullTrack(DatasetMIDIConditionedNoOverlapChunks):
                 metadata = dict()
 
             # Open MIDI file as a symusic score object
-            score = load_score(midi_file)
+            score = load_score(midi_file, as_seconds=self.tokenizing_seconds)
             # Apply our own preprocessing to the score
             preprocessed_score = preprocess_score(score)
             # Return the preprocessed score, an empty tuple of ints (for signature) and the metadata
@@ -599,7 +602,7 @@ if __name__ == "__main__":
     )
 
     # Get a MIDILike tokenizer with default arguments
-    token_factory = load_tokenizer(tokenizer_str="tsd")
+    token_factory = load_tokenizer(tokenizer_str="custom-tsd")
     # Get filepaths for all MIDI files in the /data/raw/ directories
     midi_paths = utils.get_data_files_with_ext(ext="**/*.mid")
     metadata_paths = [i.replace("piano_midi.mid", "metadata_tivo.json") for i in midi_paths]
