@@ -47,7 +47,7 @@ class ReinforceTrainTest(unittest.TestCase):
         self.assertTrue(torch.equal(worst, gens[0][0]))
 
     def test_compute_log_probs_grad(self):
-        input_ids = torch.tensor([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]])
+        input_ids = torch.tensor([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]], device=utils.DEVICE)
         self.RT.model.eval()
         # Test with no_grad=True
         lprobs_ng = self.RT.compute_log_probs(self.RT.model, input_ids, no_grad=True)
@@ -61,8 +61,8 @@ class ReinforceTrainTest(unittest.TestCase):
         self.assertEqual(lprobs_ng.item(), lprobs_rg.item())
 
     def test_compute_log_probs_mask(self):
-        input_ids_nomask = torch.tensor([[1, 2, 3, 4, 5]])
-        input_ids_withmask = torch.tensor([[1, 2, 3, 4, 0]])
+        input_ids_nomask = torch.tensor([[1, 2, 3, 4, 5]], device=utils.DEVICE)
+        input_ids_withmask = torch.tensor([[1, 2, 3, 4, 0]], device=utils.DEVICE)
         self.RT.model.eval()
         # With a mask token, we'd expect the sum of all log probs to be smaller than without a mask token
         lprobs_nomask = self.RT.compute_log_probs(self.RT.model, input_ids_nomask, no_grad=True)
@@ -71,7 +71,8 @@ class ReinforceTrainTest(unittest.TestCase):
 
     def test_dpo_loss(self):
         # Test with a batch size of 2
-        best_b2, worst_b2 = torch.randint(1, 10, (2, 10)), torch.randint(1, 10, (2, 10))
+        best_b2 = torch.randint(1, 10, (2, 10), device=utils.DEVICE)
+        worst_b2 = torch.randint(1, 10, (2, 10), device=utils.DEVICE)
         # Compute loss
         loss = self.RT.compute_dpo_loss(best_b2, worst_b2)
         # Loss should be within the range [0, inf]
