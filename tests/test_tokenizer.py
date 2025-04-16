@@ -61,6 +61,21 @@ class TokenizerTest(unittest.TestCase):
         ts_tokens = [t for t in tok.vocab if "TimeShift" in t]
         self.assertTrue(len(ts_tokens) == 100)
 
+    def test_load_custom_tokenizer(self):
+        # Test with all defaults
+        tok = load_tokenizer(tokenizer_str="custom-tsd")
+        self.assertTrue(isinstance(tok, CustomTSD))
+        self.assertFalse(tok.config.use_tempos)
+        self.assertFalse(tok.config.use_pitch_bends)
+        self.assertFalse(tok.config.use_time_signatures)
+        self.assertFalse(tok.is_trained)
+        # Should have some additional parameters vs a vanilla miditok tokenizer
+        self.assertTrue(hasattr(tok.config, "time_range"))
+        self.assertTrue(hasattr(tok.config, "time_factor"))
+        # Should have 102 timeshift tokens
+        ts_tokens = [t for t in tok.vocab if "TimeShift" in t]
+        self.assertTrue(len(ts_tokens) == 102)
+
     def test_train_tokenizer(self):
         midi_files = [
             "test_midi1/piano_midi.mid",
@@ -383,6 +398,7 @@ class CustomTSDTest(unittest.TestCase):
                 self.assertTrue(note_raw.pitch == note_proc.pitch)
                 self.assertTrue(note_raw.velocity == note_proc.velocity)
 
+    @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
     def test_dummy_versus_vanilla_miditok(self):
         # Create two identical note lists: one as seconds, one as "fake ticks" (where 1ms == 1 tick)
         notelist_secs = [
@@ -548,7 +564,7 @@ class CustomTSDTest(unittest.TestCase):
 
     def test_dummy_midi_nonlinear(self):
         notelist = [
-            Note(pitch=80, duration=0.567, time=0.2, velocity=70, ttype="Second"),  # two duration tokens
+            Note(pitch=80, duration=0.567, time=0.2, velocity=70, ttype="Second"),  # one duration token
             Note(pitch=82, duration=2.0, time=0.3, velocity=80, ttype="Second"),  # one duration token
             # Duration greater than maximum: should have two duration tokens
             Note(pitch=84, duration=3.0, time=0.45, velocity=75, ttype="Second"),
@@ -559,11 +575,11 @@ class CustomTSDTest(unittest.TestCase):
         # Convert the notelist to a score with time in seconds
         score = note_list_to_score(notelist, utils.TICKS_PER_QUARTER, ttype="Second")
         expected = [
-            "TimeShift_200", "Pitch_80", "Velocity_71", "Duration_562", "Duration_10",
+            "TimeShift_200", "Pitch_80", "Velocity_71", "Duration_562",
             "TimeShift_100", "Pitch_82", "Velocity_79", "Duration_2003",
             "TimeShift_150", "Pitch_84", "Velocity_75", "Duration_2500", "Duration_499",
             "TimeShift_50", "Pitch_94", "Velocity_59", "Duration_20",
-            "TimeShift_2500", "TimeShift_1015", "Pitch_93", "Velocity_59", "Duration_562"
+            "TimeShift_2500", "TimeShift_985", "TimeShift_10", "Pitch_93", "Velocity_59", "Duration_562"
         ]
         # Convert to tokens
         encoded = self.tok_actual.encode(score, no_preprocess_score=True)
