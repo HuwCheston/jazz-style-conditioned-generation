@@ -3,6 +3,7 @@
 
 """Trains a Tokenizer in MIDITok and dumps a .json with all parameters"""
 
+import json
 import os
 from pathlib import Path
 from typing import Sequence, Union
@@ -14,6 +15,7 @@ from miditok.attribute_controls import create_random_ac_indexes
 from miditok.constants import SCORE_LOADING_EXCEPTION
 from miditok.tokenizations import REMI, MIDILike, TSD, Structured, PerTok
 from miditok.tokenizer_training_iterator import TokTrainingIterator
+from miditok.utils import convert_ids_tensors_to_list
 from symusic import Score, Tempo, TimeSignature, Note, Track
 from tqdm import tqdm
 
@@ -67,8 +69,9 @@ class CustomTSD:
     2) Multiple duration tokens for notes longer than `max(Duration_Token)`.
 
     Everything else should be pretty much the same as the MIDITok API. Use the CustomTokenizerConfig class to pass in
-    the tokenizer parameters. Set `num_times` and `max_times` to specify the number of tokens, which will be set in the
-    form range(0, max_time, num_times)[1:].
+    the tokenizer parameters. Set `time_range` and `time_factor` to specify the minimum and maximum time, and the
+    factor used to between successive times, where `time_{i} = time_{i-1} * factor`. Set `time_factor = 1` for linear
+    distance between successive times.
 
     NB. There are lots of hard-coded assumptions currently, such that the MIDI files will only contain one piano track
     and that they will not contain embedded tempo or time signature information. These will be ignored if provided.
@@ -104,7 +107,7 @@ class CustomTSD:
         """Load the parameters of the tokenizer from a config file"""
         params = utils.read_json_cached(file_path)
 
-        self.config = TokenizerConfig()
+        self.config = CustomTokenizerConfig()
         config_attributes = list(self.config.to_dict().keys())
         old_add_tokens_attr = {
             "Chord": "use_chords",
@@ -131,10 +134,13 @@ class CustomTSD:
                 for beat_res_key in ["beat_res", "beat_res_rest"]:
                     # check here for previous versions (< v2.1.5)
                     if beat_res_key in value:
-                        value[beat_res_key] = {
-                            tuple(map(int, beat_range.split("_"))): res
-                            for beat_range, res in value[beat_res_key].items()
-                        }
+                        try:
+                            value[beat_res_key] = {
+                                tuple(map(int, beat_range.split("_"))): res
+                                for beat_range, res in value[beat_res_key].items()
+                            }
+                        except AttributeError:
+                            continue
                 value["time_signature_range"] = {
                     int(res): beat_range
                     for res, beat_range in value["time_signature_range"].items()
@@ -144,7 +150,9 @@ class CustomTSD:
                     value["rest_range"] = {
                         (0, value["rest_range"][1]): value["rest_range"][0]
                     }
-                value = TokenizerConfig.from_dict(value)
+                if "additional_params" not in value:
+                    value["additional_params"] = {}
+                value = CustomTokenizerConfig.from_dict(value)
             if key in config_attributes:
                 if key == "beat_res":
                     value = {
@@ -160,6 +168,36 @@ class CustomTSD:
                 continue
             setattr(self, key, value)
 
+    def to_dict(self) -> dict:
+        """Return the serializable dictionary form of the tokenizer."""
+        # Don't need to account for trained tokenizer here
+        return {
+            "config": self.config.to_dict(serialize=True),
+            "tokenization": self.__class__.__name__,
+            "miditok_version": 1.,  # these are all dummy versions
+            "symusic_version": 1.,  # these are all dummy versions
+            "hf_tokenizers_version": 1.,  # these are all dummy versions
+        }
+
+    def save(
+            self,
+            out_path: str | Path,
+            additional_attributes: dict | None = None,
+            filename: str | None = "tokenizer.json",
+    ) -> None:
+        """Save tokenizer in a JSON file, useful to keep track of how a dataset has been tokenized."""
+        tokenizer_dict = self.to_dict()
+
+        if additional_attributes:
+            tokenizer_dict.update(additional_attributes)
+
+        out_path = Path(out_path)
+        if out_path.is_dir() or "." not in out_path.name:
+            out_path /= filename
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        with out_path.open("w") as outfile:
+            json.dump(tokenizer_dict, outfile, indent=4)
+
     def _create_base_vocabulary(self) -> list[str]:
         """Create the vocabulary, as a list of string tokens. Each token is given as the form `"Type_Value"`"""
         vocab = []
@@ -168,9 +206,9 @@ class CustomTSD:
         # Velocity
         vocab += [f"Velocity_{f}" for f in self.velocities]
         # Duration
-        vocab += [f"Duration_{f:.2f}" for f in self.times]
+        vocab += [f"Duration_{f}" for f in self.times]
         # TimeShift
-        vocab += [f"TimeShift_{f:.2f}" for f in self.times]
+        vocab += [f"TimeShift_{f}" for f in self.times]
         return vocab
 
     def __create_vocabulary(self):
@@ -214,14 +252,14 @@ class CustomTSD:
         # [1:] ensures that there is no velocity 0
         return np.linspace(0, utils.MAX_VELOCITY, self.config.num_velocities + 1, dtype=np.intc)[1:]
 
-    # @property
-    # def times(self):
-    #     return np.linspace(0., 1., 100 + 1, dtype=np.float32)[1:]
-
     @property
     def times(self) -> np.ndarray:
         """Array of time values, between min and max time and scaled by factor"""
         min_time, max_time = self.config.time_range
+        # Sanity check from config
+        assert min_time > 0. and max_time > 0., "`min_time` and `max_time` must be greater than 0"
+        assert min_time < max_time, "`min_time` must be smaller than `max_time`"
+        assert self.config.time_factor >= 1., "`time_factor` must be greater or equal to 1"
         # Linear spacing: can just use np.linspace
         if self.config.time_factor == 1.:
             times = np.linspace(min_time, max_time, int(max_time / min_time), dtype=np.float32)
@@ -242,7 +280,8 @@ class CustomTSD:
             # Add in the maximum time if the sequence doesn't end with it
             if times[-1] != max_time:
                 times.append(max_time)
-        return np.array(times, dtype=np.float32)
+            times = np.array(times, dtype=np.float32)
+        return np.rint(times * 1000).astype(int)
 
     def add_to_vocab(self, token: str, special_token: bool = False, *_, **__) -> None:
         """Add an event to the vocabulary. Its ID will be the length of the vocab"""
@@ -270,24 +309,21 @@ class CustomTSD:
         token = self.__get_from_voc(id_)
         return token.split("_")[0]
 
-    @staticmethod
-    def get_closest(val: float, to_match: np.ndarray, tolerance: float = 2e-3) -> float:
-        """Get the closest value within an array to a desired value"""
-        # idx = np.argmin(np.abs(to_match - val))
-        # return to_match[idx]
-        # Find the closest match to the value
-        idx = np.argmin(np.abs(to_match - val))
-        closest = to_match[idx]
-        # If the difference is small enough (within tolerance), just return the closest match
-        if abs(val - closest) <= tolerance:
-            return closest
-        # If not, prefer the largest value that doesn't exceed the target (to avoid drifting ahead)
-        smaller_vals = to_match[to_match <= val]
-        return smaller_vals[-1] if len(smaller_vals) > 0 else closest
-
     def _validate_tokens(self, tokens: list[str]):
+        """Check that all tokens in a sequence are in the vocabulary"""
         for t in tokens:
-            assert t in self.vocab.keys(), f"Token {t} is not in the vocabulary!"
+            # Handle both ID (int) or token (str) input
+            if isinstance(t, str):
+                assert t in self.vocab.keys(), f"Token {t} is not in the vocabulary!"
+            elif isinstance(t, int):
+                assert t in self.__vocab_base_inv.keys(), f"Token {t} is not in the vocabulary!"
+            # Unknown token type, need to raise an error
+            else:
+                raise TypeError(f"Expected either `str` or `int` type for token {t}, but got {type(t)}")
+
+    @staticmethod
+    def get_closest(array: np.ndarray, val: int) -> int:
+        return array[np.argmin(np.abs(array - val))]
 
     def _score_to_tokens(self, score: Score) -> TokSequence:
         """Convert a **preprocessed** `symusic.Score` object to a sequence of tokens"""
@@ -295,29 +331,43 @@ class CustomTSD:
         for track in score.tracks:
             previous_time = 0.
             for note in track.notes:
-                # Timeshift tokens
-                # Only add this if the counter has moved
-                note_start = round(note.start, 2)
-                if note_start > previous_time:
-                    remaining_time = note_start - previous_time
-                    while remaining_time > 0:
-                        timeshift_ = self.get_closest(remaining_time, self.times)
-                        tokens.append(f"TimeShift_{timeshift_:.2f}")
-                        remaining_time = round(remaining_time - timeshift_, 2)
-                previous_time = note_start
+                # Timeshift tokens (incremental update)
+                note_start = int(round(note.start * 1000))
+                # while the gap from the current cursor to the note start is positive
+                while note_start - previous_time > 0:
+                    gap = note_start - previous_time
+                    # Ignore cases where the remaining time rounds down to 0
+                    if gap < min(self.times) / 2:
+                        break
+                    # Use the MIDItok function to get the closest timeshift token to the current gap
+                    # timeshift_token = np_get_closest(self.times, np.array([gap]))[0]
+                    timeshift_token = self.get_closest(self.times, gap)
+                    tokens.append(f"TimeShift_{timeshift_token}")
+                    previous_time += timeshift_token
+
                 # Pitch token
                 tokens.append(f"Pitch_{note.pitch}")
-                # Velocity token
-                tokens.append(f"Velocity_{self.get_closest(note.velocity, self.velocities)}")
+                # Velocity token: use the miditok function to get the closets velocity
+                # vel_token = np_get_closest(self.velocities, np.array([note.velocity]))[0]
+                vel_token = self.get_closest(self.velocities, note.velocity)
+                tokens.append(f"Velocity_{vel_token}")
+
                 # Duration
-                remaining_time = round(note.duration, 2)
-                # Use greedy algorithm for multiple duration tokens
-                while remaining_time > 0:
-                    duration_ = self.get_closest(remaining_time, self.times)
-                    tokens.append(f"Duration_{duration_:.2f}")
-                    remaining_time = round(remaining_time - duration_, 2)
+                duration_ms = int(round(note.duration * 1000))
+                accumulated = 0
+                while accumulated < duration_ms:
+                    remaining = duration_ms - accumulated
+                    # Ignore cases where the remaining time rounds down to 0
+                    if remaining < min(self.times) / 2:
+                        break
+                    # Use the miditok function to get the closest duration token to the amount of time remaining to fill
+                    # duration_token = np_get_closest(self.times, np.array([remaining]))[0]
+                    duration_token = self.get_closest(self.times, remaining)
+                    tokens.append(f"Duration_{duration_token}")
+                    accumulated += duration_token
+
         # Check all the tokens are in our vocabulary
-        self._validate_tokens(tokens)
+        # self._validate_tokens(tokens)
         # Tokenize as list of integers
         ids = self._ids_to_tokens(tokens)
         # Convert to MIDITok's format (for compatibility with MIDITok more broadly
@@ -325,11 +375,14 @@ class CustomTSD:
 
     def encode(self, score, no_preprocess_score: bool = False, *_, **__) -> list[TokSequence]:
         """Tokenize a music file given as a `symusic.Score` or file path"""
-        # TODO: score loading and preprocessing
+        # Load the score
         if not isinstance(score, Score):
-            score = Score(score, ttype="Second").resample(utils.TICKS_PER_QUARTER).to("Second")
-        # assert score.ttype == "Second"
-        # Tokenize as list of strings
+            score = load_score(score, as_seconds=True)
+            # Preprocess it if required
+            if not no_preprocess_score:
+                score = preprocess_score(score)
+        # Otherwise, we assume that the input score has already been preprocessed
+        # Tokenize the score as a list of strings
         tokseq = self._score_to_tokens(score)
         for seq in tokseq:
             self.complete_sequence(seq)
@@ -368,7 +421,7 @@ class CustomTSD:
             tok_type, tok_val = token.split("_")
             # TimeShift tokens: add to the cursor
             if tok_type == "TimeShift":
-                current_time += float(tok_val)
+                current_time += int(tok_val)
             # Pitch tokens
             elif tok_type == "Pitch":
                 pitch = int(tok_val)
@@ -382,14 +435,14 @@ class CustomTSD:
                         dur_type, dur = maybe_duration_token.split("_")
                         # Continue gathering the duration up until we hit another type of token
                         if dur_type == "Duration":
-                            duration += float(dur)
+                            duration += int(dur)
                         else:
                             break
                     # As long as we have velocities and durations for this note, add it to the score
                     if vel_type == "Velocity" and duration > 0:
                         new_note = Note(
-                            time=current_time,
-                            duration=duration,
+                            time=current_time / 1000,
+                            duration=duration / 1000,
                             pitch=pitch,
                             velocity=velocity,
                             ttype="Second"
@@ -402,14 +455,65 @@ class CustomTSD:
                     pass
         return score
 
+    def _convert_sequence_to_tokseq(
+            self,
+            input_seq: list[int | str | list[int | str]] | np.ndarray,
+    ) -> TokSequence | list[TokSequence]:
+        """Convert a sequence of tokens/ids into a (list of) `TokSequence`."""
+        # Deduce the type of data (ids/tokens/events)
+        try:
+            arg = ("ids", convert_ids_tensors_to_list(input_seq))
+        except (AttributeError, ValueError, TypeError, IndexError):
+            if isinstance(input_seq[0], str) or (
+                    isinstance(input_seq[0], list) and isinstance(input_seq[0][0], str)
+            ):
+                arg = ("tokens", input_seq)
+            else:  # list of Event, but unlikely
+                arg = ("events", input_seq)
+        # Deduce number of subscripts / dims
+        num_io_dims = len(self.io_format)
+        num_seq_dims = 1
+        if len(arg[1]) > 0 and isinstance(arg[1][0], list):
+            num_seq_dims += 1
+            if len(arg[1][0]) > 0 and isinstance(arg[1][0][0], list):
+                num_seq_dims += 1
+            elif len(arg[1][0]) == 0 and num_seq_dims == num_io_dims - 1:
+                # Special case where the sequence contains no tokens, we increment
+                num_seq_dims += 1
+        # Check the number of dimensions is good
+        # In case of no one_token_stream and one dimension short --> unsqueeze
+        if num_seq_dims == num_io_dims - 1:
+            logger.warning(
+                f"The input sequence has one dimension less than expected ("
+                f"{num_seq_dims} instead of {num_io_dims}). It is being unsqueezed to "
+                f"conform with the tokenizer's i/o format ({self.io_format})",
+            )
+            arg = (arg[0], [arg[1]])
+        elif num_seq_dims != num_io_dims:
+            msg = (
+                f"The input sequence does not have the expected dimension "
+                f"({num_seq_dims} instead of {num_io_dims})."
+            )
+            raise ValueError(msg)
+        # Convert to TokSequence
+        if num_io_dims == num_seq_dims:
+            seq = []
+            for obj in arg[1]:
+                kwarg = {arg[0]: obj}
+                seq.append(TokSequence(**kwarg))
+        else:  # 1 subscript, one_token_stream and no multi-voc
+            kwarg = {arg[0]: arg[1]}
+            seq = TokSequence(**kwarg)
+        return seq
+
     def decode(self, tokens: Union[TokSequence, list[TokSequence], list[int], np.ndarray], *_, **__) -> Score:
         """Detokenize sequences of tokens into a `symusic.Score` object"""
+        # Coerce inputs to TokSequence
         if not isinstance(tokens, (TokSequence, list)) or (
                 isinstance(tokens, list)
                 and any(not isinstance(seq, TokSequence) for seq in tokens)
         ):
-            # TODO: convert sequence to tokseq
-            pass
+            tokens = self._convert_sequence_to_tokseq(tokens)
 
         # Preprocess TokSequence(s)
         if isinstance(tokens, TokSequence):
@@ -445,7 +549,13 @@ class CustomTSD:
         # Decode tokens: may be a TokSequence, numpy array, or tensor
         return self.decode(obj, *args, **kwargs)
 
-    def __len__(self):
+    @property
+    def len(self) -> int:
+        """Alias for __len__"""
+        return len(self)
+
+    def __len__(self) -> int:
+        """Return the length of the vocabulary, as an integer"""
         return len(self.vocab)
 
     def __repr__(self):
@@ -479,7 +589,8 @@ class CustomTSD:
         raise NotImplementedError("`.train` is not implemented for this custom TSD-style tokenizer")
 
     @property
-    def vocab_size(self):
+    def vocab_size(self) -> int:
+        """Alias for __len__"""
         return len(self)
 
     @property
@@ -697,12 +808,17 @@ def train_tokenizer(tokenizer: MusicTokenizer, files_paths: list[str], **kwargs)
 
 if __name__ == "__main__":
     tokfactory = CustomTSD(CustomTokenizerConfig(time_factor=1.03, time_range=(0.01, 2.5)))
-    for i in os.listdir(os.path.join(utils.get_project_root(), "data/raw/pijama"))[:100]:
-        midi = os.path.join(utils.get_project_root(), "data/raw/pijama", i, "piano_midi.mid")
-        raw = Score(midi, ttype="Second").resample(utils.TICKS_PER_QUARTER).to("Second")
-        enc = tokfactory.encode(os.path.join(utils.get_project_root(), midi))
-        det = tokfactory.decode(enc)
 
-        last_note_raw = max(raw.tracks[0].notes, key=lambda x: x.start)
-        last_note_enc = max(det.tracks[0].notes, key=lambda x: x.start)
-        print(i, last_note_raw.start, last_note_enc.start)
+    with utils.timer("encode"):
+        for n, i in enumerate(os.listdir(os.path.join(utils.get_project_root(), "data/raw/pijama"))[300:400]):
+            midi = os.path.join(utils.get_project_root(), "data/raw/pijama", i, "piano_midi.mid")
+            raw = preprocess_score(load_score(midi, as_seconds=True))
+            enc = tokfactory.encode(os.path.join(utils.get_project_root(), midi))
+            det = tokfactory.decode(enc)
+
+            last_note_raw = max(raw.tracks[0].notes, key=lambda x: x.start)
+            last_note_enc = max(det.tracks[0].notes, key=lambda x: x.start)
+            # print(i, last_note_raw.start, last_note_enc.start)
+        # raw.dump_midi(f"test_raw_{n}.mid")
+        # det.dump_midi(f"test_dec_{n}.mid")
+        # break
