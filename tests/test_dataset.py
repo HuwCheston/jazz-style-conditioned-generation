@@ -31,7 +31,7 @@ class DatasetTester(unittest.TestCase):
             "jtd": 1294,  # as reported in paper
             "jja": 5 * 9,  # five pianists, nine performances each
             "pianist8": 47,  # dataset contains 50 performances, but 3 are also in pijama
-            "bushgrafts": 620  # total number we expect to scrape
+            "bushgrafts": 299  # total number we expect to scrape
         }
         for dataset, expected_tracks in expected.items():
             dataset_dir = os.path.join(DATA_ROOT, dataset)
@@ -141,6 +141,28 @@ class DatasetTester(unittest.TestCase):
                 min_pitch, max_pitch = utils.get_pitch_range(sc)
                 self.assertTrue(min_pitch >= utils.MIDI_OFFSET)
                 self.assertTrue(max_pitch <= utils.MIDI_OFFSET + utils.PIANO_KEYS)
+
+    def test_tracks_in_split_exist(self):
+        # Gather all tracks in all data splits
+        all_tracks = []
+        for split in ["train", "test", "validation"]:
+            split_path = os.path.join(utils.get_project_root(), "references/data_splits", split + "_split.txt")
+            with open(split_path, "r") as fin:
+                tracks = fin.read().split("\n")
+            all_tracks.extend([t for t in tracks if t != ""])
+        # Go from split -> track
+        for track in all_tracks:
+            track_path = os.path.join(DATA_ROOT, track)
+            self.assertTrue(os.path.exists(track_path))
+        # Go from track -> split
+        for data in DATASETS:
+            data_path = os.path.join(DATA_ROOT, data)
+            for track in os.listdir(data_path):
+                # Skip over any .gitkeep files
+                if track == ".gitkeep":
+                    continue
+                track = os.path.join(data, track)
+                self.assertTrue(track in all_tracks)
 
 
 if __name__ == '__main__':
