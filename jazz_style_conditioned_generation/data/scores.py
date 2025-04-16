@@ -150,6 +150,8 @@ def remove_overlap(note_list: list[Note]) -> list[Note]:
     set the offset of the first note to the onset of the second
     """
     newnotes = []
+    # Padding to separate overlapping offsets/onsets: 10 ms
+    pad = 0.01 if isinstance(note_list[0].ttype, Second) else 10
     # Iterate over all MIDI pitches
     for pitch in range(utils.MIDI_OFFSET, utils.MIDI_OFFSET + utils.PIANO_KEYS + 1):
         # Get the notes played at this pitch
@@ -169,8 +171,8 @@ def remove_overlap(note_list: list[Note]) -> list[Note]:
                 note2 = notes_sorted[note_idx + 1]
                 # If the earlier note overlaps the later one
                 if note1.time + note1.duration > note2.time:
-                    # Set its offset time to be the onset time of the subsequent note
-                    note1.duration = note2.time - note1.time
+                    # Set its offset time to be the onset time of the subsequent note, minus padding
+                    note1.duration = note2.time - note1.time - pad
                 newnotes.append(note1)  # add only once
             # After the loop, add the last note
             newnotes.append(notes_sorted[-1])

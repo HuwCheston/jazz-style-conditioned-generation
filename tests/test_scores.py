@@ -206,10 +206,10 @@ class PreProcessingScoreTest(unittest.TestCase):
             Note(pitch=90, duration=2.0, time=4., velocity=50, ttype="Second"),
         ]
         no_overlap = sorted(remove_overlap(notes), key=lambda x: x.time)
-        self.assertTrue(no_overlap[0].duration == 1.0)
-        self.assertTrue(no_overlap[1].duration == 1.0)
-        self.assertTrue(no_overlap[2].duration == 0.5)
-        self.assertTrue(no_overlap[3].duration == 2.0)
+        self.assertAlmostEqual(no_overlap[0].duration, 0.99)
+        self.assertAlmostEqual(no_overlap[1].duration, 1.0)
+        self.assertAlmostEqual(no_overlap[2].duration, 0.5)
+        self.assertAlmostEqual(no_overlap[3].duration, 2.0)
         self.assertTrue(len(no_overlap) == len(notes))
         # No changes to any other parameters
         for newnote, oldnote in zip(no_overlap, notes):
