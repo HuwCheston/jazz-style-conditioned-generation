@@ -5,6 +5,7 @@
 
 import json
 import os
+from functools import lru_cache
 from pathlib import Path
 from typing import Sequence, Union
 
@@ -16,6 +17,7 @@ from miditok.constants import SCORE_LOADING_EXCEPTION
 from miditok.tokenizations import REMI, MIDILike, TSD, Structured, PerTok
 from miditok.tokenizer_training_iterator import TokTrainingIterator
 from miditok.utils import convert_ids_tensors_to_list
+from miditok.utils.utils import np_get_closest
 from symusic import Score, Tempo, TimeSignature, Note, Track
 from tqdm import tqdm
 
@@ -283,6 +285,11 @@ class CustomTSD:
             times = np.array(times, dtype=np.float32)
         return np.rint(times * 1000).astype(int)
 
+    @property
+    def _times_tuple(self) -> tuple[int]:
+        """Returns times as a tuple: useful for caching, where numpy arrays aren't supported"""
+        return tuple(self.times)
+
     def add_to_vocab(self, token: str, special_token: bool = False, *_, **__) -> None:
         """Add an event to the vocabulary. Its ID will be the length of the vocab"""
         token_str = token if isinstance(token, str) else str(token)
@@ -325,49 +332,70 @@ class CustomTSD:
     def get_closest(array: np.ndarray, val: int) -> int:
         return array[np.argmin(np.abs(array - val))]
 
+    @property
+    def min_time(self):
+        return min(self.times) / 2
+
+    @staticmethod
+    @lru_cache(maxsize=None)
+    def decompose_time(value: int, times_tuple: tuple[int], min_time: int):
+        """Keep decomposing a time value into its closest tokens, until `min_time` is reached"""
+        times = np.fromiter(times_tuple, dtype=np.intc)
+        result = []
+        remaining = value
+
+        while remaining > min_time:
+            idx = np.searchsorted(times, remaining)
+            if idx == 0:
+                token = times[0]
+            elif idx == len(times):
+                token = times[-1]
+            else:
+                before, after = times[idx - 1], times[idx]
+                token = before if abs(remaining - before) <= abs(remaining - after) else after
+
+            result.append(token)
+            remaining -= token
+
+        return result
+
     def _score_to_tokens(self, score: Score) -> TokSequence:
         """Convert a **preprocessed** `symusic.Score` object to a sequence of tokens"""
-        tokens = []
-        for track in score.tracks:
-            previous_time = 0.
-            for note in track.notes:
-                # Timeshift tokens (incremental update)
-                note_start = int(round(note.start * 1000))
-                # while the gap from the current cursor to the note start is positive
-                while note_start - previous_time > 0:
-                    gap = note_start - previous_time
-                    # Ignore cases where the remaining time rounds down to 0
-                    if gap < min(self.times) / 2:
-                        break
-                    # Use the MIDItok function to get the closest timeshift token to the current gap
-                    # timeshift_token = np_get_closest(self.times, np.array([gap]))[0]
-                    timeshift_token = self.get_closest(self.times, gap)
-                    tokens.append(f"TimeShift_{timeshift_token}")
-                    previous_time += timeshift_token
 
-                # Pitch token
-                tokens.append(f"Pitch_{note.pitch}")
-                # Velocity token: use the miditok function to get the closets velocity
-                # vel_token = np_get_closest(self.velocities, np.array([note.velocity]))[0]
-                vel_token = self.get_closest(self.velocities, note.velocity)
-                tokens.append(f"Velocity_{vel_token}")
+        note_list = score.tracks[0].notes  # assuming only one track
+        # Batch processing of pitches
+        pitches = np.array([ev.pitch for ev in note_list])
 
-                # Duration
-                duration_ms = int(round(note.duration * 1000))
-                accumulated = 0
-                while accumulated < duration_ms:
-                    remaining = duration_ms - accumulated
-                    # Ignore cases where the remaining time rounds down to 0
-                    if remaining < min(self.times) / 2:
-                        break
-                    # Use the miditok function to get the closest duration token to the amount of time remaining to fill
-                    # duration_token = np_get_closest(self.times, np.array([remaining]))[0]
-                    duration_token = self.get_closest(self.times, remaining)
-                    tokens.append(f"Duration_{duration_token}")
-                    accumulated += duration_token
+        # Batch processing of start + duration times (in milliseconds!)
+        starts_ms = np.round(np.array([ev.start for ev in note_list]) * 1000).astype(int)
+        durations_ms = np.round(np.array([ev.duration for ev in note_list]) * 1000).astype(int)
 
-        # Check all the tokens are in our vocabulary
-        # self._validate_tokens(tokens)
+        # Batch processing of velocities
+        velocities = np.array([ev.velocity for ev in note_list])
+        velocities_closest = np_get_closest(self.velocities, velocities)
+
+        tokens = []  # store tokens
+        previous_time = 0.  # cursor
+
+        # Iterate over all notes
+        for note_start, note_pitch, note_velocity, note_duration in zip(
+                starts_ms, pitches, velocities_closest, durations_ms
+        ):
+            # Timeshift tokens (incremental update)
+            for shift in self.decompose_time(note_start - previous_time, self._times_tuple, self.min_time):
+                tokens.append(f"TimeShift_{shift}")
+                previous_time += shift
+
+            # Pitch token
+            tokens.append(f"Pitch_{note_pitch}")
+
+            # Velocity token: use the miditok function to get the closets velocity
+            tokens.append(f"Velocity_{note_velocity}")
+
+            # Duration
+            for dt in self.decompose_time(note_duration, self._times_tuple, self.min_time):
+                tokens.append(f"Duration_{dt}")
+
         # Tokenize as list of integers
         ids = self._ids_to_tokens(tokens)
         # Convert to MIDITok's format (for compatibility with MIDITok more broadly
@@ -406,7 +434,7 @@ class CustomTSD:
             # Can't handle multiple vocabularies yet
             raise NotImplementedError
 
-    def _ids_to_tokens(self, ids: list[int], *args, **kwargs) -> list[str]:
+    def _ids_to_tokens(self, ids: list[int], *_, **__) -> list[str]:
         """Convert a sequence of ids (int) to their tokens format (str)"""
         return [self[id_] for id_ in ids]
 
@@ -615,7 +643,7 @@ class CustomTokTrainingIterator(TokTrainingIterator):
     ):
         super().__init__(tokenizer, files_paths, tracks_idx_random_ratio_range, bars_idx_random_ratio_range)
         self.condition_tokens = [
-            i for i in tokenizer.vocab if i.startswith(("GENRES", "PIANIST", "TEMPO", "TIMESIGNATURE"))
+            ct for ct in tokenizer.vocab if ct.startswith(("GENRES", "PIANIST", "TEMPO", "TIMESIGNATURE"))
         ]
 
     def load_file(self, path: Path) -> list[str]:
@@ -717,7 +745,7 @@ def add_tempos_to_vocab(tokenizer: MusicTokenizer, min_tempo: int, n_tempos: int
 
 def get_tokenizer_class_from_string(tokenizer_type: str):
     """Given a string, return the correct tokenizer class"""
-    valids = ["remi", "midilike", "tsd", "structured", "pertok"]
+    valids = ["remi", "midilike", "tsd", "structured", "pertok", "custom-tsd"]
     tokenizer_type = tokenizer_type.lower()
     if tokenizer_type == "remi":
         return REMI
@@ -729,6 +757,8 @@ def get_tokenizer_class_from_string(tokenizer_type: str):
         return Structured
     elif tokenizer_type == "pertok":
         return PerTok
+    elif tokenizer_type == "custom-tsd":
+        return CustomTSD
     else:
         raise ValueError(f'`tokenizer_type` must be one of {", ".join(valids)} but got {tokenizer_type}')
 
@@ -762,7 +792,7 @@ def load_tokenizer(**kwargs) -> MusicTokenizer:
         tokenizer_kws = utils.update_dictionary(tokenizer_kws, DEFAULT_TOKENIZER_CONFIG)
         logger.debug(f'Initialising tokenizer type {tokenizer_method} with params {tokenizer_kws}')
         # Create the tokenizer configuration + tokenizer
-        cfg = TokenizerConfig(**tokenizer_kws)
+        cfg = CustomTokenizerConfig(**tokenizer_kws)
         tokenizer = get_tokenizer_class_from_string(tokenizer_method)(cfg)
     logger.debug(f'... got tokenizer: {tokenizer}')
     # We need to set this attribute to make decoding tokens easier
@@ -807,18 +837,27 @@ def train_tokenizer(tokenizer: MusicTokenizer, files_paths: list[str], **kwargs)
 
 
 if __name__ == "__main__":
-    tokfactory = CustomTSD(CustomTokenizerConfig(time_factor=1.03, time_range=(0.01, 2.5)))
+    from time import time
 
-    with utils.timer("encode"):
-        for n, i in enumerate(os.listdir(os.path.join(utils.get_project_root(), "data/raw/pijama"))[300:400]):
+    tokfactory = CustomTSD(CustomTokenizerConfig(time_factor=1.03, time_range=(0.01, 2.5)))
+    all_times = []
+    to_process = os.listdir(os.path.join(utils.get_project_root(), "data/raw/pijama"))[300:400]
+    with utils.timer("encode custom"):
+        for i in tqdm(to_process, desc="Encoding custom"):
             midi = os.path.join(utils.get_project_root(), "data/raw/pijama", i, "piano_midi.mid")
             raw = preprocess_score(load_score(midi, as_seconds=True))
+            start = time()
             enc = tokfactory.encode(os.path.join(utils.get_project_root(), midi))
-            det = tokfactory.decode(enc)
+            all_times.append(time() - start)
+    print(np.mean(all_times))
 
-            last_note_raw = max(raw.tracks[0].notes, key=lambda x: x.start)
-            last_note_enc = max(det.tracks[0].notes, key=lambda x: x.start)
-            # print(i, last_note_raw.start, last_note_enc.start)
-        # raw.dump_midi(f"test_raw_{n}.mid")
-        # det.dump_midi(f"test_dec_{n}.mid")
-        # break
+    all_times = []
+    tokfactory_vanilla = load_tokenizer(tokenizer_str="tsd")
+    with utils.timer("encode vanilla"):
+        for i in tqdm(to_process, desc="Encoding vanilla"):
+            midi = os.path.join(utils.get_project_root(), "data/raw/pijama", i, "piano_midi.mid")
+            raw = preprocess_score(load_score(midi, as_seconds=True))
+            start = time()
+            enc = tokfactory_vanilla.encode(os.path.join(utils.get_project_root(), midi))
+            all_times.append(time() - start)
+    print(np.mean(all_times))
