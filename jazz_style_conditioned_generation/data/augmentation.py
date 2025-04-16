@@ -6,6 +6,7 @@
 import numpy as np
 from miditok.data_augmentation import augment_score
 from symusic import Score
+from symusic.core import Second
 
 from jazz_style_conditioned_generation import utils
 
@@ -51,9 +52,14 @@ def _data_augmentation_deterministic(
     assert aug_min >= utils.MIDI_OFFSET
     assert aug_max <= utils.MIDI_OFFSET + utils.PIANO_KEYS
     # We need to use the symusic pretty_midi-like function to do duration augmentation
+    new_end = augmented.end() * duration_augment_value
+    # With timing in ticks (integers), we need to round the new end time to the nearest integer
+    # Otherwise, with timing in seconds (float), we just use the raw value
+    if not isinstance(augmented.ttype, Second):
+        new_end = round(new_end)
     return augmented.adjust_time(
         [augmented.start(), augmented.end()],
-        [augmented.start(), int(augmented.end() * duration_augment_value)],
+        [augmented.start(), new_end],
         inplace=False
     )
 
