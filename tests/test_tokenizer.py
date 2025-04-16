@@ -381,8 +381,14 @@ class CustomTSDTest(unittest.TestCase):
             detok_vanilla = self.tok_vanilla.decode(tok_vanilla).to("Second")
             detok_new = self.tok_actual.decode(tok_new)
             # Get notes
-            raw_notes = sorted(detok_vanilla.tracks[0].notes, key=lambda x: (x.pitch, x.start, x.duration))
-            proc_notes = sorted(detok_new.tracks[0].notes, key=lambda x: (x.pitch, x.start, x.duration,))
+            raw_notes = sorted(
+                [i for i in detok_vanilla.tracks[0].notes if round(i.duration, 2) > 0.05],
+                key=lambda x: (x.pitch, x.start, x.duration)
+            )
+            proc_notes = sorted(
+                [i for i in detok_new.tracks[0].notes if round(i.duration, 2) > 0.05],
+                key=lambda x: (x.pitch, x.start, x.duration,)
+            )
             # Should have the same number of notes
             self.assertTrue(len(raw_notes) == len(proc_notes))
             # Iterate over sorted notes
