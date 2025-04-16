@@ -1302,7 +1302,6 @@ jtd/evansb-myromance-johnsonmlabarberaj-1977-6fe9d497
 jtd/drewk-eveningatthepark-vindingmthigpene-1981-cb60e40d
 pijama/alleng-flyingtowardthesoundreprise-unaccompanied-xxxx-4k3pq28q
 bushgrafts/mckenzied-tryalittle21-bassbdrumsd-xxxx-b3193111
-bushgrafts/mckenzied-myfunny3-bassbdrumsd-xxxx-72d95fd5
 pijama/tatuma-theverythoughtofyou-unaccompanied-xxxx-emclx8ds
 pijama/hamasyant-motherwhereareyou-unaccompanied-xxxx-0dypxrc9
 pijama/hiromi-mr-unaccompanied-xxxx-dpipvxap
@@ -1316,7 +1315,6 @@ jtd/kellyw-autumnleaves-jonesscobbj-1961-1eaac3af
 pianist8/hancockh-thepleasureismine-bassbdrumsd-1999-d8dc726b
 bushgrafts/mckenzied-iheararhapsody-bassbdrumsd-xxxx-396ffca4
 bushgrafts/mckenzied-gymnopedieitneverenteredmymind-unaccompanied-xxxx-3c9c6758
-bushgrafts/mckenzied-blackbird-bassbdrumsd-xxxx-9905a801
 pijama/camilom-onfire-unaccompanied-xxxx-mlbtxonh
 pijama/rosenthalt-longagoandfaraway-unaccompanied-xxxx-szipzosm
 bushgrafts/mckenzied-loveletters-unaccompanied-xxxx-0dfab1a3
@@ -1454,14 +1452,12 @@ jtd/garlandr-butnotforme-carterrjoep-1977-de537ef9
 pijama/bryantr-blackandbluelive-unaccompanied-xxxx-e80ehys4
 jtd/powellb-igetakickout-trotmanlblakeya-1955-9882c94d
 pijama/mckennad-dancinginthedark-unaccompanied-xxxx-yga3txr4
-bushgrafts/mckenzied-caravan2-bassbdrumsd-xxxx-4f5c4984
 bushgrafts/mckenzied-alabama-bassbdrumsd-xxxx-2ba4fdb3
 pijama/hymand-honeysucklerose-unaccompanied-xxxx-ja9ms7vk
 pijama/rosenthalt-jesujoyofmansdesiring-unaccompanied-xxxx-ox8c7r9k
 pijama/coplandm-sundayschool-unaccompanied-xxxx-os438up3
 pijama/keezerg-cometalktome-unaccompanied-xxxx-d7z6t7dg
 pijama/robertsm-inwalkedbud-unaccompanied-xxxx-gnqcr8qy
-bushgrafts/mckenzied-allthethingsyouare-bassbdrumsd-xxxx-483f1a54
 pijama/hamasyant-kakavikthelittlepartridge-unaccompanied-xxxx-xp8gt3rl
 pijama/tatuma-teafortwo-unaccompanied-xxxx-d1ypb8fw
 pijama/shearingg-reverie-unaccompanied-xxxx-46tcd0hw
@@ -1503,7 +1499,6 @@ pijama/hymand-myfateisinyourhands-unaccompanied-xxxx-i5gufzl9
 pijama/reede-comesunday-unaccompanied-xxxx-kei9efd9
 pijama/hymand-poorbutterfly-unaccompanied-xxxx-65kd89kv
 pijama/mulligans-astimegoesby-unaccompanied-xxxx-faek5zp9
-bushgrafts/mckenzied-blackbirdxg-bassbdrumsd-xxxx-e1c6dfb1
 pijama/tatuma-outofnowhere-unaccompanied-xxxx-xo3dtenq
 pijama/farnhama-inyourownsweetway-unaccompanied-xxxx-6288qlf2
 bushgrafts/mckenzied-pentuphouse-unaccompanied-xxxx-329e5a4f
@@ -1547,7 +1542,6 @@ pijama/hymand-cabininthesky-unaccompanied-xxxx-2p7sqrdi
 jtd/kellyw-dontchahearmecallin-mcclurercobbj-1966-c450ccdb
 pijama/campbellj-youandthenightandthe-unaccompanied-xxxx-mqckd9co
 pijama/cablesg-lullabyliveatmaybeckrecital-unaccompanied-xxxx-z1guk32b
-bushgrafts/mckenzied-recordame-bassbdrumsd-xxxx-8f5d7779
 bushgrafts/mckenzied-easydoesit-bassbdrumsd-xxxx-c7bcffd5
 pijama/adairb-smokegetsinyoureyes-unaccompanied-xxxx-j5mp31vm
 bushgrafts/mckenzied-remembersolojazzpiano-unaccompanied-xxxx-0341ab01
@@ -1710,7 +1704,6 @@ bushgrafts/mckenzied-braziliansuite-bassbdrumsd-xxxx-7cfeab93
 pijama/cablesg-lullaby-unaccompanied-xxxx-279fwudm
 bushgrafts/mckenzied-allthethingsv2-bassbdrumsd-xxxx-ee3ae34a
 bushgrafts/mckenzied-itsalmostlikebeinginlove-bassbdrumsd-xxxx-99cf0980
-bushgrafts/mckenzied-blackbird-bassbdrumsd-xxxx-bf387859
 pijama/hymand-skylark-unaccompanied-xxxx-r29zz50e
 bushgrafts/mckenzied-icantgetstarted-unaccompanied-xxxx-57919845
 bushgrafts/mckenzied-itcouldhappenv2-unaccompanied-xxxx-9a4846ec
@@ -1780,7 +1773,6 @@ bushgrafts/mckenzied-mckenzieishouldcare2-bassbdrumsd-xxxx-8e747878
 bushgrafts/mckenzied-manteca-bassbdrumsd-xxxx-8396702d
 pijama/tatuma-happyfeet-unaccompanied-xxxx-porf06oz
 pijama/keezerg-grunionrun-unaccompanied-xxxx-g7uh5jne
-bushgrafts/mckenzied-rainwalt-bassbdrumsd-xxxx-682d5ee4
 pijama/harrisb-thatsecretplace-unaccompanied-xxxx-bbdsx8ic
 pijama/cablesg-helenssong-unaccompanied-xxxx-jsu89c36
 pijama/previna-whatisthisthingcalledlove-unaccompanied-xxxx-4hheh7ns
@@ -1856,7 +1848,6 @@ pianist8/hancockh-andwhatifidontknow-bassbdrumsd-1999-b11a7142
 pijama/drewk-straightnochaserlive-unaccompanied-xxxx-qup1p0lh
 jtd/tristanol-mymelacholybaby-indpweyburnt-1955-df6db3fc
 pijama/hymand-bewitchedbotheredandbewildered-unaccompanied-xxxx-4g0hmb0j
-bushgrafts/mckenzied-squeezemetriov1-bassbdrumsd-xxxx-d57df85c
 pijama/bryantr-rockinchair-unaccompanied-xxxx-5kakxntb
 pijama/galperh-detouraheadliveatmaybeck-unaccompanied-xxxx-miwnvqyr
 pijama/adairb-onlythelonely-unaccompanied-xxxx-c6p9p6hn
@@ -1901,7 +1892,6 @@ pijama/berkmand-equinox-unaccompanied-xxxx-lfxelfx5
 pijama/herschf-askmenow-unaccompanied-xxxx-pwhe1dra
 pijama/cunliffeb-lostweekend-unaccompanied-xxxx-x582gkkk
 pijama/adairb-ithadtobeyou-unaccompanied-xxxx-cinguwgm
-bushgrafts/mckenzied-bymyself3-bassbdrumsd-xxxx-7e5f07fa
 pijama/brownd-selfportrait-unaccompanied-xxxx-7gsr0ahq
 pijama/djangirove-sophisticatedlady-unaccompanied-xxxx-agl4xhc3
 bushgrafts/mckenzied-waltsefordave-bassbdrumsd-xxxx-dcc1091d
@@ -2044,7 +2034,6 @@ jtd/timmonsb-whywasiborn-jonessmccurdyr-1964-a6bb6e79
 bushgrafts/mckenzied-soinlovetrioversion-bassbdrumsd-xxxx-50f4108c
 pijama/westonr-bluesforcb-unaccompanied-xxxx-7e439zxj
 pijama/charlapb-iwassoyoungyouwere-unaccompanied-xxxx-e8l56zys
-bushgrafts/mckenzied-caravan2-bassbdrumsd-xxxx-9caf058a
 pianist8/hancockh-loveisstrongerthanpride-bassbdrumsd-1996-a6975cdc
 jtd/nicholsh-117thstreet-mckibbonaroachm-1955-c76cb0b9
 pijama/distlerj-igotitbadandthat-unaccompanied-xxxx-iy0knfmz
@@ -2096,7 +2085,6 @@ pijama/kellawayr-closeyoureyesliveat-unaccompanied-xxxx-9oab2inr
 jtd/kellyw-skatin-chamberspjoep-1955-3bf1108f
 jtd/nicholsh-2300skidooalternate-mckibbonablakeya-1955-f30a1bab
 pijama/harrisb-sphere-unaccompanied-xxxx-tn4iqauw
-bushgrafts/mckenzied-blackbird-bassbdrumsd-xxxx-03c18784
 pijama/brackeenj-mythicalmagic-unaccompanied-xxxx-crdnfot5
 bushgrafts/mckenzied-summerwind2-bassbdrumsd-xxxx-9788d6c9
 pijama/hymand-nightandday-unaccompanied-xxxx-cawwl7h4
@@ -2158,7 +2146,6 @@ pijama/hymand-shenandoah-unaccompanied-xxxx-hh5imv4g
 bushgrafts/mckenzied-bluebossa3gm-bassbdrumsd-xxxx-1a7642d8
 pijama/fischerc-brunnerschwerpunkt-unaccompanied-xxxx-d26wl2b3
 pijama/tatuma-deeppurple-unaccompanied-xxxx-q9gkwf7i
-bushgrafts/mckenzied-grelots-bassbdrumsd-xxxx-a2d6d55a
 pijama/shearingg-friendlypersuasiontheeilove-unaccompanied-xxxx-09bb9sir
 pijama/grusind-sadie-unaccompanied-xxxx-07xrgk2q
 pijama/williamsj-spiritualmedleyholyholy-unaccompanied-xxxx-a43gi104
@@ -2360,7 +2347,6 @@ pijama/montoliut-allofyou-unaccompanied-xxxx-vyay8umv
 bushgrafts/mckenzied-asleepinbee-unaccompanied-xxxx-0b379d5e
 pijama/hannar-perugia-unaccompanied-xxxx-mz8fhww9
 bushgrafts/mckenzied-irememberyousolo-unaccompanied-xxxx-a1607240
-bushgrafts/mckenzied-goodbaitgm-bassbdrumsd-xxxx-8e78b51c
 pijama/bryantr-inthebackroomlive-unaccompanied-xxxx-hf9dfgux
 pijama/fischerc-excerptfromcanonicpassacaglia-unaccompanied-xxxx-kck7w0au
 pijama/montgomeryb-acottageforsalelive-unaccompanied-xxxx-520a12qs
@@ -2440,7 +2426,6 @@ pijama/akiyoshit-olddevilmoonliveat-unaccompanied-xxxx-azeha8x2
 bushgrafts/mckenzied-yesterdays1-unaccompanied-xxxx-cc1ff956
 pijama/hamasyant-thelegendofthemoon-unaccompanied-xxxx-fnv7014t
 bushgrafts/mckenzied-moonlightinvermont-unaccompanied-xxxx-ca9b2212
-bushgrafts/mckenzied-louisiana-bassbdrumsd-xxxx-79b34ac9
 pijama/wernerk-achildisbornlive-unaccompanied-xxxx-3f5jhhwc
 bushgrafts/mckenzied-iloveyou-unaccompanied-xxxx-b6a11993
 pijama/montoliut-alonetogether-unaccompanied-xxxx-28b9n1ul
@@ -2610,7 +2595,6 @@ jtd/powellb-tuneforduke-bibigfieldsk-1961-76c3ea93
 pijama/mcpartlandm-afineromanceliveat-unaccompanied-xxxx-sxlc89hk
 pijama/shearingg-guilty-unaccompanied-xxxx-vvb4lawq
 pijama/herschf-ramblinliveatmaybeckrecital-unaccompanied-xxxx-ukicr53x
-bushgrafts/mckenzied-myfunny3-bassbdrumsd-xxxx-05451f36
 pijama/rosenthalt-gonewiththewindlive-unaccompanied-xxxx-74nbklxt
 pijama/birnbauma-thereisnogreaterlove-unaccompanied-xxxx-ut85mzhn
 bushgrafts/mckenzied-allthethingsreharmonized-bassbdrumsd-xxxx-f17f136b
@@ -2732,7 +2716,6 @@ pijama/mulligans-dontgetaroundmuchanymore-unaccompanied-xxxx-vkot22mg
 pijama/mcneelyj-zingaroliveatmaybeckrecital-unaccompanied-xxxx-a7kcbw4b
 jtd/kellyw-potluck-chamberspjoep-1955-738b8163
 pijama/cablesg-evc-unaccompanied-xxxx-4s9lt9gn
-bushgrafts/mckenzied-myfunny3-bassbdrumsd-xxxx-3a235279
 jtd/kellyw-autumnleaves-chamberspcobbj-1961-7814d578
 pijama/montoliut-whispernot-unaccompanied-xxxx-8c9ayrlu
 pijama/akiyoshit-sophisticatedladyliveatmaybeck-unaccompanied-xxxx-99l0yt5n
@@ -3001,7 +2984,6 @@ bushgrafts/mckenzied-justagigolo-unaccompanied-xxxx-11b6ae2f
 pijama/previna-skylark-unaccompanied-xxxx-o8okl8or
 pijama/hannar-afterglow-unaccompanied-xxxx-trsciz2i
 pijama/hymand-yesterdays-unaccompanied-xxxx-ovbayqlk
-bushgrafts/mckenzied-blackbirdxg-bassbdrumsd-xxxx-24b736a0
 bushgrafts/mckenzied-askmenow2-bassbdrumsd-xxxx-9efa6c6f
 pijama/keezerg-suddenlyisee-unaccompanied-xxxx-otq4juym
 pijama/bryantr-littlegirllive-unaccompanied-xxxx-394apre3
@@ -3318,7 +3300,6 @@ jtd/hawesh-highinthesky-vinnegarlduckd-1970-d0b63497
 pijama/woffordm-littlegirlblueliveat-unaccompanied-xxxx-hb5zl4r8
 pijama/brownd-ididntknowwhattimeit-unaccompanied-xxxx-zr69ts06
 bushgrafts/mckenzied-beautifullovedougmckenzie-bassbdrumsd-xxxx-86ce9b57
-bushgrafts/mckenzied-dolphindance3-bassbdrumsd-xxxx-25ecf3b3
 pijama/kellawayr-myoneandonlylove-unaccompanied-xxxx-8mfkbjra
 pijama/jordand-theywayyoulooktonight-unaccompanied-xxxx-2fj8ucsh
 pijama/broadbenta-strangersinparadise-unaccompanied-xxxx-ix3lpjo7
@@ -3329,7 +3310,6 @@ pijama/hymand-takingachanceonlove-unaccompanied-xxxx-sfm3bmpg
 jtd/powellb-ladybirdalternatetake1-duviviergtaylora-1955-4db9687d
 pijama/grusind-selfquarantine-unaccompanied-xxxx-l31axzg0
 pijama/ozonem-lulusbackintown-unaccompanied-xxxx-cgxauucu
-bushgrafts/mckenzied-caravan2-bassbdrumsd-xxxx-4f8b60cc
 pijama/harrisb-thelondonderryair-unaccompanied-xxxx-xit2yeos
 pijama/westonr-outofthepast-unaccompanied-xxxx-eenye8av
 pijama/shearingg-daisy-unaccompanied-xxxx-clfwh1na
@@ -3364,7 +3344,6 @@ bushgrafts/mckenzied-thisnearlywasmine-unaccompanied-xxxx-43c62c2a
 bushgrafts/mckenzied-taketheatrain-unaccompanied-xxxx-5d9bc5e7
 bushgrafts/mckenzied-cantabile2-bassbdrumsd-xxxx-4f950c71
 bushgrafts/mckenzied-someothertime-unaccompanied-xxxx-65272aa6
-bushgrafts/mckenzied-blackbirdxg-bassbdrumsd-xxxx-da3afda5
 pijama/colligang-sentimentalfoolishness-unaccompanied-xxxx-s4c4zuyu
 bushgrafts/mckenzied-goodbaitpiano-bassbdrumsd-xxxx-9821967b
 pijama/hymand-bodyandsoul-unaccompanied-xxxx-43lq9fqk
@@ -3410,7 +3389,6 @@ pijama/herschf-letscoolone-unaccompanied-xxxx-78unc539
 jja/pianist5-220728_1139_120-bassbdrumsd-2023-1117d056
 pijama/ozonem-bluemonk-unaccompanied-xxxx-pfdns3ls
 pijama/mckennad-somebodyelseistakingmyplace-unaccompanied-xxxx-ymyerrsg
-bushgrafts/mckenzied-bymyself3-bassbdrumsd-xxxx-233479b1
 jtd/hawesh-spanishstepstake2-woodejtaylora-1968-dfe0283f
 pijama/djangirove-tigerragarr-unaccompanied-xxxx-65tu4enx
 pijama/larkinse-nomoregodblessthe-unaccompanied-xxxx-2k5srk6n
@@ -3434,7 +3412,6 @@ pijama/hiromi-sepiaeffect-unaccompanied-xxxx-62searwc
 bushgrafts/mckenzied-anighting-bassbdrumsd-xxxx-0804e657
 pijama/lavernea-stangetzinchappaqualive-unaccompanied-xxxx-ys25t0w5
 pijama/mckennad-therewillneverbeanotheryou-unaccompanied-xxxx-jfxve97e
-bushgrafts/mckenzied-allthethingsyouare-bassbdrumsd-xxxx-b5fbdfe1
 pijama/hymand-shine-unaccompanied-xxxx-azojcj3e
 jja/pianist3-220707_1218_80-bassbdrumsd-2023-a8237add
 pijama/wernerk-inyourownsweetway-unaccompanied-xxxx-rwblpjfr
@@ -3694,7 +3671,6 @@ jja/pianist4-220709_1553_120-bassbdrumsd-2023-c29d3099
 pijama/hymand-mariannejustyoujust-unaccompanied-xxxx-m9fxp3ir
 pijama/formanm-eastvillageinvention-unaccompanied-xxxx-sigiffm4
 pijama/terrassonj-mirror-unaccompanied-xxxx-4are73h1
-bushgrafts/mckenzied-squeezemetriov2-bassbdrumsd-xxxx-6205bce5
 pijama/hymand-icantgetstarted-unaccompanied-xxxx-a3vg65he
 bushgrafts/mckenzied-iconcentrateonyouxg-bassbdrumsd-xxxx-289311e8
 pianist8/hancockh-whenicanseeyou-bassbdrumsd-1996-e0b8a74b
