@@ -12,6 +12,7 @@ from pretty_midi import Note as PMNote
 from pretty_midi import PrettyMIDI, Instrument
 from pretty_midi import TimeSignature as PMTimeSignature
 from symusic import Score, Note
+from symusic.core import Second
 from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
@@ -21,13 +22,68 @@ from jazz_style_conditioned_generation.data.scores import (
     merge_repeated_notes,
     note_list_to_score,
     remove_out_of_range_notes,
-    get_notes_from_score
+    get_notes_from_score,
+    preprocess_score,
+    cap_long_notes,
+    remove_overlap,
+    remove_duplicate_notes,
+    align_to_start
 )
 
 TEST_RESOURCES = os.path.join(utils.get_project_root(), "tests/test_resources")
 
 
 class PreProcessingScoreTest(unittest.TestCase):
+    def test_preprocess_as_seconds(self):
+        # Test with a dummy example
+        notelist = [
+            # Keep this one
+            Note(pitch=80, duration=1.0, time=100, velocity=80, ttype="Second"),
+            # Remove this one
+            Note(pitch=70, duration=0.001, time=100, velocity=80, ttype="Second"),
+            # remove this one
+            Note(pitch=60, duration=0.004, time=100, velocity=80, ttype="Second")
+        ]
+        # Convert the notelist to a score with time in seconds
+        score = note_list_to_score(notelist, utils.TICKS_PER_QUARTER, ttype="Second")
+        self.assertTrue(isinstance(score.ttype, Second))
+        # Preprocess the score
+        preproc = preprocess_score(score)
+        # Should have removed all but the very first note
+        self.assertTrue(len(preproc.tracks[0].notes) == 1)
+        self.assertTrue(preproc.tracks[0].notes[0].pitch == 80)
+        self.assertTrue(isinstance(preproc.ttype, Second))
+
+    def test_align_notes_to_start(self):
+        # Test with a dummy example, using ticks
+        notelist = [
+            Note(pitch=80, duration=100, time=100, velocity=80, ttype="tick"),
+            Note(pitch=70, duration=10, time=120, velocity=80, ttype="tick")
+        ]
+        expected = [
+            Note(pitch=80, duration=100, time=0, velocity=80, ttype="tick"),
+            Note(pitch=70, duration=10, time=20, velocity=80, ttype="tick")
+        ]
+        actual = align_to_start(notelist)
+        self.assertTrue(expected == actual)
+        # Test with a dummy example, using seconds
+        notelist = [
+            Note(pitch=80, duration=0.5, time=0.15, velocity=80, ttype="Second"),
+            Note(pitch=70, duration=0.6, time=0.35, velocity=80, ttype="Second")
+        ]
+        expected = [
+            Note(pitch=80, duration=0.5, time=0., velocity=80, ttype="Second"),
+            Note(pitch=70, duration=0.6, time=0.2, velocity=80, ttype="Second")
+        ]
+        actual = align_to_start(notelist)
+        for actual_note, expected_note in zip(actual, expected):
+            # Velocity and pitch should be identical
+            self.assertEqual(actual_note.pitch, expected_note.pitch)
+            self.assertEqual(actual_note.velocity, expected_note.velocity)
+            # Allow some wiggle room in duration and time
+            self.assertAlmostEqual(actual_note.duration, expected_note.duration)
+            self.assertAlmostEqual(actual_note.time, expected_note.time)
+
     def test_remove_short_notes_dummy(self):
         # Test with a dummy example
         notelist = [
@@ -111,8 +167,12 @@ class PreProcessingScoreTest(unittest.TestCase):
             Note(pitch=90, duration=5, time=110, velocity=80, ttype="tick"),
             # This note is too low
             Note(pitch=1, duration=10, time=1000, velocity=50, ttype="tick"),
+            # This note is also too low
+            Note(pitch=20, duration=10, time=1000, velocity=50, ttype="tick"),
             # This note is too high
             Note(pitch=125, duration=10, time=2000, velocity=50, ttype="tick"),
+            # This note is also too high
+            Note(pitch=109, duration=10, time=1000, velocity=50, ttype="tick"),
             # This note is valid
             Note(pitch=50, duration=10, time=3000, velocity=60, ttype="tick"),
         ]
@@ -120,8 +180,146 @@ class PreProcessingScoreTest(unittest.TestCase):
         actual_len = len(remove_out_of_range_notes(notes))
         self.assertEqual(expected_len, actual_len)
 
+    def test_cap_long_notes(self):
+        notes = [
+            Note(pitch=90, duration=1.0, time=1., velocity=80, ttype="Second"),
+            # This note will be capped to a five-second duration
+            Note(pitch=1, duration=10, time=2., velocity=50, ttype="Second"),
+            Note(pitch=20, duration=4., time=3., velocity=50, ttype="Second"),
+        ]
+        capped = cap_long_notes(notes, max_duration_milliseconds=5.)
+        self.assertTrue(capped[0].duration == 1.)  # no cap
+        self.assertTrue(capped[1].duration == 5.)  # capped
+        self.assertTrue(capped[2].duration == 4.)  # no cap frfr
+        # Repeat, but cap at 3 seconds
+        capped_4 = cap_long_notes(notes, max_duration_milliseconds=3.)
+        self.assertTrue(capped_4[0].duration == 1.)  # no cap
+        self.assertTrue(capped_4[1].duration == 3.)
+        self.assertTrue(capped_4[2].duration == 3.)
+
+    def test_remove_overlap(self):
+        notes = [
+            # This note overlaps with the next one, so its duration will be capped
+            Note(pitch=90, duration=1.5, time=1., velocity=80, ttype="Second"),
+            Note(pitch=90, duration=1.0, time=2., velocity=50, ttype="Second"),
+            Note(pitch=93, duration=0.5, time=2., velocity=50, ttype="Second"),
+            Note(pitch=90, duration=2.0, time=4., velocity=50, ttype="Second"),
+        ]
+        no_overlap = sorted(remove_overlap(notes), key=lambda x: x.time)
+        self.assertTrue(no_overlap[0].duration == 1.0)
+        self.assertTrue(no_overlap[1].duration == 1.0)
+        self.assertTrue(no_overlap[2].duration == 0.5)
+        self.assertTrue(no_overlap[3].duration == 2.0)
+        self.assertTrue(len(no_overlap) == len(notes))
+        # No changes to any other parameters
+        for newnote, oldnote in zip(no_overlap, notes):
+            self.assertEqual(newnote.pitch, oldnote.pitch)
+            self.assertEqual(newnote.time, oldnote.time)
+            self.assertEqual(newnote.velocity, oldnote.velocity)
+
+    def test_remove_duplicates(self):
+        notes = [
+            # We'll only keep one of the next two notes
+            Note(pitch=90, duration=1.5, time=1., velocity=80, ttype="Second"),
+            Note(pitch=90, duration=1.5, time=1., velocity=80, ttype="Second"),
+            # Differs by pitch
+            Note(pitch=91, duration=1.5, time=1., velocity=80, ttype="Second"),
+            # Differs by onset
+            Note(pitch=90, duration=1.5, time=1.1, velocity=81, ttype="Second"),
+            # Differs by duration
+            Note(pitch=90, duration=1.55, time=1., velocity=80, ttype="Second"),
+            # Differs by velocity
+            Note(pitch=90, duration=1.5, time=1., velocity=81, ttype="Second"),
+        ]
+        deduped = remove_duplicate_notes(notes)
+        self.assertTrue(len(deduped) == len(notes) - 1)  # removing one duplicate
+
+    @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
+    def test_preprocess_score_full_dataset(self):
+        """Tests our preprocess_score function on the entire dataset. Only runs locally"""
+        datasets = [
+            "raw/bushgrafts",
+            "raw/pijama",
+            "raw/jtd",
+            "raw/jja",
+            "raw/pianist8",
+            "pretraining/atepp"
+        ]
+        # Iterate over all datasets
+        for ds in datasets:
+            # Add the beginning of the filepath
+            ds = os.path.join(utils.get_project_root(), "data", ds)
+            for t in tqdm(os.listdir(ds), desc="Testing preprocessing on dataset {}".format(ds)):
+
+                # Skip over e.g. .gitkeep files
+                if not os.path.isdir(os.path.join(ds, t)):
+                    continue
+                midi_fp = os.path.join(ds, t, "piano_midi.mid")
+
+                # Load score and preprocess
+                loaded = load_score(midi_fp, as_seconds=True)
+                score = preprocess_score(loaded, min_duration_milliseconds=50, max_duration_milliseconds=5000)
+
+                # All notes should be within range of the piano
+                min_pitch, max_pitch = utils.get_pitch_range(score)
+                self.assertTrue(utils.MIDI_OFFSET <= min_pitch < utils.PIANO_KEYS + utils.MIDI_OFFSET)
+                self.assertTrue(utils.MIDI_OFFSET <= max_pitch < utils.PIANO_KEYS + utils.MIDI_OFFSET)
+                self.assertTrue(min_pitch <= max_pitch)
+
+                # No notes should have a short duration
+                smallest_duration = min(score.tracks[0].notes, key=lambda x: x.duration).duration
+                self.assertTrue(smallest_duration >= 0.05)
+
+                # Notes should be capped at a maximum duration
+                longest_duration = max(score.tracks[0].notes, key=lambda x: x.duration).duration
+                self.assertTrue(longest_duration <= 5.)
+
+                # Should be no overlap between notes
+                for pitch in range(utils.MIDI_OFFSET, utils.MIDI_OFFSET + utils.PIANO_KEYS + 1):
+                    at_pitch = sorted([n for n in score.tracks[0].notes if n.pitch == pitch], key=lambda x: x.time)
+                    for n1, n2 in zip(at_pitch, at_pitch[1:]):
+                        self.assertTrue(round(n2.start, 3) >= round(n1.end, 3))
+
+                # First note should start at 0 seconds
+                first_note = score.tracks[0].notes[0]
+                self.assertAlmostEqual(first_note.time, 0.)
+
+                # Should be no duplicates
+                seen = set()
+                note_list = score.tracks[0].notes
+                for note in note_list:
+                    note_key = (note.pitch, note.time, note.duration, note.velocity)
+                    seen.add(note_key)
+                self.assertTrue(len(list(seen)) == len(note_list))
+
 
 class LoadScoreTest(unittest.TestCase):
+    def test_load_score_as_seconds(self):
+        # TESTING WITH ACTUAL MIDI FILES
+        files = [
+            "test_midi1/piano_midi.mid",
+            "test_midi2/piano_midi.mid",
+            "test_midi3/piano_midi.mid",
+            "test_midi_jja1/piano_midi.mid",
+            "test_midi_bushgrafts1/piano_midi.mid",
+            "test_midi_bushgrafts2/piano_midi.mid",
+            "test_midi_bushgrafts3/piano_midi.mid",
+        ]
+        for file in files:
+            loaded = load_score(os.path.join(utils.get_project_root(), "tests/test_resources", file), as_seconds=True)
+            # Sanity check that the score is correct
+            self.assertTrue(isinstance(loaded, Score))
+            # Should have ttype == Seconds
+            self.assertTrue(isinstance(loaded.ttype, Second))
+            # Should have the correct resolution
+            self.assertTrue(loaded.ticks_per_quarter == utils.TICKS_PER_QUARTER)
+            # Should have the correct tempo
+            self.assertTrue(len(loaded.tempos) == 1)
+            self.assertTrue(loaded.tempos[0].qpm == utils.TEMPO)
+            # Should have the correct time signatures
+            self.assertTrue(len(loaded.time_signatures) == 1)
+            self.assertTrue(loaded.time_signatures[0].numerator == utils.TIME_SIGNATURE)
+
     def test_load_score_tsd(self):
         # Create the tokenizer
         TOKENIZER = TSD(

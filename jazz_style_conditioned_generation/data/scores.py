@@ -3,12 +3,16 @@
 
 """Files for loading and preprocessing score objects"""
 
+from copy import deepcopy
+
 from symusic import Score, Note, Track, Tempo, TimeSignature
+from symusic.core import Second
 
 from jazz_style_conditioned_generation import utils
 
 OVERLAP_MILLISECONDS = 0  # If two notes with the same pitch have less than this offset-onset time, they will be merged
 MIN_DURATION_MILLISECONDS = 50  # We remove notes that have a duration of less than this value
+MAX_DURATION_MILLISECONDS = 5000  # we cap notes with a duration longer than this to this value
 
 
 def get_notes_from_score(score: Score) -> list[Note]:
@@ -25,19 +29,26 @@ def get_notes_from_score(score: Score) -> list[Note]:
         return sorted(score.tracks[0].notes, key=lambda x: x.start)
 
 
-def load_score(filepath: str) -> Score:
+def load_score(filepath: str, as_seconds: bool = False) -> Score:
     """Loads a MIDI file and resamples such that 1 tick == 1 millisecond in real time"""
     # Load as a symusic object with time sampled in seconds and sort the notes by onset time
     score_as_secs = Score(filepath, ttype="Second")  # this preserves tempo, time signature information etc.
     secs_notes = get_notes_from_score(score_as_secs)
     # Create an EMPTY symusic object with time sampled in ticks
-    score_as_ticks = Score(ttype="Tick").resample(tpq=utils.TICKS_PER_QUARTER)
+    ttype = "Second" if as_seconds else "Tick"
+    score_obj = Score(ttype=ttype).resample(tpq=utils.TICKS_PER_QUARTER)
+    # Need to convert back to seconds, as resample automatically converts to ticks
+    if as_seconds:
+        score_obj = score_obj.to(ttype)
     # Add in required attributes: tracks, tempo, time signatures
-    score_as_ticks.tracks = [Track(program=0, ttype="Tick")]
-    score_as_ticks.tempos = [Tempo(time=0, qpm=utils.TEMPO, ttype="Tick")]
-    score_as_ticks.time_signatures = [
-        TimeSignature(time=0, numerator=utils.TIME_SIGNATURE, denominator=4, ttype="Tick")
+    score_obj.tracks = [Track(program=0, ttype=ttype)]
+    score_obj.tempos = [Tempo(time=0, qpm=utils.TEMPO, ttype=ttype)]
+    score_obj.time_signatures = [
+        TimeSignature(time=0, numerator=utils.TIME_SIGNATURE, denominator=4, ttype=ttype)
     ]
+    if as_seconds:
+        score_obj.tracks[0].notes = secs_notes
+        return score_obj
     # Iterate over the notes sampled in seconds
     newnotes = []
     for n in secs_notes:
@@ -53,8 +64,8 @@ def load_score(filepath: str) -> Score:
         )
         newnotes.append(newnote)
     # Set the notes correctly
-    score_as_ticks.tracks[0].notes = newnotes
-    return score_as_ticks
+    score_obj.tracks[0].notes = newnotes
+    return score_obj
 
 
 def remove_short_notes(note_list: list[Note], min_duration_milliseconds: int = MIN_DURATION_MILLISECONDS) -> list[Note]:
@@ -64,6 +75,17 @@ def remove_short_notes(note_list: list[Note], min_duration_milliseconds: int = M
         # Notes with a duration this short are transcription errors usually
         if note.duration >= min_duration_milliseconds:
             newnotes.append(note)
+    return newnotes
+
+
+def cap_long_notes(note_list: list[Note], max_duration_milliseconds: int = MAX_DURATION_MILLISECONDS):
+    """Cap symusic.Note objects with a duration of longer than max_duration_milliseconds to max_duration_milliseconds"""
+    newnotes = []
+    for note in note_list:
+        # Notes with a duration this long will be capped to the maximum
+        if note.duration >= max_duration_milliseconds:
+            note.duration = max_duration_milliseconds
+        newnotes.append(note)
     return newnotes
 
 
@@ -122,37 +144,121 @@ def merge_repeated_notes(note_list: list[Note], overlap_milliseconds: int = OVER
     return newnotes
 
 
+def remove_overlap(note_list: list[Note]) -> list[Note]:
+    """
+    If the offset-onset time for two successive notes at the same pitch overlap,
+    set the offset of the first note to the onset of the second
+    """
+    newnotes = []
+    # Iterate over all MIDI pitches
+    for pitch in range(utils.MIDI_OFFSET, utils.MIDI_OFFSET + utils.PIANO_KEYS + 1):
+        # Get the notes played at this pitch
+        notes_at_pitch = [note for note in note_list if note.pitch == pitch]
+        # If this pitch only appears once
+        if len(notes_at_pitch) < 2:
+            # We can just use it straight away
+            newnotes.extend(notes_at_pitch)
+        # Otherwise, if we have multiple appearances of this pitch
+        else:
+            # Sort notes by onset time
+            notes_sorted = sorted(notes_at_pitch, key=lambda x: x.time)
+            # Iterate over successive pairs of notes (note1, note2), (note2, note3)...
+            for note_idx in range(len(notes_sorted) - 1):
+                # Unpack to get desired notes
+                note1 = notes_sorted[note_idx]
+                note2 = notes_sorted[note_idx + 1]
+                # If the earlier note overlaps the later one
+                if note1.time + note1.duration > note2.time:
+                    # Set its offset time to be the onset time of the subsequent note
+                    note1.duration = note2.time - note1.time
+                newnotes.append(note1)  # add only once
+            # After the loop, add the last note
+            newnotes.append(notes_sorted[-1])
+    return newnotes
+
+
 def remove_out_of_range_notes(note_list: list[Note]) -> list[Note]:
     """Remove notes from a list that are outside the range of the piano keyboard"""
-    return [n for n in note_list if utils.MIDI_OFFSET <= n.pitch <= utils.MIDI_OFFSET + utils.PIANO_KEYS]
+    note_list_ = deepcopy(note_list)
+    return [n for n in note_list_ if utils.MIDI_OFFSET <= n.pitch < utils.MIDI_OFFSET + utils.PIANO_KEYS]
 
 
-def note_list_to_score(note_list: list[Note], ticks_per_quarter: int) -> Score:
+def note_list_to_score(note_list: list[Note], ticks_per_quarter: int, ttype: str = "tick") -> Score:
     """Converts a list of symusic.Note objects to a single symusic.Score"""
     # This API is fairly similar to pretty_midi
-    newscore = Score()
+    newscore = Score(ttype=ttype)
     newscore.ticks_per_quarter = ticks_per_quarter
-    newscore.tracks = [Track()]
+    newscore.tracks = [Track(program=utils.MIDI_PIANO_PROGRAM, ttype=ttype)]
     newscore.tracks[0].notes = note_list
     return newscore
+
+
+def remove_duplicate_notes(note_list: list[Note]):
+    """Removes duplicates from a list of notes, based on pitch, onset, duration, and velocity"""
+    seen = set()
+    unique_notes = []
+    # Iterate over all the notes
+    for note in note_list:
+        note_key = (note.pitch, note.time, note.duration, note.velocity)
+        # Add unique notes (based on pitch, time, duration, and velocity) to the list
+        if note_key not in seen:
+            seen.add(note_key)
+            unique_notes.append(note)
+    return unique_notes
+
+
+def align_to_start(notes: list[Note]) -> list[Note]:
+    """Aligns a list of notes such that the earliest onset time == 0 seconds"""
+    # Prevents `min arg is an empty sequence` when no notes present
+    if len(notes) == 0:
+        return []
+    # Get the earliest note by onset time: break ties by using offset time
+    first_note = min(notes, key=lambda x: (x.start, x.end))
+    newnotes = []
+    # Iterate over all the notes in the list
+    for note in notes:
+        # Create a new note where the time is shifted to align the note on 0
+        newnote = Note(
+            time=note.time - first_note.time,
+            duration=note.duration,  # maintain as before
+            pitch=note.pitch,  # maintain as before
+            velocity=note.velocity,  # maintain as before
+            ttype=note.ttype  # maintain as before
+        )
+        newnotes.append(newnote)
+    # Return the new list of notes
+    return newnotes
 
 
 def preprocess_score(
         score: Score,
         min_duration_milliseconds: int = MIN_DURATION_MILLISECONDS,
-        overlap_milliseconds: int = OVERLAP_MILLISECONDS
+        overlap_milliseconds: int = OVERLAP_MILLISECONDS,
+        max_duration_milliseconds: int = MAX_DURATION_MILLISECONDS
 ) -> Score:
     """Applies our own preprocessing to a Score object: removes short notes, merges duplicates"""
+    # Scores in seconds, not "hacked" ticks: we need to convert the times from milliseconds to seconds
+    if isinstance(score.ttype, Second):
+        min_duration_milliseconds /= 1000
+        overlap_milliseconds /= 1000
+        max_duration_milliseconds /= 1000
     # Get the notes from the score
-    note_list = get_notes_from_score(score)
+    score_ = deepcopy(score)
+    note_list = get_notes_from_score(score_)
     # First, we remove notes that are outside the range of the piano keyboard
     validated_notes = remove_out_of_range_notes(note_list)
+    # We cap notes with an exceptionally long duration to the max duration
+    no_long_notes = cap_long_notes(validated_notes, max_duration_milliseconds=max_duration_milliseconds)
+    # Then, we remove any overlap between successive onset-offset times of the same note
+    no_overlap_notes = remove_overlap(no_long_notes)
     # Then, we remove notes with a very short duration
-    no_short_notes = remove_short_notes(validated_notes, min_duration_milliseconds=min_duration_milliseconds)
-    # Next, we merge successive notes with the same pitch and a very short onset-offset time into the same pitch
-    merged_notes = merge_repeated_notes(no_short_notes, overlap_milliseconds=overlap_milliseconds)
+    no_short_notes = remove_short_notes(no_overlap_notes, min_duration_milliseconds=min_duration_milliseconds)
+    # Align the notes such that the earliest onset time == 0
+    aligned_notes = align_to_start(no_short_notes)
+    # De-duplicate the list of notes
+    deduped_notes = remove_duplicate_notes(aligned_notes)
     # Finally, we convert everything back to a Score object that can be passed to our tokenizer
-    score.tracks[0].notes = sorted(merged_notes, key=lambda x: x.start)
+    score.tracks[0].notes = sorted(deduped_notes, key=lambda x: (x.time, x.duration, x.pitch))
     return score
 
 
