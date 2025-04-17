@@ -13,7 +13,12 @@ import numpy as np
 from loguru import logger
 from miditok import MusicTokenizer, TokSequence, TokenizerConfig
 from miditok.attribute_controls import create_random_ac_indexes
-from miditok.constants import SCORE_LOADING_EXCEPTION
+from miditok.constants import (
+    SCORE_LOADING_EXCEPTION,
+    CURRENT_MIDITOK_VERSION,
+    CURRENT_SYMUSIC_VERSION,
+    CURRENT_TOKENIZERS_VERSION
+)
 from miditok.tokenizations import REMI, MIDILike, TSD, Structured, PerTok
 from miditok.tokenizer_training_iterator import TokTrainingIterator
 from miditok.utils import convert_ids_tensors_to_list
@@ -176,9 +181,9 @@ class CustomTSD:
         return {
             "config": self.config.to_dict(serialize=True),
             "tokenization": self.__class__.__name__,
-            "miditok_version": 1.,  # these are all dummy versions
-            "symusic_version": 1.,  # these are all dummy versions
-            "hf_tokenizers_version": 1.,  # these are all dummy versions
+            "miditok_version": CURRENT_MIDITOK_VERSION,
+            "symusic_version": CURRENT_SYMUSIC_VERSION,
+            "hf_tokenizers_version": CURRENT_TOKENIZERS_VERSION,
         }
 
     def save(
