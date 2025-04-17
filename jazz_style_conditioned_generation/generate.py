@@ -47,6 +47,15 @@ class GenerateDataset(DatasetMIDIConditionedFullTrack):
             custom_tempo: int = None,
             use_track_tokens: bool = True,
     ):
+        # We have to set these attributes before we call super().__init__()
+        #  This is because we need these attributes inside our overridden `get_conditioning_tokens`
+        #  which itself is called inside super().preload_data()
+        self.custom_pianists = custom_pianists
+        self.custom_genres = custom_genres
+        self.custom_time_signature = custom_time_signature
+        self.custom_recording_year = custom_recording_year
+        self.custom_tempo = custom_tempo
+        self.use_track_tokens = use_track_tokens
         super().__init__(
             tokenizer,
             files_paths,
@@ -57,12 +66,6 @@ class GenerateDataset(DatasetMIDIConditionedFullTrack):
             max_pianist_tokens,
             max_genre_tokens
         )
-        self.custom_pianists = custom_pianists
-        self.custom_genres = custom_genres
-        self.custom_time_signature = custom_time_signature
-        self.custom_recording_year = custom_recording_year
-        self.custom_tempo = custom_tempo
-        self.use_track_tokens = use_track_tokens
 
     def get_conditioning_tokens(self, metadata: dict) -> list[str]:
         """Overrides base methods, allows use of condition tokens not contained in a track's metadata"""
