@@ -4,7 +4,6 @@
 """Test suite for dataloader"""
 
 import os
-import random
 import unittest
 from copy import deepcopy
 
@@ -228,14 +227,14 @@ class DatasetConditionedTest(unittest.TestCase):
             do_conditioning=False,
             max_seq_len=100,
         )
-        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditionedNoOverlapChunks]:
-            ds = ds_cls(**kwargs)
-            # Test the first "slice" of the first item
-            item = ds.__getitem__(0)
-            input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
-            # Should be the desired length
-            self.assertEqual(len(input_ids), 100)
-            self.assertEqual(len(targets), 100)
+        # This will only work with the dataloader that allows for augmentation
+        ds = DatasetMIDIConditionedRandomChunk(**kwargs)
+        # Test the first "slice" of the first item
+        item = ds.__getitem__(0)
+        input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
+        # Should be the desired length
+        self.assertEqual(len(input_ids), 100)
+        self.assertEqual(len(targets), 100)
 
     def test_getitem_with_conditioning_midi1(self):
         token_factory = prepare_conditioned_tokenizer()
@@ -419,27 +418,45 @@ class DatasetConditionedTest(unittest.TestCase):
                     # When decoded, condition tokens SHOULD start with one of our condition token patterns
                     self.assertTrue(decoded_token.startswith(tuple(CONDITION_TOKEN_STARTS)))
 
-        # Get a large number of tracks
-        midi_fps = utils.get_data_files_with_ext("data/raw", "**/*.mid")
-        random.shuffle(midi_fps)
-        # Get the arguments for the dataset
-        kwargs = dict(
-            files_paths=midi_fps,
-            max_seq_len=utils.MAX_SEQUENCE_LENGTH,
+        tok = prepare_conditioned_tokenizer()
+
+        # Get the training split of the full jazz dataset
+        train_path = os.path.join(utils.get_project_root(), "references/data_splits/train_split.txt")
+        with open(train_path, "r") as fin:
+            train_data = [
+                os.path.join(DATA_DIR, "raw", n.replace("\n", ""), "piano_midi.mid")
+                for n in fin.readlines()
+            ]
+
+        # Get the test and validation splits of the jazz dataset
+        test_data = []
+        for split in ["test", "validation"]:
+            test_path = os.path.join(utils.get_project_root(), f"references/data_splits/{split}_split.txt")
+            with open(test_path, "r") as fin:
+                test_data.extend([
+                    os.path.join(DATA_DIR, "raw", n.replace("\n", ""), "piano_midi.mid")
+                    for n in fin.readlines()
+                ])
+
+        # Create the datasets: random chunks for training, non-overlapping chunks for testing
+        train_dataset = DatasetMIDIConditionedRandomChunk(
+            tokenizer=tok,
+            files_paths=train_data,
+            max_seq_len=1024,
+            do_augmentation=True,
+            do_conditioning=True,
+        )
+        test_dataset = DatasetMIDIConditionedNoOverlapChunks(
+            tokenizer=tok,
+            files_paths=test_data,
+            max_seq_len=1024,
             do_augmentation=False,
             do_conditioning=True,
         )
-        # This test works with multiple tokenizer classes
-        for ds_cls in [DatasetMIDIConditionedRandomChunk]:
-            # Create a tokenizer
-            tok = prepare_conditioned_tokenizer()
-            # FIRST: we test without training the tokenizer
-            dataset = ds_cls(tokenizer=tok, **kwargs)
-            runner(dataset)
-            # SECOND: we test WITH training the tokenizer
-            # train_tokenizer(tok, midi_fps, vocab_size=1000, training_method="BPE")
-            # dataset = ds_cls(tokenizer=tok, **kwargs)
-            # runner(dataset)
+
+        # Test both datasets
+        runner(train_dataset)
+        runner(test_dataset)
 
     def test_getitem_consistency_across_epochs(self):
         """Test that we don't modify the underlying preloaded objects across successive epochs with augmentation"""
@@ -452,18 +469,17 @@ class DatasetConditionedTest(unittest.TestCase):
             do_augmentation=True,  # need augmentation for this to work properly
             do_conditioning=True
         )
-        # We can run this test with multiple dataset types
-        for ds_cls in [DatasetMIDIConditionedRandomChunk, DatasetMIDIConditionedNoOverlapChunks]:
-            ds = ds_cls(**kwargs)
-            before_augment = deepcopy(ds.preloaded_data[0])
-            # Create the item a few times: this will apply augmentation to the item in .track_slices[0]
-            for _ in range(20):
-                _ = ds.__getitem__(0)
-            # Check that we haven't manipulated the underlying item at all
-            after_augment = ds.preloaded_data[0]
-            self.assertEqual(before_augment[-1]["tempo"], after_augment[-1]["tempo"])  # check tempo field in metadata
-            self.assertTrue(scores_are_identical(before_augment[0], after_augment[0]))  # check score items
-            self.assertEqual(before_augment[1], after_augment[1])  # check slices
+        # We can only run this test with the dataset that supports augmentation
+        ds = DatasetMIDIConditionedRandomChunk(**kwargs)
+        before_augment = deepcopy(ds.preloaded_data[0])
+        # Create the item a few times: this will apply augmentation to the item in .track_slices[0]
+        for _ in range(20):
+            _ = ds.__getitem__(0)
+        # Check that we haven't manipulated the underlying item at all
+        after_augment = ds.preloaded_data[0]
+        self.assertEqual(before_augment[-1]["tempo"], after_augment[-1]["tempo"])  # check tempo field in metadata
+        self.assertTrue(scores_are_identical(before_augment[0], after_augment[0]))  # check score items
+        self.assertEqual(before_augment[1], after_augment[1])  # check slices
 
     def test_chunk_starting_point(self):
         # Create the dataset
