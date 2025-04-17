@@ -22,9 +22,9 @@ def get_pitch_augmentation_value(score: Score, pitch_augmentation_range: list) -
     # Default values
     pitch_augment, min_pitch_augmented, max_pitch_augmented = 0, 0, 1000
     # Keep iterating until we have an acceptable pitch augmentation value
-    while min_pitch_augmented < utils.MIDI_OFFSET or max_pitch_augmented > utils.MIDI_OFFSET + utils.PIANO_KEYS:
+    while min_pitch_augmented < utils.MIDI_OFFSET or max_pitch_augmented > (utils.MIDI_OFFSET + utils.PIANO_KEYS) - 1:
         # Get a possible pitch augment value
-        pitch_augment = np.random.choice(pitch_augmentation_range, 1)
+        pitch_augment = np.random.choice(pitch_augmentation_range, 1)[0]
         # Add this to the min and max pitch
         min_pitch_augmented = min_pitch + pitch_augment
         max_pitch_augmented = max_pitch + pitch_augment
