@@ -11,8 +11,11 @@ from symusic.core import Second
 from jazz_style_conditioned_generation import utils
 
 OVERLAP_MILLISECONDS = 0  # If two notes with the same pitch have less than this offset-onset time, they will be merged
-MIN_DURATION_MILLISECONDS = 50  # We remove notes that have a duration of less than this value
+MIN_DURATION_MILLISECONDS = 10  # We remove notes that have a duration of less than this value
 MAX_DURATION_MILLISECONDS = 5000  # we cap notes with a duration longer than this to this value
+QUANTIZE_MILLISECONDS = 10  # We quantize notes to the nearest 10 ms
+
+TINY = 1e-4
 
 
 def get_notes_from_score(score: Score) -> list[Note]:
@@ -232,11 +235,38 @@ def align_to_start(notes: list[Note]) -> list[Note]:
     return newnotes
 
 
+def quantize_notes(notes: list[Note], quantize_resolution: float) -> list[Note]:
+    """Quantize note onset and duration times according to a given resolution"""
+    newnotes = []
+    for note in notes:
+        # Quantize note start and duration times
+        start = round(note.time / quantize_resolution) * quantize_resolution
+        duration = round(note.duration / quantize_resolution) * quantize_resolution
+        # Skip over notes that are smaller than our quantized resolution
+        if duration + TINY < quantize_resolution:  # adding a small epsilon value should help floating-point precision
+            continue
+        # For time in ticks, the start and duration value must be integers, not floats
+        if not isinstance(note.ttype, Second):
+            start = int(round(start))
+            duration = int(round(duration))
+        # Create the new note object and append it to the list
+        newnote = Note(
+            pitch=note.pitch,
+            velocity=note.velocity,
+            ttype=note.ttype,
+            time=start,
+            duration=duration
+        )
+        newnotes.append(newnote)
+    return newnotes
+
+
 def preprocess_score(
         score: Score,
         min_duration_milliseconds: int = MIN_DURATION_MILLISECONDS,
         overlap_milliseconds: int = OVERLAP_MILLISECONDS,
-        max_duration_milliseconds: int = MAX_DURATION_MILLISECONDS
+        max_duration_milliseconds: int = MAX_DURATION_MILLISECONDS,
+        quantize_milliseconds: int = QUANTIZE_MILLISECONDS
 ) -> Score:
     """Applies our own preprocessing to a Score object: removes short notes, merges duplicates"""
     # Scores in seconds, not "hacked" ticks: we need to convert the times from milliseconds to seconds
@@ -244,40 +274,45 @@ def preprocess_score(
         min_duration_milliseconds /= 1000
         overlap_milliseconds /= 1000
         max_duration_milliseconds /= 1000
+        quantize_milliseconds /= 1000
     # Get the notes from the score
     score_ = deepcopy(score)
     note_list = get_notes_from_score(score_)
-    # First, we remove notes that are outside the range of the piano keyboard
+    # Remove notes that are outside the range of the piano keyboard
     validated_notes = remove_out_of_range_notes(note_list)
-    # We cap notes with an exceptionally long duration to the max duration
+    # Cap notes with an exceptionally long duration to the max duration
     no_long_notes = cap_long_notes(validated_notes, max_duration_milliseconds=max_duration_milliseconds)
-    # Then, we remove any overlap between successive onset-offset times of the same note
-    no_overlap_notes = remove_overlap(no_long_notes)
-    # Then, we remove notes with a very short duration
+    # Quantize notes to the nearest 10 ms
+    quantized_notes = quantize_notes(no_long_notes, quantize_milliseconds)
+    # Remove any overlap between successive onset-offset times of the same note
+    no_overlap_notes = remove_overlap(quantized_notes)
+    # Remove notes with a very short duration
     no_short_notes = remove_short_notes(no_overlap_notes, min_duration_milliseconds=min_duration_milliseconds)
     # Align the notes such that the earliest onset time == 0
     aligned_notes = align_to_start(no_short_notes)
     # De-duplicate the list of notes
     deduped_notes = remove_duplicate_notes(aligned_notes)
-    # Finally, we convert everything back to a Score object that can be passed to our tokenizer
-    score.tracks[0].notes = sorted(deduped_notes, key=lambda x: (x.time, x.duration, x.pitch))
-    return score
+    # Sort the notes by time, pitch, duration, and velocity (same order as MidiTok/Symusic default)
+    deduped_notes.sort(key=lambda n: (n.time, n.pitch, n.duration, n.velocity))
+    # Finally, convert everything back to a Score object that can be passed to our tokenizer
+    score_.tracks[0].notes = deduped_notes
+    return score_
 
 
 if __name__ == "__main__":
     import os
 
-    from miditok import MIDILike, TokenizerConfig
+    from jazz_style_conditioned_generation.data.tokenizer import (
+        DEFAULT_TOKENIZER_CONFIG, CustomTSD, CustomTokenizerConfig
+    )
 
-    from jazz_style_conditioned_generation.data.tokenizer import DEFAULT_TOKENIZER_CONFIG
-
-    file = "data/raw/pijama/mehldaub-blackbirdlive-unaccompanied-xxxx-wf4yk8ao/piano_midi.mid"
+    file = "data/pretraining/atepp/handelgf-harpsichordsuiteingminor-richters-2008-d64629e4/piano_midi.mid"
     mf = os.path.join(utils.get_project_root(), file)
-    loaded = load_score(mf)
+    loaded = load_score(mf, as_seconds=True)
 
-    tokenizer = MIDILike(TokenizerConfig(**DEFAULT_TOKENIZER_CONFIG))
+    tokenizer = CustomTSD(CustomTokenizerConfig(**DEFAULT_TOKENIZER_CONFIG, time_range=(0.01, 1.0), time_factor=1.0))
 
     preproc = preprocess_score(loaded)
     enc = tokenizer.encode(preproc)
     dec = tokenizer.decode(enc)
-    dec.dump_midi(os.path.join(utils.get_project_root(), f"preproc_bbird.mid"))
+    dec.dump_midi(os.path.join(utils.get_project_root(), f"preproc.mid"))

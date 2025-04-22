@@ -27,7 +27,8 @@ from jazz_style_conditioned_generation.data.scores import (
     cap_long_notes,
     remove_overlap,
     remove_duplicate_notes,
-    align_to_start
+    align_to_start,
+    quantize_notes
 )
 
 TEST_RESOURCES = os.path.join(utils.get_project_root(), "tests/test_resources")
@@ -96,6 +97,23 @@ class PreProcessingScoreTest(unittest.TestCase):
         actual = remove_short_notes(notelist)
         self.assertEqual(actual, expected)
 
+    def test_remove_short_notes_seconds(self):
+        # Test with a dummy example
+        notelist = [
+            # Keep this one
+            Note(pitch=80, duration=1.0, time=1., velocity=80, ttype="Second"),
+            # Remove this one
+            Note(pitch=70, duration=0.005, time=1., velocity=80, ttype="Second"),
+            # Keep this one
+            Note(pitch=70, duration=0.5, time=1.5, velocity=80, ttype="Second")
+        ]
+        expected = [
+            Note(pitch=80, duration=1.0, time=1., velocity=80, ttype="Second"),
+            Note(pitch=70, duration=0.5, time=1.5, velocity=80, ttype="Second")
+        ]
+        actual = remove_short_notes(notelist, min_duration_milliseconds=0.01)
+        self.assertEqual(actual, expected)
+
     def test_remove_short_notes_real(self):
         # Test with a real example
         # The example has 4 notes at pitch 68 (G#4): three are of a normal length, one is really short
@@ -105,7 +123,7 @@ class PreProcessingScoreTest(unittest.TestCase):
         init_len = len([i for i in notelist if i.pitch == 68])
         self.assertEqual(init_len, 4)
         # Test the output
-        actual = remove_short_notes(notelist)
+        actual = remove_short_notes(notelist, min_duration_milliseconds=50)
         actual_len = len([i for i in actual if i.pitch == 68])
         self.assertEqual(actual_len, 3)
         self.assertLess(actual_len, init_len)
@@ -234,6 +252,24 @@ class PreProcessingScoreTest(unittest.TestCase):
         deduped = remove_duplicate_notes(notes)
         self.assertTrue(len(deduped) == len(notes) - 1)  # removing one duplicate
 
+    def test_quantize_notes(self):
+        notes = [
+            Note(pitch=90, duration=1.7938, time=1.028374, velocity=80, ttype="Second"),
+            Note(pitch=90, duration=2.234324, time=1.983745, velocity=80, ttype="Second"),
+            Note(pitch=91, duration=3.5234346, time=1.1892319, velocity=80, ttype="Second"),
+            Note(pitch=90, duration=4.3436, time=1.981729817, velocity=81, ttype="Second"),
+            Note(pitch=90, duration=5.58345, time=1.290873, velocity=80, ttype="Second"),
+            Note(pitch=90, duration=6.59845, time=5.30948309, velocity=81, ttype="Second"),
+            Note(pitch=90, duration=0.004, time=0.004, velocity=81, ttype="Second"),  # will be removed
+        ]
+        expected_times = [1.03, 1.98, 1.19, 1.98, 1.29, 5.31]
+        expected_durations = [1.79, 2.23, 3.52, 4.34, 5.58, 6.60]
+        actual_notes = quantize_notes(notes, quantize_resolution=0.01)
+        self.assertEqual(len(actual_notes), len(notes) - 1)  # should be one fewer note
+        for an, et, ed in zip(actual_notes, expected_times, expected_durations):
+            self.assertAlmostEqual(an.time, et, places=2)  # 2 places = 10ms
+            self.assertAlmostEqual(an.duration, ed, places=2)  # 2 places = 10ms
+
     @unittest.skipIf(os.getenv("REMOTE") == "true", "Skipping test on GitHub Actions")
     def test_preprocess_score_full_dataset(self):
         """Tests our preprocess_score function on the entire dataset. Only runs locally"""
@@ -258,7 +294,7 @@ class PreProcessingScoreTest(unittest.TestCase):
 
                 # Load score and preprocess
                 loaded = load_score(midi_fp, as_seconds=True)
-                score = preprocess_score(loaded, min_duration_milliseconds=50, max_duration_milliseconds=5000)
+                score = preprocess_score(loaded, min_duration_milliseconds=10, max_duration_milliseconds=5000)
 
                 # All notes should be within range of the piano
                 min_pitch, max_pitch = utils.get_pitch_range(score)
@@ -266,9 +302,14 @@ class PreProcessingScoreTest(unittest.TestCase):
                 self.assertTrue(utils.MIDI_OFFSET <= max_pitch < utils.PIANO_KEYS + utils.MIDI_OFFSET)
                 self.assertTrue(min_pitch <= max_pitch)
 
+                # Notes should be quantized
+                for note in score.tracks[0].notes:
+                    self.assertAlmostEqual(round(note.time, 2), note.time, places=2)  # 2 places = 10ms
+                    self.assertAlmostEqual(round(note.duration, 2), note.duration, places=2)  # 2 places = 10ms
+
                 # No notes should have a short duration
                 smallest_duration = min(score.tracks[0].notes, key=lambda x: x.duration).duration
-                self.assertTrue(smallest_duration >= 0.05)
+                self.assertTrue(smallest_duration >= 0.01)
 
                 # Notes should be capped at a maximum duration
                 longest_duration = max(score.tracks[0].notes, key=lambda x: x.duration).duration
