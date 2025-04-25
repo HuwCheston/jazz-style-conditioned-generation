@@ -19,6 +19,7 @@ FONTSIZE = 18
 
 ALPHA = 0.4
 BLACK = '#000000'
+GREY = "#808080"
 WHITE = '#FFFFFF'
 
 RED = '#FF0000'
@@ -34,6 +35,7 @@ TICKWIDTH = 3
 MARKERSCALE = 1.6
 MARKERS = ['o', 's', 'D']
 HATCHES = ['/', '\\', '|', '-', '+', 'x', 'o', 'O', '.', '*']
+BARWIDTH = 0.7
 
 DOTTED = 'dotted'
 DASHED = 'dashed'
@@ -192,6 +194,119 @@ class PointPlotVocabSizeCustomLoss(BasePlot):
 
     def _format_fig(self) -> None:
         self.fig.tight_layout()
+
+
+class HeatmapPerformerGenreCounts(BasePlot):
+    """Heatmap showing total counts of tracks for all genres and pianists"""
+
+    HEATMAP_KWS = dict(
+        linecolor=GREY, fmt="", square=True, linewidths=LINEWIDTH / 3, linestyles=LINESTYLE, cbar=None, cmap="Blues"
+    )
+
+    def __init__(self, df, **kwargs):
+        super().__init__(figure_title="heatmap_performer_genre_counts", **kwargs)
+        self.df = self._format_df(df)
+        self.fig, self.ax = plt.subplots(1, 1, figsize=(WIDTH, WIDTH))
+
+    def _format_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        from jazz_style_conditioned_generation.data.conditions import INCLUDE
+
+        # Create the dataframe
+        fmt = (
+            df.groupby("performer")
+            .value_counts()
+            .reset_index(drop=False)
+            .pivot(columns="genre", index="performer")
+            .fillna(0)
+            .astype(int)
+            .droplevel(0, axis=1)
+        )
+        # Fill in missing genres with columns of zeros
+        for genre in INCLUDE["genres"]:
+            if genre not in fmt.columns:
+                fmt[genre] = 0
+        return (
+            fmt.reindex(sorted(fmt.columns, reverse=True), axis=1)
+            .astype(int)
+            .transpose()
+        )
+
+    def _create_plot(self) -> None:
+        mask = self.df.copy()
+        mask[mask == 0] = ""
+        sns.heatmap(data=self.df, mask=self.df == 0, annot=mask, ax=self.ax, **self.HEATMAP_KWS)
+
+    def add_dual_axis(self):
+        # Get the sums for both x and y-axis
+        total_x, total_y = self.df.sum(axis=0).values, self.df.sum(axis=1).values
+        # Add dual x axis
+        x_top = self.ax.secondary_xaxis("top")
+        x_top.set_xticks(np.arange(0.5, len(total_x)), labels=total_x, rotation=90)
+        # Add dual y axis
+        y_top = self.ax.secondary_yaxis("right")
+        y_top.set_yticks(np.arange(0.5, len(total_y)), labels=total_y)
+        # Set aesthetics
+        for ax_ in [x_top, y_top]:
+            plt.setp(ax_.spines.values(), linewidth=LINEWIDTH, color=BLACK)
+            ax_.tick_params(width=0.)
+
+    def _format_ax(self):
+        self.add_dual_axis()
+        # Set spine visibility and width to create a border
+        for spine in self.ax.spines.values():
+            spine.set_visible(True)
+        # Set aesthetics for main colorbar axis
+        plt.setp(self.ax.spines.values(), linewidth=LINEWIDTH, color=BLACK)
+        self.ax.tick_params(axis='both', width=TICKWIDTH, color=BLACK)
+        self.ax.set(ylabel="Genre", xlabel="Pianist")
+
+
+class BarPlotPianistGenreCount(BasePlot):
+    """Creates a barplot showing numbers of tracks for all genres + pianists"""
+
+    BAR_KWS = dict(edgecolor=BLACK, linewidth=LINEWIDTH, linestyle=LINESTYLE, legend=False, zorder=10, width=BARWIDTH)
+
+    def __init__(self, df, **kwargs):
+        super().__init__(**kwargs)
+        self.df = df
+        self.fig, self.ax = plt.subplots(nrows=1, ncols=2, figsize=(WIDTH, WIDTH // 2), sharex=False, sharey=False)
+
+    def _create_plot(self) -> None:
+        for res, ax, color in zip(self.df, self.ax.flatten(), [RED, BLUE]):
+            res_fmt = pd.Series(res).sort_values()
+            sns.barplot(data=res_fmt, ax=ax, color=color, **self.BAR_KWS)
+
+    def _format_ax(self):
+        for ax, name in zip(self.ax.flatten(), ["Pianist", "Genre"]):
+            ax.set(xlabel=name)
+            ax.tick_params(axis='x', rotation=90, labelbottom=True)
+            ax.grid(axis='y', zorder=0, **GRID_KWS)
+        self.ax[0].set(ylabel="Number of tracks")
+        super()._format_ax()
+
+
+class BarPlotGenrePCENPS(BasePlot):
+    """Creates a barplot showing pitch-class entropy and notes-per-second for all genres"""
+
+    BAR_KWS = dict(edgecolor=BLACK, linewidth=LINEWIDTH, linestyle=LINESTYLE, legend=False, zorder=10, width=BARWIDTH)
+
+    def __init__(self, df, **kwargs):
+        super().__init__(**kwargs)
+        self.fig, self.ax = plt.subplots(nrows=1, ncols=2, figsize=(WIDTH, WIDTH / 2), sharex=False, sharey=False)
+        self.df = df
+
+    def _create_plot(self):
+        for var, ax_, color in zip(["pce", "nps"], self.ax.flatten(), [RED, BLUE]):
+            sub = self.df.sort_values(by=var).reset_index(drop=True)
+            sns.barplot(data=sub, x="name", y=var, ax=ax_, color=color, **self.BAR_KWS)
+
+    def _format_ax(self):
+        for ax_, name in zip(self.ax.flatten(), ["Sliding pitch class entropy", "Notes per second"]):
+            ax_.set_xticklabels(ax_.get_xticklabels(), rotation=90)
+            ax_.set(xlabel="Genre", ylabel=name)
+            ax_.grid(axis='y', zorder=0, **GRID_KWS)
+        self.ax[0].set_ylim(2., 2.35)
+        super()._format_ax()
 
 
 if __name__ == "__main__":
