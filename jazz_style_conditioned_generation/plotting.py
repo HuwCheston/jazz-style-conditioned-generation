@@ -262,7 +262,7 @@ class HeatmapPerformerGenreCounts(BasePlot):
 
 
 class BarPlotPianistGenreCount(BasePlot):
-    """Creates a barplot showing numbers of tracks for all genres + pianists"""
+    """Creates a barplot showing numbers of albums for all genres + pianists"""
 
     BAR_KWS = dict(edgecolor=BLACK, linewidth=LINEWIDTH, linestyle=LINESTYLE, legend=False, zorder=10, width=BARWIDTH)
 
@@ -281,7 +281,7 @@ class BarPlotPianistGenreCount(BasePlot):
             ax.set(xlabel=name)
             ax.tick_params(axis='x', rotation=90, labelbottom=True)
             ax.grid(axis='y', zorder=0, **GRID_KWS)
-        self.ax[0].set(ylabel="Number of tracks")
+        self.ax[0].set(ylabel="Number of albums")
         super()._format_ax()
 
 
@@ -306,6 +306,66 @@ class BarPlotGenrePCENPS(BasePlot):
             ax_.set(xlabel="Genre", ylabel=name)
             ax_.grid(axis='y', zorder=0, **GRID_KWS)
         self.ax[0].set_ylim(2., 2.35)
+        super()._format_ax()
+
+
+class BarPlotWeightDistribution(BasePlot):
+    """Plot the number of album tags with different weights assigned by TiVo"""
+
+    BAR_KWS = dict(
+        edgecolor=BLACK, linewidth=LINEWIDTH, linestyle=LINESTYLE, legend=False, zorder=10, color=GREEN, width=BARWIDTH
+    )
+
+    def __init__(self, df, **kwargs):
+        super().__init__(**kwargs)
+        self.df = self._format_df(df)
+        self.fig, self.ax = plt.subplots(nrows=1, ncols=1, figsize=(WIDTH // 2, WIDTH // 3))
+
+    def _format_df(self, df) -> pd.DataFrame:
+        return (
+            pd.DataFrame([df])
+            .transpose()
+            .sort_index()
+            .rename(columns={0: "norm"})
+            .reset_index(drop=False)
+        )
+
+    def _create_plot(self):
+        sns.barplot(data=self.df, x="index", y="norm", ax=self.ax, **self.BAR_KWS)
+
+    def _format_ax(self):
+        self.ax.set(xlabel="Assigned weight", ylabel="Number of tags")
+        super()._format_ax()
+
+
+class BarPlotGroupedGenreCounts(BasePlot):
+    BAR_KWS = dict(
+        edgecolor=BLACK, linewidth=LINEWIDTH, linestyle=LINESTYLE, legend=False, zorder=10, color=GREEN, width=BARWIDTH
+    )
+
+    def __init__(self, df, **kwargs):
+        super().__init__(**kwargs)
+        self.df = self._format_df(df)
+        self.fig, self.ax = plt.subplots(1, 1, figsize=(WIDTH, WIDTH // 3))
+
+    def _format_df(self, df):
+        return (
+            pd.DataFrame([df])
+            .transpose()
+            .rename(columns={0: "count"})
+            .sort_values(by="count")
+            .reset_index(drop=False)
+            .rename(columns={"index": "genre"})
+        )
+
+    def _create_plot(self):
+        sns.barplot(data=self.df, x="count", y="genre", ax=self.ax, **self.BAR_KWS)
+
+    def _format_ax(self):
+        self.ax.set(xlabel="Recordings", ylabel="Genre category")
+        self.ax.grid(axis='x', zorder=0, **GRID_KWS)
+        self.ax.axvline(x=4462, ymin=0, ymax=1, linestyle=DASHED, linewidth=LINEWIDTH, color=BLACK)
+        self.ax.text(4400, 10, "Total number of recordings", rotation=90, ha="center", va="center")
         super()._format_ax()
 
 
