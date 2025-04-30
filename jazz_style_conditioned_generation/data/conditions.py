@@ -473,24 +473,23 @@ def get_genre_tokens(
     """Gets tokens for a track's genres: either from the track itself, or (if none found) from the artist"""
     # Check that we've added pianist tokens to our tokenizer
     assert len([i for i in tokenizer.vocab.keys() if "GENRES" in i]) > 0, "Genre tokens not added to tokenizer!"
-    # Get the genres from the track and from the pianist
-    genres_track = _get_track_genres(track_metadata_dict)
-    genres_pianist = _get_pianist_genres(track_metadata_dict["pianist"])
-    # Merge them together
-    genres = genres_track + genres_pianist
-    if len(genres) == 0:
-        return []
-    # Run validation: this will remove duplicates and sort depending on weight
-    validated_genres = validate_condition_values(genres, "genres")
+    # Get the genres from the album
+    genres_album = _get_track_genres(track_metadata_dict)
+    # Validate the conditions for the album: this groups into the 20 "high-level" genres
+    validated_genres = validate_condition_values(genres_album, "genres")
+    # If we have no genres for the album, try getting genres for the pianist instead
+    if len(validated_genres) == 0:
+        genres_pianist = _get_pianist_genres(track_metadata_dict["pianist"])
+        validated_genres += validate_condition_values(genres_pianist, "genres")
     # Take a sample of N genres based on assigned weights
     if len(validated_genres) > 0:
         genres, weights = zip(*validated_genres)
-        finalised_genres = utils.weighted_sample(genres, weights, n_genres)
-    # Otherwise, if we don't have enough genres, just return an empty list
+        sampled_genres = utils.weighted_sample(genres, weights, n_genres)
+    # Otherwise, if we have no album and no pianist genres, just return an empty list
     else:
         return []
     # Add the prefix to the token
-    prefixed = [f'GENRES_{utils.remove_punctuation(g).replace(" ", "")}' for g in finalised_genres]
+    prefixed = [f'GENRES_{utils.remove_punctuation(g).replace(" ", "")}' for g in sampled_genres]
     # Sanity checks
     assert len(set(prefixed)) == len(prefixed)
     for pfix in prefixed:

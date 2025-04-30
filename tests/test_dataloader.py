@@ -102,7 +102,7 @@ class DatasetConditionedTest(unittest.TestCase):
         # Test with metadata from first track
         #  GENRE and PIANIST are sorted in DESCENDING weight order, with the track pianist always placed first
         expected_tokens = [
-            "GENRES_Caribbean", "GENRES_HardBop", "GENRES_PostBop", "GENRES_StraightAheadJazz", "GENRES_Fusion",
+            "GENRES_Caribbean", "GENRES_HardBop", "GENRES_PostBop",  # "GENRES_StraightAheadJazz", "GENRES_Fusion",
             "PIANIST_KennyBarron", "RECORDINGYEAR_1990", "TEMPOCUSTOM_299", "TIMESIGNATURECUSTOM_44"
         ]
         expected_token_ids = [token_factory[t] for t in expected_tokens]
@@ -261,19 +261,19 @@ class DatasetConditionedTest(unittest.TestCase):
             self.assertEqual(input_ids[0], token_factory["GENRES_Caribbean"])  # most strongly weighted genre, = 10
             self.assertEqual(input_ids[1], token_factory["GENRES_HardBop"])
             self.assertEqual(input_ids[2], token_factory["GENRES_PostBop"])
-            self.assertEqual(input_ids[3], token_factory["GENRES_StraightAheadJazz"])
-            self.assertEqual(input_ids[4], token_factory["GENRES_Fusion"])  # least strongly weighted genre, = 5
-            self.assertEqual(input_ids[5], token_factory["PIANIST_KennyBarron"])
-            self.assertEqual(input_ids[6], token_factory["RECORDINGYEAR_1990"])
-            self.assertEqual(input_ids[7], token_factory["TEMPOCUSTOM_299"])  # closest match to our provided tempo
-            self.assertEqual(input_ids[8], token_factory["TIMESIGNATURECUSTOM_44"])
+            # self.assertEqual(input_ids[3], token_factory["GENRES_StraightAheadJazz"])
+            # self.assertEqual(input_ids[4], token_factory["GENRES_Fusion"])  # least strongly weighted genre, = 5
+            self.assertEqual(input_ids[3], token_factory["PIANIST_KennyBarron"])
+            self.assertEqual(input_ids[4], token_factory["RECORDINGYEAR_1990"])
+            self.assertEqual(input_ids[5], token_factory["TEMPOCUSTOM_299"])  # closest match to our provided tempo
+            self.assertEqual(input_ids[6], token_factory["TIMESIGNATURECUSTOM_44"])
 
         # These tests can only work with our exhaustive dataloader
         ds = DatasetMIDIConditionedNoOverlapChunks(**kwargs)
         # Test the first slice of the first item
         item = ds.__getitem__(0)
         input_ids, targets = item["input_ids"].tolist(), item["labels"].tolist()
-        self.assertEqual(input_ids[9], token_factory["BOS_None"])  # after condition tokens, we should get BOS
+        self.assertEqual(input_ids[7], token_factory["BOS_None"])  # after condition tokens, we should get BOS
 
         # Test the last "slice" of the first item
         item = ds.__getitem__(-1)
@@ -283,8 +283,8 @@ class DatasetConditionedTest(unittest.TestCase):
         self.assertEqual(len(targets), 100)
         # Should have all the desired condition tokens, but not followed by BOS
         self.assertEqual(input_ids[0], token_factory["GENRES_Caribbean"])  # most strongly weighted genre, = 10
-        self.assertEqual(input_ids[8], token_factory["TIMESIGNATURECUSTOM_44"])
-        self.assertNotEqual(input_ids[9], token_factory["BOS_None"])  # after condition tokens, NO BOS
+        self.assertEqual(input_ids[6], token_factory["TIMESIGNATURECUSTOM_44"])
+        self.assertNotEqual(input_ids[7], token_factory["BOS_None"])  # after condition tokens, NO BOS
         # Should have the EOS token in the last chunk
         no_pad = [i_ for i_ in input_ids if i_ != token_factory["PAD_None"]]
         self.assertTrue(no_pad[-1] == token_factory["EOS_None"])
@@ -575,7 +575,7 @@ class DatasetConditionedTest(unittest.TestCase):
             do_conditioning=True,
         )
         # Run through multiple different values of N
-        for n in range(1, 6):
+        for n in range(1, 3):
             # Create the dataset with this value of N
             kwargs_copy = deepcopy(kwargs)
             kwargs_copy["max_genre_tokens"] = n

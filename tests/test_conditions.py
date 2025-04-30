@@ -122,11 +122,11 @@ class ConditionsTest(unittest.TestCase):
         track = utils.read_json_cached(files[0])
         expected_token = sorted([
             "GENRES_HardBop", "GENRES_PostBop", "GENRES_Caribbean",  # These genres are associated with the track
-            "GENRES_Fusion", "GENRES_StraightAheadJazz"  # These genres are associated with the pianist (Kenny Barron)
+            # "GENRES_Fusion", "GENRES_StraightAheadJazz"  # These genres are associated with the pianist (Kenny Barron)
         ])
         actual_tokens = sorted(cond.get_genre_tokens(track, tokenizer, n_genres=5))
         self.assertEqual(expected_token, actual_tokens)
-        self.assertTrue(len(actual_tokens) == 5)
+        self.assertTrue(len(actual_tokens) == 3)
         # This track does not have genres associated with it, so we'll grab those associated with the pianist instead
         track = utils.read_json_cached(files[1])
         expected_token = ["GENRES_StraightAheadJazz"]  # Associated with Beegie Adair the artist, not this track
