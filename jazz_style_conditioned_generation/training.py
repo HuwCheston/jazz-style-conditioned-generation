@@ -874,7 +874,7 @@ class FineTuningModule(TrainingModule):
             self.pretrained_checkpoint_path = kwargs.pop("pretrained_checkpoint_path")
             # If the path doesn't exist, try adding the checkpoint directory to it
             if not os.path.exists(self.pretrained_checkpoint_path):
-                checkpoint_dir = self.checkpoint_cfg.get(
+                checkpoint_dir = kwargs.get("checkpoint_cfg", dict()).get(
                     "checkpoint_dir", os.path.join(utils.get_project_root(), 'checkpoints')
                 )
                 self.pretrained_checkpoint_path = os.path.join(checkpoint_dir, self.pretrained_checkpoint_path)
@@ -905,7 +905,7 @@ class FineTuningModule(TrainingModule):
               and isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau)):
             factor = self.scheduler.factor
             num_reduces = self.scheduler_cfg["num_reduces"] + 1  # add one to the number of reduces
-            return self.min_lr * factor ** num_reduces
+            return self.initial_lr * factor ** num_reduces
         # Otherwise, fall back on the overridden function
         else:
             return super().min_lr
