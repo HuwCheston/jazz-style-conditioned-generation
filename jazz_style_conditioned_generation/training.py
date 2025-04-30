@@ -184,8 +184,9 @@ class TrainingModule:
         self.best_validation_loss = 1e4  # should always be beaten...
 
         # OPTIMISER
+        self.initial_lr = self.optimizer_cfg["optimizer_kws"].get("lr", 0.0001)
         optimizer_type = self.optimizer_cfg.get("optimizer_type", "adam")
-        optimizer_kws = self.optimizer_cfg.get("optimizer_kws", dict(lr=0.0001))
+        optimizer_kws = self.optimizer_cfg.get("optimizer_kws", dict(lr=self.initial_lr))
         logger.debug(f'Initialising optimiser {optimizer_type} with parameters {optimizer_kws}...')
         betas = tuple(optimizer_kws.pop("betas", (0.9, 0.999)))
         self.optimizer = self.get_optimizer(optimizer_type)(self.model.parameters(), betas=betas, **optimizer_kws)
@@ -198,11 +199,16 @@ class TrainingModule:
 
         # EARLY STOPPING
         self.do_early_stopping = self.scheduler_cfg.get("do_early_stopping", False)
-        self.min_lr = self.scheduler_cfg.get("min_lr", 1e-100)  # should never be reached by default
+        logger.debug(f'Early stopping {self.do_early_stopping}, minimum LR {self.min_lr}')
 
         # CHECKPOINTS
         if self.checkpoint_cfg.get("load_checkpoints", True):
             self.load_most_recent_checkpoint()
+
+    @property
+    def min_lr(self) -> float:
+        """No early stopping during training from scratch/pretraining. This property is overridden during finetuning"""
+        return self.scheduler_cfg.get("min_lr", 1e-100)  # should never be reached by default
 
     def create_dataloaders(self) -> tuple[DataLoader, DataLoader, DataLoader]:
         """Creates a dataloader for a given split and configuration"""
@@ -423,7 +429,14 @@ class TrainingModule:
                 checkpoint_path = latest_check_path
 
         # Load the desired checkpoint
-        self.load_checkpoint(os.path.join(self.checkpoint_dir, checkpoint_path), weights_only=weights_only)
+        try:
+            self.load_checkpoint(os.path.join(self.checkpoint_dir, checkpoint_path), weights_only=weights_only)
+        except RuntimeError:
+            raise RuntimeError(f"Failed to load the checkpoint at {checkpoint_path}! "
+                               f"Probably, what has happened is that you tried to load a corrupted checkpoint. "
+                               f"This often happens when you run out of disk space when calling `save_checkpoint`. "
+                               f"The solution will be to manually delete this checkpoint so that the next-most recent"
+                               f" checkpoint is loaded instead.")
         # Set a NEW random seed according to the epoch, otherwise we'll just use the same randomisations as epoch 1
         utils.seed_everything(utils.SEED * self.current_epoch)
 
@@ -434,17 +447,26 @@ class TrainingModule:
         if not os.path.exists(run_folder):
             os.makedirs(run_folder, exist_ok=True)
         # Save everything, including the metrics, state dictionaries, and current epoch
-        torch.save(
-            dict(
-                **epoch_metrics,
-                model_state_dict=self.model.state_dict(),
-                optimizer_state_dict=self.optimizer.state_dict(),
-                scheduler_state_dict=self.scheduler.state_dict(),
-                epoch=self.current_epoch
-            ),
-            os.path.join(path),
-        )
-        logger.debug(f'Saved a checkpoint to {run_folder}')
+        try:
+            torch.save(
+                dict(
+                    **epoch_metrics,
+                    model_state_dict=self.model.state_dict(),
+                    optimizer_state_dict=self.optimizer.state_dict(),
+                    scheduler_state_dict=self.scheduler.state_dict(),
+                    epoch=self.current_epoch
+                ),
+                os.path.join(path),
+            )
+        # Rather than killing the run when we run out of disk space, log this and then continue
+        except RuntimeError as e:
+            logger.error(f"Failed to save the checkpoint to {run_folder}! "
+                         f"Probably, what has happened is that you have run out of disk space. "
+                         f"The run will continue, but note that *no checkpoints will be saved* until you make "
+                         f"some more room on the disk.")
+            logger.error(f"The full error message follows: {e}")
+        else:
+            logger.debug(f'Saved a checkpoint to {run_folder}')
 
     @property
     def data_dir(self) -> str:
@@ -850,14 +872,43 @@ class FineTuningModule(TrainingModule):
         # Get the pretrained checkpoint path and remove from the kwargs dictionary
         try:
             self.pretrained_checkpoint_path = kwargs.pop("pretrained_checkpoint_path")
-        # Raise a nicer looking error if we haven't passed the checkpoint path in
+            # If the path doesn't exist, try adding the checkpoint directory to it
+            if not os.path.exists(self.pretrained_checkpoint_path):
+                checkpoint_dir = self.checkpoint_cfg.get(
+                    "checkpoint_dir", os.path.join(utils.get_project_root(), 'checkpoints')
+                )
+                self.pretrained_checkpoint_path = os.path.join(checkpoint_dir, self.pretrained_checkpoint_path)
+            # Validate that the filepath exists
+            utils.validate_paths([self.pretrained_checkpoint_path], expected_extension="pth")
+        # Raise a nicer looking error if we haven't passed the checkpoint path in or it does not exist
         except KeyError:
             raise KeyError("Must pass `pretrained_checkpoint_path` when fine-tuning a pre-trained model")
-        # Initialise the training module: this will grab our model, dataloaders, etc.
-        super().__init__(**kwargs)
-        logger.info("----FINETUNING ON JAZZ DATASET----")
-        # Load the pretrained checkpoint
-        self.load_pretrained_checkpoint()
+        except AssertionError:
+            raise FileNotFoundError(
+                f"`pretrained_checkpoint_path` was passed, but {self.pretrained_checkpoint_path} does not exist!"
+            )
+        else:
+            # Initialise the training module: this will grab our model, dataloaders, etc.
+            super().__init__(**kwargs)
+            logger.info("----FINETUNING ON JAZZ DATASET----")
+            # Load the pretrained checkpoint
+            self.load_pretrained_checkpoint()
+
+    @property
+    def min_lr(self) -> float:
+        """Define the minimum LR to use before applying early stopping"""
+        # If we explicitly are defining a minimum learning rate in our scheduler config, use this
+        if "min_lr" in self.scheduler_cfg.keys():
+            return self.scheduler_cfg["min_lr"]
+        # If we're defining the number of times we should reduce the default learning rate
+        elif ("num_reduces" in self.scheduler_cfg.keys()
+              and isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau)):
+            factor = self.scheduler.factor
+            num_reduces = self.scheduler_cfg["num_reduces"] + 1  # add one to the number of reduces
+            return self.min_lr * factor ** num_reduces
+        # Otherwise, fall back on the overridden function
+        else:
+            return super().min_lr
 
     @property
     def tokenizer_path(self) -> str:
