@@ -10,7 +10,7 @@ from miditok import MusicTokenizer
 
 from jazz_style_conditioned_generation import utils
 
-MAX_GENRE_TOKENS_PER_TRACK = 5  # This is the maximum number of genre tokens we'll consider per track
+MAX_GENRE_TOKENS_PER_TRACK = 3  # This is the maximum number of genre tokens we'll consider per track
 MAX_PIANIST_TOKENS_PER_TRACK = 1  # This is the maximum number of pianists (incl. similar pianists) we'll get per track
 
 # These are the only conditions we'll accept values for
