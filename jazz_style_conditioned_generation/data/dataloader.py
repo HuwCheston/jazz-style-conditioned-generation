@@ -589,11 +589,11 @@ if __name__ == "__main__":
         max_seq_len=1024,
         do_conditioning=True
     )
-    for dataset_cls, do_augmentation in zip(
+    for dataset_cls, aug in zip(
             [DatasetMIDIConditionedNoOverlapChunks, DatasetMIDIConditionedRandomChunk],
             [False, True]
     ):
-        dm = dataset_cls(**kwargs, do_augmentation=do_augmentation)
+        dm = dataset_cls(**kwargs, do_augmentation=aug)
         print(dm)
 
         all_times = []

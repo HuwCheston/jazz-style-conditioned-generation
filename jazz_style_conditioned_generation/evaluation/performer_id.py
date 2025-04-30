@@ -44,9 +44,9 @@ def score_to_piano_roll(score: Score) -> torch.Tensor:
             mode="constant",
             constant_values=0.
         )
-    # Truncate from end to get shape (channel, 88, 3000)
+    # Truncate from beginning to get shape (channel, 88, 3000)
     else:
-        clip = downsampled[:, :, -desired_width:]
+        clip = downsampled[:, :, :desired_width]
     # Normalize to within the range (0, 1)
     normalized = (clip - np.min(clip)) / (np.max(clip) - np.min(clip))
     return torch.tensor(normalized, dtype=torch.float32)

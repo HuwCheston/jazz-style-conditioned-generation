@@ -145,6 +145,7 @@ class GenerateModule(TrainingModule):
 
         # Make a random file selection from the test split if we haven't passed in a primer file
         if self.primer_file is None:
+            random.seed(int(utils.time()))  # ensures a new random track every run
             self.primer_file = random.choices(self.track_splits["test"], k=1)[0]
         utils.validate_paths([self.primer_file], expected_extension=".mid")
 
