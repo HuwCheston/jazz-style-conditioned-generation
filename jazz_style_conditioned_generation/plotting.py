@@ -364,8 +364,8 @@ class BarPlotGroupedGenreCounts(BasePlot):
     def _format_ax(self):
         self.ax.set(xlabel="Recordings", ylabel="Genre category")
         self.ax.grid(axis='x', zorder=0, **GRID_KWS)
-        self.ax.axvline(x=4462, ymin=0, ymax=1, linestyle=DASHED, linewidth=LINEWIDTH, color=BLACK)
-        self.ax.text(4400, 10, "Total number of recordings", rotation=90, ha="center", va="center")
+        # self.ax.axvline(x=4462, ymin=0, ymax=1, linestyle=DASHED, linewidth=LINEWIDTH, color=BLACK)
+        # self.ax.text(4400, 10, "Total number of recordings", rotation=90, ha="center", va="center")
         super()._format_ax()
 
 
