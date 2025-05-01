@@ -484,7 +484,7 @@ class CustomTSD:
                 # A well constructed sequence should not usually raise an exception here.
                 # However, this can happen with generated sequences, or sequences
                 # that are chunks from a larger score
-                except IndexError:
+                except (IndexError, ValueError, KeyError):
                     pass
         return score
 
