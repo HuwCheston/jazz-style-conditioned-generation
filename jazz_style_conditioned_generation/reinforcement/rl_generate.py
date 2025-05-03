@@ -70,7 +70,7 @@ class ReinforceGenerateModule(training.TrainingModule):
 
         # Set parameters for generation
         logger.info("----REINFORCEMENT LEARNING: GENERATING MIDIS----")
-        self.generated_sequence_length = self.reinforce_cfg.get("generated_sequence_length", 256)
+        self.generated_sequence_length = self.reinforce_cfg.get("generated_sequence_length", 1024)
         self.n_generations = self.reinforce_cfg.get("n_generations", 400)  # number of generations to make per track
         self.current_iteration = self.reinforce_cfg.get("current_iteration", 0)
         # By default, don't use temperature or top-p sampling
