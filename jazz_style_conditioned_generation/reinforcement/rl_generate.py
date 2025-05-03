@@ -12,23 +12,33 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils, training
+from jazz_style_conditioned_generation.data.tokenizer import CustomTSD
 
 # Default config file for the generator
 GENERATIVE_MODEL_CFG = (
-    "reinforcement-clamp-ppo/"
-    "music_transformer_rpr_tsd_nobpe_conditionsmall_augment_schedule_10l8h_clampppo_2e6_TEST.yaml"
+    "finetuning-custom-tokenizer/"
+    "finetuning_customtok_10msmin_lineartime_moreaugment_linearwarmup10k_5e5_thresh1e4patience4_batch4_1024seq_12l8h768d3072ff.yaml"
 )
 
 
 class ConditionTokenLoader:
     """Returns random pianist/genre tokens for use in generation"""
 
-    def __init__(self, tokenizer):
+    def __init__(self, tokenizer, genre_ids: list[int] = None, pianist_ids: list[int] = None):
         self.tokenizer = tokenizer
-        self.pianists = [i for i in tokenizer.vocab.keys() if i.startswith("PIANIST")]
-        self.genres = [i for i in tokenizer.vocab.keys() if i.startswith("GENRES")]
-        # We want to generate from every pianist and every genre
-        self.to_gen_from = self.pianists + self.genres
+        self.pianists = [i for i in sorted(tokenizer.vocab.keys()) if i.startswith("PIANIST")]
+        self.genres = [i for i in sorted(tokenizer.vocab.keys()) if i.startswith("GENRES")]
+        # Subset to get only required genres and pianists
+        if genre_ids is not None:
+            self.genres = [i for n, i in enumerate(self.genres) if n in genre_ids]
+        else:
+            self.genres = []
+        if pianist_ids is not None:
+            self.pianists = [i for n, i in enumerate(self.pianists) if n in pianist_ids]
+        else:
+            self.pianists = []
+        # Combine everything together
+        self.to_gen_from = sorted(self.pianists + self.genres)
 
     def __len__(self):
         return len(self.to_gen_from)
@@ -44,28 +54,41 @@ class ConditionTokenLoader:
         )
 
 
-class ReinforceGenerateModule(training.FineTuningModule):
-    def __init__(self, **training_kwargs):
+class ReinforceGenerateModule(training.TrainingModule):
+    def __init__(self, genre_ids: list[int] = None, pianist_ids: list[int] = None, **training_kwargs):
+        self.genre_ids = genre_ids
+        self.pianist_ids = pianist_ids
         # Need to grab this and remove from kwargs before passing to the training module
         self.reinforce_cfg = training_kwargs.pop("reinforce_cfg", dict())
+        training_kwargs.pop("pretrained_checkpoint_path", None)
         # No MLFlow, we're not optimising anything
         training_kwargs["mlflow_cfg"]["use"] = False
         # This initialises our dataloaders, generative model, loads checkpoints, etc.
         super().__init__(**training_kwargs)
+        # Whether we're tokenizing using ttype="Second" or ttype="Tick"
+        self.ttype = "Second" if isinstance(self.tokenizer, CustomTSD) else "tick"
 
         # Set parameters for generation
         logger.info("----REINFORCEMENT LEARNING: GENERATING MIDIS----")
-        self.generated_sequence_length = self.reinforce_cfg.get("generated_sequence_length", 1024)
-        self.n_generations = self.reinforce_cfg.get("n_generations", 1000)  # number of generations to make per track
+        self.generated_sequence_length = self.reinforce_cfg.get("generated_sequence_length", 256)
+        self.n_generations = self.reinforce_cfg.get("n_generations", 400)  # number of generations to make per track
         self.current_iteration = self.reinforce_cfg.get("current_iteration", 0)
+        # By default, don't use temperature or top-p sampling
+        self.temperature = self.reinforce_cfg.get("temperature", 1.0)
+        self.top_p = self.reinforce_cfg.get("top_p", 1.0)
 
-        logger.debug(f"For each of our {len(self.train_loader)} training tracks, "
-                     f"we'll generate {self.n_generations} tracks of {self.generated_sequence_length} tokens.")
+        logger.debug(f"For each of our {len(self.train_loader)} genre/pianist configurations, "
+                     f"we'll generate {self.n_generations} tracks of {self.generated_sequence_length} tokens each. "
+                     f"Generations will be stored in {self.generation_output_dir}.")
+
+    def load_most_recent_checkpoint(self, weights_only: bool = True) -> None:
+        # Load the checkpoint with the best validation loss (we don't care about optimizer/scheduler here)
+        self.load_checkpoint(os.path.join(self.checkpoint_dir, 'validation_best.pth'), weights_only=True)
 
     def create_dataloaders(self) -> tuple[DataLoader, DataLoader, DataLoader]:
         """We only want to create a single full-track dataloader"""
         train_loader = DataLoader(
-            ConditionTokenLoader(tokenizer=self.tokenizer),
+            ConditionTokenLoader(tokenizer=self.tokenizer, genre_ids=self.genre_ids, pianist_ids=self.pianist_ids),
             batch_size=1,  # have to use a batch size of one for this class
             shuffle=False,  # don't want to shuffle either for this one
             drop_last=False,
@@ -88,8 +111,13 @@ class ReinforceGenerateModule(training.FineTuningModule):
         """Given condition tokens, generate MIDI and return tokens + decoded Score object"""
         # Need to be in evaluation mode for generation
         self.model.eval()
-        # Through the model
-        gen_i = self.model.generate(condition_tokens, target_seq_length=self.generated_sequence_length)
+        # Through the model with desired top-p and temperature
+        gen_i = self.model.generate(
+            condition_tokens,
+            target_seq_length=self.generated_sequence_length,
+            top_p=self.top_p,
+            temperature=self.temperature,
+        )
         # Pad to the desired length if required
         if gen_i.size(1) < self.generated_sequence_length:
             gen_i = torch.nn.functional.pad(
@@ -98,22 +126,22 @@ class ReinforceGenerateModule(training.FineTuningModule):
                 value=self.tokenizer.pad_token_id
             )
         # Convert to a score, resample to desired sample rate, and set tempo/time signature
-        gen_score = self.tokenizer.decode(gen_i.cpu()).resample(utils.TICKS_PER_QUARTER)
+        gen_score = self.tokenizer.decode(gen_i.cpu()).resample(utils.TICKS_PER_QUARTER).to(self.ttype)
         gen_score.time_signatures = [TimeSignature(
             time=gen_score.time_signatures[0].time,
             numerator=utils.TIME_SIGNATURE,
             denominator=4,
-            ttype="tick"
+            ttype=self.ttype
         )]
         gen_score.tempos = [Tempo(
             time=gen_score.tempos[0].time,
             qpm=utils.TEMPO,
-            ttype="tick"
+            ttype=self.ttype
         )]
         return gen_i, gen_score
 
     def start(self):
-        """Makes generations"""
+        """Makes N generations for all required genre/pianist tokens"""
         self.model.eval()
         # Iterate over every track
         for batch in self.train_loader:
@@ -127,7 +155,7 @@ class ReinforceGenerateModule(training.FineTuningModule):
                 # Don't make the generation if it already exists as both a MIDI and pytorch tensor
                 if os.path.isfile(fname + ".mid") and os.path.isfile(fname + ".pt"):
                     continue
-                # Do the generation, get the token sequence + decoded score (we ned to save both)
+                # Do the generation, get the token sequence + decoded score (we need to save both)
                 condition_tokens = batch["condition_ids"]
                 gen_tokens, gen_score = self.do_generation(condition_tokens)
                 # Dump the MIDI and tensor to disk
@@ -145,6 +173,14 @@ if __name__ == "__main__":
         "-c", "--config", default=GENERATIVE_MODEL_CFG, type=str,
         help="Path to config YAML file, relative to root folder of the project"
     )
+    parser.add_argument(
+        "-g", "--genres", nargs="+", type=int, default=None,
+        help="IDs corresponding to genres to use in generation. Defaults to all genres."
+    )
+    parser.add_argument(
+        "-p", "--pianists", nargs="+", type=int, default=None,
+        help="IDs corresponding to pianists to use in generation. Defaults to all performers."
+    )
     # Parse all arguments from the command line
     parser_args = vars(parser.parse_args())
     if not parser_args["config"]:
@@ -152,4 +188,5 @@ if __name__ == "__main__":
     # Parse the config file
     cfg = training.parse_config_yaml(parser_args["config"])
     # Run training
-    training.main(training_kws=cfg, trainer_cls=ReinforceGenerateModule, config_fpath=parser_args["config"])
+    cls = ReinforceGenerateModule(genre_ids=parser_args["genres"], pianist_ids=parser_args["pianists"], **cfg)
+    cls.start()  # no need for any mlflow here!
