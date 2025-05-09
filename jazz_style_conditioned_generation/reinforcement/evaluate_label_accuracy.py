@@ -112,7 +112,7 @@ def get_generations(generation_path: str, generation_iter: int) -> tuple[list[st
     return tracks, metas
 
 
-def main(generation_path: str, generation_iter: int = 0):
+def main(generation_path: str, generation_iter: int = 0, force_retraining: bool = False):
     # Load up training + test track + metadata paths
     train_tracks, train_metas = read_tracks_for_splits("train")
     test_tracks, test_metas = read_tracks_for_splits("test")
@@ -139,13 +139,13 @@ def main(generation_path: str, generation_iter: int = 0):
     # Initialize the model
     logger.debug("Fitting model...")
     # Try and load a fitted model from disk
-    if os.path.exists(CLASSIFIER_FPATH):
+    if os.path.exists(CLASSIFIER_FPATH) and not force_retraining:
         with open(CLASSIFIER_FPATH, "rb") as f:
             model = pickle.load(f)
         logger.debug(f"... loaded model from {CLASSIFIER_FPATH}")
     # Train the model from scratch
     else:
-        model = LogisticRegression(random_state=utils.SEED, penalty="l2")
+        model = LogisticRegression(random_state=utils.SEED, penalty="l2", max_iter=10000)
         model.fit(train_xs, train_ys)
         # Dump to the disk
         with open(CLASSIFIER_FPATH, "wb") as f:
