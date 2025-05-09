@@ -118,7 +118,9 @@ def main(generation_path: str, generation_iter: int = 0):
     gen_xs, gen_ys = extract_features(generated_tracks, generated_metas)
     # Scale the data
     scaler = StandardScaler()
-    train_xs = scaler.fit_transform(train_xs)
+    all_xs = np.concatenate([train_xs, test_xs, gen_xs], axis=0)
+    scaler.fit(all_xs)
+    train_xs = scaler.transform(train_xs)
     test_xs = scaler.transform(test_xs)
     gen_xs = scaler.transform(gen_xs)
     # Initialize the model
