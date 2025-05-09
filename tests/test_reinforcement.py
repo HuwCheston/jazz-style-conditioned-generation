@@ -91,7 +91,8 @@ class ReinforceTrainTest(unittest.TestCase):
                     os.path.join(resources_root, "test_midi2/piano_midi.mid"),
                     os.path.join(resources_root, "test_midi3/piano_midi.mid"),
                 ],
-                condition_token="Hard Bop"
+                condition_token="Hard Bop",
+                clamp=self.RT.clamp
             ),
             batch_size=1,
             shuffle=True,
@@ -116,7 +117,7 @@ class ReinforceGenerateTest(unittest.TestCase):
 
             cfg_parsed = training.parse_config_yaml(GENERATIVE_MODEL_CFG)
             cfg_parsed["reinforce_cfg"]["generated_sequence_length"] = 10  # short sequences for speed
-            cls.RG = ReinforceGenerateModule(**cfg_parsed)
+            cls.RG = ReinforceGenerateModule(genre_ids=range(20), pianist_ids=range(25), **cfg_parsed)
 
     def test_condition_token_loader(self):
         # Dataset should contain 25 pianists, 20 genres
