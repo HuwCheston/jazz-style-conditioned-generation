@@ -978,6 +978,8 @@ def add_run_id_to_config_yaml(config_fname: str, mlflow_run_id: str) -> None:
     """Append an automatically-created mlflow run ID to a config `.yaml` file at the start of a new run"""
     # This is the directory where our config file is
     yamlpath = os.path.join(utils.get_project_root(), 'config', config_fname)
+    if not yamlpath.endswith(".yaml"):
+        yamlpath += ".yaml"
     # Load the config file
     with open(yamlpath, 'r') as yamlfile:
         cur_yaml = yaml.safe_load(yamlfile)
