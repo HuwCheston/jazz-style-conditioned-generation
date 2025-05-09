@@ -72,10 +72,12 @@ def extract_features(tracks: list[str], metas: list[str] | list[dict]) -> tuple[
         if pianist in PIANIST_MAPPING.keys():
             # Extract the features and append to the list
             track_clamp_input = clamp_utils.midi_to_clamp(train_track)
-            track_clamp_features = clamp_utils.extract_clamp_features(track_clamp_input, CLAMP)
+            # Shape is (N, 768)
+            track_clamp_features = clamp_utils.extract_clamp_features(track_clamp_input, CLAMP, get_global=False)
             # Append extracted features and pianist IDX to the list
-            xs.append(track_clamp_features.cpu())  # should be on CPU for sklearn + numpy
-            ys.append(PIANIST_MAPPING[pianist])
+            for feat in track_clamp_features:
+                xs.append(feat.cpu())  # should be on CPU for sklearn + numpy
+                ys.append(PIANIST_MAPPING[pianist])
     # Stack xs to (N_tracks, N_dims), ys to (N_tracks)
     return np.stack(xs), np.stack(ys)
 

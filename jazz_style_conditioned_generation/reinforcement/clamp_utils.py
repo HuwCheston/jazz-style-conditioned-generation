@@ -85,7 +85,7 @@ def midi_to_clamp(
     return clamp_patches
 
 
-def extract_clamp_features(patches: torch.Tensor, clamp: CLaMP3Model) -> torch.Tensor:
+def extract_clamp_features(patches: torch.Tensor, clamp: CLaMP3Model, get_global: bool = True) -> torch.Tensor:
     """Extracts features using CLaMP3. Ported from clamp3.code.extract_clamp3.extract_feature"""
     segment_list = []
     for i in range(0, len(patches), PATCH_LENGTH):
@@ -113,19 +113,27 @@ def extract_clamp_features(patches: torch.Tensor, clamp: CLaMP3Model) -> torch.T
             )
         last_hidden_states_list.append(last_hidden_states)
 
-    # We assume `get_global` = True here
-    full_chunk_cnt = len(patches) // PATCH_LENGTH
-    remain_chunk_len = len(patches) % PATCH_LENGTH
-    if remain_chunk_len == 0:
-        feature_weights = torch.tensor([PATCH_LENGTH] * full_chunk_cnt, device=utils.DEVICE).view(-1, 1)
+    # simply return (N, 768)
+    if not get_global:
+        # last_hidden_states_list = [last_hidden_states[0] for last_hidden_states in last_hidden_states_list]
+        # last_hidden_states_list[-1] = last_hidden_states_list[-1][-(len(patches) % PATCH_LENGTH):]
+        # last_hidden_states_list = torch.concat(last_hidden_states_list, 0)
+        last_hidden_states_list = torch.concat(last_hidden_states_list)
+    # pool to return (768)
     else:
-        feature_weights = torch.tensor(
-            [PATCH_LENGTH] * full_chunk_cnt + [remain_chunk_len], device=utils.DEVICE
-        ).view(-1, 1)
+        full_chunk_cnt = len(patches) // PATCH_LENGTH
+        remain_chunk_len = len(patches) % PATCH_LENGTH
+        if remain_chunk_len == 0:
+            feature_weights = torch.tensor([PATCH_LENGTH] * full_chunk_cnt, device=utils.DEVICE).view(-1, 1)
+        else:
+            feature_weights = torch.tensor(
+                [PATCH_LENGTH] * full_chunk_cnt + [remain_chunk_len], device=utils.DEVICE
+            ).view(-1, 1)
 
-    last_hidden_states_list = torch.concat(last_hidden_states_list, 0)
-    last_hidden_states_list = last_hidden_states_list * feature_weights
-    return last_hidden_states_list.sum(dim=0) / feature_weights.sum()
+        last_hidden_states_list = torch.concat(last_hidden_states_list, 0)
+        last_hidden_states_list = last_hidden_states_list * feature_weights
+        last_hidden_states_list = last_hidden_states_list.sum(dim=0) / feature_weights.sum()
+    return last_hidden_states_list
 
 
 def initialize_clamp(pretrained: bool = True) -> CLaMP3Model:
