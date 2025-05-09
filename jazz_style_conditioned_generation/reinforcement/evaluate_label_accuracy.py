@@ -112,7 +112,7 @@ def get_generations(generation_path: str, generation_iter: int) -> tuple[list[st
     return tracks, metas
 
 
-def main(generation_path: str, generation_iter: int = 0, force_retraining: bool = False):
+def main(generation_path: str, generation_iter: int = 0, force_training: bool = False):
     # Load up training + test track + metadata paths
     train_tracks, train_metas = read_tracks_for_splits("train")
     test_tracks, test_metas = read_tracks_for_splits("test")
@@ -139,7 +139,7 @@ def main(generation_path: str, generation_iter: int = 0, force_retraining: bool 
     # Initialize the model
     logger.debug("Fitting model...")
     # Try and load a fitted model from disk
-    if os.path.exists(CLASSIFIER_FPATH) and not force_retraining:
+    if os.path.exists(CLASSIFIER_FPATH) and not force_training:
         with open(CLASSIFIER_FPATH, "rb") as f:
             model = pickle.load(f)
         logger.debug(f"... loaded model from {CLASSIFIER_FPATH}")
@@ -179,4 +179,8 @@ if __name__ == "__main__":
     )
     args = vars(parser.parse_args())
     # Run everything
-    main(generation_path=args["generation_dir"], generation_iter=args["generation_iter"])
+    main(
+        generation_path=args["generation_dir"],
+        generation_iter=args["generation_iter"],
+        force_training=args["force_training"]
+    )
