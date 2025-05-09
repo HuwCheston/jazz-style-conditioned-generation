@@ -60,7 +60,7 @@ class ReinforceGenerateModule(training.TrainingModule):
         self.pianist_ids = pianist_ids
         # Need to grab this and remove from kwargs before passing to the training module
         self.reinforce_cfg = training_kwargs.pop("reinforce_cfg", dict())
-        training_kwargs.pop("pretrained_checkpoint_path", None)
+        self.pretrained_checkpoint_path = training_kwargs.pop("pretrained_checkpoint_path", None)
         # No MLFlow, we're not optimising anything
         training_kwargs["mlflow_cfg"]["use"] = False
         # This initialises our dataloaders, generative model, loads checkpoints, etc.
@@ -83,7 +83,8 @@ class ReinforceGenerateModule(training.TrainingModule):
 
     def load_most_recent_checkpoint(self, weights_only: bool = True) -> None:
         # Load the checkpoint with the best validation loss (we don't care about optimizer/scheduler here)
-        self.load_checkpoint(os.path.join(self.checkpoint_dir, 'validation_best.pth'), weights_only=True)
+        self.load_checkpoint(os.path.join(utils.get_project_root(), "checkpoints", self.pretrained_checkpoint_path),
+                             weights_only=True)
 
     def create_dataloaders(self) -> tuple[DataLoader, DataLoader, DataLoader]:
         """We only want to create a single full-track dataloader"""
