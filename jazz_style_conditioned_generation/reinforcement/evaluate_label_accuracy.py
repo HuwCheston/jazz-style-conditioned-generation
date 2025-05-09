@@ -15,6 +15,7 @@ from tqdm import tqdm
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data import DATA_DIR
 from jazz_style_conditioned_generation.data.conditions import INCLUDE
+from jazz_style_conditioned_generation.data.scores import load_score, preprocess_score
 from jazz_style_conditioned_generation.preprocessing.splits import SPLIT_DIR, check_all_splits_unique
 from jazz_style_conditioned_generation.reinforcement import clamp_utils
 
@@ -60,7 +61,8 @@ def validate_splits(track_splits: dict[str, str], metadata_splits: dict[str, str
     utils.validate_paths(metadata_splits, expected_extension=".json")
 
 
-def extract_features(tracks: list[str], metas: list[str] | list[dict]) -> tuple[np.ndarray, np.ndarray]:
+def extract_features(tracks: list[str], metas: list[str] | list[dict], preprocess: bool = True) -> tuple[
+    np.ndarray, np.ndarray]:
     """Given a list of track and metadata filepaths, extract features + target variables"""
     xs, ys = [], []
     for train_track, train_meta in tqdm(zip(tracks, metas), total=len(tracks), desc="Extracting features..."):
@@ -70,14 +72,24 @@ def extract_features(tracks: list[str], metas: list[str] | list[dict]) -> tuple[
         pianist = train_meta["pianist"]
         # If the track is by one of our 25 pianists
         if pianist in PIANIST_MAPPING.keys():
-            # Extract the features and append to the list
-            track_clamp_input = clamp_utils.midi_to_clamp(train_track)
+            # Load up the score and preprocess it
+            if preprocess:
+                loaded = load_score(train_track, as_seconds=True)
+                preprocessed = preprocess_score(loaded)
+                preprocessed.dump_midi("tmp.mid")
+                # Extract the features and append to the list
+                track_clamp_input = clamp_utils.midi_to_clamp("tmp.mid")
+            # Otherwise, do not preprocess the score, use the raw MIDI
+            else:
+                track_clamp_input = clamp_utils.midi_to_clamp(train_track)
             # Shape is (N, 768)
             track_clamp_features = clamp_utils.extract_clamp_features(track_clamp_input, CLAMP, get_global=False)
             # Append extracted features and pianist IDX to the list
             for feat in track_clamp_features:
                 xs.append(feat.cpu())  # should be on CPU for sklearn + numpy
                 ys.append(PIANIST_MAPPING[pianist])
+            if os.path.exists("tmp.mid"):
+                os.remove("tmp.mid")
     # Stack xs to (N_tracks, N_dims), ys to (N_tracks)
     return np.stack(xs), np.stack(ys)
 
@@ -110,12 +122,13 @@ def main(generation_path: str, generation_iter: int = 0):
     generated_tracks, generated_metas = get_generations(generation_path, generation_iter)
     logger.debug(f"Loaded {len(generated_tracks)} generations")
     # Get features for tracks by all pianists
-    train_xs, train_ys = extract_features(train_tracks, train_metas)
+    train_xs, train_ys = extract_features(train_tracks, train_metas, preprocess=True)
     logger.debug(f"Extracted training features with CLaMP-3: x shape {train_xs.shape}, y shape {train_ys.shape}")
-    test_xs, test_ys = extract_features(test_tracks, test_metas)
+    test_xs, test_ys = extract_features(test_tracks, test_metas, preprocess=True)
     logger.debug(f"Extracted testing features with CLaMP-3: x shape {test_xs.shape}, y shape {test_ys.shape}")
     # Get features for all generated tracks
-    gen_xs, gen_ys = extract_features(generated_tracks, generated_metas)
+    gen_xs, gen_ys = extract_features(generated_tracks, generated_metas, preprocess=False)
+    logger.debug(f"Extracted generated features with CLaMP-3: x shape {gen_xs.shape}, y shape {gen_ys.shape}")
     # Scale the data
     scaler = StandardScaler()
     all_xs = np.concatenate([train_xs, test_xs, gen_xs], axis=0)
