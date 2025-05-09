@@ -129,5 +129,20 @@ def main(generation_path: str, generation_iter: int = 0):
 
 
 if __name__ == "__main__":
-    main(
-        generation_path="finetuning-customtok-plateau/finetuning_customtok_10msmin_lineartime_moreaugment_init6e5reduce10patience5_batch4_1024seq_12l8h768d3072ff")
+    import argparse
+
+    # Seed everything for reproducible results
+    utils.seed_everything(utils.SEED)
+    # Parsing arguments from the command line interface
+    parser = argparse.ArgumentParser(description="Evaluate label accuracy of generated MIDI files")
+    parser.add_argument(
+        "-d", "--generation-dir", type=str, help="Path to generated MIDIs",
+        default="finetuning-customtok-plateau/finetuning_customtok_10msmin_lineartime_"
+                "moreaugment_init6e5reduce10patience5_batch4_1024seq_12l8h768d3072ff"
+    )
+    parser.add_argument(
+        "-i", "--generation-iter", type=int, help="Iteration of generations to use."
+    )
+    args = vars(parser.parse_args())
+    # Run everything
+    main(generation_path=args["generation_dir"], generation_iter=args["generation_iter"])
