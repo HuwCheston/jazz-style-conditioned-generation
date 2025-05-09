@@ -159,6 +159,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "-i", "--generation-iter", type=int, help="Iteration of generations to use.", default=0
     )
+    parser.add_argument(
+        "-f", "--force-training", type=utils.string_to_bool, help="Force retraing", default=False
+    )
     args = vars(parser.parse_args())
     # Run everything
     main(generation_path=args["generation_dir"], generation_iter=args["generation_iter"])
