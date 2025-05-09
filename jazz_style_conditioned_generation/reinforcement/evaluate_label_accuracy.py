@@ -4,6 +4,7 @@
 """Evaluates generated MIDI files using label (pianist/genre) accuracy"""
 
 import os
+import pickle
 
 import numpy as np
 from loguru import logger
@@ -19,6 +20,8 @@ from jazz_style_conditioned_generation.reinforcement import clamp_utils
 
 JAZZ_DATA_DIR = os.path.join(DATA_DIR, "raw")
 GENERATION_DIR = os.path.join(utils.get_project_root(), "data/rl_generations")
+
+CLASSIFIER_FPATH = os.path.join(utils.get_project_root(), "references/label_accuracy_classifier.p")
 
 CLAMP = clamp_utils.initialize_clamp(pretrained=True)
 
@@ -118,9 +121,20 @@ def main(generation_path: str, generation_iter: int = 0):
     gen_xs = scaler.transform(gen_xs)
     # Initialize the model
     logger.debug("Fitting model...")
-    model = LogisticRegression(random_state=utils.SEED, penalty="l2")
-    # Fit the model and predict the (real) test data
-    model.fit(train_xs, train_ys)
+    # Try and load a fitted model from disk
+    if os.path.exists(CLASSIFIER_FPATH):
+        with open(CLASSIFIER_FPATH, "rb") as f:
+            model = pickle.load(f)
+        logger.debug(f"... loaded model from {CLASSIFIER_FPATH}")
+    # Train the model from scratch
+    else:
+        model = LogisticRegression(random_state=utils.SEED, penalty="l2")
+        model.fit(train_xs, train_ys)
+        # Dump to the disk
+        with open(CLASSIFIER_FPATH, "wb") as f:
+            pickle.dump(model, f, protocol=5)
+        logger.debug(f"... model dumped to {CLASSIFIER_FPATH}")
+    # Predict the real-world (test) data
     test_acc = model.score(test_xs, test_ys)
     logger.debug(f"... accuracy predicting real-world test data: {test_acc:.3f}")
     # Predict the generated data
