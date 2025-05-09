@@ -141,7 +141,7 @@ if __name__ == "__main__":
                 "moreaugment_init6e5reduce10patience5_batch4_1024seq_12l8h768d3072ff"
     )
     parser.add_argument(
-        "-i", "--generation-iter", type=int, help="Iteration of generations to use."
+        "-i", "--generation-iter", type=int, help="Iteration of generations to use.", default=0
     )
     args = vars(parser.parse_args())
     # Run everything
