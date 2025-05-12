@@ -25,7 +25,7 @@ MAX_COS_SIM = 0.95
 # Config file for the generator
 GENERATIVE_MODEL_CFG = (
     "reinforcement-customtok-plateau/"
-    "reinforcement_customtok_10msmin_lineartime_moreaugment_init6e5reduce10patience5_batch4_1024seq_12l8h768d3072ff.yaml"
+    "reinforcement_iter1_customtok_10msmin_lineartime_moreaugment_init6e5reduce10patience5_batch4_1024seq_12l8h768d3072ff.yaml"
 )
 
 
@@ -80,7 +80,7 @@ class GroundTruthDataset(Dataset):
         return clamp_utils.extract_clamp_features(gt_data, self.clamp)
 
 
-class ReinforceTrainModule(training.FineTuningModule):
+class ReinforceTrainModule(training.TrainingModule):
     """Module used to train a finetuned model with CLaMP3-DPO"""
 
     def __init__(self, **training_kwargs):
@@ -105,26 +105,51 @@ class ReinforceTrainModule(training.FineTuningModule):
         self.current_iteration = self.reinforce_cfg.get("current_iteration", 0)
         logger.debug(f"We'll compute the loss with beta {self.beta_}, lambda {self.lambda_}.")
 
-        # Get our reference model from the fine-tuned checkpoint
-        self.model_ref = self.load_reference_model()
+        self.test_cosine_sims = []  # keep track of cosine similarity of TEST (real) tracks to ground-truth tracks
+
+        # Get model parameters
+        model_type = self.model_cfg.get("model_type", "gpt2-lm")
+        model_kws = self.model_cfg.get("model_kws", dict())
+        logger.debug(f'Initialising policy + reference models {model_type} with arguments {model_kws}...')
+
+        # Load the reference model, without also loading scheduler + optimizer
+        logger.debug(f"Loading reference model checkpoint from {self.reference_checkpoint_path}")
+        self.model_ref = self.get_model(model_type, model_kws).to(utils.DEVICE)
+        self.load_checkpoint(self.reference_checkpoint_path, weights_only=True, model=self.model_ref)
+
+        # Load the policy model, also loading scheduler + optimizer
+        logger.debug(f"Loading policy model checkpoint from {self.policy_checkpoint_path}")
+        self.model = self.get_model(model_type, model_kws).to(utils.DEVICE)
+        self.load_checkpoint(self.policy_checkpoint_path, weights_only=False, model=self.model)
+
         # Initialize clamp3 from checkpoint
         self.clamp = clamp_utils.initialize_clamp(pretrained=True)
 
-    def load_reference_model(self):
-        """Our reference model is initialised from the finetuned model (i.e., no reinforcement learning at all)"""
-        model_type = self.model_cfg.get("model_type", "gpt2-lm")
-        model_kws = self.model_cfg.get("model_kws", dict())
-        logger.debug(f'Initialising reference model {model_type} with arguments {model_kws}...')
-        model_ref = self.get_model(model_type, model_kws).to(utils.DEVICE)
-        try:
-            loaded = torch.load(self.pretrained_checkpoint_path, map_location=utils.DEVICE, weights_only=False)
-        except FileNotFoundError:
-            raise FileNotFoundError(f'Could not load reference model checkpoint at {self.pretrained_checkpoint_path}!')
-        else:
-            logger.debug(f'Loaded reference model checkpoint at {self.pretrained_checkpoint_path}!')
-            model_ref.load_state_dict(loaded["model_state_dict"], strict=True)
-        return model_ref
+    @property
+    def reference_checkpoint_path(self) -> str:
+        """Path to the .pth file for the reference model"""
+        fpath = self.reinforce_cfg.get("reference_model_checkpoint", None)
+        # If the path doesn't exist, try adding the checkpoint directory to it
+        if not os.path.exists(fpath):
+            fpath = os.path.join(utils.get_project_root(), "checkpoints", fpath)
+        # Validate that the filepath exists
+        utils.validate_paths([fpath], expected_extension="pth")
+        return fpath
 
+    @property
+    def policy_checkpoint_path(self):
+        """Path to the .pth file for the policy model"""
+        fpath = self.reinforce_cfg.get("policy_model_checkpoint", None)
+        # If the path doesn't exist, try adding the checkpoint directory to it
+        if not os.path.exists(fpath):
+            fpath = os.path.join(utils.get_project_root(), "checkpoints", fpath)
+        # Validate that the filepath exists
+        utils.validate_paths([fpath], expected_extension="pth")
+        return fpath
+
+    def load_most_recent_checkpoint(self, weights_only: bool = True) -> None:
+        """Override base method, we load checkpoints inside the __init__ now"""
+        pass
 
     def create_dataloaders(self) -> tuple[DataLoader, DataLoader, DataLoader]:
         """Skip over creating training and validation dataloader, just create test"""
@@ -133,7 +158,7 @@ class ReinforceTrainModule(training.FineTuningModule):
         test_loader = DataLoader(
             DatasetMIDIConditionedNoOverlapChunks(
                 tokenizer=self.tokenizer,
-                files_paths=self.track_splits["test"],
+                files_paths=self.track_splits["test"][:10],
                 max_seq_len=self.max_seq_len,
                 **self.test_dataset_cfg  # most arguments can be shared across test + validation loader
             ),
@@ -147,7 +172,7 @@ class ReinforceTrainModule(training.FineTuningModule):
     @property
     def generation_output_dir(self):
         # Get the filepath from the name of the finetuning experiment
-        fpath = os.path.dirname(self.pretrained_checkpoint_path).replace("checkpoints", "data/rl_generations")
+        fpath = os.path.dirname(self.reference_checkpoint_path).replace("checkpoints", "data/rl_generations")
         if not os.path.isdir(fpath):
             raise FileNotFoundError(f"Couldn't find generations in {fpath}")
         return fpath
@@ -278,6 +303,31 @@ class ReinforceTrainModule(training.FineTuningModule):
         self.optimizer.step()
         return loss.item()
 
+    def test_train_similarity(self, gt_features: torch.Tensor, condition_token: str) -> float:
+        """Computes cosine similarity between (real) test tracks and ground truth features"""
+        # Define the dataloader with tracks from the TEST data that have this condition token
+        gt_test_loader = DataLoader(
+            GroundTruthDataset(
+                self.track_splits["test"],
+                condition_token=condition_token,
+                clamp=self.clamp
+            ),
+            batch_size=1,
+            shuffle=False,
+            drop_last=False
+        )
+        test_sims = []
+        # Iterate over all tracks in the test dataset with the corresponding condition token
+        for test_features in gt_test_loader:
+            # Compute the cosine similarity: dims (N_train_tracks)
+            test_sim = F.cosine_similarity(test_features, gt_features, dim=-1)
+            # Average to a scalar
+            test_sims.append(test_sim.mean().item())
+        # Extend the list containing ALL of our test cosine similarities
+        self.test_cosine_sims.extend(test_sims)
+        # Return the mean for this condition token for logging
+        return np.mean(test_sims)
+
     def reinforcement(self, ) -> tuple[float, float]:
         all_losses_mean, all_losses_sum = [], []
         # Iterate over all the desired condition tokens we want to use in generation
@@ -308,6 +358,9 @@ class ReinforceTrainModule(training.FineTuningModule):
             # Append everything to the lists
             all_losses_mean.append(avg_loss)
             all_losses_sum.append(summed_loss)
+            # Compute the similarity between the ground truth tracks and the REAL tracks from the held-out test data
+            real_sim = self.test_train_similarity(gt_features, token)
+            logger.debug(f"Token {token}: test data similarity to ground-truth {real_sim:.3f}")
         return np.mean(all_losses_mean), np.mean(all_losses_sum)
 
     def testing(self) -> tuple[float, float]:
@@ -335,7 +388,9 @@ class ReinforceTrainModule(training.FineTuningModule):
                      f"mean cosine similarity {mean_cosine_sim:.3f}")
         # Do testing
         test_loss, test_acc = self.testing()
+        test_sim_mean = np.mean(self.test_cosine_sims)
         logger.debug(f"Finished testing: loss {test_loss:.3f}, accuracy {test_acc:.3f}")
+        logger.debug(f"Mean cosine similarity between test tracks and ground truth: {test_sim_mean:.3f}")
         # Save the checkpoint
         iteration_metrics = dict(
             summed_reinforcement_loss=train_loss_sum,
@@ -343,6 +398,7 @@ class ReinforceTrainModule(training.FineTuningModule):
             mean_cosine_similarity=mean_cosine_sim,
             test_loss=test_loss,
             test_accuracy=test_acc,
+            test_mean_cosine_similarity=test_sim_mean,
             reinforcement_time=time() - training_start
         )
         checkpoint_path = os.path.join(self.checkpoint_dir, f"reinforcement_iteration_{self.current_iteration}.pth")
