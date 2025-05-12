@@ -7,6 +7,7 @@ import os
 import pickle
 
 import numpy as np
+import torch
 from loguru import logger
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
@@ -16,11 +17,29 @@ from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data import DATA_DIR
 from jazz_style_conditioned_generation.data.conditions import INCLUDE
 from jazz_style_conditioned_generation.data.scores import load_score, preprocess_score
+from jazz_style_conditioned_generation.data.tokenizer import (
+    load_tokenizer,
+    add_pianists_to_vocab,
+    add_tempos_to_vocab,
+    add_timesignatures_to_vocab,
+    add_recording_years_to_vocab,
+    add_genres_to_vocab
+)
 from jazz_style_conditioned_generation.preprocessing.splits import SPLIT_DIR, check_all_splits_unique
 from jazz_style_conditioned_generation.reinforcement import clamp_utils
 
 JAZZ_DATA_DIR = os.path.join(DATA_DIR, "raw")
 GENERATION_DIR = os.path.join(utils.get_project_root(), "data/rl_generations")
+
+MAX_SEQ_LEN = 1024
+
+# Initialise the tokenizer, add all the condition tokens in
+TOKENIZER = load_tokenizer(tokenizer_str="custom-tsd", tokenizer_kws=dict(time_range=[0.01, 1.0], time_factor=1.0))
+add_genres_to_vocab(TOKENIZER)
+add_pianists_to_vocab(TOKENIZER)
+add_recording_years_to_vocab(TOKENIZER, 1945, 2025, step=5)  # [1945, 1950, ..., 2025]
+add_tempos_to_vocab(TOKENIZER, 80, 30, factor=1.05)
+add_timesignatures_to_vocab(TOKENIZER, [3, 4])
 
 CLASSIFIER_FPATH = os.path.join(utils.get_project_root(), "references/label_accuracy_classifier.p")
 
@@ -61,8 +80,9 @@ def validate_splits(track_splits: dict[str, str], metadata_splits: dict[str, str
     utils.validate_paths(metadata_splits, expected_extension=".json")
 
 
-def extract_features(tracks: list[str], metas: list[str] | list[dict], preprocess: bool = True) -> tuple[
-    np.ndarray, np.ndarray]:
+def extract_features(
+        tracks: list[str], metas: list[str] | list[dict], preprocess: bool = True
+) -> tuple[np.ndarray, np.ndarray]:
     """Given a list of track and metadata filepaths, extract features + target variables"""
     xs, ys = [], []
     for train_track, train_meta in tqdm(zip(tracks, metas), total=len(tracks), desc="Extracting features..."):
@@ -72,22 +92,25 @@ def extract_features(tracks: list[str], metas: list[str] | list[dict], preproces
         pianist = train_meta["pianist"]
         # If the track is by one of our 25 pianists
         if pianist in PIANIST_MAPPING.keys():
-            # Load up the score and preprocess it
+            # Load up the score and preprocess it if required
+            loaded = load_score(train_track, as_seconds=True)
             if preprocess:
-                loaded = load_score(train_track, as_seconds=True)
-                preprocessed = preprocess_score(loaded)
-                preprocessed.dump_midi("tmp.mid")
-                # Extract the features and append to the list
-                track_clamp_input = clamp_utils.midi_to_clamp("tmp.mid")
-            # Otherwise, do not preprocess the score, use the raw MIDI
-            else:
-                track_clamp_input = clamp_utils.midi_to_clamp(train_track)
-            # Shape is (N, 768)
-            track_clamp_features = clamp_utils.extract_clamp_features(track_clamp_input, CLAMP, get_global=False)
-            # Append extracted features and pianist IDX to the list
-            for feat in track_clamp_features:
-                xs.append(feat.cpu())  # should be on CPU for sklearn + numpy
+                loaded = preprocess_score(loaded)
+            # Encode the score with our tokenizer and get the IDs
+            track_encoded = torch.tensor([TOKENIZER(loaded)[0].ids])
+            # Iterate over 1024-token chunks
+            for seq_start in range(0, track_encoded.size(1), MAX_SEQ_LEN):
+                # Chunk the token input
+                seq_end = seq_start + MAX_SEQ_LEN
+                ids_chunked = track_encoded[:, seq_start:seq_end]
+                # Convert to expected clamp input
+                chunk_clamp_input = clamp_utils.midi_to_clamp(ids_chunked, TOKENIZER)
+                # Extract features with clamp
+                chunk_clamp_features = clamp_utils.extract_clamp_features(chunk_clamp_input, CLAMP, get_global=True)
+                # Append extracted features and pianist IDX to the list
+                xs.append(chunk_clamp_features.cpu())
                 ys.append(PIANIST_MAPPING[pianist])
+            # Cleanup if required
             if os.path.exists("tmp.mid"):
                 os.remove("tmp.mid")
     # Stack xs to (N_tracks, N_dims), ys to (N_tracks)
