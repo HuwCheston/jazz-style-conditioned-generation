@@ -122,6 +122,10 @@ class ReinforceTrainModule(training.TrainingModule):
         self.model = self.get_model(model_type, model_kws).to(utils.DEVICE)
         self.load_checkpoint(self.policy_checkpoint_path, weights_only=False, model=self.model)
 
+        # Set the optimizer LR correctly
+        for g in self.optimizer.param_groups:
+            g['lr'] = self.initial_lr
+
         # Initialize clamp3 from checkpoint
         self.clamp = clamp_utils.initialize_clamp(pretrained=True)
 
