@@ -6,6 +6,7 @@
 import os
 from copy import deepcopy
 from time import time
+from typing import Any
 
 import mlflow
 import numpy as np
@@ -349,8 +350,11 @@ class TrainingModule:
             valid_types = ", ".join([i if i is not None else "None" for i in valids])
             raise ValueError(f'`sched_type` must be one of {valid_types} but got {sched_type}')
 
-    def load_checkpoint(self, checkpoint_path: str, weights_only: bool = False) -> None:
+    def load_checkpoint(self, checkpoint_path: str, weights_only: bool = False, model: Any = None) -> None:
         """Load the checkpoint at the given fpath"""
+        # Allow for custom models to be passed in: this is useful for rl_train.py
+        if model is None:
+            model = self.model
         # This will raise a warning about possible ACE exploits, but we don't care
         try:
             loaded = torch.load(checkpoint_path, map_location=utils.DEVICE, weights_only=False)
@@ -359,7 +363,7 @@ class TrainingModule:
             return
         else:
             # Set state dictionary for all torch objects
-            self.model.load_state_dict(loaded["model_state_dict"], strict=True)
+            model.load_state_dict(loaded["model_state_dict"], strict=True)
             # If we don't want to load the optimizer and scheduler dictionaries (i.e., we're fine-tuning the model)
             if weights_only:
                 logger.warning("Skipped loading optimizer and scheduler state dictionaries, they will restart!")
