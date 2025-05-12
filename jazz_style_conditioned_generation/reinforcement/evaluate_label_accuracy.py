@@ -15,7 +15,6 @@ from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data import DATA_DIR
-from jazz_style_conditioned_generation.data.conditions import INCLUDE
 from jazz_style_conditioned_generation.data.scores import load_score, preprocess_score
 from jazz_style_conditioned_generation.data.tokenizer import (
     load_tokenizer,
@@ -45,7 +44,8 @@ CLASSIFIER_FPATH = os.path.join(utils.get_project_root(), "references/label_accu
 
 CLAMP = clamp_utils.initialize_clamp(pretrained=True)
 
-PIANIST_MAPPING = {p: n for n, p in enumerate(sorted(INCLUDE["pianist"]))}
+PIANISTS = ["Bill Evans", "Oscar Peterson", "Ahmad Jamal", "Keith Jarrett", "McCoy Tyner"]
+PIANIST_MAPPING = {p: n for n, p in enumerate(sorted(PIANISTS))}
 PIANIST_FMT = {utils.remove_punctuation(p).lower().replace(" ", ""): p for p in PIANIST_MAPPING}
 
 
