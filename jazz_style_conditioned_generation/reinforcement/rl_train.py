@@ -158,7 +158,7 @@ class ReinforceTrainModule(training.TrainingModule):
         test_loader = DataLoader(
             DatasetMIDIConditionedNoOverlapChunks(
                 tokenizer=self.tokenizer,
-                files_paths=self.track_splits["test"][:10],
+                files_paths=self.track_splits["test"],
                 max_seq_len=self.max_seq_len,
                 **self.test_dataset_cfg  # most arguments can be shared across test + validation loader
             ),
