@@ -120,7 +120,7 @@ class ReinforceTrainModule(training.TrainingModule):
         # Load the policy model, also loading scheduler + optimizer
         logger.debug(f"Loading policy model checkpoint from {self.policy_checkpoint_path}")
         self.model = self.get_model(model_type, model_kws).to(utils.DEVICE)
-        self.load_checkpoint(self.policy_checkpoint_path, weights_only=False, model=self.model)
+        self.load_checkpoint(self.policy_checkpoint_path, weights_only=True, model=self.model)
 
         # Set the optimizer LR correctly
         for g in self.optimizer.param_groups:
