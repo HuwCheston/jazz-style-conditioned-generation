@@ -80,10 +80,8 @@ def validate_splits(track_splits: dict[str, str], metadata_splits: dict[str, str
     utils.validate_paths(metadata_splits, expected_extension=".json")
 
 
-def extract_features(
-        tracks: list[str], metas: list[str] | list[dict], preprocess: bool = True
-) -> tuple[np.ndarray, np.ndarray]:
-    """Given a list of track and metadata filepaths, extract features + target variables"""
+def extract_ground_truth_features(tracks: list[str], metas: list[str] | list[dict]) -> tuple[np.ndarray, np.ndarray]:
+    """Given a list of track and metadata filepaths corresponding to real tracks, extract features + target variables"""
     xs, ys = [], []
     for train_track, train_meta in tqdm(zip(tracks, metas), total=len(tracks), desc="Extracting features..."):
         # If we haven't loaded the JSON already, do this now
@@ -92,10 +90,9 @@ def extract_features(
         pianist = train_meta["pianist"]
         # If the track is by one of our 25 pianists
         if pianist in PIANIST_MAPPING.keys():
-            # Load up the score and preprocess it if required
+            # Load up the score and preprocess it
             loaded = load_score(train_track, as_seconds=True)
-            if preprocess:
-                loaded = preprocess_score(loaded)
+            loaded = preprocess_score(loaded)
             # Encode the score with our tokenizer and get the IDs
             track_encoded = torch.tensor([TOKENIZER(loaded)[0].ids])
             # Iterate over 1024-token chunks
@@ -113,6 +110,28 @@ def extract_features(
             # Cleanup if required
             if os.path.exists("tmp.mid"):
                 os.remove("tmp.mid")
+    # Stack xs to (N_tracks, N_dims), ys to (N_tracks)
+    return np.stack(xs), np.stack(ys)
+
+
+def extract_generated_features(tracks: list[str], metas: list[str]) -> tuple[np.ndarray, np.ndarray]:
+    """Given a list of track and metadata filepaths corresponding to generations, extract features + target variables"""
+    xs, ys = [], []
+    for train_track, train_meta in tqdm(zip(tracks, metas), total=len(tracks), desc="Extracting features..."):
+        # If we haven't loaded the JSON already, do this now
+        if isinstance(train_meta, str):
+            train_meta = utils.read_json_cached(train_meta)
+        pianist = train_meta["pianist"]
+        # If the track is by one of our 25 pianists
+        if pianist in PIANIST_MAPPING.keys():
+            # No need to load score + convert to tokens, generations will always be 1024 tokens long
+            # Convert to expected clamp input
+            chunk_clamp_input = clamp_utils.midi_to_clamp(train_track)
+            # Extract features with clamp
+            chunk_clamp_features = clamp_utils.extract_clamp_features(chunk_clamp_input, CLAMP, get_global=True)
+            # Append extracted features and pianist IDX to the list
+            xs.append(chunk_clamp_features.cpu())
+            ys.append(PIANIST_MAPPING[pianist])
     # Stack xs to (N_tracks, N_dims), ys to (N_tracks)
     return np.stack(xs), np.stack(ys)
 
@@ -145,12 +164,12 @@ def main(generation_path: str, generation_iter: int = 0, force_training: bool = 
     generated_tracks, generated_metas = get_generations(generation_path, generation_iter)
     logger.debug(f"Loaded {len(generated_tracks)} generations")
     # Get features for tracks by all pianists
-    train_xs, train_ys = extract_features(train_tracks, train_metas, preprocess=True)
+    train_xs, train_ys = extract_ground_truth_features(train_tracks, train_metas)
     logger.debug(f"Extracted training features with CLaMP-3: x shape {train_xs.shape}, y shape {train_ys.shape}")
-    test_xs, test_ys = extract_features(test_tracks, test_metas, preprocess=True)
+    test_xs, test_ys = extract_ground_truth_features(test_tracks, test_metas)
     logger.debug(f"Extracted testing features with CLaMP-3: x shape {test_xs.shape}, y shape {test_ys.shape}")
     # Get features for all generated tracks
-    gen_xs, gen_ys = extract_features(generated_tracks, generated_metas, preprocess=False)
+    gen_xs, gen_ys = extract_generated_features(generated_tracks, generated_metas)
     logger.debug(f"Extracted generated features with CLaMP-3: x shape {gen_xs.shape}, y shape {gen_ys.shape}")
     # Scale the data
     scaler = StandardScaler()
