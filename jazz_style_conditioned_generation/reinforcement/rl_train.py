@@ -112,19 +112,23 @@ class ReinforceTrainModule(training.TrainingModule):
         model_kws = self.model_cfg.get("model_kws", dict())
         logger.debug(f'Initialising policy + reference models {model_type} with arguments {model_kws}...')
 
-        # Load the reference model, without also loading scheduler + optimizer
+        # Load the reference model, without loading scheduler + optimizer
         logger.debug(f"Loading reference model checkpoint from {self.reference_checkpoint_path}")
         self.model_ref = self.get_model(model_type, model_kws).to(utils.DEVICE)
         self.load_checkpoint(self.reference_checkpoint_path, weights_only=True, model=self.model_ref)
 
-        # Load the policy model, also loading scheduler + optimizer
+        # Load the policy model, without loading scheduler + optimizer
         logger.debug(f"Loading policy model checkpoint from {self.policy_checkpoint_path}")
         self.model = self.get_model(model_type, model_kws).to(utils.DEVICE)
         self.load_checkpoint(self.policy_checkpoint_path, weights_only=True, model=self.model)
 
-        # Set the optimizer LR correctly
-        for g in self.optimizer.param_groups:
-            g['lr'] = self.initial_lr
+        # Initialize the optimizer from scratch every iteration (same as NotaGen)
+        self.initial_lr = self.optimizer_cfg["optimizer_kws"].get("lr", 0.0001)
+        optimizer_type = self.optimizer_cfg.get("optimizer_type", "adam")
+        optimizer_kws = self.optimizer_cfg.get("optimizer_kws", dict(lr=self.initial_lr))
+        logger.debug(f'Initialising optimiser {optimizer_type} with parameters {optimizer_kws}...')
+        betas = tuple(optimizer_kws.pop("betas", (0.9, 0.999)))
+        self.optimizer = self.get_optimizer(optimizer_type)(self.model.parameters(), betas=betas, **optimizer_kws)
 
         # Initialize clamp3 from checkpoint
         self.clamp = clamp_utils.initialize_clamp(pretrained=True)
@@ -367,19 +371,27 @@ class ReinforceTrainModule(training.TrainingModule):
             logger.debug(f"Token {token}: test data similarity to ground-truth {real_sim:.3f}")
         return np.mean(all_losses_mean), np.mean(all_losses_sum)
 
-    def testing(self) -> tuple[float, float]:
+    def testing(self) -> tuple[float, float, float, float]:
         # Don't load a checkpoint, keep the model as it is following the reinforcement iteration we've just done
         self.model.eval()
-        test_loss, test_accuracy = [], []
+        test_loss_policy, test_accuracy_policy = [], []
+        test_loss_ref, test_accuracy_ref = [], []
         # Iterate over every batch in the dataloader
         for batch in tqdm(self.test_loader, total=len(self.test_loader), desc='Testing...'):
-            # Forwards pass
+            # Forwards pass with both policy and reference model
             with torch.no_grad():
-                loss, accuracy = self.step(batch)
+                loss_policy, accuracy_policy = self.step(batch, model=self.model)
+                loss_ref, accuracy_ref = self.step(batch, model=self.model_ref)
             # No backwards pass
-            test_loss.append(loss.item())
-            test_accuracy.append(accuracy.item())
-        return np.mean(test_loss), np.mean(test_accuracy)
+            # Append policy model results
+            test_loss_policy.append(loss_policy.item())
+            test_accuracy_policy.append(accuracy_policy.item())
+            # Append reference model results
+            test_loss_ref.append(loss_ref.item())
+            test_accuracy_ref.append(accuracy_ref.item())
+        # Return average loss + accuracy for both policy and reference model
+        return (np.mean(test_loss_policy), np.mean(test_accuracy_policy),
+                np.mean(test_loss_ref), np.mean(test_accuracy_ref))
 
     def start(self):
         """Runs training for this module"""
@@ -391,17 +403,18 @@ class ReinforceTrainModule(training.TrainingModule):
         logger.debug(f"Finished reinforcement iteration {self.current_iteration}: "
                      f"mean cosine similarity {mean_cosine_sim:.3f}")
         # Do testing
-        test_loss, test_acc = self.testing()
+        test_loss_pol, test_acc_pol, test_loss_ref, test_acc_ref = self.testing()
         test_sim_mean = np.mean(self.test_cosine_sims)
-        logger.debug(f"Finished testing: loss {test_loss:.3f}, accuracy {test_acc:.3f}")
+        logger.debug(f"Finished testing: policy loss {test_loss_pol:.3f}, accuracy {test_acc_pol:.3f}, "
+                     f"reference loss {test_loss_ref:.3f}, accuracy {test_acc_ref:.3f}")
         logger.debug(f"Mean cosine similarity between test tracks and ground truth: {test_sim_mean:.3f}")
         # Save the checkpoint
         iteration_metrics = dict(
             summed_reinforcement_loss=train_loss_sum,
             mean_reinforcement_loss=train_loss_mean,
             mean_cosine_similarity=mean_cosine_sim,
-            test_loss=test_loss,
-            test_accuracy=test_acc,
+            test_loss=test_loss_pol,
+            test_accuracy=test_acc_pol,
             test_mean_cosine_similarity=test_sim_mean,
             reinforcement_time=time() - training_start
         )
@@ -437,3 +450,22 @@ if __name__ == "__main__":
     cfg["mlflow_cfg"]["use"] = False  # no mlflow!
     # Run training
     training.main(training_kws=cfg, trainer_cls=ReinforceTrainModule, config_fpath=parser_args["config"])
+
+# # Load the policy model, also loading scheduler + optimizer
+# logger.debug(f"Loading policy model checkpoint from {self.policy_checkpoint_path}")
+# self.model = self.get_model(model_type, model_kws).to(utils.DEVICE)
+# self.load_checkpoint(self.reference_checkpoint_path, weights_only=True, model=self.model)
+#
+# # Load the reference model, without also loading scheduler + optimizer
+# self.model_ref = deepcopy(self.model)
+# # logger.debug(f"Loading reference model checkpoint from {self.reference_checkpoint_path}")
+# # self.model_ref = self.get_model(model_type, model_kws).to(utils.DEVICE)
+# # self.load_checkpoint(self.reference_checkpoint_path, weights_only=True, model=self.model_ref)
+#
+# # Set the optimizer LR correctly
+# self.initial_lr = self.optimizer_cfg["optimizer_kws"].get("lr", 0.0001)
+# optimizer_type = self.optimizer_cfg.get("optimizer_type", "adam")
+# optimizer_kws = self.optimizer_cfg.get("optimizer_kws", dict(lr=self.initial_lr))
+# logger.debug(f'Initialising optimiser {optimizer_type} with parameters {optimizer_kws}...')
+# betas = tuple(optimizer_kws.pop("betas", (0.9, 0.999)))
+# self.optimizer = self.get_optimizer(optimizer_type)(self.model.parameters(), betas=betas, **optimizer_kws)
