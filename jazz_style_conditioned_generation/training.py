@@ -538,11 +538,18 @@ class TrainingModule:
             logger.warning(f"Failed to get LR from scheduler! Returning 0.0... {sched_e}")
             return 0.
 
-    def step(self, batch: dict[str, torch.tensor]) -> tuple[torch.Tensor, torch.Tensor]:
+    def step(self, batch: dict[str, torch.tensor], model: torch.nn.Module = None) -> tuple[torch.Tensor, torch.Tensor]:
+        # Allows the model to be parameterized
+        #  This is useful for RL where we want to test both our policy and reference model
+        if model is None:
+            model = self.model
+        # Put everything on the correct device
         input_ids = batch["input_ids"].to(utils.DEVICE)
         labels = batch["labels"].to(utils.DEVICE)
         attention_mask = batch["attention_mask"].to(utils.DEVICE)
-        logits = self.model(input_ids=input_ids, labels=labels, attention_mask=attention_mask)
+        # Through the model to get logits: shape (batch_size, seq_len, vocab_size)
+        logits = model(input_ids=input_ids, labels=labels, attention_mask=attention_mask)
+        # Compute loss and accuracy scores (both as scalars)
         loss = metrics.cross_entropy_loss(logits, labels, self.tokenizer)
         accuracy = metrics.accuracy_score(logits, labels, self.tokenizer)
         return loss, accuracy
