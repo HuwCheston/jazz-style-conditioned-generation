@@ -17,7 +17,7 @@ import torch.nn.functional as F
 from joblib import Parallel, delayed
 from loguru import logger
 from miditok import MusicTokenizer
-from symusic import Score
+from symusic import Score, Note
 from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
@@ -80,6 +80,58 @@ def cross_entropy_loss(logits: torch.Tensor, labels: torch.Tensor, tokenizer: Mu
         labels.flatten().to(torch.long),
         ignore_index=tokenizer.pad_token_id
     )
+
+
+def sliding_pitch_class_entropy(notes: list[Note], window: int = 15, hop: int = 1) -> float:
+    """Calculates sliding pitch-class entropy, as defined in Edwards et al. (2023)"""
+
+    def pce(notes_in_window: list[Note]) -> float:
+        counter = np.zeros(12)
+        for note in notes_in_window:
+            counter[note.pitch % 12] += 1
+        denominator = counter.sum()
+        if denominator < 1:
+            entropy = np.nan
+        else:
+            prob = counter / denominator
+            with np.errstate(divide="ignore", invalid="ignore"):
+                # Drew uses natural log whereas muspy uses base-2
+                entropy = -np.nansum(prob * np.log(prob))
+        return entropy
+
+    all_pces = []
+    # Sort the notes by onset time
+    notes = sorted(notes, key=lambda x: x.start)
+    # Get the duration of the track
+    duration = round(max(notes, key=lambda x: x.end).end)
+    # Slide a window over the track with the given window and hop (uses Drew's values by default)
+    window_end = duration - window if duration - window > 0 else duration
+    for start in range(0, window_end, hop):  # 1 second hop
+        end = start + window
+        # Get the notes within this window
+        windowed_notes = [n for n in notes if start < n.time < end]
+        # Compute the PCE and append to the list
+        windowed_pce = pce(windowed_notes)
+        all_pces.append(windowed_pce)
+    # Return the average sliding pitch-class entropy
+    return np.nanmean(all_pces)
+
+
+def sliding_event_density(notes: list[Note], window: int = 1, hop: int = 1) -> float:
+    """Calculates sliding event density. Defaults are equivalent to notes-per-second in Edwards et al. (2023)"""
+    # Sort the notes by onset time
+    notes = sorted(notes, key=lambda x: x.start)
+    # Get the duration of the track
+    duration = round(max(notes, key=lambda x: x.end).end)
+    all_nps = []
+    # Slide the window over the track with given window and hop (Drew's values used by default)
+    window_end = duration - window if duration - window > 0 else duration
+    for start in range(0, window_end, hop):
+        end = start + window
+        # compute event density
+        notes_in_window = [n for n in notes if start < n.time < end]
+        all_nps.append(len(notes_in_window))
+    return np.nanmean(all_nps)
 
 
 def _symusic_to_muspy(score: Score) -> muspy.Music:
