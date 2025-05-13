@@ -166,7 +166,7 @@ class ReinforceTrainModule(training.TrainingModule):
         test_loader = DataLoader(
             DatasetMIDIConditionedNoOverlapChunks(
                 tokenizer=self.tokenizer,
-                files_paths=self.track_splits["test"],
+                files_paths=self.track_splits["test"][:10],
                 max_seq_len=self.max_seq_len,
                 **self.test_dataset_cfg  # most arguments can be shared across test + validation loader
             ),
@@ -178,9 +178,18 @@ class ReinforceTrainModule(training.TrainingModule):
         return [], [], test_loader
 
     @property
-    def generation_output_dir(self):
-        # Get the filepath from the name of the finetuning experiment
-        fpath = os.path.dirname(self.reference_checkpoint_path).replace("checkpoints", "data/rl_generations")
+    def generation_output_dir(self) -> str:
+        """Gets the directory where MIDI generations are stored for this model"""
+        # Get the filepath from the config
+        if "generation_output_dir" in self.reinforce_cfg:
+            fpath = os.path.join(
+                utils.get_project_root(),
+                "data/rl_generations",
+                self.reinforce_cfg["generation_output_dir"]
+            )
+        # For backwards compatibility: get the filepath from the name of the finetuning experiment
+        else:
+            fpath = os.path.dirname(self.reference_checkpoint_path).replace("checkpoints", "data/rl_generations")
         if not os.path.isdir(fpath):
             raise FileNotFoundError(f"Couldn't find generations in {fpath}")
         return fpath
