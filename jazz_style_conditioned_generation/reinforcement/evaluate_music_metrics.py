@@ -11,12 +11,26 @@ from tqdm import tqdm
 
 from jazz_style_conditioned_generation import utils
 from jazz_style_conditioned_generation.data import DATA_DIR
+from jazz_style_conditioned_generation.data.conditions import INCLUDE, validate_condition_values
 from jazz_style_conditioned_generation.data.scores import load_score, preprocess_score, get_notes_from_score
 from jazz_style_conditioned_generation.metrics import sliding_event_density, sliding_pitch_class_entropy
 from jazz_style_conditioned_generation.preprocessing.splits import SPLIT_DIR
 
 JAZZ_DATA_DIR = os.path.join(DATA_DIR, "raw")
 GENERATION_DIR = os.path.join(utils.get_project_root(), "data/rl_generations")
+
+
+def validate_track(metadata_fpath: str) -> bool:
+    """Returns True if a track is made by one of our 25 pianists or tagged with one of our 20 genres, False otherwise"""
+    # Read the JSON
+    meta_read = utils.read_json_cached(metadata_fpath)
+    # Get the name of the pianist
+    pianist = meta_read["pianist"]
+    # Get the genre name
+    genres = [(i["name"], i["weight"]) for i in meta_read["genres"]]
+    genres_validated = validate_condition_values(genres, "genres")
+    genres_names = [name for name, _ in genres_validated]
+    return pianist in INCLUDE["pianist"] or any(g in INCLUDE["genres"] for g in genres_names)
 
 
 def read_tracks_for_splits(split_type: str) -> list[str]:
@@ -30,10 +44,16 @@ def read_tracks_for_splits(split_type: str) -> list[str]:
             # Skip over empty lines
             if path == "":
                 continue
+            # Get both MIDI and JSON filepaths
             track_path = os.path.join(JAZZ_DATA_DIR, path, "piano_midi.mid")
             if not os.path.isfile(track_path):
                 raise FileNotFoundError(f'Could not find MIDI for track at {track_path}')
-            tracks.append(track_path)
+            meta_path = os.path.join(JAZZ_DATA_DIR, path, "metadata_tivo.json")
+            if not os.path.isfile(meta_path):
+                raise FileNotFoundError(f'Could not find metadata for track at {meta_path}')
+            # only keep tracks by one of our 25 pianists or tagged with one of our 20 genres
+            if validate_track(meta_path):
+                tracks.append(track_path)
     utils.validate_paths(tracks, expected_extension=".mid")
     return tracks
 
