@@ -97,6 +97,7 @@ class ReinforceTrainModule(training.TrainingModule):
         # Set parameters for reinforcement learning
         self.n_generations = self.reinforce_cfg.get("n_generations", 400)  # number of generations to use per track
         self.generation_keep_proportion = self.reinforce_cfg.get("generation_keep_proportion", .1)  # % best/worst gens
+        self.n_test_tracks = self.reinforce_cfg.get("n_test_tracks", None)  # for faster debugging
 
         # Values used in calculating the loss
         self.beta_ = self.reinforce_cfg.get("beta", .1)  # same as notagen
@@ -161,12 +162,17 @@ class ReinforceTrainModule(training.TrainingModule):
 
     def create_dataloaders(self) -> tuple[DataLoader, DataLoader, DataLoader]:
         """Skip over creating training and validation dataloader, just create test"""
+        # Subset the number of test tracks if required
+        if self.n_test_tracks is not None:
+            test_tracks = self.track_splits["test"][:self.n_test_tracks]
+        else:
+            test_tracks = self.track_splits["test"]
         # Create test dataset loader: uses FULL tracks, with no overlap between chunks
         # i.e., we go 0 - 100, 101 - 201, 202 - 302, etc., then average the loss over all chunks
         test_loader = DataLoader(
             DatasetMIDIConditionedNoOverlapChunks(
                 tokenizer=self.tokenizer,
-                files_paths=self.track_splits["test"][:10],
+                files_paths=test_tracks,
                 max_seq_len=self.max_seq_len,
                 **self.test_dataset_cfg  # most arguments can be shared across test + validation loader
             ),
