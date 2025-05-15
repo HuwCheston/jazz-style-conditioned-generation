@@ -86,6 +86,7 @@ class ReinforceTrainModule(training.TrainingModule):
     def __init__(self, **training_kwargs):
         # Need to grab this and remove from kwargs before passing to the training module
         self.reinforce_cfg = training_kwargs.pop("reinforce_cfg", dict())
+        self.n_test_tracks = self.reinforce_cfg.get("n_test_tracks", None)  # for faster debugging
 
         # This initialises our dataloaders, generative model, loads checkpoints, etc.
         super().__init__(**training_kwargs)
@@ -97,7 +98,6 @@ class ReinforceTrainModule(training.TrainingModule):
         # Set parameters for reinforcement learning
         self.n_generations = self.reinforce_cfg.get("n_generations", 400)  # number of generations to use per track
         self.generation_keep_proportion = self.reinforce_cfg.get("generation_keep_proportion", .1)  # % best/worst gens
-        self.n_test_tracks = self.reinforce_cfg.get("n_test_tracks", None)  # for faster debugging
 
         # Values used in calculating the loss
         self.beta_ = self.reinforce_cfg.get("beta", .1)  # same as notagen
@@ -465,22 +465,3 @@ if __name__ == "__main__":
     cfg["mlflow_cfg"]["use"] = False  # no mlflow!
     # Run training
     training.main(training_kws=cfg, trainer_cls=ReinforceTrainModule, config_fpath=parser_args["config"])
-
-# # Load the policy model, also loading scheduler + optimizer
-# logger.debug(f"Loading policy model checkpoint from {self.policy_checkpoint_path}")
-# self.model = self.get_model(model_type, model_kws).to(utils.DEVICE)
-# self.load_checkpoint(self.reference_checkpoint_path, weights_only=True, model=self.model)
-#
-# # Load the reference model, without also loading scheduler + optimizer
-# self.model_ref = deepcopy(self.model)
-# # logger.debug(f"Loading reference model checkpoint from {self.reference_checkpoint_path}")
-# # self.model_ref = self.get_model(model_type, model_kws).to(utils.DEVICE)
-# # self.load_checkpoint(self.reference_checkpoint_path, weights_only=True, model=self.model_ref)
-#
-# # Set the optimizer LR correctly
-# self.initial_lr = self.optimizer_cfg["optimizer_kws"].get("lr", 0.0001)
-# optimizer_type = self.optimizer_cfg.get("optimizer_type", "adam")
-# optimizer_kws = self.optimizer_cfg.get("optimizer_kws", dict(lr=self.initial_lr))
-# logger.debug(f'Initialising optimiser {optimizer_type} with parameters {optimizer_kws}...')
-# betas = tuple(optimizer_kws.pop("betas", (0.9, 0.999)))
-# self.optimizer = self.get_optimizer(optimizer_type)(self.model.parameters(), betas=betas, **optimizer_kws)
