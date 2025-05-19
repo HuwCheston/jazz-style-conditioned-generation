@@ -87,10 +87,13 @@ class ReinforceTrainModule(training.TrainingModule):
         # Need to grab this and remove from kwargs before passing to the training module
         self.reinforce_cfg = training_kwargs.pop("reinforce_cfg", dict())
         self.n_test_tracks = self.reinforce_cfg.get("n_test_tracks", None)  # for faster debugging
+        self.skip_training = self.reinforce_cfg.get("skip_training", False)  # only calculate ACS etc., don't train
 
         # This initialises our dataloaders, generative model, loads checkpoints, etc.
         super().__init__(**training_kwargs)
         logger.info("----REINFORCEMENT LEARNING WITH CLAMP3----")
+        if self.skip_training:
+            logger.warning("We will SKIP training and only calculate metrics (loss, ACS)")
 
         # These are the condition tokens we'll use in generation + evaluation
         self.condition_tokens = INCLUDE["genres"] + INCLUDE["pianist"]
@@ -107,6 +110,7 @@ class ReinforceTrainModule(training.TrainingModule):
         logger.debug(f"We'll compute the loss with beta {self.beta_}, lambda {self.lambda_}.")
 
         self.test_cosine_sims = []  # keep track of cosine similarity of TEST (real) tracks to ground-truth tracks
+        self.all_res = []  # List of dictionaries, converted into a JSON later on
 
         # Get model parameters
         model_type = self.model_cfg.get("model_type", "gpt2-lm")
@@ -297,6 +301,8 @@ class ReinforceTrainModule(training.TrainingModule):
             score = cos_sim_all.mean().item()
             all_cos_sim.append(score)
             all_res.append((gen_i_toks, score))
+        # Append results to list of dictionaries
+        self.all_res.append(dict(token=token, cosine_sims=all_cos_sim, type="generated"))
         # Extend the lists of all our cosine similarities
         self.all_cosine_sims.extend(all_cos_sim)
         # Compute summary statistics from all of our generations
@@ -315,15 +321,21 @@ class ReinforceTrainModule(training.TrainingModule):
         )
 
     def step_loss(self, best: torch.Tensor, worst: torch.Tensor) -> torch.Tensor:
-        self.model.train()
-        # Forwards
-        loss = self.compute_dpo_loss(best, worst)
-        # Backwards
-        self.optimizer.zero_grad()
-        loss.backward()
-        if self.clip_grad_norm > 0.:  # Clip gradients if required
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clip_grad_norm)
-        self.optimizer.step()
+        # Small debug switch that we can use just to calculate ACS metrics, etc.
+        if self.skip_training:
+            with torch.no_grad():
+                loss = self.compute_dpo_loss(best, worst)
+        # Otherwise, actually do training
+        else:
+            self.model.train()
+            # Forwards
+            loss = self.compute_dpo_loss(best, worst)
+            # Backwards
+            self.optimizer.zero_grad()
+            loss.backward()
+            if self.clip_grad_norm > 0.:  # Clip gradients if required
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clip_grad_norm)
+            self.optimizer.step()
         return loss.item()
 
     def test_train_similarity(self, gt_features: torch.Tensor, condition_token: str) -> float:
@@ -346,6 +358,8 @@ class ReinforceTrainModule(training.TrainingModule):
             test_sim = F.cosine_similarity(test_features, gt_features, dim=-1)
             # Average to a scalar
             test_sims.append(test_sim.mean().item())
+        # Append results to list of dictionaries
+        self.all_res.append(dict(token=condition_token, cosine_sims=test_sims, type="real"))
         # Extend the list containing ALL of our test cosine similarities
         self.test_cosine_sims.extend(test_sims)
         # Return the mean for this condition token for logging
@@ -417,6 +431,9 @@ class ReinforceTrainModule(training.TrainingModule):
         mean_cosine_sim = np.mean(self.all_cosine_sims)
         logger.debug(f"Finished reinforcement iteration {self.current_iteration}: "
                      f"mean cosine similarity {mean_cosine_sim:.3f}")
+        # Dump ACS metrics to a JSON
+        js_path = os.path.join(self.checkpoint_dir, f"reinforcement_iteration_{self.current_iteration}.json")
+        utils.write_json(self.all_res, js_path)
         # Do testing
         test_loss_pol, test_acc_pol, test_loss_ref, test_acc_ref = self.testing()
         test_sim_mean = np.mean(self.test_cosine_sims)
@@ -433,8 +450,10 @@ class ReinforceTrainModule(training.TrainingModule):
             test_mean_cosine_similarity=test_sim_mean,
             reinforcement_time=time() - training_start
         )
-        checkpoint_path = os.path.join(self.checkpoint_dir, f"reinforcement_iteration_{self.current_iteration}.pth")
-        self.save_checkpoint(iteration_metrics, checkpoint_path)
+        # Dump a checkpoint if we haven't been skipping training
+        if not self.skip_training:
+            checkpoint_path = os.path.join(self.checkpoint_dir, f"reinforcement_iteration_{self.current_iteration}.pth")
+            self.save_checkpoint(iteration_metrics, checkpoint_path)
 
     def save_checkpoint(self, epoch_metrics: dict, path: str) -> None:
         epoch_metrics["reinforcement"] = True  # add a flag to the checkpoint
