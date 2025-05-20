@@ -369,6 +369,62 @@ class BarPlotGroupedGenreCounts(BasePlot):
         super()._format_ax()
 
 
+class BarPlotMeanClampScore(BasePlot):
+    BAR_KWS = dict(edgecolor=BLACK, linewidth=LINEWIDTH, linestyle=LINESTYLE, legend=True, zorder=10)
+    ERROR_KWS = dict(fmt='none', color=BLACK, capsize=LINEWIDTH * 2, zorder=100000, linewidth=LINEWIDTH)
+    N_BOOT = 1000
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.df = self._format_df(kwargs.get("res"))
+        self.fig, self.ax = plt.subplots(
+            nrows=2, ncols=1, sharex=False, sharey=True, figsize=(WIDTH, WIDTH)
+        )
+
+    def _format_df(self, df: pd.DataFrame):
+        from jazz_style_conditioned_generation.data.conditions import INCLUDE
+
+        cond_toks = set(i["token"] for i in df)
+        res = []
+        for cond_tok in cond_toks:
+            for gen_real in ["generated", "real"]:
+                gen = [i for i in df if i["token"] == cond_tok and i["type"] == gen_real][0]
+                sims = gen["cosine_sims"]
+                gen_boots = [np.mean(np.random.choice(sims, size=len(sims), replace=True)) for _ in range(self.N_BOOT)]
+                res_tok = dict(
+                    type=gen_real.title(),
+                    token=cond_tok,
+                    mean=np.mean(sims),
+                    std=np.std(sims),
+                    low=abs(np.mean(sims) - np.percentile(gen_boots, 2.5)),
+                    high=abs(np.mean(sims) - np.percentile(gen_boots, 97.5)),
+                    is_pianist=cond_tok in INCLUDE["pianist"]
+                )
+                res.append(res_tok)
+        return pd.DataFrame(res)
+
+    def _format_ax(self):
+        for ax_ in self.ax.flatten():
+            ax_.set_xticks(ax_.get_xticks(), labels=ax_.get_xticklabels(), rotation=90)
+            ax_.grid(axis='y', zorder=0, **GRID_KWS)
+            sns.move_legend(ax_, loc="upper right", title="", **LEGEND_KWS)
+            ax_.set(xlim=[-0.5, max(ax_.get_xlim()) - 0.75], ylabel="Average CLaMP-3 Score")
+        super()._format_ax()
+
+    def _create_plot(self):
+        for (idx, grp), ax_ in zip(self.df.groupby("is_pianist", as_index=False), self.ax.flatten()):
+            grp = grp.sort_values(by="mean", ascending=False).reset_index(drop=True)
+            sns.barplot(data=grp, x="token", y="mean", hue="type", ax=ax_, **self.BAR_KWS)
+            ax_.set(xlabel="Pianist" if idx else "Genre")
+            # Get the x positions of the bars
+            bar_positions = [patch.get_x() + patch.get_width() / 2 for patch in ax_.patches]  # Bar midpoints
+            bar_heights = [patch.get_height() for patch in ax_.patches]  # Bar heights
+            # Loop through the bars and add the error bars using iterrows
+            for i, (_, row) in enumerate(grp.iterrows()):
+                # Add error bars
+                ax_.errorbar(bar_positions[i], bar_heights[i], yerr=row["std"], **self.ERROR_KWS)
+
+
 if __name__ == "__main__":
     pp = PointPlotVocabSizeCustomLoss()
     pp.create_plot()

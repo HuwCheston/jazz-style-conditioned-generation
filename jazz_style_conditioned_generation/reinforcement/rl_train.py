@@ -14,7 +14,7 @@ from loguru import logger
 from torch.utils.data import DataLoader, Dataset, TensorDataset
 from tqdm import tqdm
 
-from jazz_style_conditioned_generation import utils, training
+from jazz_style_conditioned_generation import utils, training, plotting
 from jazz_style_conditioned_generation.data.conditions import validate_condition_values, INCLUDE
 from jazz_style_conditioned_generation.data.dataloader import create_padding_mask, DatasetMIDIConditionedNoOverlapChunks
 from jazz_style_conditioned_generation.data.scores import load_score, preprocess_score
@@ -434,6 +434,10 @@ class ReinforceTrainModule(training.TrainingModule):
         # Dump ACS metrics to a JSON
         js_path = os.path.join(self.checkpoint_dir, f"reinforcement_iteration_{self.current_iteration}.json")
         utils.write_json(self.all_res, js_path)
+        # Create plots
+        bp = plotting.BarPlotMeanClampScore(res=self.all_res)
+        bp.create_plot()
+        bp.save_fig(os.path.join(self.checkpoint_dir, "barplot_avgclamp"))
         # Do testing
         test_loss_pol, test_acc_pol, test_loss_ref, test_acc_ref = self.testing()
         test_sim_mean = np.mean(self.test_cosine_sims)
