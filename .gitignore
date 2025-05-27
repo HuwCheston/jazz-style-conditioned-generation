@@ -125,6 +125,7 @@ target/
 *.html
 *.pdf
 *.svg
+*.mp3
 
 # Exclude blindfold tests
 /data/blindfold_tests/*.txt
