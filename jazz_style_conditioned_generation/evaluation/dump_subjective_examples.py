@@ -32,7 +32,6 @@ CONDITION_TOKENS = [
     "Straight-Ahead Jazz",
     "Traditional & Early Jazz",
     "Global",
-    "Soul Jazz"
 ]
 TRAIN_TRACKS = read_tracks_for_splits("train")
 TEST_TRACKS = read_tracks_for_splits("test")
@@ -58,6 +57,33 @@ if not os.path.isdir(EXAMPLES_DIR):
 class TestDataset(GroundTruthDataset):
     """Custom dataset that also returns track filepaths"""
 
+    def __init__(
+            self,
+            match_token: bool,
+            files_paths: list[str],
+            condition_token: str,
+            clamp: clamp_utils.CLaMP3Model,
+            n_tracks: int = None
+    ):
+        self.match_token = match_token
+        super().__init__(files_paths, condition_token, clamp)
+        if n_tracks is not None:
+            self.files_paths = self.files_paths[:n_tracks]
+
+    def get_tracks_with_condition(self, files_paths: list[str]):
+        for track in files_paths:
+            condition_tokens = self.get_condition_tokens(track)
+            # Matching token: return all tracks with this token
+            if self.match_token:
+                if self.condition_token in condition_tokens:
+                    yield track
+            # Not matching token: return all valid tracks WITHOUT this token
+            else:
+                if (len([ct for ct in condition_tokens if ct in CONDITION_TOKENS]) > 0
+                        and self.condition_token not in condition_tokens):
+                    assert self.condition_token not in condition_tokens
+                    yield track
+
     def __getitem__(self, item: int):
         # Return both the filepath and the extracted features
         fpath = self.files_paths[item]
@@ -66,29 +92,44 @@ class TestDataset(GroundTruthDataset):
 
 
 class GenerationDataset(TestDataset):
+    def __init__(
+            self,
+            match_token: bool,
+            files_paths: list[str],
+            condition_token: str,
+            clamp: clamp_utils.CLaMP3Model,
+            n_tracks: int = None
+    ):
+        super().__init__(match_token, files_paths, condition_token, clamp, n_tracks)
+
+    @staticmethod
+    def format_condition_token(condition_token) -> str:
+        return utils.remove_punctuation(condition_token).replace(' ', '').lower()
+
     def get_tracks_with_condition(self, files_paths: list[str]):
-        tok_fmt = utils.remove_punctuation(self.condition_token).replace(' ', '').lower()
-        for track in tqdm(
-                files_paths,
-                total=len(files_paths),
-                desc=f"Getting generated tracks with condition {self.condition_token}"
-        ):
-            if track.split(os.path.sep)[-1].startswith(tok_fmt) and track.endswith(".mid"):
-                yield track
+        desired_tok_fmt = self.format_condition_token(self.condition_token)
+        other_tok_fmt = tuple(self.format_condition_token(ct) for ct in CONDITION_TOKENS)
+
+        for track in files_paths:
+            # Skip over non-MIDI files
+            if not track.endswith(".mid"):
+                continue
+            # Matching the condition token: return all tracks that start with the correct token
+            track_gen_token = track.split(os.path.sep)[-1]
+            if self.match_token:
+                if track_gen_token.startswith(desired_tok_fmt):
+                    yield track
+            # NOT matching the condition token: return all other valid tracks
+            else:
+                if not track_gen_token.startswith(desired_tok_fmt):
+                    if track_gen_token.startswith(other_tok_fmt):
+                        yield track
 
 
-def extract_features_and_sort(dataset: torch.utils.data.Dataset, gt_features: torch.Tensor) -> list[str]:
-    test_res = []
-    for i in tqdm(range(len(dataset)), "Loading examples..."):
-        fpath, features = dataset[i]
-        sim = F.cosine_similarity(features, gt_features, dim=-1).mean().item()
-        test_res.append((fpath, sim))
-    return [i for i, _ in sorted(test_res, key=lambda x: x[1], reverse=True)][:N_TRACKS]
-
-
-def process_ground_truth_track(filepath: str):
+def dump_real_track(input_filepath: str, output_filepath: str):
+    """Given the filepath of a track, grab a random chunk of 1024 tokens and dump to disk with given filepath"""
     # Load and preprocess score in seconds
-    loaded = preprocess_score(load_score(filepath, as_seconds=True))
+    loaded = preprocess_score(load_score(input_filepath, as_seconds=True))
     # Encode as tokens
     encoded = TOKENIZER(loaded)[0].ids
     # Get a random starting point for the 1024-token chunk
@@ -97,7 +138,39 @@ def process_ground_truth_track(filepath: str):
     end_point = start_point + MAX_SEQ_LEN
     chunk = encoded[start_point:end_point]
     # Back to a Score object to let us dump it to disk
-    return TOKENIZER(torch.tensor([chunk]))
+    outp = TOKENIZER(torch.tensor([chunk]))
+    outp.dump_midi(os.path.join(EXAMPLES_DIR, output_filepath))
+
+
+def get_fpaths_and_features(dataset_cls, **dataset_kwargs) -> tuple[list[str], torch.Tensor]:
+    """Given a dataset class and arguments, get all filepaths and features"""
+    # Create the dataset with desired kwargs
+    dataset = DataLoader(
+        dataset_cls(**dataset_kwargs),
+        shuffle=False,
+        drop_last=False,
+        batch_size=4
+    )
+    # Extract the features from all tracks in the dataset
+    fpaths, features = zip(*[(fp, feat) for (fp, feat) in tqdm(dataset, desc="Extracting features...")])
+    fpaths = [x for xs in fpaths for x in xs]  # flatten to (N_tracks)
+    features = torch.cat(features, dim=0)  # shape (N_tracks, features)
+    return fpaths, features
+
+
+def get_most_similar_track_idx(x_feat: torch.Tensor, y_feats: torch.Tensor, idx: int = 0) -> int:
+    """Given a 1D tensor and 2D tensor of features, get index of row in 2D tensor that is most similar to 1D tensor"""
+    match_sims = F.cosine_similarity(x_feat, y_feats, dim=-1)
+    return torch.argsort(match_sims, descending=True).tolist()[idx]
+
+
+def get_clamp_features_from_clip(clip_fpath: str, clamp) -> torch.Tensor:
+    track_tmp = load_score(clip_fpath, as_seconds=True)
+    track_loaded = preprocess_score(track_tmp)
+    # Convert the ground truth track into the format required for CLaMP
+    gt_data = clamp_utils.midi_to_clamp(track_loaded)
+    # Extract features using CLaMP
+    return clamp_utils.extract_clamp_features(gt_data, clamp)
 
 
 def main(generation_dir_clamp: str, generation_dir_noclamp: str) -> None:
@@ -124,7 +197,7 @@ def main(generation_dir_clamp: str, generation_dir_noclamp: str) -> None:
         tok_fmt = utils.remove_punctuation(condition_token).replace(' ', '').lower()
         logger.info(f"Processing token {tok_fmt}")
         # Get ground truth tracks from the training dataset with this condition
-        train_dataset = DataLoader(
+        gt_dataset = DataLoader(
             GroundTruthDataset(
                 files_paths=TRAIN_TRACKS,
                 condition_token=condition_token,
@@ -134,48 +207,113 @@ def main(generation_dir_clamp: str, generation_dir_noclamp: str) -> None:
             drop_last=False,
             batch_size=4
         )
-        gt_features = torch.cat([i for i in tqdm(train_dataset, desc="Loading train examples...")], dim=0)
+        # Extract the features
+        gt_features = torch.cat([i for i in tqdm(gt_dataset, desc="Loading train examples...")], dim=0)
 
-        generated_dataset_clamp = GenerationDataset(files_paths=gen_fps_clamp, condition_token=condition_token,
-                                                    clamp=clamp)
-        # Compute cosine similarities and store filenames + sims
-        gen_res_sorted_clamp = extract_features_and_sort(generated_dataset_clamp, gt_features)
-        # Iterate over the top N most similar generations
-        for n, t in enumerate(gen_res_sorted_clamp):
-            # No need to do anything special here, we can just copy the generation with shutil
-            dst = os.path.join(EXAMPLES_DIR, f"{tok_fmt}_{str(n).zfill(3)}_gen_clamp.mid")
-            shutil.copy(t, dst)
-
-        generated_dataset_noclamp = GenerationDataset(
-            files_paths=gen_fps_noclamp,
-            condition_token=condition_token,
-            clamp=clamp
-        )
-        # Compute cosine similarities and store filenames + sims
-        gen_res_sorted_noclamp = extract_features_and_sort(generated_dataset_noclamp, gt_features)
-        # Iterate over the top N most similar generations
-        for n, t in enumerate(gen_res_sorted_noclamp):
-            # No need to do anything special here, we can just copy the generation with shutil
-            dst = os.path.join(EXAMPLES_DIR, f"{tok_fmt}_{str(n).zfill(3)}_gen_noclamp.mid")
-            shutil.copy(t, dst)
-
-        # Do the same for the held-out test data (both validation and test tracks)
-        test_dataset = TestDataset(
+        # Get held-out test tracks with this condition token
+        test_fpaths, test_features = get_fpaths_and_features(
+            TestDataset,
+            match_token=True,
             files_paths=HELD_OUT_TRACKS,
             condition_token=condition_token,
             clamp=clamp
         )
-        test_res_sorted = extract_features_and_sort(test_dataset, gt_features)
-        for n, t in enumerate(test_res_sorted):
-            # We need to extract a random 1024-token chunk from the test track
-            dec = process_ground_truth_track(t)
-            # Grab the metadata JSON file
-            meta = t.replace("piano_midi.mid", "metadata_tivo.json")
-            meta_read = utils.read_json_cached(meta)
-            # Get the first part of the ID
-            mbz_id = meta_read["mbz_id"].split("-")[0]
-            fp = os.path.join(EXAMPLES_DIR, f"{tok_fmt}_{str(n).zfill(3)}_real_{mbz_id}.mid")
-            dec.dump_midi(fp)
+
+        # For every track in the test dataset, compute the cosine similarity vs the ground truth: shape (N_test_tracks)
+        sim_matrix = torch.matmul(F.normalize(test_features, dim=1), F.normalize(gt_features, dim=1).T)
+        collapsed = sim_matrix.mean(dim=1)
+        # Extract top-N test tracks
+        sort_idxs = collapsed.argsort(descending=True).tolist()[:N_TRACKS]
+        test_fpaths_top_n = [test_fpaths[i] for i in sort_idxs]
+        test_features_top_n = test_features[sort_idxs, :]
+
+        # Get held-out test tracks WITHOUT this condition token
+        test_nomatch_fpaths, test_nomatch_features = get_fpaths_and_features(
+            TestDataset,
+            match_token=False,
+            files_paths=HELD_OUT_TRACKS,
+            condition_token=condition_token,
+            clamp=clamp
+        )
+
+        # Get generated tracks WITH this condition token, WITH clamp
+        gen_match_clamp_fpaths, gen_match_clamp_features = get_fpaths_and_features(
+            GenerationDataset,
+            match_token=True,
+            files_paths=gen_fps_clamp,
+            condition_token=condition_token,
+            clamp=clamp
+        )
+        # Get generated tracks WITHOUT this condition token, WITH clamp
+        gen_nomatch_clamp_fpaths, gen_nomatch_clamp_features = get_fpaths_and_features(
+            GenerationDataset,
+            match_token=False,
+            files_paths=gen_fps_clamp,
+            condition_token=condition_token,
+            clamp=clamp
+        )
+        # Get generated tracks WITH this condition token, WITHOUT clamp
+        gen_match_noclamp_fpaths, gen_match_noclamp_features = get_fpaths_and_features(
+            GenerationDataset,
+            match_token=True,
+            files_paths=gen_fps_noclamp,
+            condition_token=condition_token,
+            clamp=clamp
+        )
+        # Get generated tracks WITHOUT this condition token, WITHOUT clamp
+        gen_nomatch_noclamp_fpaths, gen_nomatch_noclamp_features = get_fpaths_and_features(
+            GenerationDataset,
+            match_token=False,
+            files_paths=gen_fps_noclamp,
+            condition_token=condition_token,
+            clamp=clamp
+        )
+
+        # Iterate over top-N held-out tracks that are most similar to the ground truth
+        for n, (test_fpath, test_feat) in enumerate(zip(test_fpaths_top_n, test_features_top_n)):
+            # Grab a random chunk of 1024 tokens and dump to disk
+            dump_real_track(test_fpath, f'{tok_fmt}_{str(n).zfill(3)}_anchor.mid')
+            clip_features = get_clamp_features_from_clip(
+                os.path.join(EXAMPLES_DIR, f'{tok_fmt}_{str(n).zfill(3)}_anchor.mid'), clamp)
+
+            # Get all file paths for this track
+            # Starting with the "real" tracks
+            real_match = test_fpaths[get_most_similar_track_idx(clip_features, test_features, idx=0)]
+            if real_match == test_fpath:
+                real_match = test_fpaths[get_most_similar_track_idx(clip_features, test_features, idx=1)]
+            real_nomatch = np.random.choice(test_nomatch_fpaths)
+
+            # Then with generations using clamp
+            gen_match_clamp = gen_match_clamp_fpaths[
+                get_most_similar_track_idx(clip_features, gen_match_clamp_features)]
+            gen_nomatch_clamp = np.random.choice(gen_nomatch_clamp_fpaths)
+
+            # Then generations not using clamp
+            gen_match_noclamp = gen_match_noclamp_fpaths[
+                get_most_similar_track_idx(clip_features, gen_match_noclamp_features)]
+            gen_nomatch_noclamp = np.random.choice(gen_nomatch_noclamp_fpaths)
+
+            # Check all filepaths are unique
+            all_fps = [
+                real_match, real_nomatch,  # real tracks
+                gen_match_clamp, gen_nomatch_clamp,  # generated tracks with clamp
+                gen_match_noclamp, gen_nomatch_noclamp,  # generated tracks without clamp
+                test_fpath
+            ]
+            assert len(set(all_fps)) == len(all_fps)
+
+            # For the "real" tracks, we need to snip a random chunk of 1024 tokens. This function does that.
+            dump_real_track(real_match, f'{tok_fmt}_{str(n).zfill(3)}_real_match.mid')
+            dump_real_track(real_nomatch, f'{tok_fmt}_{str(n).zfill(3)}_real_nomatch.mid')
+
+            # For the "generated" tracks, we can just use the full generation
+            shutil.copy(gen_match_clamp, os.path.join(EXAMPLES_DIR, f'{tok_fmt}_{str(n).zfill(3)}_gen_match_clamp.mid'))
+            shutil.copy(gen_match_noclamp,
+                        os.path.join(EXAMPLES_DIR, f'{tok_fmt}_{str(n).zfill(3)}_gen_match_noclamp.mid'))
+            shutil.copy(gen_nomatch_clamp,
+                        os.path.join(EXAMPLES_DIR, f'{tok_fmt}_{str(n).zfill(3)}_gen_nomatch_clamp.mid'))
+            shutil.copy(gen_nomatch_noclamp,
+                        os.path.join(EXAMPLES_DIR, f'{tok_fmt}_{str(n).zfill(3)}_gen_nomatch_noclamp.mid'))
 
 
 if __name__ == "__main__":

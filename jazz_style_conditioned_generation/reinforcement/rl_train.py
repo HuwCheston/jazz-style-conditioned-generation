@@ -43,6 +43,22 @@ class GroundTruthDataset(Dataset):
         utils.validate_paths(files_paths, expected_extension=".mid")
         self.files_paths = list(self.get_tracks_with_condition(files_paths))
 
+    @staticmethod
+    def get_condition_tokens(track: str) -> list[str]:
+        """Given a track, load up the metadata and return the condition tokens (pianist + genre)"""
+        # Load in metadata for the track
+        metadata = track.replace("piano_midi.mid", "metadata_tivo.json")
+        metadata_read = utils.read_json_cached(metadata)
+        # Get track pianist
+        pianist = metadata_read["pianist"]
+        validated_pianist = [pianist] if pianist in INCLUDE["pianist"] else []
+        # Get genres and merge with other similar genres
+        genres = [(n["name"], n["weight"]) for n in metadata_read["genres"]]
+        validated_genres = validate_condition_values(genres, "genres")
+        validated_genres = [i for i, _ in validated_genres]
+        # Concatenate condition tokens together
+        return validated_pianist + validated_genres
+
     def get_tracks_with_condition(self, files_paths: list[str]):
         """For every ground truth track with associated valid genres/pianist, extract features with CLaMP3"""
         for track in tqdm(
@@ -50,18 +66,7 @@ class GroundTruthDataset(Dataset):
                 total=len(files_paths),
                 desc=f"Getting ground truth tracks with condition {self.condition_token}"
         ):
-            # Load in metadata for the track
-            metadata = track.replace("piano_midi.mid", "metadata_tivo.json")
-            metadata_read = utils.read_json_cached(metadata)
-            # Get track pianist
-            pianist = metadata_read["pianist"]
-            validated_pianist = [pianist] if pianist in INCLUDE["pianist"] else []
-            # Get genres and merge with other similar genres
-            genres = [(n["name"], n["weight"]) for n in metadata_read["genres"]]
-            validated_genres = validate_condition_values(genres, "genres")
-            validated_genres = [i for i, _ in validated_genres]
-            # Concatenate condition tokens together
-            condition_tokens = validated_pianist + validated_genres
+            condition_tokens = self.get_condition_tokens(track)
             # We only want to consider tracks with the desired condition token
             if self.condition_token in condition_tokens:
                 yield track
@@ -80,6 +85,14 @@ class GroundTruthDataset(Dataset):
         return clamp_utils.extract_clamp_features(gt_data, self.clamp)
 
 
+class GroundTruthDatasetAll(GroundTruthDataset):
+    """GroundTruthDataset that doesn't check for a particular condition token"""
+
+    def get_tracks_with_condition(self, files_paths: list[str]):
+        for track in files_paths:
+            yield track
+
+
 class ReinforceTrainModule(training.TrainingModule):
     """Module used to train a finetuned model with CLaMP3-DPO"""
 
@@ -94,6 +107,14 @@ class ReinforceTrainModule(training.TrainingModule):
         logger.info("----REINFORCEMENT LEARNING WITH CLAMP3----")
         if self.skip_training:
             logger.warning("We will SKIP training and only calculate metrics (loss, ACS)")
+
+        # Initialize clamp3 from checkpoint
+        self.clamp = clamp_utils.initialize_clamp(pretrained=True)
+
+        # Extract features from all training tracks, regardless of token
+        self.train_features = self.extract_all_training_features()
+        self.cosine_sim_all_train_tracks = []  # keep track of generated cosine sim to ALL training tracks
+        self.cosine_sim_rand_train_tracks = []  # sampled means
 
         # These are the condition tokens we'll use in generation + evaluation
         self.condition_tokens = INCLUDE["genres"] + INCLUDE["pianist"]
@@ -135,8 +156,20 @@ class ReinforceTrainModule(training.TrainingModule):
         betas = tuple(optimizer_kws.pop("betas", (0.9, 0.999)))
         self.optimizer = self.get_optimizer(optimizer_type)(self.model.parameters(), betas=betas, **optimizer_kws)
 
-        # Initialize clamp3 from checkpoint
-        self.clamp = clamp_utils.initialize_clamp(pretrained=True)
+    def extract_all_training_features(self):
+        # Define a dataloader that will extract all ground truth features
+        gt_loader = DataLoader(
+            GroundTruthDatasetAll(
+                self.track_splits["train"],
+                condition_token=None,
+                clamp=self.clamp
+            ),
+            batch_size=self.batch_size,
+            shuffle=False,
+            drop_last=False
+        )
+        # Get all the features for all the ground truth tracks: shape (N_ground_truth, N_clamp_dims)
+        return torch.cat([i for i in tqdm(gt_loader, desc="Extracting features from all training tracks...")], dim=0)
 
     @property
     def reference_checkpoint_path(self) -> str:
@@ -288,6 +321,7 @@ class ReinforceTrainModule(training.TrainingModule):
         self.model.eval()
         # Start doing the generations
         all_cos_sim, all_log_likelihood = [], []
+        cos_sim_all_training, cos_sim_rand_training = [], []
         all_res = []
         for gen_idx in tqdm(range(self.n_generations), desc="Scoring generations..."):
             # Pull the generated MIDI from disk and return the token sequence + CLaMP features
@@ -301,10 +335,30 @@ class ReinforceTrainModule(training.TrainingModule):
             score = cos_sim_all.mean().item()
             all_cos_sim.append(score)
             all_res.append((gen_i_toks, score))
+            # Compute cosine similarity vs ALL training tracks
+            cos_sim_all_training.append(F.cosine_similarity(gen_i_features, self.train_features).mean().item())
+
+            # Compute cosine similarity vs a random subset of N training tracks (sampled without replacement)
+            # Create a list of N idxs, without replacement
+            rand_idxs = torch.randperm(len(self.train_features))[:len(gt_features)]
+            # Subset the training features according to the N features
+            rand_subset = self.train_features[rand_idxs, :]
+            # Compute the cosine similarity
+            rand_cs = F.cosine_similarity(gen_i_features, rand_subset).mean().item()
+            cos_sim_rand_training.append(rand_cs)
+
         # Append results to list of dictionaries
-        self.all_res.append(dict(token=token, cosine_sims=all_cos_sim, type="generated"))
+        self.all_res.append(dict(
+            token=token,
+            cosine_sims=all_cos_sim,
+            cosine_sims_all_training=cos_sim_all_training,
+            cosine_sims_rand_trainig=cos_sim_rand_training,
+            type="generated"
+        ))
         # Extend the lists of all our cosine similarities
         self.all_cosine_sims.extend(all_cos_sim)
+        self.cosine_sim_all_train_tracks.extend(cos_sim_all_training)
+        self.cosine_sim_rand_train_tracks.extend(cos_sim_rand_training)
         # Compute summary statistics from all of our generations
         logger.debug(f"Finished getting generations for token {token}: "
                      f"best cosine similarity {max(all_cos_sim):.3f}, "
@@ -431,6 +485,11 @@ class ReinforceTrainModule(training.TrainingModule):
         mean_cosine_sim = np.mean(self.all_cosine_sims)
         logger.debug(f"Finished reinforcement iteration {self.current_iteration}: "
                      f"mean cosine similarity {mean_cosine_sim:.3f}")
+        # Compute correlation between desired token cosine similarity and entire training set cosine similarity
+        cosine_sim_r = np.corrcoef(self.all_cosine_sims, self.cosine_sim_all_train_tracks)[0, 1]
+        logger.debug(f"Cosine similarity correlation with ALL training tracks: {cosine_sim_r:.3f}")
+        cosine_sim_r_rand = np.corrcoef(self.all_cosine_sims, self.cosine_sim_all_train_tracks)[0, 1]
+        logger.debug(f"Cosine similarity correlation with RANDOM training tracks: {cosine_sim_r_rand:.3f}")
         # Dump ACS metrics to a JSON
         js_path = os.path.join(self.checkpoint_dir, f"reinforcement_iteration_{self.current_iteration}.json")
         utils.write_json(self.all_res, js_path)
