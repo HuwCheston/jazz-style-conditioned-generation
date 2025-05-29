@@ -126,7 +126,7 @@ class GenerationDataset(TestDataset):
                         yield track
 
 
-def dump_real_track(input_filepath: str, output_filepath: str):
+def dump_real_track(input_filepath: str, output_filepath: str) -> str:
     """Given the filepath of a track, grab a random chunk of 1024 tokens and dump to disk with given filepath"""
     # Load and preprocess score in seconds
     loaded = preprocess_score(load_score(input_filepath, as_seconds=True))
@@ -139,7 +139,15 @@ def dump_real_track(input_filepath: str, output_filepath: str):
     chunk = encoded[start_point:end_point]
     # Back to a Score object to let us dump it to disk
     outp = TOKENIZER(torch.tensor([chunk]))
-    outp.dump_midi(os.path.join(EXAMPLES_DIR, output_filepath))
+    # Grab the metadata JSON file
+    meta = input_filepath.replace("piano_midi.mid", "metadata_tivo.json")
+    meta_read = utils.read_json_cached(meta)
+    # Get the first part of the ID
+    mbz_id = meta_read["mbz_id"].split("-")[0]
+    # Dump to disk with the complete filepath
+    outpath = os.path.join(EXAMPLES_DIR, output_filepath + "_" + mbz_id + ".mid")
+    outp.dump_midi(outpath)
+    return outpath
 
 
 def get_fpaths_and_features(dataset_cls, **dataset_kwargs) -> tuple[list[str], torch.Tensor]:
@@ -272,9 +280,9 @@ def main(generation_dir_clamp: str, generation_dir_noclamp: str) -> None:
         # Iterate over top-N held-out tracks that are most similar to the ground truth
         for n, (test_fpath, test_feat) in enumerate(zip(test_fpaths_top_n, test_features_top_n)):
             # Grab a random chunk of 1024 tokens and dump to disk
-            dump_real_track(test_fpath, f'{tok_fmt}_{str(n).zfill(3)}_anchor.mid')
-            clip_features = get_clamp_features_from_clip(
-                os.path.join(EXAMPLES_DIR, f'{tok_fmt}_{str(n).zfill(3)}_anchor.mid'), clamp)
+            test_fpath_out = dump_real_track(test_fpath, f'{tok_fmt}_{str(n).zfill(3)}_anchor')
+            # Get features from the random chunk of 1024 tokens
+            clip_features = get_clamp_features_from_clip(test_fpath_out, clamp)
 
             # Get all file paths for this track
             # Starting with the "real" tracks
@@ -303,8 +311,8 @@ def main(generation_dir_clamp: str, generation_dir_noclamp: str) -> None:
             assert len(set(all_fps)) == len(all_fps)
 
             # For the "real" tracks, we need to snip a random chunk of 1024 tokens. This function does that.
-            dump_real_track(real_match, f'{tok_fmt}_{str(n).zfill(3)}_real_match.mid')
-            dump_real_track(real_nomatch, f'{tok_fmt}_{str(n).zfill(3)}_real_nomatch.mid')
+            dump_real_track(real_match, f'{tok_fmt}_{str(n).zfill(3)}_real_match')
+            dump_real_track(real_nomatch, f'{tok_fmt}_{str(n).zfill(3)}_real_nomatch')
 
             # For the "generated" tracks, we can just use the full generation
             shutil.copy(gen_match_clamp, os.path.join(EXAMPLES_DIR, f'{tok_fmt}_{str(n).zfill(3)}_gen_match_clamp.mid'))

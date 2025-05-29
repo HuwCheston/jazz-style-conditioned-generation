@@ -425,6 +425,169 @@ class BarPlotMeanClampScore(BasePlot):
                 ax_.errorbar(bar_positions[i], bar_heights[i], yerr=row["std"], **self.ERROR_KWS)
 
 
+class BarPlotSubjectiveQuality(BasePlot):
+    """Bar plot for quality (enjoyment, diversity, AI-generated) questions asked during listening test"""
+
+    N_BOOT = 10000
+    BAR_KWS = dict(
+        edgecolor=BLACK,
+        linewidth=LINEWIDTH,
+        linestyle=LINESTYLE,
+        legend=True,
+        zorder=10,
+        errorbar=('ci', 95),
+        err_kws=dict(
+            zorder=10000,
+            color=BLACK,
+            linewidth=LINEWIDTH
+        ),
+        capsize=0.2,
+        n_boot=N_BOOT,
+    )
+
+    def __init__(self, df: pd.DataFrame, **kwargs):
+        super().__init__(**kwargs)
+        self.df = self._format_df(df)
+        self.fig, self.ax = plt.subplots(1, 1, figsize=(WIDTH // 2, WIDTH // 2))
+
+    def _format_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Format the dataframe for `quality` questions (preference, diversity, is_ml)"""
+        kind_map = {"real": "Ground Truth", "_clamp": "Fine-tune/DPO-P", "_noclamp": "Fine-tune"}
+        quality_res = [
+            {
+                "kind": kind,
+                "preference": row[f"preference_{sord}"],
+                "diversity": row[f"diversity_{sord}"],
+                "is_ml": row[f"is_ml_{sord}"],
+                # "sord": sord
+            }
+            for _, row in df.iterrows()
+            for sord in ["a", "b"]
+            for suffix, kind in kind_map.items() if suffix in row[sord]
+        ]
+        assert len(quality_res) == len(df) * 2
+        return (
+            pd.DataFrame(quality_res)
+            .melt(id_vars="kind")
+            .dropna()  # remove missing values: these happen occasionally if a participant only rates 1/2 performances
+            .reset_index(drop=True)
+        )
+
+    def _create_plot(self):
+        return sns.barplot(data=self.df, x="variable", y="value", hue="kind", ax=self.ax, **self.BAR_KWS)
+
+    def _format_ax(self):
+        self.ax.set(
+            xlabel="Question",
+            xticklabels=[r"Liking $\uparrow$", r"Diversity $\uparrow$", r"AI-Generated $\downarrow$"],
+            ylabel="Mean response",
+            ylim=(0, 5.7)  # gives us a bit of headroom
+        )
+        self.ax.grid(axis="y", zorder=0, **GRID_KWS)
+        sns.move_legend(self.ax, title="", loc="upper right", **LEGEND_KWS)
+        super()._format_ax()
+
+
+class BarPlotSubjectiveSimilarity(BasePlot):
+    """Bar plot for similarity question asked during listening test"""
+    BAR_KWS = dict(edgecolor=BLACK, linewidth=LINEWIDTH, linestyle=LINESTYLE, legend=False, zorder=10, width=BARWIDTH)
+    TEXT_KWS = dict(va='center', ha='center', zorder=10000, color=WHITE, fontsize=FONTSIZE * 1.25)
+
+    def __init__(self, df: pd.DataFrame, **kwargs):
+        super().__init__(**kwargs)
+        self.df = self._format_df(df)
+        self.fig, self.ax = plt.subplots(ncols=2, nrows=1, figsize=(WIDTH, WIDTH // 2), sharey=False, sharex=True)
+
+    @staticmethod
+    def get_winner(row: pd.Series) -> str:
+        """Determine the winner for each row"""
+        if row["similar"] == "a":
+            return row["a"]
+        elif row["similar"] == "b":
+            return row["b"]
+        else:
+            return "tie"
+
+    @staticmethod
+    def summarize_group(grp: pd.DataFrame) -> pd.Series:
+        """Group and count results"""
+        a, b = grp.name.split("+")
+        counts = grp["winner"].value_counts()
+        return pd.Series({
+            "kind": grp.name,
+            "a_wins": counts.get(a, 0),
+            "b_wins": counts.get(b, 0),
+            "ties": counts.get("tie", 0),
+        })
+
+    @staticmethod
+    def df_as_proportion(to_prop: pd.DataFrame) -> pd.DataFrame:
+        """Convert row values to percentages"""
+        return to_prop.div(to_prop.sum(axis=1), axis=0) * 100
+
+    def _format_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        mapper = {
+            "gen_match_clamp": "CLaMP/target",
+            "gen_nomatch_clamp": "CLaMP/wrong",
+            "gen_match_noclamp": "nCLaMP/target",
+            "gen_nomatch_noclamp": "nCLaMP/wrong",
+            "real_match": "real/target",
+            "real_nomatch": "real/wrong",
+            "tie": "tie"
+        }
+        # Apply winner function and map to standardized labels
+        df["winner"] = df.apply(self.get_winner, axis=1).map(mapper)
+        result_df = (
+            df.groupby("type")
+            .apply(self.summarize_group)
+            .reset_index(drop=True)
+            .set_index("kind")
+        )
+        prop = self.df_as_proportion(result_df).reset_index(drop=False)
+        prop["is_clamp"] = prop["kind"].apply(lambda x: True if "nCLaMP" not in x else False)
+        return prop.set_index("kind")[["a_wins", "ties", "b_wins", "is_clamp"]]
+
+    def _create_plot(self):
+        for (idx, grp), ax_ in zip(self.df.groupby("is_clamp"), self.ax.flatten()):
+            ax_ = grp.plot(kind='barh', stacked=True, ax=ax_, **self.BAR_KWS)
+            # Add custom text labels
+            for i, row in grp.iterrows():
+                a, b = str(i).split("+")
+                cum_width = 0
+                for s, col in zip([a, "No Preference", b], ["a_wins", "ties", "b_wins"]):
+                    if "nCLaMP/" in s:
+                        s = s.replace("nCLaMP/", "Model, ")
+                    elif "CLaMP/" in s:
+                        s = s.replace("CLaMP/", "Model, ")
+                    if "real" in s:
+                        s = s.replace("real", "Real")
+                    if "target" in s:
+                        s = s.replace("target", "same genre")
+                    elif "wrong" in s:
+                        s = s.replace("wrong", "wrong genre")
+                    value = row[col]
+                    if value > 0.01:
+                        ax_.text(
+                            x=cum_width + value / 2,
+                            y=ax_.get_yticks()[list(grp.index).index(i)],
+                            s=f"{s}\n({value:.1f}%)",
+                            **self.TEXT_KWS
+                        )
+                    cum_width += value
+            ax_.set_title("Fine-tune/DPO-P" if idx else "Fine-tune")
+
+    def _format_ax(self):
+        for ax_ in self.ax.flatten():
+            ax_.set(
+                yticklabels=["" for _ in range(len(ax_.get_yticklabels()))],
+                ylabel="",
+                xlabel="Voting Rate (%)",
+                xlim=(0, 100)
+            )
+            ax_.grid(axis='x', zorder=0, **GRID_KWS)
+        super()._format_ax()
+
+
 if __name__ == "__main__":
     pp = PointPlotVocabSizeCustomLoss()
     pp.create_plot()
