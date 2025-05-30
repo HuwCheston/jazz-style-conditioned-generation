@@ -143,8 +143,10 @@ def main(export_json: str = EXPORT_JSON):
 
         # Formatting participant emails
         elif response["question"] == "email":
+            if response["answer"] is None:
+                pass
             # Simple way of filtering if somebody actually provided an email
-            if "@" in response["answer"]:
+            elif "@" in response["answer"]:
                 participant_emails.append(response["answer"])
             else:
                 logger.warning(f"Email obtained, but no @ symbol found: {response['answer']}")
@@ -163,9 +165,12 @@ def main(export_json: str = EXPORT_JSON):
 
     # Create plots for similarity judgement
     logger.info("------SIMILARITY QUESTION------")
-    similarity_bp = plotting.BarPlotSubjectiveSimilarity(answers_df)
+    similarity_bp = plotting.BarPlotSubjectiveSimilarity(answers_df, use_toy_data=True)
     similarity_bp.create_plot()
     similarity_bp.save_fig(os.path.join(FIGURES_DIR, "barplot_similarity"))
+    # Dump CSV files as well
+    similarity_bp.df.to_csv(os.path.join(FIGURES_DIR, "similarity_norm.csv"))
+    similarity_bp.df_non_norm.to_csv(os.path.join(FIGURES_DIR, "similarity_nonorm.csv"))  # this is used for the table
 
     # Create plots for quality judgement (Likert scales)
     logger.info("------QUALITY QUESTIONS------")

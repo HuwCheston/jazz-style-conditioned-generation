@@ -4,6 +4,7 @@
 """Plotting classes, functions, and variables."""
 
 import os
+import random
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -490,13 +491,37 @@ class BarPlotSubjectiveQuality(BasePlot):
 
 class BarPlotSubjectiveSimilarity(BasePlot):
     """Bar plot for similarity question asked during listening test"""
-    BAR_KWS = dict(edgecolor=BLACK, linewidth=LINEWIDTH, linestyle=LINESTYLE, legend=False, zorder=10, width=BARWIDTH)
-    TEXT_KWS = dict(va='center', ha='center', zorder=10000, color=WHITE, fontsize=FONTSIZE * 1.25)
+    BAR_KWS = dict(
+        edgecolor=BLACK, linewidth=LINEWIDTH, linestyle=LINESTYLE, legend=False, zorder=10, width=BARWIDTH / 2
+    )
+    TEXT_KWS = dict(va='center', ha='center', zorder=10000, fontsize=FONTSIZE)
+    CONDITIONS = [
+        'CLaMP/target+nCLaMP/target',
+        'CLaMP/target+real/target', 'CLaMP/target+real/wrong', 'CLaMP/target+CLaMP/wrong',
+        'nCLaMP/target+nCLaMP/wrong', 'nCLaMP/target+real/target', 'nCLaMP/target+real/wrong'
+    ]
 
     def __init__(self, df: pd.DataFrame, **kwargs):
         super().__init__(**kwargs)
-        self.df = self._format_df(df)
+        self.df_non_norm = None
+        if kwargs.get("use_toy_data", False):
+            self.df = self._get_toy_data()
+            self.df_non_norm = self.df
+        else:
+            self.df = self._format_df(df)
         self.fig, self.ax = plt.subplots(ncols=2, nrows=1, figsize=(WIDTH, WIDTH // 2), sharey=False, sharex=True)
+
+    def _get_toy_data(self) -> pd.DataFrame:
+        """Gets toy data in the correct format, for use before we have real data"""
+
+        def getter():
+            rand = [random.random() for _ in range(3)]
+            a_wins, ties, b_wins = [(i / sum(rand)) * 100 for i in rand]
+            return dict(a_wins=a_wins, ties=ties, b_wins=b_wins)
+
+        is_clamp = [False, True, True, True, False, False, False]
+        toy_data = [{"kind": k, **getter(), "is_clamp": ic} for k, ic in zip(self.CONDITIONS, is_clamp)]
+        return pd.DataFrame(toy_data).set_index("kind")
 
     @staticmethod
     def get_winner(row: pd.Series) -> str:
@@ -543,15 +568,18 @@ class BarPlotSubjectiveSimilarity(BasePlot):
             .reset_index(drop=True)
             .set_index("kind")
         )
+        self.df = result_df.copy()
         prop = self.df_as_proportion(result_df).reset_index(drop=False)
         prop["is_clamp"] = prop["kind"].apply(lambda x: True if "nCLaMP" not in x else False)
         return prop.set_index("kind")[["a_wins", "ties", "b_wins", "is_clamp"]]
 
     def _create_plot(self):
+        self.df = self.df[self.df.index != "CLaMP/target+nCLaMP/target"]
         for (idx, grp), ax_ in zip(self.df.groupby("is_clamp"), self.ax.flatten()):
             ax_ = grp.plot(kind='barh', stacked=True, ax=ax_, **self.BAR_KWS)
             # Add custom text labels
             for i, row in grp.iterrows():
+                prev_above = False
                 a, b = str(i).split("+")
                 cum_width = 0
                 for s, col in zip([a, "No Preference", b], ["a_wins", "ties", "b_wins"]):
@@ -559,20 +587,30 @@ class BarPlotSubjectiveSimilarity(BasePlot):
                         s = s.replace("nCLaMP/", "Model, ")
                     elif "CLaMP/" in s:
                         s = s.replace("CLaMP/", "Model, ")
-                    if "real" in s:
-                        s = s.replace("real", "Real")
+                    if "real/" in s:
+                        s = s.replace("real/", "Real, ")
                     if "target" in s:
-                        s = s.replace("target", "same genre")
-                    elif "wrong" in s:
-                        s = s.replace("wrong", "wrong genre")
+                        s = s.replace("target", "match")
                     value = row[col]
-                    if value > 0.01:
-                        ax_.text(
-                            x=cum_width + value / 2,
-                            y=ax_.get_yticks()[list(grp.index).index(i)],
-                            s=f"{s}\n({value:.1f}%)",
-                            **self.TEXT_KWS
-                        )
+                    y = ax_.get_yticks()[list(grp.index).index(i)]
+                    if value < 25:
+                        if prev_above:
+                            y -= 0.3
+                            prev_above = False
+                        else:
+                            prev_above = True
+                            y += 0.3
+                        color = BLACK
+                        s = f"{s}\n({value:.1f}%)"
+                    else:
+                        color = WHITE
+                        if value < 35:
+                            s = f"{s}\n({value:.1f}%)"
+                        else:
+                            s = f"{s} ({value:.1f}%)"
+                        prev_above = False
+
+                    ax_.text(x=cum_width + value / 2, y=y, s=s, color=color, **self.TEXT_KWS)
                     cum_width += value
             ax_.set_title("Fine-tune/DPO-P" if idx else "Fine-tune")
 
