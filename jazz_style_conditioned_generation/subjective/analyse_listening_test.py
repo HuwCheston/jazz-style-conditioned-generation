@@ -165,7 +165,7 @@ def main(export_json: str = EXPORT_JSON):
 
     # Create plots for similarity judgement
     logger.info("------SIMILARITY QUESTION------")
-    similarity_bp = plotting.BarPlotSubjectiveSimilarity(answers_df, use_toy_data=True)
+    similarity_bp = plotting.BarPlotSubjectiveSimilarity(answers_df, use_toy_data=False)
     similarity_bp.create_plot()
     similarity_bp.save_fig(os.path.join(FIGURES_DIR, "barplot_similarity"))
     # Dump CSV files as well

@@ -568,7 +568,7 @@ class BarPlotSubjectiveSimilarity(BasePlot):
             .reset_index(drop=True)
             .set_index("kind")
         )
-        self.df = result_df.copy()
+        self.df_non_norm = result_df.copy()
         prop = self.df_as_proportion(result_df).reset_index(drop=False)
         prop["is_clamp"] = prop["kind"].apply(lambda x: True if "nCLaMP" not in x else False)
         return prop.set_index("kind")[["a_wins", "ties", "b_wins", "is_clamp"]]
