@@ -49,23 +49,17 @@ def coerce_type(dangerous: Any) -> Any:
 
 def format_answer(answer_dict: dict) -> dict:
     """Formats the nested JSON with key `answer` for `question`: `rating`"""
-    new_dict = {
-        "similar": answer_dict["similar"]["similar_perf"].split("_")[1]
-        if answer_dict["similar"]["similar_perf"] != "null" else None
-    }
-    # Format similar performance question
-    # Format the three likert scale questions
-    for k in ["preference", "is_ml", "diversity"]:
-        assert k in answer_dict
-        for c in ["a", "b"]:
-            # May be possible for a user not to provide a response for every track?
-            if f"test_{c}" not in answer_dict[k]:
-                logger.error(f"Couldn't find response for track {c}, question {k}")
-                new_dict[f"{k}_{c}"] = None
-            # Otherwise, try and coerce the answer to an integer
-            else:
-                new_dict[f"{k}_{c}"] = coerce_type(answer_dict[k][f"test_{c}"])
-    return new_dict
+    answer_fmt = {}
+    for k, v in answer_dict.items():
+        # Unpack nested dictionary
+        if isinstance(v, dict):
+            v = v["null"]
+        if isinstance(v, str):
+            v = coerce_type(v)
+        if k == "genre":
+            k = "predicted_genre"
+        answer_fmt[k] = v
+    return answer_fmt
 
 
 def format_metadata(metadata_dict: dict) -> dict:
@@ -73,21 +67,11 @@ def format_metadata(metadata_dict: dict) -> dict:
     # We only need the prompt dictionary, so grab that
     prompt_dict = metadata_dict["prompt"]
     assert isinstance(prompt_dict, dict)
-    new_dict = {}
-    # Formats filepaths, operates differently for generated/real fpaths
-    fmt = lambda x: "_".join(
-        prompt_dict[x].replace(".mid.mp3", "").split("_")[2:]
-        if "real" not in prompt_dict[x]
-        else prompt_dict[x].replace(".mid.mp3", "").split("_")[2:-1]
+    return dict(
+        condition_type=prompt_dict["condition_type"],
+        actual_genre=prompt_dict["track_fpath"].split("_")[0],
+        track_fpath=prompt_dict["track_fpath"]
     )
-    new_dict["type"] = prompt_dict["description"]
-    # Format the filepaths so we get the type of each audio file (generated/real, matching/wrong genre, clamp/noclamp)
-    new_dict["a"] = fmt("test_a")
-    new_dict["b"] = fmt("test_b")
-    # Keep the actual filepaths, which is useful for knowing how many responses we got per audio clip
-    new_dict["a_fpath"] = prompt_dict["test_a"]
-    new_dict["b_fpath"] = prompt_dict["test_b"]
-    return new_dict
 
 
 def format_rating(response_dict: dict) -> dict:
@@ -100,6 +84,7 @@ def format_rating(response_dict: dict) -> dict:
     answer_fmt = format_answer(answer)
     # Get some extra information
     extras = {
+        "correct": answer_fmt["predicted_genre"] == metadata_fmt["actual_genre"],  # if predicted genre == actual genre
         "response_id": coerce_type(response_dict["id"]),
         "participant_id": coerce_type(response_dict["participant_id"]),
         "time_taken": coerce_type(metadata["time_taken"])
@@ -131,10 +116,15 @@ def main(export_json: str = EXPORT_JSON):
 
         # Formatting demographic questions with numeric type, e.g. age, hours of music listening, etc.
         elif response["question"] in METADATA_NUMERIC_TYPES:
-            participant_numeric_metadatas[response["question"]].append(coerce_type(response["answer"]))
+            answer = coerce_type(response["answer"])
+            if response["question"] == "hours_of_daily_music_listening" and answer > 20:
+                response["answer"] = None  # again, a fucking undergrad thought it'd be funny to put 24
+            participant_numeric_metadatas[response["question"]].append(answer)
 
         # Formatting demographic questions with categorical type
         elif response["question"] in METADATA_CATEGORICAL_TYPES:
+            if response["answer"] not in ["male", "female", "non-binary"] and response["question"] == "gender":
+                response["answer"] = "not specified"  # this is because some fucking undergrad put "Drummer"
             participant_categoric_metadatas[response["question"]][response["answer"]] += 1
 
         # Formatting demographic questions with string type
@@ -160,17 +150,17 @@ def main(export_json: str = EXPORT_JSON):
     n_responses = len(all_answers)
     logger.debug(f"Obtained {n_participants} participant(s) with {n_responses} total responses")
     # Organise the number of responses according to condition
-    grped_by_condition = answers_df.groupby("type")["response_id"].size()
+    grped_by_condition = answers_df.groupby("condition_type")["response_id"].size()
     logger.debug(f"Mean responses per condition {grped_by_condition.mean():.3f}, SD {grped_by_condition.std():.3f}")
 
     # Create plots for similarity judgement
     logger.info("------SIMILARITY QUESTION------")
-    similarity_bp = plotting.BarPlotSubjectiveSimilarity(answers_df, use_toy_data=False)
-    similarity_bp.create_plot()
-    similarity_bp.save_fig(os.path.join(FIGURES_DIR, "barplot_similarity"))
-    # Dump CSV files as well
-    similarity_bp.df.to_csv(os.path.join(FIGURES_DIR, "similarity_norm.csv"))
-    similarity_bp.df_non_norm.to_csv(os.path.join(FIGURES_DIR, "similarity_nonorm.csv"))  # this is used for the table
+    heatmap = plotting.HeatmapSubjectiveAccuracy(answers_df)
+    heatmap.create_plot()
+    heatmap.save_fig(os.path.join(FIGURES_DIR, "heatmap_accuracy"))
+    for idx, ct in answers_df.groupby("condition_type"):
+        accuracy = (len(ct[ct["correct"] == True]) / len(ct)) * 100
+        logger.info(f"Condition {idx}, accuracy {accuracy:.3f}")
 
     # Create plots for quality judgement (Likert scales)
     logger.info("------QUALITY QUESTIONS------")
@@ -182,7 +172,8 @@ def main(export_json: str = EXPORT_JSON):
 
     # Log average and standard deviation for all numeric types
     for numeric_type, numeric_vals in participant_numeric_metadatas.items():
-        logger.debug(f"Question {numeric_type}: mean {np.mean(numeric_vals):.3f}, SD {np.std(numeric_vals):.3f}")
+        numeric_vals = np.array(numeric_vals, dtype=float)
+        logger.debug(f"Question {numeric_type}: mean {np.nanmean(numeric_vals):.3f}, SD {np.nanstd(numeric_vals):.3f}")
 
     # Log counts and proportions for all categorical types
     for numeric_type, numeric_vals in participant_categoric_metadatas.items():

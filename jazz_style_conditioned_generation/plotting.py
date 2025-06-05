@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from sklearn.metrics import confusion_matrix
 
 from jazz_style_conditioned_generation import utils
 
@@ -453,24 +454,11 @@ class BarPlotSubjectiveQuality(BasePlot):
 
     def _format_df(self, df: pd.DataFrame) -> pd.DataFrame:
         """Format the dataframe for `quality` questions (preference, diversity, is_ml)"""
-        kind_map = {"real": "Ground Truth", "_clamp": "Fine-tune/DPO-P", "_noclamp": "Fine-tune"}
-        quality_res = [
-            {
-                "kind": kind,
-                "preference": row[f"preference_{sord}"],
-                "diversity": row[f"diversity_{sord}"],
-                "is_ml": row[f"is_ml_{sord}"],
-                # "sord": sord
-            }
-            for _, row in df.iterrows()
-            for sord in ["a", "b"]
-            for suffix, kind in kind_map.items() if suffix in row[sord]
-        ]
-        assert len(quality_res) == len(df) * 2
+        kind_map = {"real": "Ground Truth", "clamp": "DPO-P", "noclamp": "No DPO-P"}
+        df["kind"] = df["condition_type"].map(kind_map)
         return (
-            pd.DataFrame(quality_res)
-            .melt(id_vars="kind")
-            .dropna()  # remove missing values: these happen occasionally if a participant only rates 1/2 performances
+            df.melt(id_vars="kind", value_vars=["fit", "preference", "diversity", "is_ml"])
+            .dropna()
             .reset_index(drop=True)
         )
 
@@ -480,7 +468,8 @@ class BarPlotSubjectiveQuality(BasePlot):
     def _format_ax(self):
         self.ax.set(
             xlabel="Question",
-            xticklabels=[r"Liking $\uparrow$", r"Diversity $\uparrow$", r"AI-Generated $\downarrow$"],
+            xticklabels=[r"Fit $\uparrow$", r"Liking $\uparrow$", r"Diversity $\uparrow$",
+                         r"AI-Generated $\downarrow$"],
             ylabel="Mean response",
             ylim=(0, 5.7)  # gives us a bit of headroom
         )
@@ -624,6 +613,52 @@ class BarPlotSubjectiveSimilarity(BasePlot):
             )
             ax_.grid(axis='x', zorder=0, **GRID_KWS)
         super()._format_ax()
+
+
+class HeatmapSubjectiveAccuracy(BasePlot):
+    HMAP_KWS = dict(
+        annot=True, cbar=False, square=True, linewidths=LINEWIDTH,
+        linestyle=LINESTYLE, linecolor=BLACK, cmap="rocket"
+    )
+    HMAP_TYPES = ["DPO-P", "No DPO-P", "Ground truth"]
+
+    def __init__(self, df: pd.DataFrame, **kwargs):
+        super().__init__(**kwargs)
+        mapper = {
+            "avantgardejazz": "Avant-Garde",
+            "straightaheadjazz": "Straight-Ahead",
+            "traditionalearlyjazz": "Traditional"
+        }
+        self.labels = sorted(df["actual_genre"].map(mapper).unique())
+        self.df = self._format_df(df)
+        self.fig, self.ax = plt.subplots(
+            nrows=1, ncols=len(self.df), sharex=True, sharey=False,
+            figsize=(WIDTH, WIDTH / 2.5)
+        )
+
+    def _format_df(self, df: pd.DataFrame):
+        all_cts = []
+        for idx, ct in df.groupby("condition_type"):
+            y_true = ct["actual_genre"].values
+            y_pred = ct["predicted_genre"].values
+            all_cts.append(confusion_matrix(y_true, y_pred))
+        return all_cts
+
+    def _create_plot(self):
+        for a, ct in zip(self.ax.flatten(), self.df):
+            sns.heatmap(data=ct, ax=a, **self.HMAP_KWS)
+
+    def _format_ax(self):
+        for g, ct_type in zip(self.ax.flatten(), self.HMAP_TYPES):
+            g.set(title=ct_type, xticklabels=self.labels, yticklabels=self.labels)
+            g.set_xticklabels(self.labels, rotation=90)
+            g.set_yticklabels(self.labels, rotation=0)
+        super()._format_ax()
+
+    def _format_fig(self) -> None:
+        self.fig.supylabel("True label")
+        self.fig.supxlabel("Predicted label")
+        super()._format_fig()
 
 
 if __name__ == "__main__":
