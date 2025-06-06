@@ -1,0 +1,50 @@
+experiment: pretraining-custom-tokenizer-fixed-preprocessing
+run: pretraining_customtok_10msmin_lineartime_moreaugment_linearwarmup10k_1e4_batch4_1024seq_12l8h768d3072ff
+batch_size: 4
+epochs: 100
+full_validate_after_n_epochs: 350
+max_seq_len: 1024
+n_full_validation_tracks: 0
+train_dataset_cfg:
+  do_augmentation: true
+  do_conditioning: true
+  pitch_augment_range: [ -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6 ]
+  duration_augment_range: [ 0.85, 0.875, 0.9, 0.925, 0.95, 0.975, 1.0, 1.025, 1.05, 1.075, 1.1, 1.125, 1.15 ]
+  velocity_augment_range: [ -12, -8, -4, 0, 4, 8, 12 ]
+test_dataset_cfg:
+  do_augmentation: false
+  do_conditioning: true
+model_cfg:
+  model_type: music-transformer
+  clip_grad_norm: 1.0
+  model_kws:
+    rpr: true
+    n_layers: 12
+    num_heads: 8
+    d_model: 768
+    dim_feedforward: 3072
+optimizer_cfg:
+  optimizer_type: adam
+  optimizer_kws:
+    lr: 1.0e-4
+scheduler_cfg:
+  scheduler_type: linear
+  do_early_stopping: false
+  scheduler_kws:
+    num_warmup_steps: 10000
+checkpoint_cfg:
+  save_checkpoints: true
+  load_checkpoints: true
+  checkpoint_after_n_epochs: 10
+  # checkpoint_dir: /rds/user/hwc31/hpc-work/jazz-style-conditioned-generation/checkpoints
+tokenizer_cfg:
+  tokenizer_str: custom-tsd
+  do_training: false
+  tokenizer_kws:
+    time_range: [ 0.01, 1.0 ]
+    time_factor: 1.0
+generate_cfg:
+  do_generation: false
+mlflow_cfg:
+  use: true
+  port: 5000
