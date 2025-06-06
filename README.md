@@ -57,7 +57,8 @@ pip install clamp3
 ### Download data and checkpoints
 
 Data and checkpoints are required regardless of if you want to run inference or train from scratch. These can be
-downloaded from [our Zenodo archive]() as a single `.zip` file. The folder structure of the `.zip` is identical to this
+downloaded from [our Zenodo archive](https://doi.org/10.5281/zenodo.15610452) as a single `.zip` file. The folder
+structure of the `.zip` is identical to this
 repository, so if you unzip it to the root directory (`jazz-style-conditioned-generation`), you should end up with
 something like the following:
 
