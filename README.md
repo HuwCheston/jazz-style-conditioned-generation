@@ -19,8 +19,9 @@ Full Python dependencies can be found inside the [
 - [Installation](#installation)
 - [Inference](#inference)
 - [Tests](#tests)
-- [License](#license)
 - [Citation](#citation)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
 
 ## Installation
 
@@ -142,6 +143,9 @@ We provide a few additional flags that can be used to control aspects of the gen
   metadata already assigned to a track. When `False`, we will not use any conditioning tokens.
 
 </details>
+
+The condition tokens that can be used during inference are found inside
+`jazz_style_conditioned_generation/data/conditions.py`.
 
 By default, generation will occur using a random primer MIDI file from the held out dataset. 128 primer tokens will be
 used, and generation will occur until the sequence lasts for 1024 tokens or a `End` token is sent by the model,
