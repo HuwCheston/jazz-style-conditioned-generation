@@ -1,11 +1,11 @@
 # Style-Conditioned Symbolic Jazz Generation
 [![Tests](https://github.com/HuwCheston/jazz-style-conditioned-generation/actions/workflows/tests.yml/badge.svg)](https://github.com/HuwCheston/jazz-style-conditioned-generation/actions/workflows/tests.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15610452.svg)](https://doi.org/10.5281/zenodo.15610452)
-[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC_BY--NC_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Listen to example generations!](https://img.shields.io/badge/Listen%20to%20example%20generations!-8A2BE2)](https://huwcheston.github.io/jazz-style-conditioned-generation/index.html)
 
 This repository accompanies our paper "Performer and Subgenre Conditioned Generation of Jazz Piano Music". For more
-information,check out
+information, check out
 the [interactive web application.](https://huwcheston.github.io/jazz-style-conditioned-generation/index.html)
 
 The code in this repository was developed and tested using the following configuration:
