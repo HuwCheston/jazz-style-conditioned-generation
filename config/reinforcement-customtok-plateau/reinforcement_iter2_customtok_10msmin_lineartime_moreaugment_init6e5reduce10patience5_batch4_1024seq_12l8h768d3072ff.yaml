@@ -1,0 +1,56 @@
+experiment: reinforcement-customtok-plateau
+run: reinforcement_iter2_customtok_10msmin_lineartime_moreaugment_init6e5reduce10patience5_batch4_1024seq_12l8h768d3072ff
+batch_size: 4
+epochs: 10000
+full_validate_after_n_epochs: 1000000
+max_seq_len: 1024
+n_full_validation_tracks: 0
+train_dataset_cfg:
+  do_augmentation: true
+  do_conditioning: true
+  pitch_augment_range: [ -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6 ]
+  duration_augment_range: [ 0.85, 0.875, 0.9, 0.925, 0.95, 0.975, 1.0, 1.025, 1.05, 1.075, 1.1, 1.125, 1.15 ]
+  velocity_augment_range: [ -12, -8, -4, 0, 4, 8, 12 ]
+test_dataset_cfg:
+  do_augmentation: false
+  do_conditioning: true
+model_cfg:
+  model_type: music-transformer
+  clip_grad_norm: 1.0
+  model_kws:
+    rpr: true
+    n_layers: 12
+    num_heads: 8
+    d_model: 768
+    dim_feedforward: 3072
+optimizer_cfg:
+  optimizer_type: adam
+  optimizer_kws:
+    lr: 2.0e-5
+scheduler_cfg:
+  scheduler_type: null
+checkpoint_cfg:
+  save_checkpoints: true
+  load_checkpoints: true
+  checkpoint_after_n_epochs: 20
+  # checkpoint_dir: /rds/user/hwc31/hpc-work/jazz-style-conditioned-generation/checkpoints
+tokenizer_cfg:
+  tokenizer_str: custom-tsd
+  do_training: false
+  tokenizer_kws:
+    time_range: [ 0.01, 1.0 ]
+    time_factor: 1.0
+generate_cfg:
+  do_generation: false
+reinforce_cfg:
+  generation_keep_proportion: 0.1
+  beta: 0.1
+  lambda: 10
+  current_iteration: 2
+  n_test_tracks: 10
+  policy_model_checkpoint: reinforcement-customtok-plateau/reinforcement_iter1_customtok_10msmin_lineartime_moreaugment_init6e5reduce10patience5_batch4_1024seq_12l8h768d3072ff/reinforcement_iteration_1.pth
+  reference_model_checkpoint: finetuning-customtok-plateau/finetuning_customtok_10msmin_lineartime_moreaugment_init6e5reduce10patience5_batch4_1024seq_12l8h768d3072ff/validation_best.pth
+  generation_output_dir: reinforcement-customtok-plateau/reinforcement_iter2_customtok_10msmin_lineartime_moreaugment_init6e5reduce10patience5_batch4_1024seq_12l8h768d3072ff
+mlflow_cfg:
+  use: true
+  port: 5000
