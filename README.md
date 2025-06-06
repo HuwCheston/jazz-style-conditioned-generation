@@ -15,7 +15,7 @@ The code in this repository was developed and tested using the following configu
 - CUDA 12.2
 
 Full Python dependencies can be found inside the [
-`requirements.txt` file](https://github.com/HuwCheston/deep-pianist-identification/blob/main/requirements.txt).
+`requirements.txt` file](https://github.com/HuwCheston/jazz-style-conditioned-generation/blob/main/requirements.txt).
 
 ## Contents:
 
