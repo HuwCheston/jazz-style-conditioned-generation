@@ -53,5 +53,5 @@ reinforce_cfg:
   reference_model_checkpoint: finetuning-customtok-plateau/finetuning_customtok_10msmin_lineartime_moreaugment_init6e5reduce10patience5_batch4_1024seq_12l8h768d3072ff/validation_best.pth
   generation_output_dir: reinforcement-customtok-plateau/reinforcement_iter3_customtok_10msmin_lineartime_moreaugment_init6e5reduce10patience5_batch4_1024seq_12l8h768d3072ff
 mlflow_cfg:
-  use: true
-  port: 5000
+  use: false
+  # port: 5000

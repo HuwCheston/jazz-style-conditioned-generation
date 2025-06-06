@@ -52,5 +52,5 @@ tokenizer_cfg:
 generate_cfg:
   do_generation: false
 mlflow_cfg:
-  use: true
-  port: 5000
+  use: false
+  # port: 5000
