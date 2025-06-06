@@ -33,9 +33,13 @@
         cherry-picked. We also include several ground truth examples from the held-out test dataset.</p>
     <p>All generations are <b>unprompted</b>, meaning the model only sees the associated <em>Genre</em> and
         <em>Start</em> tokens before generation begins. Examples are included both with and without the DPO-P loss.</p>
+    <p>Note that fine-tuning refers to training the model on the <em>entire</em> jazz dataset with conditioning tokens,
+        as opposed to training only on a specific genre (just Avant-Garde Jazz, etc.).
+    </p>
     <p>All examples are rendered using the <a
             href="https://www.spitfireaudio.com/bbc-symphony-orchestra-piano-professional">BBC Symphony Orchestra
-        Piano</a> library from Spitfire Audio.</p>
+        Piano</a> library from Spitfire Audio. Note that examples are constrained to 1024 tokens or 15 seconds,
+        whichever occurs first.</p>
     <table id="table-examples">
         <!--        <tr>-->
         <!--            <th>Description</th>-->
