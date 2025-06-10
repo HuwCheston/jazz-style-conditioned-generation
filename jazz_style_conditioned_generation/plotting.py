@@ -450,7 +450,7 @@ class BarPlotSubjectiveQuality(BasePlot):
     def __init__(self, df: pd.DataFrame, **kwargs):
         super().__init__(**kwargs)
         self.df = self._format_df(df)
-        self.fig, self.ax = plt.subplots(1, 1, figsize=(WIDTH // 2, WIDTH // 2))
+        self.fig, self.ax = plt.subplots(1, 1, figsize=(WIDTH // 2, WIDTH / 3))
 
     def _format_df(self, df: pd.DataFrame) -> pd.DataFrame:
         """Format the dataframe for `quality` questions (preference, diversity, is_ml)"""
@@ -620,17 +620,17 @@ class HeatmapSubjectiveAccuracy(BasePlot):
         annot=True, cbar=False, square=True, linewidths=LINEWIDTH,
         linestyle=LINESTYLE, linecolor=BLACK, cmap="rocket"
     )
-    HMAP_TYPES = ["DPO-P", "No DPO-P", "Ground truth"]
+    HMAP_TYPES = ["Ground truth", "DPO-P", "No DPO-P"]
 
     def __init__(self, df: pd.DataFrame, **kwargs):
         super().__init__(**kwargs)
-        mapper = {
+        self.mapper = {
             "avantgardejazz": "Avant-Garde",
             "straightaheadjazz": "Straight-Ahead",
             "traditionalearlyjazz": "Traditional"
         }
-        self.labels = sorted(df["actual_genre"].map(mapper).unique())
-        self.df = self._format_df(df)
+        self.labels = sorted(df["actual_genre"].map(self.mapper).unique())
+        self.df, self.accs = self._format_df(df)
         self.fig, self.ax = plt.subplots(
             nrows=1, ncols=len(self.df), sharex=True, sharey=False,
             figsize=(WIDTH, WIDTH / 2.5)
@@ -638,19 +638,22 @@ class HeatmapSubjectiveAccuracy(BasePlot):
 
     def _format_df(self, df: pd.DataFrame):
         all_cts = []
-        for idx, ct in df.groupby("condition_type"):
+        all_accs = []
+        for idx, ct in df.groupby("condition_type", sort=False):
             y_true = ct["actual_genre"].values
             y_pred = ct["predicted_genre"].values
-            all_cts.append(confusion_matrix(y_true, y_pred))
-        return all_cts
+            all_cts.append(confusion_matrix(y_true, y_pred, labels=sorted(self.mapper.keys())))
+            all_accs.append((y_true == y_pred).mean() * 100)
+        return all_cts, all_accs
 
     def _create_plot(self):
         for a, ct in zip(self.ax.flatten(), self.df):
             sns.heatmap(data=ct, ax=a, **self.HMAP_KWS)
 
     def _format_ax(self):
-        for g, ct_type in zip(self.ax.flatten(), self.HMAP_TYPES):
-            g.set(title=ct_type, xticklabels=self.labels, yticklabels=self.labels)
+        for g, ct_type, acc in zip(self.ax.flatten(), self.HMAP_TYPES, self.accs):
+            title = f"{ct_type}\nAccuracy: {round(acc, 1)}%"
+            g.set(title=title, xticklabels=self.labels, yticklabels=self.labels)
             g.set_xticklabels(self.labels, rotation=90)
             g.set_yticklabels(self.labels, rotation=0)
         super()._format_ax()

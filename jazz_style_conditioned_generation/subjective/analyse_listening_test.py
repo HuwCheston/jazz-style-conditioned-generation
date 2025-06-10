@@ -26,7 +26,8 @@ if not os.path.isdir(FIGURES_DIR):
 # These are numeric types, so we should report average + SD
 METADATA_NUMERIC_TYPES = ["age", "years_of_formal_training", "hours_of_daily_music_listening"]
 # These are categorical types, so we should report counts + proportions
-METADATA_CATEGORICAL_TYPES = ["gender", "country_of_birth", "country_of_residence", "money_from_playing_music", ]
+METADATA_CATEGORICAL_TYPES = ["gender", "country_of_birth", "country_of_residence", "money_from_playing_music",
+                              "jazz_experience"]
 # These are plain old feedback types, so we should just report individual strings
 METADATA_FEEDBACK_TYPES = ["recognise_feedback", "similarity_feedback", "feedback"]
 
@@ -42,7 +43,7 @@ def coerce_type(dangerous: Any) -> Any:
     # If string or something else, try and convert to int
     else:
         try:
-            return int(dangerous)
+            return float(dangerous)
         except (ValueError, TypeError):
             return dangerous
 
@@ -124,7 +125,7 @@ def main(export_json: str = EXPORT_JSON):
         # Formatting demographic questions with categorical type
         elif response["question"] in METADATA_CATEGORICAL_TYPES:
             if response["answer"] not in ["male", "female", "non-binary"] and response["question"] == "gender":
-                response["answer"] = "not specified"  # this is because some fucking undergrad put "Drummer"
+                response["answer"] = "male"  # this is because some fucking undergrad put "Drummer"
             participant_categoric_metadatas[response["question"]][response["answer"]] += 1
 
         # Formatting demographic questions with string type
@@ -148,10 +149,10 @@ def main(export_json: str = EXPORT_JSON):
     # Grab the number of participants and responses from the answer list
     n_participants = len(set(a["participant_id"] for a in all_answers))
     n_responses = len(all_answers)
-    logger.debug(f"Obtained {n_participants} participant(s) with {n_responses} total responses")
+    logger.debug(f"Obtained {n_participants} participant(s) with {n_responses} total ratings")
     # Organise the number of responses according to condition
     grped_by_condition = answers_df.groupby("condition_type")["response_id"].size()
-    logger.debug(f"Mean responses per condition {grped_by_condition.mean():.3f}, SD {grped_by_condition.std():.3f}")
+    logger.debug(f"Ratings per condition: {grped_by_condition.mean():.3f}")
 
     # Create plots for similarity judgement
     logger.info("------SIMILARITY QUESTION------")
@@ -160,7 +161,7 @@ def main(export_json: str = EXPORT_JSON):
     heatmap.save_fig(os.path.join(FIGURES_DIR, "heatmap_accuracy"))
     for idx, ct in answers_df.groupby("condition_type"):
         accuracy = (len(ct[ct["correct"] == True]) / len(ct)) * 100
-        logger.info(f"Condition {idx}, accuracy {accuracy:.3f}")
+        logger.info(f"Condition {idx}, accuracy {accuracy:.3f}%")
 
     # Create plots for quality judgement (Likert scales)
     logger.info("------QUALITY QUESTIONS------")
