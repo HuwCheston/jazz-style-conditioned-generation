@@ -27,9 +27,11 @@ WHITE = '#FFFFFF'
 RED = '#FF0000'
 GREEN = '#008000'
 BLUE = '#0000FF'
+CYAN = '#00FFFF'
+MAGENTA = '#FF00FF'
 YELLOW = '#FFFF00'
 RGB = [RED, GREEN, BLUE]
-CONCEPT_COLOR_MAPPING = {"Melody": "#ff0000ff", "Harmony": "#00ff00ff", "Rhythm": "#0000ffff", "Dynamics": "#ff9900ff"}
+CMY = [CYAN, MAGENTA, YELLOW]
 
 LINEWIDTH = 2
 LINESTYLE = '-'
@@ -445,36 +447,54 @@ class BarPlotSubjectiveQuality(BasePlot):
         ),
         capsize=0.2,
         n_boot=N_BOOT,
+        x="variable",
+        y="value",
     )
 
     def __init__(self, df: pd.DataFrame, **kwargs):
         super().__init__(**kwargs)
-        self.df = self._format_df(df)
-        self.fig, self.ax = plt.subplots(1, 1, figsize=(WIDTH // 2, WIDTH / 3))
+
+        self.df_cond, self.df_genre = self._format_df(df)
+        self.fig, self.ax = plt.subplots(1, 2, figsize=(WIDTH, WIDTH / 3))
 
     def _format_df(self, df: pd.DataFrame) -> pd.DataFrame:
         """Format the dataframe for `quality` questions (preference, diversity, is_ml)"""
         kind_map = {"real": "Ground Truth", "clamp": "DPO-P", "noclamp": "No DPO-P"}
+        gen_map = {
+            "avantgardejazz": "Avant-Garde",
+            "straightaheadjazz": "Straight-Ahead",
+            "traditionalearlyjazz": "Traditional"
+        }
         df["kind"] = df["condition_type"].map(kind_map)
-        return (
+        df["genre"] = df["actual_genre"].map(gen_map)
+        by_condition = (
             df.melt(id_vars="kind", value_vars=["fit", "preference", "diversity", "is_ml"])
             .dropna()
             .reset_index(drop=True)
         )
+        by_genre = (
+            df.melt(id_vars="genre", value_vars=["fit", "preference", "diversity", "is_ml"])
+            .dropna()
+            .reset_index(drop=True)
+        )
+        return by_condition, by_genre
 
     def _create_plot(self):
-        return sns.barplot(data=self.df, x="variable", y="value", hue="kind", ax=self.ax, **self.BAR_KWS)
+        _ = sns.barplot(data=self.df_cond, hue="kind", ax=self.ax[0], palette=RGB, **self.BAR_KWS)
+        _ = sns.barplot(data=self.df_genre, hue="genre", ax=self.ax[1], palette=CMY, **self.BAR_KWS)
 
     def _format_ax(self):
-        self.ax.set(
-            xlabel="Question",
-            xticklabels=[r"Fit $\uparrow$", r"Liking $\uparrow$", r"Diversity $\uparrow$",
-                         r"AI-Generated $\downarrow$"],
-            ylabel="Mean response",
-            ylim=(0, 5.7)  # gives us a bit of headroom
-        )
-        self.ax.grid(axis="y", zorder=0, **GRID_KWS)
-        sns.move_legend(self.ax, title="", loc="upper right", **LEGEND_KWS)
+        for ax, tit in zip(self.ax.flatten(), ["Condition", "Genre"]):
+            ax.set(
+                title=tit,
+                xlabel="Question",
+                xticklabels=[r"Fit $\uparrow$", r"Liking $\uparrow$", r"Creativity $\uparrow$",
+                             r"AI-Generated $\downarrow$"],
+                ylabel="Mean response",
+                ylim=(0, 5.7)  # gives us a bit of headroom
+            )
+            ax.grid(axis="y", zorder=0, **GRID_KWS)
+            sns.move_legend(ax, title="", loc="upper right", **LEGEND_KWS)
         super()._format_ax()
 
 
@@ -618,9 +638,10 @@ class BarPlotSubjectiveSimilarity(BasePlot):
 class HeatmapSubjectiveAccuracy(BasePlot):
     HMAP_KWS = dict(
         annot=True, cbar=False, square=True, linewidths=LINEWIDTH,
-        linestyle=LINESTYLE, linecolor=BLACK, cmap="rocket"
+        linestyle=LINESTYLE, linecolor=BLACK, cmap="rocket",
+        vmin=0, vmax=15
     )
-    HMAP_TYPES = ["Ground truth", "DPO-P", "No DPO-P"]
+    HMAP_TYPES = ["DPO-P", "No DPO-P", "Ground truth"]
 
     def __init__(self, df: pd.DataFrame, **kwargs):
         super().__init__(**kwargs)
@@ -631,15 +652,13 @@ class HeatmapSubjectiveAccuracy(BasePlot):
         }
         self.labels = sorted(df["actual_genre"].map(self.mapper).unique())
         self.df, self.accs = self._format_df(df)
-        self.fig, self.ax = plt.subplots(
-            nrows=1, ncols=len(self.df), sharex=True, sharey=False,
-            figsize=(WIDTH, WIDTH / 2.5)
-        )
+        self.fig, self.ax = plt.subplots(nrows=1, ncols=len(self.df), sharex=True, sharey=False,
+                                         figsize=(WIDTH, WIDTH / 2.5))
 
     def _format_df(self, df: pd.DataFrame):
         all_cts = []
         all_accs = []
-        for idx, ct in df.groupby("condition_type", sort=False):
+        for idx, ct in df.groupby("condition_type", sort=True):
             y_true = ct["actual_genre"].values
             y_pred = ct["predicted_genre"].values
             all_cts.append(confusion_matrix(y_true, y_pred, labels=sorted(self.mapper.keys())))

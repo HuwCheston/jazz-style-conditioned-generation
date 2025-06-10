@@ -30,6 +30,7 @@ METADATA_CATEGORICAL_TYPES = ["gender", "country_of_birth", "country_of_residenc
                               "jazz_experience"]
 # These are plain old feedback types, so we should just report individual strings
 METADATA_FEEDBACK_TYPES = ["recognise_feedback", "similarity_feedback", "feedback"]
+QUALITY_QUESTIONS = ["fit", "preference", "diversity", "is_ml"]
 
 
 def coerce_type(dangerous: Any) -> Any:
@@ -124,6 +125,9 @@ def main(export_json: str = EXPORT_JSON):
 
         # Formatting demographic questions with categorical type
         elif response["question"] in METADATA_CATEGORICAL_TYPES:
+            # One participant accidentally answered a question twice so skip over their "null" response
+            if response["answer"] == "null":
+                continue
             if response["answer"] not in ["male", "female", "non-binary"] and response["question"] == "gender":
                 response["answer"] = "male"  # this is because some fucking undergrad put "Drummer"
             participant_categoric_metadatas[response["question"]][response["answer"]] += 1
@@ -168,13 +172,24 @@ def main(export_json: str = EXPORT_JSON):
     quality_bp = plotting.BarPlotSubjectiveQuality(answers_df)
     quality_bp.create_plot()
     quality_bp.save_fig(os.path.join(FIGURES_DIR, "barplot_quality"))
+    # Log responses to quality questions across conditions
+    for idx, grp in answers_df.groupby("condition_type", sort=False):
+        for quality_ques in QUALITY_QUESTIONS:
+            vals = grp[quality_ques]
+            logger.info(f"Condition {idx}, {quality_ques}, mean {vals.mean():.3f}, SD {vals.std():.3f}")
+    # Do the same across genres
+    for idx, genre in answers_df.groupby("actual_genre", sort=False):
+        for quality_ques in QUALITY_QUESTIONS:
+            vals = genre[quality_ques]
+            logger.info(f"Genre {idx}, {quality_ques}, mean {vals.mean():.3f}, SD {vals.std():.3f}")
 
     logger.info("------DEMOGRAPHIC QUESTIONS------")
 
     # Log average and standard deviation for all numeric types
     for numeric_type, numeric_vals in participant_numeric_metadatas.items():
         numeric_vals = np.array(numeric_vals, dtype=float)
-        logger.debug(f"Question {numeric_type}: mean {np.nanmean(numeric_vals):.3f}, SD {np.nanstd(numeric_vals):.3f}")
+        logger.debug(
+            f"Question {numeric_type}: mean {np.nanmean(numeric_vals):.3f}, median {np.nanmedian(numeric_vals):.3f}, SD {np.nanstd(numeric_vals):.3f}")
 
     # Log counts and proportions for all categorical types
     for numeric_type, numeric_vals in participant_categoric_metadatas.items():
