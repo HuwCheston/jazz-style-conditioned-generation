@@ -157,6 +157,8 @@ def main(export_json: str = EXPORT_JSON):
     # Organise the number of responses according to condition
     grped_by_condition = answers_df.groupby("condition_type")["response_id"].size()
     logger.debug(f"Ratings per condition: {grped_by_condition.mean():.3f}")
+    overall_accuracy = (len(answers_df[answers_df["correct"] == True]) / len(answers_df)) * 100
+    logger.info(f"Overall accuracy: {overall_accuracy:.3f}%")
 
     # Create plots for similarity judgement
     logger.info("------SIMILARITY QUESTION------")

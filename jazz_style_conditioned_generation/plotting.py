@@ -455,7 +455,7 @@ class BarPlotSubjectiveQuality(BasePlot):
         super().__init__(**kwargs)
 
         self.df_cond, self.df_genre = self._format_df(df)
-        self.fig, self.ax = plt.subplots(1, 2, figsize=(WIDTH, WIDTH / 3))
+        self.fig, self.ax = plt.subplots(1, 2, figsize=(WIDTH, WIDTH / 3), sharex=True, sharey=True)
 
     def _format_df(self, df: pd.DataFrame) -> pd.DataFrame:
         """Format the dataframe for `quality` questions (preference, diversity, is_ml)"""
@@ -465,18 +465,23 @@ class BarPlotSubjectiveQuality(BasePlot):
             "straightaheadjazz": "Straight-Ahead",
             "traditionalearlyjazz": "Traditional"
         }
+        value_map = {
+            "fit": r"Fit $\uparrow$",
+            "preference": r"Liking $\uparrow$",
+            "diversity": r"Creativity $\uparrow$",
+            "is_ml": r"AI-Generated $\downarrow$"
+        }
         df["kind"] = df["condition_type"].map(kind_map)
         df["genre"] = df["actual_genre"].map(gen_map)
-        by_condition = (
-            df.melt(id_vars="kind", value_vars=["fit", "preference", "diversity", "is_ml"])
-            .dropna()
-            .reset_index(drop=True)
-        )
-        by_genre = (
-            df.melt(id_vars="genre", value_vars=["fit", "preference", "diversity", "is_ml"])
-            .dropna()
-            .reset_index(drop=True)
-        )
+
+        by_condition = df.melt(id_vars="kind", value_vars=["fit", "preference", "diversity", "is_ml"]).dropna()
+        by_condition["variable"] = by_condition["variable"].map(value_map)
+        by_condition["idx"] = by_condition["kind"].map({'DPO-P': 0, 'No DPO-P': 1, 'Ground Truth': 2})
+        by_condition = by_condition.sort_values(by=["idx", "variable"]).reset_index(drop=True).drop(columns="idx")
+
+        by_genre = df.melt(id_vars="genre", value_vars=["fit", "preference", "diversity", "is_ml"]).dropna()
+        by_genre["variable"] = by_genre["variable"].map(value_map)
+        by_genre = by_genre.sort_values(by=["genre", "variable"]).reset_index(drop=True)
         return by_condition, by_genre
 
     def _create_plot(self):
@@ -485,17 +490,16 @@ class BarPlotSubjectiveQuality(BasePlot):
 
     def _format_ax(self):
         for ax, tit in zip(self.ax.flatten(), ["Condition", "Genre"]):
-            ax.set(
-                title=tit,
-                xlabel="Question",
-                xticklabels=[r"Fit $\uparrow$", r"Liking $\uparrow$", r"Creativity $\uparrow$",
-                             r"AI-Generated $\downarrow$"],
-                ylabel="Mean response",
-                ylim=(0, 5.7)  # gives us a bit of headroom
-            )
+            ax.set(title=tit, ylim=(0, 5.7), xlabel="", ylabel="")
             ax.grid(axis="y", zorder=0, **GRID_KWS)
             sns.move_legend(ax, title="", loc="upper right", **LEGEND_KWS)
         super()._format_ax()
+
+    def _format_fig(self) -> None:
+        self.fig.supxlabel("Question")
+        self.fig.supylabel("Mean response")
+        super()._format_fig()
+        self.fig.subplots_adjust(bottom=0.125)
 
 
 class BarPlotSubjectiveSimilarity(BasePlot):
