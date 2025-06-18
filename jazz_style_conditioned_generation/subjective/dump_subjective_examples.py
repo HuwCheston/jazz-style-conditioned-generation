@@ -36,6 +36,9 @@ CONDITION_TOKENS = [
     "Avant-Garde Jazz",
     "Straight-Ahead Jazz",
     "Traditional & Early Jazz",
+    "Bill Evans",
+    "Oscar Peterson",
+    "Keith Jarrett",
 ]
 TRAIN_TRACKS = sorted(read_tracks_for_splits("train"))
 TEST_TRACKS = read_tracks_for_splits("test")
@@ -261,15 +264,22 @@ def main(generation_dir_clamp: str, generation_dir_noclamp: str) -> None:
             # Iterate over all files for the condition with a counter
             for fnum, (fpath, sim) in enumerate(zip(fpaths, sims)):
                 # Get the output path for saving this MIDI
-                outpath = os.path.join(EXAMPLES_DIR, f"{tok_fmt}_{str(fnum).zfill(3)}_{condition_type}.mid")
-                # Convert the MIDI to a score and truncate to 1024 tokens/15 seconds duration
-                sc = process_midi(fpath)
-                # Load up the metadata
-                meta_read = process_metadata(fpath, condition_token, condition_type)
-                meta_read["similarity"] = sim  # add in the cosine similarity value here
+                outpath_mid = os.path.join(EXAMPLES_DIR, f"{tok_fmt}_{str(fnum).zfill(3)}_{condition_type}.mid")
+                outpath_js = outpath_mid.replace(".mid", ".json")
                 # Write the metadata and dump the score
-                utils.write_json(meta_read, outpath.replace(".mid", ".json"))
-                sc.dump_midi(outpath)
+                if not os.path.isfile(outpath_js):
+                    # Load up the metadata
+                    meta_read = process_metadata(fpath, condition_token, condition_type)
+                    meta_read["similarity"] = sim  # add in the cosine similarity value here
+                    utils.write_json(meta_read, outpath_js)
+                else:
+                    logger.warning(f"File {outpath_js} exists, skipping!")
+                if not os.path.isfile(outpath_mid):
+                    # Convert the MIDI to a score and truncate to 1024 tokens/15 seconds duration
+                    sc = process_midi(fpath)
+                    sc.dump_midi(outpath_mid)
+                else:
+                    logger.warning(f"File {outpath_mid} exists, skipping!")
 
 
 if __name__ == "__main__":
