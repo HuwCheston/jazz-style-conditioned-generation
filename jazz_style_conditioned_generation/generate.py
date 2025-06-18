@@ -148,9 +148,11 @@ class GenerateModule(TrainingModule):
             random.seed(int(utils.time()))  # ensures a new random track every run
             self.primer_file = random.choices(self.track_splits["test"], k=1)[0]
         utils.validate_paths([self.primer_file], expected_extension=".mid")
+        self.test_loader = self.get_test_loader()
 
+    def get_test_loader(self):
         # Create a dataloader solely with only our primer file
-        self.test_loader = DataLoader(
+        return DataLoader(
             GenerateDataset(
                 tokenizer=self.tokenizer,
                 files_paths=[self.primer_file],
