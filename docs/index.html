@@ -25,6 +25,7 @@
     </p>
     <ul>
         <li><a href="#examples">Subgenre + Pianist Examples</a></li>
+        <li><a href="#koln">The Jazz Transformer at the Köln Concert</a></li>
         <li><a href="#license">License</a></li>
         <li><a href="#acknowledgements">Acknowledgements</a></li>
     </ul>
@@ -807,6 +808,99 @@
         </tr>
         </tbody>
     </table>
+    <h2 id="koln">The Jazz Transformer at the Köln Concert</h2>
+    <p>
+        These examples show cherry-picked generations for different pianists. The prompt was the associated
+        <em>Pianist</em> token, followed by the opening seconds of Keith Jarrett's famous <a
+            href="https://en.wikipedia.org/wiki/The_K%C3%B6ln_Concert">Köln Concert</a>, which is out of distribution
+        for our entire dataset.
+    </p>
+    <p>
+        These examples are generated using the <em>fine-tuned model only.</em> We allow generations up to the full 1024
+        tokens, or until the model sends an <em>End</em> token.
+    </p>
+    <p>
+        You can listen to the prompt here:
+    </p>
+    <p>
+        <audio controls>
+            <source src="assets/koln/prompt.mp3" type="audio/wav">
+        </audio>
+    </p>
+    <table>
+        <thead>
+        <tr class="section-header" onclick="toggleSection('section-koln')">
+            <th colspan="2">The Jazz Transformer at the Köln Concert ▼</th>
+        </tr>
+        </thead>
+        <tbody class="section-body" id="section-koln" style="display: none;">
+        <tr>
+            <td><span>Abdullah Ibrahim</span></td>
+            <td>
+                <audio controls>
+                    <source src="assets/koln/koln_abdullahibrahim_000.mid.mp3" type="audio/wav">
+                </audio>
+            </td>
+        </tr>
+        <tr>
+            <td><span>Art Tatum</span></td>
+            <td>
+                <audio controls>
+                    <source src="assets/koln/koln_arttatum_007.mid.mp3" type="audio/wav">
+                </audio>
+            </td>
+        </tr>
+        <tr>
+            <td><span>Bill Evans</span></td>
+            <td>
+                <audio controls>
+                    <source src="assets/koln/koln_billevans_009.mid.mp3" type="audio/wav">
+                </audio>
+            </td>
+        </tr>
+        <tr>
+            <td><span>Brad Mehldau</span></td>
+            <td>
+                <audio controls>
+                    <source src="assets/koln/koln_bradmehldau_006.mid.mp3" type="audio/wav">
+                </audio>
+            </td>
+        </tr>
+        <tr>
+            <td><span>Chick Corea</span></td>
+            <td>
+                <audio controls>
+                    <source src="assets/koln/koln_chickcorea_008.mid.mp3" type="audio/wav">
+                </audio>
+            </td>
+        </tr>
+        <tr>
+            <td><span>Oscar Peterson</span></td>
+            <td>
+                <audio controls>
+                    <source src="assets/koln/koln_oscarpeterson_003.mid.mp3" type="audio/wav">
+                </audio>
+            </td>
+        </tr>
+        <tr>
+            <td><span>Teddy Wilson</span></td>
+            <td>
+                <audio controls>
+                    <source src="assets/koln/koln_teddywilson_001.mid.mp3" type="audio/wav">
+                </audio>
+            </td>
+        </tr>
+        <tr>
+            <td><span>Thelonious Monk</span></td>
+            <td>
+                <audio controls>
+                    <source src="assets/koln/koln_theloniousmonk_008.mid.mp3" type="audio/wav">
+                </audio>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
     <h2 id="license">License</h2>
     <span>Our work is licensed under a <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC-BY-NC-SA-4.0 license</a>. Under the terms of this license, any performances created using our model <em>cannot</em> be used for commercial purposes.</span>
 
